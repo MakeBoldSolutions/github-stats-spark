@@ -3,12 +3,23 @@ import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 
 export const repositoryRoot = fileURLToPath(new URL("../../", import.meta.url));
-export const outputDir = path.resolve(repositoryRoot, process.env.SPARK_BUILD_DIR || "docs");
-const allowed = [path.join(repositoryRoot, "docs"), path.join(repositoryRoot, ".validation", "site")];
-if (!allowed.includes(outputDir)) throw new Error("SPARK_BUILD_DIR must be docs or .validation/site");
+export const outputDir = path.resolve(
+  repositoryRoot,
+  process.env.SPARK_BUILD_DIR || "docs",
+);
+const allowed = [
+  path.join(repositoryRoot, "docs"),
+  path.join(repositoryRoot, ".validation", "site"),
+];
+if (!allowed.includes(outputDir))
+  throw new Error("SPARK_BUILD_DIR must be docs or .validation/site");
 
 export function clean() {
-  for (const directory of [outputDir, path.join(repositoryRoot, "frontend", "dist"), path.join(repositoryRoot, "frontend", ".vite")]) {
+  for (const directory of [
+    outputDir,
+    path.join(repositoryRoot, "frontend", "dist"),
+    path.join(repositoryRoot, "frontend", ".vite"),
+  ]) {
     fs.rmSync(directory, { recursive: true, force: true });
   }
 }

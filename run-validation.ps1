@@ -4,10 +4,10 @@
 Run app validation without changing the published docs directory.
 #>
 [CmdletBinding()]
-param([switch]$Lighthouse)
+param([switch]$Lighthouse, [switch]$Browser, [string]$PythonExecutable)
 
 $ErrorActionPreference = 'Stop'
-$python = Join-Path $PSScriptRoot '.venv/Scripts/python.exe'
+$python = if ($PythonExecutable) { $PythonExecutable } else { Join-Path $PSScriptRoot '.venv/Scripts/python.exe' }
 if (-not (Test-Path -LiteralPath $python)) { $python = 'python' }
 $previousBuildDir = $env:SPARK_BUILD_DIR
 Push-Location $PSScriptRoot
@@ -37,6 +37,10 @@ try {
         foreach ($arguments in @(@('ci'), @('run', 'validate'), @('run', 'build'), @('audit'))) {
             & npm @arguments
             if ($LASTEXITCODE -ne 0) { throw "Frontend check failed: $arguments" }
+        }
+        if ($Browser) {
+            npm run test:smoke
+            if ($LASTEXITCODE -ne 0) { throw 'Browser smoke checks failed' }
         }
         if ($Lighthouse) {
             npm run lighthouse

@@ -120,7 +120,7 @@ export async function fetchDashboardData({
     const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
     try {
       const response = await fetch(url, {
-        cache: "no-store",
+        cache: cacheBust ? "no-store" : "default",
         signal: controller.signal,
       });
       clearTimeout(timeoutId);

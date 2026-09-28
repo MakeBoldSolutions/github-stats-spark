@@ -57,7 +57,7 @@ export default function useRepositoryData() {
    * Effect to fetch data on component mount
    */
   useEffect(() => {
-    fetchData();
+    fetchData({ cacheBust: false });
   }, []); // Empty dependency array = run once on mount
 
   /**

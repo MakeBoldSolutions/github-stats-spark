@@ -13,6 +13,23 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="GitHubSpark" />
     
+    <!-- Discover dashboard data before the application bundle finishes loading. -->
+    <script>
+      const selectedUser = new URLSearchParams(location.search).get("user")?.trim().toLowerCase() || "makeboldsolutions";
+      const dataPreload = document.createElement("link");
+      dataPreload.rel = "preload";
+      dataPreload.as = "fetch";
+      dataPreload.crossOrigin = "anonymous";
+      dataPreload.href = `/data/users/${encodeURIComponent(selectedUser)}/repositories.json`;
+      document.head.append(dataPreload);
+      const avatarPreload = document.createElement("link");
+      avatarPreload.rel = "preload";
+      avatarPreload.as = "image";
+      avatarPreload.fetchPriority = "high";
+      avatarPreload.href = `https://avatars.githubusercontent.com/${encodeURIComponent(selectedUser)}?s=192`;
+      document.head.append(avatarPreload);
+    </script>
+
     <!-- Critical CSS for mobile-first (inline for faster FCP) -->
     <style>
       /* Mobile-first critical styles */

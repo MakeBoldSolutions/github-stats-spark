@@ -19,10 +19,11 @@ export default function ProfileHero({ profile }) {
         <div className={styles.profileSection}>
           <div className={styles.avatarWrapper}>
             <img
-              src={`https://avatars.githubusercontent.com/${profile.username}`}
+              src={`https://avatars.githubusercontent.com/${encodeURIComponent(profile.username.toLowerCase())}?s=192`}
               alt={`${profile.username} GitHub avatar`}
               className={styles.avatar}
               loading="eager"
+              fetchPriority="high"
               width={96}
               height={96}
             />

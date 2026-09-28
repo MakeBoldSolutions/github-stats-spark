@@ -20,7 +20,8 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
-    "validate": "npm run lint && npm run format:check && vitest run --coverage"
+    "validate": "npm run lint && npm run format:check && vitest run --coverage",
+    "test:smoke": "node scripts/smoke.mjs"
   },
   "dependencies": {
     "@use-gesture/react": "^10.3.1",

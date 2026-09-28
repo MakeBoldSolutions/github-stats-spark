@@ -30,7 +30,7 @@ _GATE: Passed before research and re-checked after design._
 | 3   | Observability: Do failure paths produce actionable error messages?   | Yes    | Retain retry, offline, toast, and error-boundary paths.                   |
 | 4   | Efficiency: Does this avoid unnecessary API calls?                   | Yes    | Reuse current cache, service-worker, and refetch behavior.                |
 | 5   | Accessibility: Does visual output meet WCAG AA?                      | Yes    | Verify token contrast, focus states, semantics, and keyboard behavior.    |
-| 6   | Size: Will a modified module exceed 800 LOC?                         | No     | Split new behavior into brand primitives and focused view helpers.        |
+| 6   | Size: Will a modified module exceed 800 LOC?                         | No     | Extract app-shell state into a focused hook and split view helpers.       |
 | 7   | Generated Output: Does this add a generated output directory?        | No     | No scan-exclusion update is required.                                     |
 
 ## Project Structure
@@ -71,6 +71,8 @@ frontend/
 │   │   ├── Mobile/
 │   │   └── ErrorBoundary/
 │   ├── contexts/
+│   ├── hooks/
+│   │   └── useDashboardShell.js
 │   ├── services/
 │   ├── styles/
 │   │   ├── brand/
@@ -84,11 +86,11 @@ frontend/
 ## Implementation Approach
 
 1. Establish the brand foundation first: local fonts, supplied tokens, brand primitives, peak assets, icon dependency, global variable remapping, metadata, and dark-mode removal.
-2. Make the app shell the owner of the selected repository and active repository list. Overview and Health report their ordered visible lists upward so drawer previous/next always follows the initiating view.
+2. Extract view, selected-repository, active-result-list, toast, export, refresh, and public-user selection into a focused dashboard-shell hook. Keep `App.jsx` as composition; Overview and Health report their ordered visible lists upward so drawer previous/next always follows the initiating view.
 3. Complete the Overview as the first independently usable slice: hero, heatmap, tier-based repository catalog, export menu, sanitized summaries, and empty state.
 4. Rebuild Insights and Health against existing source fields, explicitly deleting browser-side attention-score derivation rather than maintaining two score formulas.
 5. Convert repository detail from its centered modal layout to an accessible right drawer while preserving its existing remediation prompt, signals, dependency, and website data behavior.
-6. Finish cross-cutting offline, toast, mobile navigation, loading/error, and visual/accessibility verification, then run the existing quality and build checks.
+6. Replace the legacy theme-toggle browser smoke assertion with permanent-light-shell, navigation, and mobile-tab-bar coverage. Then finish cross-cutting offline, toast, loading/error, visual/accessibility verification, and the existing quality and build checks.
 
 ## Complexity Tracking
 

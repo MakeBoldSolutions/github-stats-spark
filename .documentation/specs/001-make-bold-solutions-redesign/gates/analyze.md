@@ -8,6 +8,8 @@ summary: "Task artifact paths and public ?user= compatibility coverage are align
 
 # Specification Analysis Report
 
+**Analysis Date:** 2026-09-28 (rerun after task-plan risk remediation)
+
 | ID | Category | Severity | Location(s) | Summary | Recommendation |
 | --- | --- | --- | --- | --- |
 | I1 | Inconsistency | Resolved | tasks.md:T046-T047; gates/analyze.md; gates/critic.md | Both required gate tasks now use their workflows' authoritative `gates/` artifact paths. | Keep the gate paths unchanged. |
@@ -69,8 +71,8 @@ None.
 
 ## Next Actions
 
-1. Run `/devspark.critic` to assess delivery risks.
-2. Begin `/devspark.implement` after the Critic gate is reviewed.
+1. Begin `/devspark.implement` with T001 through T011 before integrating view-specific behavior.
+2. Complete T042 before T044 so production smoke validation no longer depends on the retired theme toggle.
 
 ## Resolution Contract
 

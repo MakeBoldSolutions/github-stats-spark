@@ -12,7 +12,7 @@
 
 from typing import Dict, List, Any, Tuple, Optional
 from datetime import datetime, timedelta, date
-from collections import defaultdict, Counter
+from collections import defaultdict
 import math
 
 
@@ -89,7 +89,7 @@ class StatsCalculator:
         )
 
         # Group commits by day for heatmap
-        commits_by_day = {}
+        commits_by_day: Dict[str, int] = {}
         for commit in self.commits:
             date = self._extract_commit_datetime(commit)
             if date:
@@ -149,7 +149,7 @@ class StatsCalculator:
             return 0.0
 
         # Group commits by week
-        week_commits = defaultdict(int)
+        week_commits: Dict[str, int] = defaultdict(int)
         for commit in self.commits:
             date = self._extract_commit_datetime(commit)
             if date:
@@ -271,7 +271,7 @@ class StatsCalculator:
             }
 
         # Count commits by hour
-        hour_counts = defaultdict(int)
+        hour_counts: Dict[int, int] = defaultdict(int)
         for commit in self.commits:
             date = self._extract_commit_datetime(commit)
             if date:
@@ -329,7 +329,7 @@ class StatsCalculator:
         if total_bytes == 0:
             return []
 
-        language_stats = []
+        language_stats: List[Dict[str, Any]] = []
         for lang, bytes_count in self.languages.items():
             percentage = (bytes_count / total_bytes) * 100
             language_stats.append(
@@ -768,7 +768,7 @@ class StatsCalculator:
         )
 
         # Initialize series with zero counts for all weeks/months
-        weekly_series = [
+        weekly_series: List[Dict[str, Any]] = [
             {
                 "week": (today - timedelta(days=i * 7)).strftime("%Y-%U"),
                 "label": f"W{(today - timedelta(days=i * 7)).strftime('%U')}",
@@ -778,7 +778,7 @@ class StatsCalculator:
             }
             for i in range(weeks - 1, -1, -1)
         ]
-        monthly_series = [
+        monthly_series: List[Dict[str, Any]] = [
             {
                 "month": (today - timedelta(days=i * 30)).strftime("%Y-%m"),
                 "label": (today - timedelta(days=i * 30)).strftime("%b"),
@@ -794,10 +794,10 @@ class StatsCalculator:
         monthly_lookup = {item["month"]: item for item in monthly_series}
 
         # Group activity by week and month
-        weekly_activity: Dict[str, Dict[str, int]] = defaultdict(
+        weekly_activity: Dict[str, Dict[str, Any]] = defaultdict(
             lambda: {"commits": 0, "repos": set()}
         )
-        monthly_activity: Dict[str, Dict[str, int]] = defaultdict(
+        monthly_activity: Dict[str, Dict[str, Any]] = defaultdict(
             lambda: {"commits": 0, "repos": set()}
         )
 
@@ -943,7 +943,7 @@ class StatsCalculator:
 
         # Calculate distribution quartiles
         sorted_sizes = sorted(commit_sizes)
-        n = len(sorted_sizes)
+        len(sorted_sizes)
 
         def percentile(data: List[int], p: float) -> int:
             """Calculate percentile value from sorted data."""

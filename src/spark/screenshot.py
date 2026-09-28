@@ -4,11 +4,12 @@ Uses Playwright to capture screenshots of repository homepages and GitHub Pages.
 Implements aggressive caching based on repository pushed_at timestamp.
 """
 
-import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional, Dict, Any
-from urllib.parse import urlparse
+from typing import TYPE_CHECKING, Literal, Optional, Dict, Any
+
+if TYPE_CHECKING:
+    from playwright.sync_api import Browser, Playwright
 
 from spark.cache import APICache
 from spark.logger import get_logger
@@ -32,7 +33,7 @@ class ScreenshotCapture:
     PAGE_TIMEOUT = 30000
 
     # Screenshot format
-    FORMAT = "png"
+    FORMAT: Literal["png"] = "png"
 
     def __init__(
         self,
@@ -53,8 +54,8 @@ class ScreenshotCapture:
         self.output_dir = output_dir or Path("output/screenshots")
         self.viewport_width = viewport_width
         self.viewport_height = viewport_height
-        self._browser = None
-        self._playwright = None
+        self._browser: Optional[Browser] = None
+        self._playwright: Optional[Playwright] = None
 
     def _ensure_output_dir(self) -> None:
         """Create output directory if it doesn't exist."""
@@ -207,6 +208,7 @@ class ScreenshotCapture:
         try:
             self._start_browser()
 
+            assert self._browser is not None
             # Create new page with viewport
             page = self._browser.new_page(
                 viewport={"width": self.viewport_width, "height": self.viewport_height}
@@ -250,7 +252,7 @@ class ScreenshotCapture:
                 if cache_key:
                     pushed_at_value = (
                         repo_pushed_at.isoformat()
-                        if hasattr(repo_pushed_at, "isoformat")
+                        if isinstance(repo_pushed_at, datetime)
                         else repo_pushed_at
                     )
                     self.cache.set(
@@ -297,7 +299,7 @@ class ScreenshotCapture:
         Returns:
             Dict mapping repo name to screenshot metadata (or None if failed/no website)
         """
-        results = {}
+        results: Dict[str, Any] = {}
         captured_count = 0
         cached_count = 0
         skipped_count = 0

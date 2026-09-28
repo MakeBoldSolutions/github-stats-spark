@@ -542,8 +542,8 @@ def handle_dated_analyze(args, logger):
 
         if len(errors) > 0:
             logger.info("\nErrors Summary:")
-            for error in errors[:5]:
-                logger.info(f"  - {error}")
+            for error_message in errors[:5]:
+                logger.info(f"  - {error_message}")
             if len(errors) > 5:
                 logger.info(
                     f"   ... and {len(errors) - 5} more (see report for details)"

@@ -121,7 +121,7 @@
     --color-border: #30363d;
     --color-text: #c9d1d9;
     --color-text-secondary: #8b949e;
-    --color-text-muted: #6e7681;
+    --color-text-muted: #919ba6;
   }
 }
 
@@ -132,7 +132,7 @@
   --color-border: #30363d;
   --color-text: #c9d1d9;
   --color-text-secondary: #8b949e;
-  --color-text-muted: #6e7681;
+  --color-text-muted: #919ba6;
 }
 
 [data-theme="light"] {
@@ -1241,4 +1241,18 @@ pre {
 .btn-secondary:hover {
   background-color: var(--color-surface-alt);
   color: var(--color-text);
+}
+
+/* Reserve the initial viewport so loading data does not push a visible footer. */
+#main-content {
+  min-height: 100vh;
+}
+
+[data-theme="dark"] {
+  --color-primary: #58a6ff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-primary: #58a6ff;
+  }
 }

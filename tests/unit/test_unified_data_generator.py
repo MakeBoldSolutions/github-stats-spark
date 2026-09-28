@@ -1,7 +1,6 @@
 """Tests for UnifiedDataGenerator - static scoring and attention metrics."""
 
 import pytest
-from datetime import datetime, timezone
 from unittest.mock import MagicMock, patch
 from pathlib import Path
 
@@ -47,8 +46,12 @@ class TestCalculateStalenessScore:
 # Pull request pressure
 # ---------------------------------------------------------------------------
 def _make_repo_with_pr(
-    total_open=0, draft_count=0, review_requested_count=0,
-    oldest_open_age_days=None, availability="available", reason="ok",
+    total_open=0,
+    draft_count=0,
+    review_requested_count=0,
+    oldest_open_age_days=None,
+    availability="available",
+    reason="ok",
 ):
     repo = MagicMock(spec=Repository)
     repo.pull_request_summary = RepositoryPullRequestSummary(
@@ -96,7 +99,9 @@ class TestCalculatePullRequestPressure:
 # Security attention
 # ---------------------------------------------------------------------------
 def _make_repo_with_security(
-    availability="available", reason="ok", overall_state="clear",
+    availability="available",
+    reason="ok",
+    overall_state="clear",
     alert_counts=None,
 ):
     repo = MagicMock(spec=Repository)
@@ -202,9 +207,11 @@ class TestBuildAttentionMetrics:
 
     def _make_generator(self):
         """Create a minimal UnifiedDataGenerator instance with mocked deps."""
-        with patch("spark.unified_data_generator.GitHubFetcher"), \
-             patch("spark.unified_data_generator.CacheManager"), \
-             patch("spark.unified_data_generator.RepositoryRanker"):
+        with (
+            patch("spark.unified_data_generator.GitHubFetcher"),
+            patch("spark.unified_data_generator.CacheManager"),
+            patch("spark.unified_data_generator.RepositoryRanker"),
+        ):
             config = MagicMock()
             config.config = {"dashboard": {"data_generation": {}}}
             config.get_github_api_version_config.return_value = {}
@@ -282,9 +289,11 @@ class TestBuildAttentionMetrics:
 class TestUnifiedDataGeneratorInit:
 
     def test_constructor_sets_attributes(self):
-        with patch("spark.unified_data_generator.GitHubFetcher"), \
-             patch("spark.unified_data_generator.CacheManager"), \
-             patch("spark.unified_data_generator.RepositoryRanker"):
+        with (
+            patch("spark.unified_data_generator.GitHubFetcher"),
+            patch("spark.unified_data_generator.CacheManager"),
+            patch("spark.unified_data_generator.RepositoryRanker"),
+        ):
             config = MagicMock()
             # require() returns the expected values for each call
             config.require.side_effect = lambda key: {
@@ -294,7 +303,11 @@ class TestUnifiedDataGeneratorInit:
                 "stats.thresholds": {},
             }.get(key, MagicMock())
             config.get_github_api_version_config.return_value = {}
-            config.get_ranking_weights.return_value = {"popularity": 0.30, "activity": 0.45, "health": 0.25}
+            config.get_ranking_weights.return_value = {
+                "popularity": 0.30,
+                "activity": 0.45,
+                "health": 0.25,
+            }
             config.get_ai_model.return_value = "claude-haiku-4-5"
             config.get_cache_dir.return_value = "/tmp/.cache"
             gen = UnifiedDataGenerator(
@@ -309,9 +322,11 @@ class TestUnifiedDataGeneratorInit:
 
     def test_max_repos_override(self):
         """max_repos_override removed — max_repositories is controlled solely by spark.yml."""
-        with patch("spark.unified_data_generator.GitHubFetcher"), \
-             patch("spark.unified_data_generator.CacheManager"), \
-             patch("spark.unified_data_generator.RepositoryRanker"):
+        with (
+            patch("spark.unified_data_generator.GitHubFetcher"),
+            patch("spark.unified_data_generator.CacheManager"),
+            patch("spark.unified_data_generator.RepositoryRanker"),
+        ):
             config = MagicMock()
             config.require.side_effect = lambda key: {
                 "dashboard.data_generation.max_repositories": 5,
@@ -319,7 +334,11 @@ class TestUnifiedDataGeneratorInit:
                 "dashboard.data_generation.include_ai_summaries": False,
             }.get(key, MagicMock())
             config.get_github_api_version_config.return_value = {}
-            config.get_ranking_weights.return_value = {"popularity": 0.30, "activity": 0.45, "health": 0.25}
+            config.get_ranking_weights.return_value = {
+                "popularity": 0.30,
+                "activity": 0.45,
+                "health": 0.25,
+            }
             config.get_ai_model.return_value = "claude-haiku-4-5"
             config.get_cache_dir.return_value = "/tmp/.cache"
             gen = UnifiedDataGenerator(
@@ -332,13 +351,22 @@ class TestUnifiedDataGeneratorInit:
     def test_defaults_without_config(self):
         """When config keys are missing, require() raises ConfigurationError."""
         from spark.exceptions import ConfigurationError
-        with patch("spark.unified_data_generator.GitHubFetcher"), \
-             patch("spark.unified_data_generator.CacheManager"), \
-             patch("spark.unified_data_generator.RepositoryRanker"):
+
+        with (
+            patch("spark.unified_data_generator.GitHubFetcher"),
+            patch("spark.unified_data_generator.CacheManager"),
+            patch("spark.unified_data_generator.RepositoryRanker"),
+        ):
             config = MagicMock()
-            config.require.side_effect = ConfigurationError("Missing key", field="dashboard.data_generation.max_repositories")
+            config.require.side_effect = ConfigurationError(
+                "Missing key", field="dashboard.data_generation.max_repositories"
+            )
             config.get_github_api_version_config.return_value = {}
-            config.get_ranking_weights.return_value = {"popularity": 0.30, "activity": 0.45, "health": 0.25}
+            config.get_ranking_weights.return_value = {
+                "popularity": 0.30,
+                "activity": 0.45,
+                "health": 0.25,
+            }
             config.get_cache_dir.return_value = "/tmp/.cache"
             with pytest.raises(ConfigurationError):
                 UnifiedDataGenerator(

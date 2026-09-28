@@ -1,7 +1,7 @@
 """User profile entity model for overall developer analysis."""
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
@@ -17,7 +17,7 @@ class ActivityPattern:
 
     pattern_type: str
     description: str
-    evidence: Dict[str, any] = field(default_factory=dict)
+    evidence: Dict[str, Any] = field(default_factory=dict)
     confidence: int = 0
 
     def to_dict(self) -> dict:
@@ -55,8 +55,12 @@ class UserProfile:
     total_repos: int = 0
     active_repos: int = 0
     tech_diversity: int = 0
-    primary_languages: Dict[str, int] = field(default_factory=dict)  # language -> total bytes
-    framework_usage: Dict[str, int] = field(default_factory=dict)  # framework -> repo count
+    primary_languages: Dict[str, int] = field(
+        default_factory=dict
+    )  # language -> total bytes
+    framework_usage: Dict[str, int] = field(
+        default_factory=dict
+    )  # framework -> repo count
     activity_patterns: List[ActivityPattern] = field(default_factory=list)
     overall_impression: Optional[str] = None
     contribution_classification: str = "unknown"
@@ -92,14 +96,18 @@ class UserProfile:
             balance_score = 0
         else:
             # Calculate Herfindahl index (lower = more diverse)
-            herfindahl = sum((bytes / total_bytes) ** 2 for bytes in self.primary_languages.values())
+            herfindahl = sum(
+                (bytes / total_bytes) ** 2 for bytes in self.primary_languages.values()
+            )
             balance_score = int((1 - herfindahl) * 100)
 
         # Framework diversity
         framework_score = min(100, len(self.framework_usage) * 10)  # Max 10 frameworks
 
         # Weighted average: 40% language count, 40% balance, 20% frameworks
-        diversity = int(language_score * 0.4 + balance_score * 0.4 + framework_score * 0.2)
+        diversity = int(
+            language_score * 0.4 + balance_score * 0.4 + framework_score * 0.2
+        )
         return min(100, diversity)
 
     def _classify_contribution_style(self) -> str:
@@ -169,7 +177,9 @@ class UserProfile:
         Returns:
             List of language names in descending order
         """
-        sorted_langs = sorted(self.primary_languages.items(), key=lambda x: x[1], reverse=True)
+        sorted_langs = sorted(
+            self.primary_languages.items(), key=lambda x: x[1], reverse=True
+        )
         return [lang for lang, _ in sorted_langs[:3]]
 
     @property
@@ -196,7 +206,9 @@ class UserProfile:
             "tech_diversity": self.tech_diversity,
             "primary_languages": self.primary_languages,
             "framework_usage": self.framework_usage,
-            "activity_patterns": [pattern.to_dict() for pattern in self.activity_patterns],
+            "activity_patterns": [
+                pattern.to_dict() for pattern in self.activity_patterns
+            ],
             "overall_impression": self.overall_impression,
             "contribution_classification": self.contribution_classification,
             "commit_frequency": self.commit_frequency,

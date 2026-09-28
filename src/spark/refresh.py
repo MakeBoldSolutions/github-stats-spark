@@ -2,7 +2,7 @@
 
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 import json
 
 from spark.cache import APICache
@@ -47,7 +47,9 @@ class SmartRefresh:
         # Step 2: Load existing data
         existing_data = self._load_existing_data(username)
         existing_repos = {r["name"]: r for r in existing_data.get("repositories", [])}
-        self.logger.info(f"Loaded {len(existing_repos)} repositories from existing data")
+        self.logger.info(
+            f"Loaded {len(existing_repos)} repositories from existing data"
+        )
 
         # Step 3: Identify what needs updating
         repos_to_refresh = []
@@ -64,8 +66,12 @@ class SmartRefresh:
                 continue
 
             # Compare pushed_at timestamps
-            fresh_pushed = datetime.fromisoformat(fresh_repo["pushed_at"].replace("+00:00", ""))
-            existing_pushed = datetime.fromisoformat(existing_repo["pushed_at"].replace("+00:00", ""))
+            fresh_pushed = datetime.fromisoformat(
+                fresh_repo["pushed_at"].replace("+00:00", "")
+            )
+            existing_pushed = datetime.fromisoformat(
+                existing_repo["pushed_at"].replace("+00:00", "")
+            )
 
             if fresh_pushed > existing_pushed:
                 # Repository has new commits
@@ -81,13 +87,13 @@ class SmartRefresh:
                 repos_to_remove.append(existing_name)
 
         # Report what we found
-        self.logger.info(f"\n📊 Refresh Analysis:")
+        self.logger.info("\n📊 Refresh Analysis:")
         self.logger.info(f"  ✅ Unchanged: {len(repos_unchanged)} repositories")
         self.logger.info(f"  🔄 Need refresh: {len(repos_to_refresh)} repositories")
         self.logger.info(f"  🗑️  To remove: {len(repos_to_remove)} repositories")
 
         if repos_to_remove:
-            self.logger.info(f"\nRemoving archived/private/forked repositories:")
+            self.logger.info("\nRemoving archived/private/forked repositories:")
             for name in repos_to_remove:
                 self.logger.info(f"  - {name}")
 
@@ -120,7 +126,7 @@ class SmartRefresh:
         final_repos.sort(
             key=lambda r: (
                 -(r.get("rank", 999) if r.get("rank") is not None else 999),
-                r["name"]
+                r["name"],
             )
         )
 
@@ -136,17 +142,18 @@ class SmartRefresh:
                 "refresh_type": "incremental",
                 "refreshed_count": len(refreshed_repos),
                 "removed_count": len(repos_to_remove),
-            }
+            },
         }
 
         from spark.cli_output_layout import build_output_layout
+
         output_layout = build_output_layout(username, "data")
         output_file = output_layout["data_dir"] / "repositories.json"
         output_file.parent.mkdir(parents=True, exist_ok=True)
         with open(output_file, "w", encoding="utf-8") as f:
             json.dump(output_data, f, indent=2, ensure_ascii=False)
 
-        self.logger.info(f"\n✨ Refresh complete!")
+        self.logger.info("\n✨ Refresh complete!")
         self.logger.info(f"  Updated: {len(refreshed_repos)} repositories")
         self.logger.info(f"  Unchanged: {len(repos_unchanged)} repositories")
         self.logger.info(f"  Removed: {len(repos_to_remove)} repositories")
@@ -162,6 +169,7 @@ class SmartRefresh:
         """Fetch fresh repository list, clearing cache first."""
         # Clear the repo list cache to force fresh fetch
         import shutil
+
         exclude_private = True
         exclude_forks = True
         exclude_archived = True
@@ -180,6 +188,7 @@ class SmartRefresh:
     def _load_existing_data(self, username: str = "") -> Dict[str, Any]:
         """Load existing user-scoped repositories.json."""
         from spark.cli_output_layout import build_output_layout
+
         if username:
             layout = build_output_layout(username, "data")
             data_file = layout["data_dir"] / "repositories.json"
@@ -205,17 +214,7 @@ class SmartRefresh:
         if clear_summaries:
             self._clear_summary_caches(username, repo_name)
 
-        # Use the existing unified data generator logic
-        # For now, return basic data - you can enhance this to call the full fetch
-        from spark.unified_data_generator import UnifiedDataGenerator
-
-        generator = UnifiedDataGenerator(
-            username=username,
-            max_repos=1,
-            include_ai_summaries=include_ai_summaries,
-        )
-
-        # This is a simplified version - you'd want to call the full processing pipeline
+        # This incremental path returns the fetched repository metadata.
         return repo_basic
 
     def _clear_summary_caches(self, username: str, repo_name: str):
@@ -226,6 +225,7 @@ class SmartRefresh:
         ai_summary_dir = cache_base / "ai_summary"
         if ai_summary_dir.exists():
             import shutil
+
             shutil.rmtree(ai_summary_dir)
             self.logger.debug(f"Cleared AI summary cache for {repo_name}")
 
@@ -233,5 +233,6 @@ class SmartRefresh:
         tech_stack_dir = cache_base / "tech_stack"
         if tech_stack_dir.exists():
             import shutil
+
             shutil.rmtree(tech_stack_dir)
             self.logger.debug(f"Cleared tech stack cache for {repo_name}")

@@ -1,13 +1,12 @@
 """Tests for RepositorySummarizer - three-tier fallback and helpers."""
 
 import pytest
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from unittest.mock import MagicMock, patch
 
 from spark.summarizer import RepositorySummarizer
 from spark.models.repository import Repository
 from spark.models.commit import CommitHistory
-from spark.models.summary import RepositorySummary
 
 
 # ---------------------------------------------------------------------------
@@ -89,10 +88,16 @@ def summarizer():
 # ---------------------------------------------------------------------------
 class TestNormalizeModelName:
     def test_known_alias(self):
-        assert RepositorySummarizer._normalize_model_name("claude-haiku-3.5") == "claude-haiku-4-5"
+        assert (
+            RepositorySummarizer._normalize_model_name("claude-haiku-3.5")
+            == "claude-haiku-4-5"
+        )
 
     def test_passthrough_unknown(self):
-        assert RepositorySummarizer._normalize_model_name("claude-haiku-4-5") == "claude-haiku-4-5"
+        assert (
+            RepositorySummarizer._normalize_model_name("claude-haiku-4-5")
+            == "claude-haiku-4-5"
+        )
 
     def test_all_aliases_resolve(self):
         for alias, target in RepositorySummarizer.MODEL_ALIASES.items():
@@ -175,7 +180,9 @@ class TestExtractDescription:
 # ---------------------------------------------------------------------------
 class TestExtractFeatures:
     def test_extracts_bullet_points(self, summarizer):
-        readme = "## Features\n- Fast rendering\n- Dark mode\n- API support\n\n## Install"
+        readme = (
+            "## Features\n- Fast rendering\n- Dark mode\n- API support\n\n## Install"
+        )
         features = summarizer._extract_features(readme)
         assert len(features) == 3
         assert "Fast rendering" in features
@@ -262,7 +269,9 @@ class TestEnhancedFallback:
 
     def test_includes_language(self, summarizer):
         repo = _make_repo(primary_language="Go")
-        result = summarizer._generate_enhanced_fallback(repo, "# Title\n\nSome desc.", None)
+        result = summarizer._generate_enhanced_fallback(
+            repo, "# Title\n\nSome desc.", None
+        )
         assert "Go" in result.summary
 
     def test_active_maintenance_note(self, summarizer):
@@ -279,7 +288,9 @@ class TestEnhancedFallback:
     def test_includes_features(self, summarizer):
         repo = _make_repo()
         result = summarizer._generate_enhanced_fallback(repo, SAMPLE_README, None)
-        assert "Fast rendering" in result.summary or "features" in result.summary.lower()
+        assert (
+            "Fast rendering" in result.summary or "features" in result.summary.lower()
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -288,22 +299,30 @@ class TestEnhancedFallback:
 class TestSummarizeRepository:
     def test_no_ai_with_readme_uses_enhanced(self, summarizer):
         repo = _make_repo()
-        result = summarizer.summarize_repository(repo, readme_content=SAMPLE_README, allow_ai=False)
+        result = summarizer.summarize_repository(
+            repo, readme_content=SAMPLE_README, allow_ai=False
+        )
         assert result.generation_method == "enhanced-template"
 
     def test_no_ai_no_readme_uses_basic(self, summarizer):
         repo = _make_repo()
-        result = summarizer.summarize_repository(repo, readme_content=None, allow_ai=False)
+        result = summarizer.summarize_repository(
+            repo, readme_content=None, allow_ai=False
+        )
         assert result.generation_method == "basic-template"
 
     def test_ai_disabled_falls_to_enhanced(self, summarizer):
         repo = _make_repo()
-        result = summarizer.summarize_repository(repo, readme_content=SAMPLE_README, allow_ai=True)
+        result = summarizer.summarize_repository(
+            repo, readme_content=SAMPLE_README, allow_ai=True
+        )
         # anthropic is None, so falls through to enhanced
         assert result.generation_method == "enhanced-template"
 
     def test_no_readme_repo_uses_basic(self, summarizer):
-        repo = _make_repo(description="A JavaScript library", primary_language="JavaScript")
+        repo = _make_repo(
+            description="A JavaScript library", primary_language="JavaScript"
+        )
         result = summarizer.summarize_repository(repo, readme_content=None)
         assert result.generation_method == "basic-template"
         assert "JavaScript" in result.summary
@@ -368,21 +387,27 @@ class TestBuildRepositoryPrompt:
     def test_includes_language_stats(self, summarizer):
         repo = _make_repo()
         stats = {"Python": 8000, "JavaScript": 2000}
-        prompt = summarizer._build_repository_prompt(repo, "README", None, language_stats=stats)
+        prompt = summarizer._build_repository_prompt(
+            repo, "README", None, language_stats=stats
+        )
         assert "Python" in prompt
         assert "80.0%" in prompt
 
     def test_language_stats_with_string_numbers(self, summarizer):
         repo = _make_repo()
         stats = {"Python": "8000", "JavaScript": 2000}
-        prompt = summarizer._build_repository_prompt(repo, "README", None, language_stats=stats)
+        prompt = summarizer._build_repository_prompt(
+            repo, "README", None, language_stats=stats
+        )
         assert "Python" in prompt
         assert "JavaScript" in prompt
 
     def test_language_stats_skips_invalid_values(self, summarizer):
         repo = _make_repo()
         stats = {"Python": "oops", "JavaScript": "2000"}
-        prompt = summarizer._build_repository_prompt(repo, "README", None, language_stats=stats)
+        prompt = summarizer._build_repository_prompt(
+            repo, "README", None, language_stats=stats
+        )
         assert "Languages: JavaScript (100.0%)" in prompt
 
     def test_includes_commit_activity(self, summarizer):

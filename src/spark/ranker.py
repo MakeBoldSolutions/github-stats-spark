@@ -8,7 +8,6 @@ This module implements the ranking algorithm specified in research.md:
 """
 
 import math
-from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
 from spark.exceptions import ConfigurationError
@@ -90,7 +89,9 @@ class RepositoryRanker:
         for repo in repositories:
             # Skip private repositories (privacy filter - constitution requirement)
             if repo.is_private:
-                self.logger.warning(f"Privacy filter: Skipping private repository {repo.name}")
+                self.logger.warning(
+                    f"Privacy filter: Skipping private repository {repo.name}"
+                )
                 continue
 
             # Skip empty repositories
@@ -100,7 +101,9 @@ class RepositoryRanker:
 
             commit_history = commit_histories.get(repo.name)
             if not commit_history:
-                self.logger.debug(f"No commit history for {repo.name}, using zero activity")
+                self.logger.debug(
+                    f"No commit history for {repo.name}, using zero activity"
+                )
                 commit_history = CommitHistory(repository_name=repo.name)
 
             score = self._calculate_composite_score(repo, commit_history)
@@ -111,7 +114,7 @@ class RepositoryRanker:
 
         # Return top N
         top_repos = scored_repos[:top_n]
-        
+
         if top_repos:
             self.logger.info(
                 f"Ranked top {len(top_repos)} repositories "
@@ -145,7 +148,9 @@ class RepositoryRanker:
         )
 
         # Apply edge case penalties
-        composite = self._apply_edge_case_penalties(repo, composite, activity, popularity)
+        composite = self._apply_edge_case_penalties(
+            repo, composite, activity, popularity
+        )
 
         return round(composite, 2)
 
@@ -166,9 +171,7 @@ class RepositoryRanker:
         """
         # Weighted popularity metric
         # Stars are most important, followed by forks, then watchers
-        popularity_value = (
-            repo.stars * 1.0 + repo.forks * 0.5 + repo.watchers * 0.3
-        )
+        popularity_value = repo.stars * 1.0 + repo.forks * 0.5 + repo.watchers * 0.3
 
         if popularity_value == 0:
             return 0.0
@@ -268,14 +271,18 @@ class RepositoryRanker:
         # Maturity (30 points)
         # Based on age and total commits
         age_score = min(15.0, repo.age_days / 365 * 5)  # Max 15 points for 3+ years
-        commit_score = min(15.0, commit_history.total_commits / 100)  # Max 15 points for 100+ commits
+        commit_score = min(
+            15.0, commit_history.total_commits / 100
+        )  # Max 15 points for 100+ commits
         health += age_score + commit_score
 
         # Issue management (20 points)
         # Lower open issues relative to activity = better health
         if commit_history.recent_90d > 0:
             issue_ratio = repo.open_issues / max(1, commit_history.recent_90d)
-            issue_score = max(0, 20 - issue_ratio * 5)  # Penalty for high issue/commit ratio
+            issue_score = max(
+                0, 20 - issue_ratio * 5
+            )  # Penalty for high issue/commit ratio
             health += issue_score
         else:
             # No recent activity but issues present = unhealthy

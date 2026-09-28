@@ -349,7 +349,6 @@ temp/
 
 # Node modules (if any frontend tooling is added later)
 node_modules/
-package-lock.json
 
 # ============================================================================
 # Frontend / React / Vite
@@ -357,7 +356,6 @@ package-lock.json
 
 # Frontend dependencies and lock files
 frontend/node_modules/
-frontend/package-lock.json
 frontend/yarn.lock
 frontend/pnpm-lock.yaml
 
@@ -393,3 +391,8 @@ MagicMock/
 # DevSpark - personal overrides (never commit)
 .documentation/*/commands/
 
+
+# Local validation artifacts
+.validation/
+frontend/.lighthouse/
+frontend/bundle-stats.html

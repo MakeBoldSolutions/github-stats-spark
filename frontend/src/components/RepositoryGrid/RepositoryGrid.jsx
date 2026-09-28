@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useId } from "react";
 import styles from "./RepositoryGrid.module.css";
 
 const LANGUAGE_COLORS = {
@@ -60,6 +60,7 @@ function QualityBadge({ icon, label, active }) {
 }
 
 function RepoCard({ repo, onClick }) {
+  const titleId = useId();
   const language = repo.language || "Unknown";
   const langColor = LANGUAGE_COLORS[language] || "#8b949e";
   const aiSummary = repo.ai_summary;
@@ -96,7 +97,7 @@ function RepoCard({ repo, onClick }) {
       onClick={handleClick}
       role="button"
       tabIndex={0}
-      aria-label={`View details for ${repo.name}`}
+      aria-labelledby={titleId}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
@@ -113,6 +114,7 @@ function RepoCard({ repo, onClick }) {
               target="_blank"
               rel="noopener noreferrer"
               className={styles.cardTitle}
+              id={titleId}
               onClick={(e) => e.stopPropagation()}
             >
               {repo.name}

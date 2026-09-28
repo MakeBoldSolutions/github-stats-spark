@@ -13,7 +13,9 @@ from spark.unified_report_workflow import UnifiedReportWorkflow
 def test_workflow_uses_configured_builtin_theme(spark_config_factory, tmp_path):
     config = spark_config_factory(theme="spark-light")
 
-    workflow = UnifiedReportWorkflow(config, cache=APICache(cache_dir=str(tmp_path / ".cache")))
+    workflow = UnifiedReportWorkflow(
+        config, cache=APICache(cache_dir=str(tmp_path / ".cache"))
+    )
 
     assert isinstance(workflow.theme, SparkLightTheme)
     assert workflow.visualizer.theme is workflow.theme
@@ -36,17 +38,23 @@ def test_workflow_uses_configured_custom_theme(spark_config_factory, tmp_path):
         },
     )
 
-    workflow = UnifiedReportWorkflow(config, cache=APICache(cache_dir=str(tmp_path / ".cache")))
+    workflow = UnifiedReportWorkflow(
+        config, cache=APICache(cache_dir=str(tmp_path / ".cache"))
+    )
 
     assert workflow.theme.name == "ocean"
     assert workflow.visualizer.theme.primary_color == "#06B6D4"
 
 
 def test_workflow_rejects_unknown_theme(spark_config_factory, tmp_path):
-    config = spark_config_factory(theme="unknown-theme", custom_themes={"ocean": {"colors": {}, "effects": {}}})
+    config = spark_config_factory(
+        theme="unknown-theme", custom_themes={"ocean": {"colors": {}, "effects": {}}}
+    )
 
     with pytest.raises(ValueError):
-        UnifiedReportWorkflow(config, cache=APICache(cache_dir=str(tmp_path / ".cache")))
+        UnifiedReportWorkflow(
+            config, cache=APICache(cache_dir=str(tmp_path / ".cache"))
+        )
 
 
 class _MemoryCache:
@@ -61,7 +69,9 @@ class _NoopFetcher:
     def fetch_user_profile(self, username):
         raise AssertionError("Profile should have been served from cache")
 
-    def fetch_repositories(self, username, exclude_private=True, exclude_forks=True, exclude_archived=True):
+    def fetch_repositories(
+        self, username, exclude_private=True, exclude_forks=True, exclude_archived=True
+    ):
         raise AssertionError("Repositories should have been served from cache")
 
     def fetch_commit_counts(self, username, repo_name, repo_pushed_at=None):
@@ -76,7 +86,9 @@ class _NoopFetcher:
 
 def test_workflow_tracks_cache_hit_count(spark_config_factory, tmp_path):
     config = spark_config_factory(theme="spark-light")
-    workflow = UnifiedReportWorkflow(config, cache=APICache(cache_dir=str(tmp_path / ".cache")), cache_only=False)
+    workflow = UnifiedReportWorkflow(
+        config, cache=APICache(cache_dir=str(tmp_path / ".cache")), cache_only=False
+    )
 
     pushed_at = "2026-03-01T00:00:00+00:00"
     cache_key = sanitize_timestamp_for_filename(datetime.fromisoformat(pushed_at))

@@ -1,0 +1,14 @@
+[tool.black]
+target-version = ["py311"]
+line-length = 88
+
+[tool.mypy]
+python_version = "3.11"
+mypy_path = "src"
+packages = ["spark"]
+warn_unused_ignores = true
+warn_redundant_casts = true
+
+[[tool.mypy.overrides]]
+module = ["svgwrite", "svgwrite.*"]
+ignore_missing_imports = true

@@ -57,7 +57,9 @@ class RepositorySummary:
         Returns:
             True if summary used AI model, False if fallback
         """
-        return self.generation_method.startswith("claude") or self.generation_method.startswith("gpt")
+        return self.generation_method.startswith(
+            "claude"
+        ) or self.generation_method.startswith("gpt")
 
     @property
     def summary_length(self) -> int:
@@ -67,6 +69,17 @@ class RepositorySummary:
             Number of characters in the summary text
         """
         return len(self.summary)
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RepositorySummary":
+        """Restore stored fields while ignoring derived presentation fields."""
+        values = {
+            key: value for key, value in data.items() if key in cls.__dataclass_fields__
+        }
+        timestamp = values.get("generation_timestamp")
+        if isinstance(timestamp, str):
+            values["generation_timestamp"] = datetime.fromisoformat(timestamp)
+        return cls(**values)
 
     def to_dict(self) -> dict:
         """Serialize summary to dictionary format.
@@ -80,7 +93,11 @@ class RepositorySummary:
             "fallback_summary": self.fallback_summary,
             "summary": self.summary,
             "generation_method": self.generation_method,
-            "generation_timestamp": self.generation_timestamp.isoformat() if self.generation_timestamp else None,
+            "generation_timestamp": (
+                self.generation_timestamp.isoformat()
+                if self.generation_timestamp
+                else None
+            ),
             "model_used": self.model_used,
             "tokens_used": self.tokens_used,
             "confidence_score": self.confidence_score,

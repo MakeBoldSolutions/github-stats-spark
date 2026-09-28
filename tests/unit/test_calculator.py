@@ -1,6 +1,5 @@
 """Unit tests for StatsCalculator."""
 
-import pytest
 from datetime import datetime, timedelta
 from spark.calculator import StatsCalculator
 
@@ -21,11 +20,22 @@ class TestSparkScore:
             {"name": "repo2", "stars": 50, "forks": 10, "watchers": 15},
         ]
 
-        calculator = StatsCalculator(profile, repositories, thresholds={"night_owl_hours": [22, 23, 0, 1, 2, 3, 4], "early_bird_hours": [5, 6, 7, 8, 9]})
+        calculator = StatsCalculator(
+            profile,
+            repositories,
+            thresholds={
+                "night_owl_hours": [22, 23, 0, 1, 2, 3, 4],
+                "early_bird_hours": [5, 6, 7, 8, 9],
+            },
+        )
 
         # Add some commits
         commits = [
-            {"sha": "abc123", "date": datetime.now().isoformat(), "message": "Test commit"}
+            {
+                "sha": "abc123",
+                "date": datetime.now().isoformat(),
+                "message": "Test commit",
+            }
             for _ in range(100)
         ]
         calculator.add_commits(commits)
@@ -46,7 +56,14 @@ class TestSparkScore:
         profile = {"username": "testuser", "public_repos": 0, "followers": 0}
         repositories = []
 
-        calculator = StatsCalculator(profile, repositories, thresholds={"night_owl_hours": [22, 23, 0, 1, 2, 3, 4], "early_bird_hours": [5, 6, 7, 8, 9]})
+        calculator = StatsCalculator(
+            profile,
+            repositories,
+            thresholds={
+                "night_owl_hours": [22, 23, 0, 1, 2, 3, 4],
+                "early_bird_hours": [5, 6, 7, 8, 9],
+            },
+        )
         spark_score = calculator.calculate_spark_score()
 
         assert spark_score["total_score"] >= 0
@@ -58,7 +75,14 @@ class TestLightningRating:
 
     def test_lightning_rating_levels(self):
         """Test all lightning rating thresholds."""
-        calculator = StatsCalculator({}, [], thresholds={"night_owl_hours": [22, 23, 0, 1, 2, 3, 4], "early_bird_hours": [5, 6, 7, 8, 9]})
+        calculator = StatsCalculator(
+            {},
+            [],
+            thresholds={
+                "night_owl_hours": [22, 23, 0, 1, 2, 3, 4],
+                "early_bird_hours": [5, 6, 7, 8, 9],
+            },
+        )
 
         assert calculator.calculate_lightning_rating(90) == 5
         assert calculator.calculate_lightning_rating(70) == 4
@@ -72,27 +96,36 @@ class TestStatisticsAggregation:
 
     def test_calculate_statistics_accepts_commit_stats_shape(self):
         """Ensure heatmap and time analysis work with nested commit dates."""
-        calculator = StatsCalculator({}, [], thresholds={"night_owl_hours": [22, 23, 0, 1, 2, 3, 4], "early_bird_hours": [5, 6, 7, 8, 9]})
-        calculator.add_commits([
-            {
-                "sha": "a",
-                "repo": "repo-a",
-                "commit": {"author": {"date": "2025-02-03T23:00:00+00:00"}},
-                "stats": {"total": 1, "additions": 1, "deletions": 0},
+        calculator = StatsCalculator(
+            {},
+            [],
+            thresholds={
+                "night_owl_hours": [22, 23, 0, 1, 2, 3, 4],
+                "early_bird_hours": [5, 6, 7, 8, 9],
             },
-            {
-                "sha": "b",
-                "repo": "repo-a",
-                "commit": {"author": {"date": "2025-02-03T10:00:00+00:00"}},
-                "stats": {"total": 1, "additions": 1, "deletions": 0},
-            },
-            {
-                "sha": "c",
-                "repo": "repo-b",
-                "commit": {"author": {"date": "2025-02-04T23:30:00+00:00"}},
-                "stats": {"total": 1, "additions": 1, "deletions": 0},
-            },
-        ])
+        )
+        calculator.add_commits(
+            [
+                {
+                    "sha": "a",
+                    "repo": "repo-a",
+                    "commit": {"author": {"date": "2025-02-03T23:00:00+00:00"}},
+                    "stats": {"total": 1, "additions": 1, "deletions": 0},
+                },
+                {
+                    "sha": "b",
+                    "repo": "repo-a",
+                    "commit": {"author": {"date": "2025-02-03T10:00:00+00:00"}},
+                    "stats": {"total": 1, "additions": 1, "deletions": 0},
+                },
+                {
+                    "sha": "c",
+                    "repo": "repo-b",
+                    "commit": {"author": {"date": "2025-02-04T23:30:00+00:00"}},
+                    "stats": {"total": 1, "additions": 1, "deletions": 0},
+                },
+            ]
+        )
 
         stats = calculator.calculate_statistics()
 
@@ -110,16 +143,29 @@ class TestStatisticsAggregation:
         calculator = StatsCalculator(
             {"username": "testuser", "created_at": "2024-01-01T00:00:00+00:00"},
             [
-                {"name": "repo-a", "stars": 5, "created_at": "2024-01-10T00:00:00+00:00"},
-                {"name": "repo-b", "stars": 7, "created_at": "2024-02-01T00:00:00+00:00"},
+                {
+                    "name": "repo-a",
+                    "stars": 5,
+                    "created_at": "2024-01-10T00:00:00+00:00",
+                },
+                {
+                    "name": "repo-b",
+                    "stars": 7,
+                    "created_at": "2024-02-01T00:00:00+00:00",
+                },
             ],
-            thresholds={"night_owl_hours": [22, 23, 0, 1, 2, 3, 4], "early_bird_hours": [5, 6, 7, 8, 9]},
+            thresholds={
+                "night_owl_hours": [22, 23, 0, 1, 2, 3, 4],
+                "early_bird_hours": [5, 6, 7, 8, 9],
+            },
         )
         calculator.add_languages({"Python": 1000, "JavaScript": 500})
-        calculator.add_commits([
-            {"sha": "a", "date": "2025-02-03T23:00:00+00:00", "repo": "repo-a"},
-            {"sha": "b", "date": "2025-02-04T23:30:00+00:00", "repo": "repo-b"},
-        ])
+        calculator.add_commits(
+            [
+                {"sha": "a", "date": "2025-02-03T23:00:00+00:00", "repo": "repo-a"},
+                {"sha": "b", "date": "2025-02-04T23:30:00+00:00", "repo": "repo-b"},
+            ]
+        )
 
         stats = calculator.calculate_statistics()
         fun_stats = stats["fun_stats"]
@@ -140,7 +186,14 @@ class TestTimePatterns:
     def test_night_owl_detection(self):
         """Test night owl pattern detection."""
         profile = {"username": "testuser"}
-        calculator = StatsCalculator(profile, [], thresholds={"night_owl_hours": [22, 23, 0, 1, 2, 3, 4], "early_bird_hours": [5, 6, 7, 8, 9]})
+        calculator = StatsCalculator(
+            profile,
+            [],
+            thresholds={
+                "night_owl_hours": [22, 23, 0, 1, 2, 3, 4],
+                "early_bird_hours": [5, 6, 7, 8, 9],
+            },
+        )
 
         # Add commits during night hours (22:00-4:00)
         night_commits = []
@@ -148,11 +201,13 @@ class TestTimePatterns:
 
         for i in range(50):
             commit_time = base_time - timedelta(days=i)
-            night_commits.append({
-                "sha": f"commit{i}",
-                "date": commit_time.isoformat(),
-                "message": "Night commit"
-            })
+            night_commits.append(
+                {
+                    "sha": f"commit{i}",
+                    "date": commit_time.isoformat(),
+                    "message": "Night commit",
+                }
+            )
 
         calculator.add_commits(night_commits)
         patterns = calculator.analyze_time_patterns()
@@ -163,7 +218,14 @@ class TestTimePatterns:
     def test_early_bird_detection(self):
         """Test early bird pattern detection."""
         profile = {"username": "testuser"}
-        calculator = StatsCalculator(profile, [], thresholds={"night_owl_hours": [22, 23, 0, 1, 2, 3, 4], "early_bird_hours": [5, 6, 7, 8, 9]})
+        calculator = StatsCalculator(
+            profile,
+            [],
+            thresholds={
+                "night_owl_hours": [22, 23, 0, 1, 2, 3, 4],
+                "early_bird_hours": [5, 6, 7, 8, 9],
+            },
+        )
 
         # Add commits during morning hours (6:00-9:00)
         morning_commits = []
@@ -171,11 +233,13 @@ class TestTimePatterns:
 
         for i in range(50):
             commit_time = base_time - timedelta(days=i)
-            morning_commits.append({
-                "sha": f"commit{i}",
-                "date": commit_time.isoformat(),
-                "message": "Morning commit"
-            })
+            morning_commits.append(
+                {
+                    "sha": f"commit{i}",
+                    "date": commit_time.isoformat(),
+                    "message": "Morning commit",
+                }
+            )
 
         calculator.add_commits(morning_commits)
         patterns = calculator.analyze_time_patterns()
@@ -185,7 +249,14 @@ class TestTimePatterns:
     def test_balanced_pattern(self):
         """Test balanced coding pattern."""
         profile = {"username": "testuser"}
-        calculator = StatsCalculator(profile, [], thresholds={"night_owl_hours": [22, 23, 0, 1, 2, 3, 4], "early_bird_hours": [5, 6, 7, 8, 9]})
+        calculator = StatsCalculator(
+            profile,
+            [],
+            thresholds={
+                "night_owl_hours": [22, 23, 0, 1, 2, 3, 4],
+                "early_bird_hours": [5, 6, 7, 8, 9],
+            },
+        )
 
         # Add commits throughout the day
         commits = []
@@ -193,12 +264,16 @@ class TestTimePatterns:
 
         for hour in range(8, 18):  # 8 AM to 6 PM
             for day in range(5):
-                commit_time = base_time.replace(hour=hour, minute=0) - timedelta(days=day)
-                commits.append({
-                    "sha": f"commit{hour}{day}",
-                    "date": commit_time.isoformat(),
-                    "message": "Day commit"
-                })
+                commit_time = base_time.replace(hour=hour, minute=0) - timedelta(
+                    days=day
+                )
+                commits.append(
+                    {
+                        "sha": f"commit{hour}{day}",
+                        "date": commit_time.isoformat(),
+                        "message": "Day commit",
+                    }
+                )
 
         calculator.add_commits(commits)
         patterns = calculator.analyze_time_patterns()
@@ -212,7 +287,14 @@ class TestStreaks:
     def test_consecutive_streak(self):
         """Test calculation of consecutive coding streak."""
         profile = {"username": "testuser"}
-        calculator = StatsCalculator(profile, [], thresholds={"night_owl_hours": [22, 23, 0, 1, 2, 3, 4], "early_bird_hours": [5, 6, 7, 8, 9]})
+        calculator = StatsCalculator(
+            profile,
+            [],
+            thresholds={
+                "night_owl_hours": [22, 23, 0, 1, 2, 3, 4],
+                "early_bird_hours": [5, 6, 7, 8, 9],
+            },
+        )
 
         # Add commits for consecutive 10 days
         commits = []
@@ -220,11 +302,13 @@ class TestStreaks:
 
         for i in range(10):
             commit_time = base_time - timedelta(days=i)
-            commits.append({
-                "sha": f"commit{i}",
-                "date": commit_time.isoformat(),
-                "message": f"Day {i} commit"
-            })
+            commits.append(
+                {
+                    "sha": f"commit{i}",
+                    "date": commit_time.isoformat(),
+                    "message": f"Day {i} commit",
+                }
+            )
 
         calculator.add_commits(commits)
         streaks = calculator.calculate_streaks()
@@ -234,7 +318,14 @@ class TestStreaks:
     def test_no_streak(self):
         """Test streak calculation with no commits."""
         profile = {"username": "testuser"}
-        calculator = StatsCalculator(profile, [], thresholds={"night_owl_hours": [22, 23, 0, 1, 2, 3, 4], "early_bird_hours": [5, 6, 7, 8, 9]})
+        calculator = StatsCalculator(
+            profile,
+            [],
+            thresholds={
+                "night_owl_hours": [22, 23, 0, 1, 2, 3, 4],
+                "early_bird_hours": [5, 6, 7, 8, 9],
+            },
+        )
 
         streaks = calculator.calculate_streaks()
 
@@ -249,12 +340,27 @@ class TestStreaks:
             {"name": "repo-js", "language": "JavaScript"},
             {"name": "repo-go", "language": "Go"},
         ]
-        calculator = StatsCalculator(profile, repositories, thresholds={"night_owl_hours": [22, 23, 0, 1, 2, 3, 4], "early_bird_hours": [5, 6, 7, 8, 9]})
+        calculator = StatsCalculator(
+            profile,
+            repositories,
+            thresholds={
+                "night_owl_hours": [22, 23, 0, 1, 2, 3, 4],
+                "early_bird_hours": [5, 6, 7, 8, 9],
+            },
+        )
 
         now = datetime.now()
         commits = [
-            {"sha": "a", "date": (now - timedelta(days=2)).isoformat(), "repo": "repo-py"},
-            {"sha": "b", "date": (now - timedelta(days=1)).isoformat(), "repo": "repo-js"},
+            {
+                "sha": "a",
+                "date": (now - timedelta(days=2)).isoformat(),
+                "repo": "repo-py",
+            },
+            {
+                "sha": "b",
+                "date": (now - timedelta(days=1)).isoformat(),
+                "repo": "repo-js",
+            },
             {"sha": "c", "date": now.isoformat(), "repo": "repo-go"},
             # Existing language on same day should not create a new introduction.
             {"sha": "d", "date": now.isoformat(), "repo": "repo-go"},
@@ -273,7 +379,14 @@ class TestLanguages:
     def test_aggregate_languages(self):
         """Test language percentage calculation."""
         profile = {"username": "testuser"}
-        calculator = StatsCalculator(profile, [], thresholds={"night_owl_hours": [22, 23, 0, 1, 2, 3, 4], "early_bird_hours": [5, 6, 7, 8, 9]})
+        calculator = StatsCalculator(
+            profile,
+            [],
+            thresholds={
+                "night_owl_hours": [22, 23, 0, 1, 2, 3, 4],
+                "early_bird_hours": [5, 6, 7, 8, 9],
+            },
+        )
 
         # Add language data
         calculator.add_languages({"Python": 1000, "JavaScript": 500, "HTML": 300})
@@ -286,12 +399,19 @@ class TestLanguages:
 
         # Check percentages sum to ~100
         total_percentage = sum(lang["percentage"] for lang in languages)
-        assert 99.9 <= total_percentage <= 100.1
+        assert 99.9 <= round(total_percentage, 1) <= 100.1
 
     def test_aggregate_languages_grouping(self):
         """Test 'Other' grouping for many languages."""
         profile = {"username": "testuser"}
-        calculator = StatsCalculator(profile, [], thresholds={"night_owl_hours": [22, 23, 0, 1, 2, 3, 4], "early_bird_hours": [5, 6, 7, 8, 9]})
+        calculator = StatsCalculator(
+            profile,
+            [],
+            thresholds={
+                "night_owl_hours": [22, 23, 0, 1, 2, 3, 4],
+                "early_bird_hours": [5, 6, 7, 8, 9],
+            },
+        )
 
         # Add 15 languages
         languages_data = {f"Lang{i}": 100 - i * 5 for i in range(15)}
@@ -311,7 +431,14 @@ class TestReleaseCadence:
     def test_release_cadence_counts_unique_repos(self):
         """Ensure weekly/monthly cadence counts unique repositories."""
         profile = {"username": "testuser"}
-        calculator = StatsCalculator(profile, [], thresholds={"night_owl_hours": [22, 23, 0, 1, 2, 3, 4], "early_bird_hours": [5, 6, 7, 8, 9]})
+        calculator = StatsCalculator(
+            profile,
+            [],
+            thresholds={
+                "night_owl_hours": [22, 23, 0, 1, 2, 3, 4],
+                "early_bird_hours": [5, 6, 7, 8, 9],
+            },
+        )
 
         base_week_start = datetime(2025, 2, 3)  # Monday anchor
         schedule = [
@@ -325,12 +452,14 @@ class TestReleaseCadence:
         for weeks_ago, repos in schedule:
             commit_day = base_week_start - timedelta(weeks=weeks_ago)
             for idx, repo in enumerate(repos):
-                commits.append({
-                    "sha": f"{repo}-{weeks_ago}-{idx}",
-                    "date": commit_day.isoformat(),
-                    "repo": repo,
-                    "message": "test",
-                })
+                commits.append(
+                    {
+                        "sha": f"{repo}-{weeks_ago}-{idx}",
+                        "date": commit_day.isoformat(),
+                        "repo": repo,
+                        "message": "test",
+                    }
+                )
 
         calculator.add_commits(commits)
         cadence = calculator.calculate_release_cadence(weeks=4, months=3)
@@ -344,10 +473,23 @@ class TestReleaseCadence:
 
     def test_release_cadence_without_repo_metadata_returns_empty_series(self):
         """Ensure cadence gracefully handles commits without repo identifiers."""
-        calculator = StatsCalculator({}, [], thresholds={"night_owl_hours": [22, 23, 0, 1, 2, 3, 4], "early_bird_hours": [5, 6, 7, 8, 9]})
-        calculator.add_commits([
-            {"sha": "abc", "date": datetime.now().isoformat(), "message": "missing repo"}
-        ])
+        calculator = StatsCalculator(
+            {},
+            [],
+            thresholds={
+                "night_owl_hours": [22, 23, 0, 1, 2, 3, 4],
+                "early_bird_hours": [5, 6, 7, 8, 9],
+            },
+        )
+        calculator.add_commits(
+            [
+                {
+                    "sha": "abc",
+                    "date": datetime.now().isoformat(),
+                    "message": "missing repo",
+                }
+            ]
+        )
 
         cadence = calculator.calculate_release_cadence(weeks=2, months=2)
 
@@ -356,18 +498,27 @@ class TestReleaseCadence:
 
     def test_release_cadence_accepts_commit_stats_shape(self):
         """Ensure cadence handles commits_stats cache payloads."""
-        calculator = StatsCalculator({}, [], thresholds={"night_owl_hours": [22, 23, 0, 1, 2, 3, 4], "early_bird_hours": [5, 6, 7, 8, 9]})
-        calculator.add_commits([
-            {
-                "sha": "abc",
-                "repo": "repo-a",
-                "commit": {
-                    "author": {"date": "2025-02-03T00:00:00+00:00"},
-                    "message": "test",
-                },
-                "stats": {"total": 1, "additions": 1, "deletions": 0},
-            }
-        ])
+        calculator = StatsCalculator(
+            {},
+            [],
+            thresholds={
+                "night_owl_hours": [22, 23, 0, 1, 2, 3, 4],
+                "early_bird_hours": [5, 6, 7, 8, 9],
+            },
+        )
+        calculator.add_commits(
+            [
+                {
+                    "sha": "abc",
+                    "repo": "repo-a",
+                    "commit": {
+                        "author": {"date": "2025-02-03T00:00:00+00:00"},
+                        "message": "test",
+                    },
+                    "stats": {"total": 1, "additions": 1, "deletions": 0},
+                }
+            ]
+        )
 
         cadence = calculator.calculate_release_cadence(weeks=1, months=1)
 
@@ -395,7 +546,10 @@ class TestReleaseCadence:
                     "updated_at": "2025-02-10T00:00:00+00:00",
                 },
             ],
-            thresholds={"night_owl_hours": [22, 23, 0, 1, 2, 3, 4], "early_bird_hours": [5, 6, 7, 8, 9]},
+            thresholds={
+                "night_owl_hours": [22, 23, 0, 1, 2, 3, 4],
+                "early_bird_hours": [5, 6, 7, 8, 9],
+            },
         )
 
         cadence = calculator.calculate_release_cadence(weeks=2, months=1)

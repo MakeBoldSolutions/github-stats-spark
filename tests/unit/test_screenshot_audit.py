@@ -1,10 +1,16 @@
-from pathlib import Path
-
-from spark.screenshot_audit import audit_screenshot_outputs, build_screenshot_audit_markdown
+from spark.screenshot_audit import (
+    audit_screenshot_outputs,
+    build_screenshot_audit_markdown,
+)
 
 
 class _FakeResponse:
-    def __init__(self, status_code=200, url="https://example.com", text="<html><title>OK</title><body>content</body></html>"):
+    def __init__(
+        self,
+        status_code=200,
+        url="https://example.com",
+        text="<html><title>OK</title><body>content</body></html>",
+    ):
         self.status_code = status_code
         self.url = url
         self.text = text
@@ -49,7 +55,12 @@ def test_audit_flags_likely_black_or_blank(monkeypatch, tmp_path):
 
     monkeypatch.setattr(
         "spark.screenshot_audit._analyze_http_response",
-        lambda website_url, timeout=20: {"status_code": 200, "final_url": website_url, "page_title": "OK", "flags": []},
+        lambda website_url, timeout=20: {
+            "status_code": 200,
+            "final_url": website_url,
+            "page_title": "OK",
+            "flags": [],
+        },
     )
     monkeypatch.setattr(
         "spark.screenshot_audit._analyze_image",

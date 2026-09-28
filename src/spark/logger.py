@@ -63,6 +63,7 @@ class Logger:
 
         if exc_info:
             import traceback
+
             traceback.print_exc(file=sys.stderr)
 
     def debug(self, message: str) -> None:

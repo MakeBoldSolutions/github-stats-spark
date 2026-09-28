@@ -11,7 +11,7 @@
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, Optional, List
+from typing import Any, Dict, Optional, List
 
 
 @dataclass
@@ -124,10 +124,10 @@ class RepositoryDiagnosticsSummary:
 
     availability: str = "unavailable"
     reason: str = "not_requested"
-    pull_requests: Dict[str, object] = field(default_factory=dict)
-    issues: Dict[str, object] = field(default_factory=dict)
-    security: Dict[str, object] = field(default_factory=dict)
-    actions: Dict[str, object] = field(default_factory=dict)
+    pull_requests: Dict[str, Any] = field(default_factory=dict)
+    issues: Dict[str, Any] = field(default_factory=dict)
+    security: Dict[str, Any] = field(default_factory=dict)
+    actions: Dict[str, Any] = field(default_factory=dict)
     sources: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict:
@@ -208,7 +208,9 @@ class Repository:
     open_issues: int = 0
     is_archived: bool = False
     is_fork: bool = False
-    fork_info: Optional[Dict[str, int]] = None  # {"commits_ahead": X, "commits_behind": Y}
+    fork_info: Optional[Dict[str, int]] = (
+        None  # {"commits_ahead": X, "commits_behind": Y}
+    )
     has_readme: bool = False
     size_kb: int = 0
     is_private: bool = False
@@ -227,9 +229,15 @@ class Repository:
     # Website URLs
     homepage: Optional[str] = None  # Custom website URL from repo settings
     has_pages: bool = False  # GitHub Pages enabled
-    pull_request_summary: RepositoryPullRequestSummary = field(default_factory=RepositoryPullRequestSummary)
-    security_summary: RepositorySecuritySummary = field(default_factory=RepositorySecuritySummary)
-    diagnostics_summary: RepositoryDiagnosticsSummary = field(default_factory=RepositoryDiagnosticsSummary)
+    pull_request_summary: RepositoryPullRequestSummary = field(
+        default_factory=RepositoryPullRequestSummary
+    )
+    security_summary: RepositorySecuritySummary = field(
+        default_factory=RepositorySecuritySummary
+    )
+    diagnostics_summary: RepositoryDiagnosticsSummary = field(
+        default_factory=RepositoryDiagnosticsSummary
+    )
 
     def __post_init__(self):
         """Validate that private repositories are never processed."""
@@ -245,9 +253,14 @@ class Repository:
         if not self.created_at:
             return 0
         from datetime import timezone
+
         now = datetime.now(timezone.utc)
         # Ensure both datetimes are timezone-aware
-        created = self.created_at if self.created_at.tzinfo else self.created_at.replace(tzinfo=timezone.utc)
+        created = (
+            self.created_at
+            if self.created_at.tzinfo
+            else self.created_at.replace(tzinfo=timezone.utc)
+        )
         delta = now - created
         return max(0, delta.days)
 
@@ -257,9 +270,14 @@ class Repository:
         if not self.pushed_at:
             return None
         from datetime import timezone
+
         now = datetime.now(timezone.utc)
         # Ensure both datetimes are timezone-aware
-        pushed = self.pushed_at if self.pushed_at.tzinfo else self.pushed_at.replace(tzinfo=timezone.utc)
+        pushed = (
+            self.pushed_at
+            if self.pushed_at.tzinfo
+            else self.pushed_at.replace(tzinfo=timezone.utc)
+        )
         delta = now - pushed
         return max(0, delta.days)
 
@@ -271,15 +289,15 @@ class Repository:
     @property
     def pages_url(self) -> Optional[str]:
         """Construct GitHub Pages URL if pages are enabled.
-        
+
         Returns:
             GitHub Pages URL in format https://{owner}.github.io/{repo}/ or None
         """
         if not self.has_pages:
             return None
         # Extract owner from URL: https://github.com/owner/repo
-        if self.url and 'github.com/' in self.url:
-            parts = self.url.split('github.com/')[-1].split('/')
+        if self.url and "github.com/" in self.url:
+            parts = self.url.split("github.com/")[-1].split("/")
             if len(parts) >= 2:
                 owner = parts[0]
                 return f"https://{owner}.github.io/{self.name}/"
@@ -288,9 +306,9 @@ class Repository:
     @property
     def website_url(self) -> Optional[str]:
         """Get the best available website URL for the repository.
-        
+
         Priority: homepage > pages_url
-        
+
         Returns:
             Website URL or None if no website is available
         """
@@ -333,7 +351,11 @@ class Repository:
             "has_docs": self.has_docs,
             # Activity Focus
             "release_count": self.release_count,
-            "latest_release_date": self.latest_release_date.isoformat() if self.latest_release_date else None,
+            "latest_release_date": (
+                self.latest_release_date.isoformat()
+                if self.latest_release_date
+                else None
+            ),
             "commit_velocity": self.commit_velocity,
             # Website URLs
             "homepage": self.homepage,
@@ -359,12 +381,22 @@ class Repository:
             ValueError: If repository is private (constitution violation)
         """
         from datetime import datetime
-        
+
         # Parse datetime strings
-        created_at = datetime.fromisoformat(data["created_at"]) if data.get("created_at") else datetime.now()
-        updated_at = datetime.fromisoformat(data["updated_at"]) if data.get("updated_at") else datetime.now()
-        pushed_at = datetime.fromisoformat(data["pushed_at"]) if data.get("pushed_at") else None
-        
+        created_at = (
+            datetime.fromisoformat(data["created_at"])
+            if data.get("created_at")
+            else datetime.now()
+        )
+        updated_at = (
+            datetime.fromisoformat(data["updated_at"])
+            if data.get("updated_at")
+            else datetime.now()
+        )
+        pushed_at = (
+            datetime.fromisoformat(data["pushed_at"]) if data.get("pushed_at") else None
+        )
+
         return cls(
             name=data.get("name", ""),
             description=data.get("description"),
@@ -395,9 +427,15 @@ class Repository:
             commit_velocity=data.get("commit_velocity"),
             homepage=data.get("homepage"),
             has_pages=data.get("has_pages", False),
-            pull_request_summary=RepositoryPullRequestSummary.from_dict(data.get("pull_request_summary")),
-            security_summary=RepositorySecuritySummary.from_dict(data.get("security_summary")),
-            diagnostics_summary=RepositoryDiagnosticsSummary.from_dict(data.get("diagnostics_summary")),
+            pull_request_summary=RepositoryPullRequestSummary.from_dict(
+                data.get("pull_request_summary")
+            ),
+            security_summary=RepositorySecuritySummary.from_dict(
+                data.get("security_summary")
+            ),
+            diagnostics_summary=RepositoryDiagnosticsSummary.from_dict(
+                data.get("diagnostics_summary")
+            ),
         )
 
     @classmethod
@@ -418,7 +456,7 @@ class Repository:
         try:
             github_repo.get_readme()
             has_readme = True
-        except:
+        except Exception:
             pass
 
         # Extract fork info if applicable
@@ -432,7 +470,7 @@ class Repository:
         contributors_count = 0
         try:
             contributors_count = github_repo.get_contributors().totalCount
-        except:
+        except Exception:
             pass
 
         # Quality Focus - Check for CI/CD workflows
@@ -440,7 +478,7 @@ class Repository:
         try:
             workflows = github_repo.get_workflows()
             has_ci_cd = workflows.totalCount > 0
-        except:
+        except Exception:
             pass
 
         # Quality Focus - Check for tests directory
@@ -448,10 +486,16 @@ class Repository:
         try:
             contents = github_repo.get_contents("")
             for item in contents:
-                if item.type == "dir" and item.name.lower() in ["test", "tests", "spec", "specs", "__tests__"]:
+                if item.type == "dir" and item.name.lower() in [
+                    "test",
+                    "tests",
+                    "spec",
+                    "specs",
+                    "__tests__",
+                ]:
                     has_tests = True
                     break
-        except:
+        except Exception:
             pass
 
         # Quality Focus - Check for LICENSE file
@@ -459,7 +503,7 @@ class Repository:
         try:
             github_repo.get_license()
             has_license = True
-        except:
+        except Exception:
             pass
 
         # Quality Focus - Check for documentation
@@ -467,13 +511,20 @@ class Repository:
         try:
             contents = github_repo.get_contents("")
             for item in contents:
-                if item.type == "dir" and item.name.lower() in ["docs", "doc", "documentation"]:
+                if item.type == "dir" and item.name.lower() in [
+                    "docs",
+                    "doc",
+                    "documentation",
+                ]:
                     has_docs = True
                     break
-                if item.type == "file" and item.name.upper() in ["CONTRIBUTING.md", "CHANGELOG.md"]:
+                if item.type == "file" and item.name.upper() in [
+                    "CONTRIBUTING.md",
+                    "CHANGELOG.md",
+                ]:
                     has_docs = True
                     break
-        except:
+        except Exception:
             pass
 
         # Activity Focus - Get release information
@@ -485,7 +536,7 @@ class Repository:
             if release_count > 0:
                 latest_release = releases[0]
                 latest_release_date = latest_release.created_at
-        except:
+        except Exception:
             pass
 
         return cls(
@@ -548,9 +599,21 @@ class Repository:
             "pages_url": self.pages_url,
             "website_url": self.website_url,
             "language": self.primary_language or "Unknown",
-            "created_at": self.created_at.isoformat() if isinstance(self.created_at, datetime) else self.created_at,
-            "updated_at": self.updated_at.isoformat() if isinstance(self.updated_at, datetime) else self.updated_at,
-            "pushed_at": self.pushed_at.isoformat() if self.pushed_at and isinstance(self.pushed_at, datetime) else self.pushed_at,
+            "created_at": (
+                self.created_at.isoformat()
+                if isinstance(self.created_at, datetime)
+                else self.created_at
+            ),
+            "updated_at": (
+                self.updated_at.isoformat()
+                if isinstance(self.updated_at, datetime)
+                else self.updated_at
+            ),
+            "pushed_at": (
+                self.pushed_at.isoformat()
+                if self.pushed_at and isinstance(self.pushed_at, datetime)
+                else self.pushed_at
+            ),
             "stars": self.stars,
             "forks": self.forks,
             "watchers": self.watchers,
@@ -564,7 +627,8 @@ class Repository:
             "release_count": self.release_count,
             "latest_release_date": (
                 self.latest_release_date.isoformat()
-                if self.latest_release_date and isinstance(self.latest_release_date, datetime)
+                if self.latest_release_date
+                and isinstance(self.latest_release_date, datetime)
                 else self.latest_release_date
             ),
             "pull_request_summary": self.pull_request_summary.to_dict(),

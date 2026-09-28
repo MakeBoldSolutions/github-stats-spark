@@ -8,9 +8,8 @@ structured JSON for frontend consumption.
 import logging
 from pathlib import Path
 from datetime import datetime
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict
 import os
-import json
 
 from spark.fetcher import GitHubFetcher
 from spark.calculator import StatsCalculator
@@ -61,9 +60,15 @@ class DashboardGenerator:
 
         # Dashboard feature flags
         self.enabled = config.require("dashboard.enabled")
-        self.include_commit_metrics = config.require("dashboard.data_generation.include_commit_metrics")
-        self.include_language_stats = config.require("dashboard.data_generation.include_language_stats")
-        self.include_ai_summaries = config.require("dashboard.data_generation.include_ai_summaries")
+        self.include_commit_metrics = config.require(
+            "dashboard.data_generation.include_commit_metrics"
+        )
+        self.include_language_stats = config.require(
+            "dashboard.data_generation.include_language_stats"
+        )
+        self.include_ai_summaries = config.require(
+            "dashboard.data_generation.include_ai_summaries"
+        )
         self.max_repositories = max_repos
 
         logger.info(
@@ -139,8 +144,10 @@ class DashboardGenerator:
 
         # Apply max_repositories limit
         if len(raw_repos) > self.max_repositories:
-            logger.warning(f"Limiting to {self.max_repositories} repositories (found {len(raw_repos)})")
-            raw_repos = raw_repos[:self.max_repositories]
+            logger.warning(
+                f"Limiting to {self.max_repositories} repositories (found {len(raw_repos)})"
+            )
+            raw_repos = raw_repos[: self.max_repositories]
 
         # Convert to DashboardRepository objects with metrics
         dashboard_repos = []
@@ -151,18 +158,21 @@ class DashboardGenerator:
             try:
                 # Calculate commit metrics for this repository
                 commit_metrics = self.calculate_commit_metrics(
-                    repo_name, 
-                    pushed_at=repo_data.get("pushed_at")
+                    repo_name, pushed_at=repo_data.get("pushed_at")
                 )
 
                 # Extract dates
                 created_at = repo_data.get("created_at")
                 if isinstance(created_at, str):
-                    created_at = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+                    created_at = datetime.fromisoformat(
+                        created_at.replace("Z", "+00:00")
+                    )
 
                 updated_at = repo_data.get("updated_at")
                 if isinstance(updated_at, str):
-                    updated_at = datetime.fromisoformat(updated_at.replace("Z", "+00:00"))
+                    updated_at = datetime.fromisoformat(
+                        updated_at.replace("Z", "+00:00")
+                    )
 
                 pushed_at = repo_data.get("pushed_at")
                 if isinstance(pushed_at, str):
@@ -193,7 +203,9 @@ class DashboardGenerator:
 
         return dashboard_repos
 
-    def calculate_commit_metrics(self, repo_name: str, pushed_at: Optional[str] = None) -> Dict:
+    def calculate_commit_metrics(
+        self, repo_name: str, pushed_at: Optional[str] = None
+    ) -> Dict:
         """Calculate commit size metrics for a repository.
 
         Fetches commits with detailed statistics and calculates aggregate metrics
@@ -217,17 +229,23 @@ class DashboardGenerator:
         repo_pushed_at = None
         if pushed_at:
             try:
-                repo_pushed_at = datetime.fromisoformat(pushed_at.replace("Z", "+00:00"))
+                repo_pushed_at = datetime.fromisoformat(
+                    pushed_at.replace("Z", "+00:00")
+                )
             except (ValueError, AttributeError):
                 pass
 
         # Fetch commits with detailed stats
-        max_commits = self.config.get("dashboard", {}).get("data_generation", {}).get("max_commits_per_repo", 200)
+        max_commits = (
+            self.config.get("dashboard", {})
+            .get("data_generation", {})
+            .get("max_commits_per_repo", 200)
+        )
         commits_with_stats = self.fetcher.fetch_commits_with_stats(
             username=self.username,
             repo_name=repo_name,
             max_commits=max_commits,
-            repo_pushed_at=repo_pushed_at
+            repo_pushed_at=repo_pushed_at,
         )
 
         if not commits_with_stats:
@@ -241,7 +259,9 @@ class DashboardGenerator:
             }
 
         # Use StatsCalculator to calculate repository metrics
-        metrics = StatsCalculator.calculate_repository_commit_metrics(commits_with_stats)
+        metrics = StatsCalculator.calculate_repository_commit_metrics(
+            commits_with_stats
+        )
 
         # Extract first commit date
         first_commit_date = None
@@ -251,9 +271,13 @@ class DashboardGenerator:
             date_str = first_commit.get("commit", {}).get("author", {}).get("date")
             if date_str:
                 try:
-                    first_commit_date = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+                    first_commit_date = datetime.fromisoformat(
+                        date_str.replace("Z", "+00:00")
+                    )
                 except (ValueError, AttributeError) as e:
-                    logger.warning(f"Failed to parse first commit date for {repo_name}: {e}")
+                    logger.warning(
+                        f"Failed to parse first commit date for {repo_name}: {e}"
+                    )
 
         # Convert largest/smallest to CommitMetric objects
         largest_commit = None
@@ -261,7 +285,11 @@ class DashboardGenerator:
             largest = metrics["largest_commit"]
             largest_commit = CommitMetric(
                 sha=largest["sha"],
-                date=datetime.fromisoformat(largest["date"].replace("Z", "+00:00")) if largest.get("date") else None,
+                date=(
+                    datetime.fromisoformat(largest["date"].replace("Z", "+00:00"))
+                    if largest.get("date")
+                    else None
+                ),
                 size=largest["size"],
                 files_changed=largest.get("files_changed", 0),
                 lines_added=largest.get("lines_added", 0),
@@ -273,7 +301,11 @@ class DashboardGenerator:
             smallest = metrics["smallest_commit"]
             smallest_commit = CommitMetric(
                 sha=smallest["sha"],
-                date=datetime.fromisoformat(smallest["date"].replace("Z", "+00:00")) if smallest.get("date") else None,
+                date=(
+                    datetime.fromisoformat(smallest["date"].replace("Z", "+00:00"))
+                    if smallest.get("date")
+                    else None
+                ),
                 size=smallest["size"],
                 files_changed=smallest.get("files_changed", 0),
                 lines_added=smallest.get("lines_added", 0),
@@ -288,7 +320,9 @@ class DashboardGenerator:
             "smallest_commit": smallest_commit,
         }
 
-    def generate_user_profile(self, repositories: Optional[List[DashboardRepository]] = None) -> UserProfile:
+    def generate_user_profile(
+        self, repositories: Optional[List[DashboardRepository]] = None
+    ) -> UserProfile:
         """Generate user profile information for dashboard header.
 
         Returns:
@@ -315,7 +349,9 @@ class DashboardGenerator:
             total_forks=total_forks,
         )
 
-    def write_json_output(self, dashboard_data: DashboardData, filename: str = "repositories.json") -> Path:
+    def write_json_output(
+        self, dashboard_data: DashboardData, filename: str = "repositories.json"
+    ) -> Path:
         """Write dashboard data to JSON file.
 
         This method ensures the output directory exists and writes the dashboard

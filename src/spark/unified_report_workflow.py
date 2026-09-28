@@ -10,7 +10,7 @@
 """
 
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
@@ -364,7 +364,7 @@ class UnifiedReportWorkflow:
             profile=UserProfile.from_dict(profile_data),
             repositories=[Repository.from_dict(r) for r in public_repos_data],
             commit_histories=commit_histories,
-            fetch_timestamp=datetime.utcnow(),
+            fetch_timestamp=datetime.now(timezone.utc),
             api_call_count=self.api_calls,
             cache_hit_count=cache_hits,
         )
@@ -734,22 +734,9 @@ class UnifiedReportWorkflow:
         """Generate the final unified report object."""
         self.logger.info("Generating unified report...")
 
-        # In single-repo mode, we don't generate a full report, just the data
-        if single_repository_mode:
-            return UnifiedReport(
-                username=username,
-                generation_date=datetime.now().isoformat(),
-                svg_files=available_svgs,
-                repository_analyses=repository_analyses,
-                errors=self.errors,
-                warnings=self.warnings,
-                api_calls=self.api_calls,
-                generation_time=time.time() - self.start_time,
-            )
-
-        return UnifiedReport(
+        report = UnifiedReport(
             username=username,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             repositories=repository_analyses,
             available_svgs=available_svgs,
             total_api_calls=github_data.api_call_count,
@@ -757,6 +744,8 @@ class UnifiedReportWorkflow:
                 a.summary.tokens_used if a.summary else 0 for a in repository_analyses
             ),
             ai_model=RepositorySummarizer.DEFAULT_MODEL,
+            errors=list(self.errors),
+            warnings=list(self.warnings),
         )
 
         # Validate report structure
@@ -766,5 +755,6 @@ class UnifiedReportWorkflow:
                 f"Report validation warnings: {', '.join(validation_errors)}"
             )
             self.warnings.extend(validation_errors)
+            report.warnings.extend(validation_errors)
 
         return report

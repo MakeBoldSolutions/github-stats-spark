@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 
 @dataclass
@@ -73,8 +73,13 @@ class CommitHistory:
         # Recency classification
         if self.last_commit_date:
             from datetime import timezone
+
             now = datetime.now(timezone.utc)
-            last_commit = self.last_commit_date if self.last_commit_date.tzinfo else self.last_commit_date.replace(tzinfo=timezone.utc)
+            last_commit = (
+                self.last_commit_date
+                if self.last_commit_date.tzinfo
+                else self.last_commit_date.replace(tzinfo=timezone.utc)
+            )
             days_ago = (now - last_commit).days
             if days_ago <= 7:
                 patterns.append("recently_updated")
@@ -88,7 +93,7 @@ class CommitHistory:
             # Check if commit rate is consistent across time windows
             rate_90 = self.recent_90d / 90
             rate_180 = self.recent_180d / 180
-            rate_365 = self.recent_365d / 365 if self.recent_365d > 0 else 0
+            self.recent_365d / 365 if self.recent_365d > 0 else 0
 
             # If rates are similar (within 20%), activity is consistent
             if rate_180 > 0 and abs(rate_90 - rate_180) / rate_180 < 0.2:
@@ -119,9 +124,14 @@ class CommitHistory:
         if not self.last_commit_date:
             return None
         from datetime import timezone
+
         now = datetime.now(timezone.utc)
         # Ensure both datetimes are timezone-aware
-        last_commit = self.last_commit_date if self.last_commit_date.tzinfo else self.last_commit_date.replace(tzinfo=timezone.utc)
+        last_commit = (
+            self.last_commit_date
+            if self.last_commit_date.tzinfo
+            else self.last_commit_date.replace(tzinfo=timezone.utc)
+        )
         delta = now - last_commit
         return max(0, delta.days)
 
@@ -138,7 +148,7 @@ class CommitHistory:
         last_commit_date = None
         if data.get("last_commit_date"):
             last_commit_date = datetime.fromisoformat(data["last_commit_date"])
-        
+
         return cls(
             repository_name=data.get("repository_name", ""),
             total_commits=data.get("total", 0),
@@ -163,7 +173,9 @@ class CommitHistory:
             "recent_90d": self.recent_90d,
             "recent_180d": self.recent_180d,
             "recent_365d": self.recent_365d,
-            "last_commit_date": self.last_commit_date.isoformat() if self.last_commit_date else None,
+            "last_commit_date": (
+                self.last_commit_date.isoformat() if self.last_commit_date else None
+            ),
             "patterns": self.patterns,
             "commit_frequency": self.commit_frequency,
             "consistency_score": self.consistency_score,

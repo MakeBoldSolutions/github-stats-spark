@@ -20,3 +20,8 @@ pip-audit>=2.9.0
 
 # Include production dependencies
 -r requirements.txt
+
+# Type metadata for third-party libraries
+types-PyYAML>=6.0.12
+types-requests>=2.33.0
+types-python-dateutil>=2.9.0

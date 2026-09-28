@@ -2,6 +2,10 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import fs from 'fs'
+import { outputDir } from './scripts/build-paths.mjs'
+import { visualizer } from 'rollup-plugin-visualizer'
+
+const __dirname = import.meta.dirname
 
 // Plugin to stamp sw.js with a build-time cache version so the SW updates on every deploy
 const swVersionPlugin = () => {
@@ -55,11 +59,12 @@ const serveDataPlugin = () => ({
 })
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     serveDataPlugin(),
-    swVersionPlugin()
+    swVersionPlugin(),
+    mode === 'analyze' && visualizer({ filename: 'bundle-stats.html', gzipSize: true, open: false })
   ],
 
   // Base URL for custom domain (github-stats.makeboldspark.com)
@@ -70,7 +75,7 @@ export default defineConfig({
 
   // Build configuration
   build: {
-    outDir: '../docs',
+    outDir: outputDir,
     emptyOutDir: true, // Clean build - data will be copied after
     
     // Always copy public directory (CNAME, manifest.json, sw.js, etc.)
@@ -93,7 +98,7 @@ export default defineConfig({
         // Optimize chunk splitting
         manualChunks(id) {
           // Vendor chunks for better caching
-          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+          if (/node_modules\/(react|react-dom|scheduler)\//.test(id.replaceAll('\\', '/'))) {
             return 'vendor-react'
           }
           if (id.includes('node_modules/chart.js') || id.includes('node_modules/react-chartjs-2')) {
@@ -177,4 +182,4 @@ export default defineConfig({
       ]
     }
   }
-})
+}))

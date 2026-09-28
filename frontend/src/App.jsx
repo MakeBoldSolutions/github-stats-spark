@@ -6,7 +6,9 @@ import LoadingState from "@/components/Common/LoadingState";
 import FilterControls from "@/components/Common/FilterControls";
 import ThemeToggle from "@/components/Common/ThemeToggle";
 import ContributionHeatmap from "@/components/Visualizations/ContributionHeatmap";
-import ActivityTimeline from "@/components/Visualizations/ActivityTimeline";
+const ActivityTimeline = lazy(
+  () => import("@/components/Visualizations/ActivityTimeline"),
+);
 import ProfileHero from "@/components/ProfileHero/ProfileHero";
 import RepositoryGrid from "@/components/RepositoryGrid/RepositoryGrid";
 import { useTableSort } from "@/hooks/useTableSort";
@@ -249,7 +251,7 @@ function App() {
                 <a
                   href="/"
                   className="header-brand"
-                  aria-label="GitHub Spark — home"
+                  aria-label="GitHubSpark — home"
                 >
                   <div className="header-logo" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="currentColor">
@@ -284,7 +286,7 @@ function App() {
                     aria-current={
                       currentView === "visualizations" ? "page" : undefined
                     }
-                    aria-label="Switch to visualizations view"
+                    aria-label="Insights — switch to visualizations view"
                   >
                     Insights
                   </button>
@@ -294,7 +296,7 @@ function App() {
                     aria-current={
                       currentView === "attention" ? "page" : undefined
                     }
-                    aria-label="Switch to repositories needing attention"
+                    aria-label="Health — repositories needing attention"
                   >
                     Health
                   </button>
@@ -357,12 +359,12 @@ function App() {
                         {/* Contribution heatmap for trailing 365-day activity */}
                         {data?.profile?.activity_calendar && (
                           <div className="mb-lg">
-                            <h3
+                            <h2
                               className="text-sm text-muted"
                               style={{ marginBottom: "0.5rem" }}
                             >
                               Contribution Activity (trailing 365 days)
-                            </h3>
+                            </h2>
                             <ContributionHeatmap
                               activityCalendar={data.profile.activity_calendar}
                             />
@@ -423,9 +425,15 @@ function App() {
                             <h3 style={{ marginBottom: "0.75rem" }}>
                               Weekly Activity Timeline
                             </h3>
-                            <ActivityTimeline
-                              weeklyActivity={data.profile.weekly_activity}
-                            />
+                            <Suspense
+                              fallback={
+                                <LoadingState message="Loading timeline..." />
+                              }
+                            >
+                              <ActivityTimeline
+                                weeklyActivity={data.profile.weekly_activity}
+                              />
+                            </Suspense>
                           </div>
                         )}
                       </section>

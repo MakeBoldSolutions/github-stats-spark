@@ -4,17 +4,18 @@ from collections.abc import Callable
 from datetime import datetime
 from typing import Set
 
-
-BASE_REFRESH_CATEGORIES = frozenset({
-    "commit_counts",
-    "languages",
-    "quality_indicators",
-    "pull_request_summary",
-    "security_summary",
-    "diagnostics_summary",
-    "web_signals",
-    "community_health",
-})
+BASE_REFRESH_CATEGORIES = frozenset(
+    {
+        "commit_counts",
+        "languages",
+        "quality_indicators",
+        "pull_request_summary",
+        "security_summary",
+        "diagnostics_summary",
+        "web_signals",
+        "community_health",
+    }
+)
 # Data-gathering categories needed before AI summaries can be generated.
 # These are GitHub API calls, not LLM calls, so they belong in Phase 2.
 AI_DATA_CATEGORIES = frozenset({"readme", "dependency_files"})

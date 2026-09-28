@@ -11,7 +11,6 @@ from spark.dependencies.analyzer import RepositoryDependencyAnalyzer
 from spark.logger import get_logger
 from spark.models.commit import CommitHistory
 from spark.models.repository import Repository
-from spark.models.tech_stack import DependencyInfo, TechnologyStack
 from spark.summarizer import RepositorySummarizer
 from spark.time_utils import sanitize_timestamp_for_filename
 
@@ -30,7 +29,14 @@ class RefreshResult:
 class CacheRefreshExecutor:
     """Executes per-category cache refresh work for a repository."""
 
-    def __init__(self, github_client, cache, summarizer: Optional[RepositorySummarizer] = None, fetcher=None, ai_model: Optional[str] = None):
+    def __init__(
+        self,
+        github_client,
+        cache,
+        summarizer: Optional[RepositorySummarizer] = None,
+        fetcher=None,
+        ai_model: Optional[str] = None,
+    ):
         self.github = github_client
         self.cache = cache
         self.logger = get_logger()
@@ -184,13 +190,24 @@ query RepoMetadata($owner: String!, $name: String!) {
         results: List[RefreshResult] = []
 
         # Check which categories still need a refresh
-        batch_categories = ["languages", "readme", "quality_indicators", "dependency_files", "community_health"]
+        batch_categories = [
+            "languages",
+            "readme",
+            "quality_indicators",
+            "dependency_files",
+            "community_health",
+        ]
         needed = []
         for cat in batch_categories:
             cached = self.cache.get(cat, username, repo=repo_name, week=cache_key)
             if cached is not None:
                 results.append(
-                    RefreshResult(repo_name=repo_name, category=cat, was_cached=True, refreshed=False)
+                    RefreshResult(
+                        repo_name=repo_name,
+                        category=cat,
+                        was_cached=True,
+                        refreshed=False,
+                    )
                 )
             else:
                 needed.append(cat)
@@ -202,8 +219,11 @@ query RepoMetadata($owner: String!, $name: String!) {
             for cat in needed:
                 results.append(
                     RefreshResult(
-                        repo_name=repo_name, category=cat, was_cached=False,
-                        refreshed=False, error="Fetcher required for batch metadata",
+                        repo_name=repo_name,
+                        category=cat,
+                        was_cached=False,
+                        refreshed=False,
+                        error="Fetcher required for batch metadata",
                     )
                 )
             return results
@@ -219,8 +239,11 @@ query RepoMetadata($owner: String!, $name: String!) {
                 for cat in needed:
                     results.append(
                         RefreshResult(
-                            repo_name=repo_name, category=cat, was_cached=False,
-                            refreshed=False, error="GraphQL returned no repository data",
+                            repo_name=repo_name,
+                            category=cat,
+                            was_cached=False,
+                            refreshed=False,
+                            error="GraphQL returned no repository data",
                         )
                     )
                 return results
@@ -241,12 +264,20 @@ query RepoMetadata($owner: String!, $name: String!) {
                     if name and isinstance(size, (int, float)) and size >= 0:
                         languages[name] = int(size)
                 self.cache.set(
-                    "languages", username, languages,
-                    repo=repo_name, week=cache_key,
+                    "languages",
+                    username,
+                    languages,
+                    repo=repo_name,
+                    week=cache_key,
                     metadata={**meta_base, "category": "languages"},
                 )
                 results.append(
-                    RefreshResult(repo_name=repo_name, category="languages", was_cached=False, refreshed=True)
+                    RefreshResult(
+                        repo_name=repo_name,
+                        category="languages",
+                        was_cached=False,
+                        refreshed=True,
+                    )
                 )
 
             # --- README ---
@@ -258,12 +289,20 @@ query RepoMetadata($owner: String!, $name: String!) {
                         readme_content = blob["text"]
                         break
                 self.cache.set(
-                    "readme", username, readme_content,
-                    repo=repo_name, week=cache_key,
+                    "readme",
+                    username,
+                    readme_content,
+                    repo=repo_name,
+                    week=cache_key,
                     metadata={**meta_base, "category": "readme"},
                 )
                 results.append(
-                    RefreshResult(repo_name=repo_name, category="readme", was_cached=False, refreshed=True)
+                    RefreshResult(
+                        repo_name=repo_name,
+                        category="readme",
+                        was_cached=False,
+                        refreshed=True,
+                    )
                 )
 
             # --- Quality Indicators ---
@@ -294,15 +333,25 @@ query RepoMetadata($owner: String!, $name: String!) {
                         has_docs = True
 
                 self.cache.set(
-                    "quality_indicators", username,
-                    {"has_license": has_license, "has_ci_cd": has_ci_cd,
-                     "has_tests": has_tests, "has_docs": has_docs},
-                    repo=repo_name, week=cache_key,
+                    "quality_indicators",
+                    username,
+                    {
+                        "has_license": has_license,
+                        "has_ci_cd": has_ci_cd,
+                        "has_tests": has_tests,
+                        "has_docs": has_docs,
+                    },
+                    repo=repo_name,
+                    week=cache_key,
                     metadata={**meta_base, "category": "quality_indicators"},
                 )
                 results.append(
-                    RefreshResult(repo_name=repo_name, category="quality_indicators",
-                                 was_cached=False, refreshed=True)
+                    RefreshResult(
+                        repo_name=repo_name,
+                        category="quality_indicators",
+                        was_cached=False,
+                        refreshed=True,
+                    )
                 )
 
             # --- Dependency Files ---
@@ -317,10 +366,9 @@ query RepoMetadata($owner: String!, $name: String!) {
                 root_tree = repo_data.get("rootEntries")
                 if root_tree:
                     for entry in root_tree.get("entries") or []:
-                        if (
-                            entry.get("type") == "blob"
-                            and entry.get("name", "").endswith(".csproj")
-                        ):
+                        if entry.get("type") == "blob" and entry.get(
+                            "name", ""
+                        ).endswith(".csproj"):
                             try:
                                 repo_obj = self._get_repo(username, repo_name)
                                 self._increment_api_calls()
@@ -332,13 +380,20 @@ query RepoMetadata($owner: String!, $name: String!) {
                                 pass
 
                 self.cache.set(
-                    "dependency_files", username, dependency_files,
-                    repo=repo_name, week=cache_key,
+                    "dependency_files",
+                    username,
+                    dependency_files,
+                    repo=repo_name,
+                    week=cache_key,
                     metadata={**meta_base, "category": "dependency_files"},
                 )
                 results.append(
-                    RefreshResult(repo_name=repo_name, category="dependency_files",
-                                 was_cached=False, refreshed=True)
+                    RefreshResult(
+                        repo_name=repo_name,
+                        category="dependency_files",
+                        was_cached=False,
+                        refreshed=True,
+                    )
                 )
 
             # --- Community Health ---
@@ -355,9 +410,13 @@ query RepoMetadata($owner: String!, $name: String!) {
 
                 # Issues
                 open_issues = (repo_data.get("issues") or {}).get("totalCount", 0)
-                closed_issues = (repo_data.get("closedIssues") or {}).get("totalCount", 0)
+                closed_issues = (repo_data.get("closedIssues") or {}).get(
+                    "totalCount", 0
+                )
                 total_issues = open_issues + closed_issues
-                issue_close_ratio = round(closed_issues / total_issues, 2) if total_issues > 0 else None
+                issue_close_ratio = (
+                    round(closed_issues / total_issues, 2) if total_issues > 0 else None
+                )
 
                 # Social signals
                 stargazer_count = repo_data.get("stargazerCount", 0)
@@ -365,11 +424,19 @@ query RepoMetadata($owner: String!, $name: String!) {
                 watcher_count = (repo_data.get("watchers") or {}).get("totalCount", 0)
 
                 # Discussions
-                has_discussions = (repo_data.get("discussions") or {}).get("totalCount", 0) > 0
+                has_discussions = (repo_data.get("discussions") or {}).get(
+                    "totalCount", 0
+                ) > 0
 
                 # Topics
-                topics_data = (repo_data.get("repositoryTopics") or {}).get("nodes") or []
-                topics = [n.get("topic", {}).get("name") for n in topics_data if n.get("topic", {}).get("name")]
+                topics_data = (repo_data.get("repositoryTopics") or {}).get(
+                    "nodes"
+                ) or []
+                topics = [
+                    n.get("topic", {}).get("name")
+                    for n in topics_data
+                    if n.get("topic", {}).get("name")
+                ]
 
                 # Description
                 description = repo_data.get("description") or ""
@@ -380,10 +447,6 @@ query RepoMetadata($owner: String!, $name: String!) {
                 # Community files (from root tree already fetched)
                 root_tree = repo_data.get("rootEntries")
                 root_entries = (root_tree.get("entries") or []) if root_tree else []
-                community_files = {
-                    "code_of_conduct", "contributing", "contributing.md",
-                    "code_of_conduct.md", "security.md", "security",
-                }
                 has_code_of_conduct = False
                 has_contributing = False
                 has_security_policy = False
@@ -403,7 +466,9 @@ query RepoMetadata($owner: String!, $name: String!) {
                 homepage_status = None
                 homepage_response_ms = None
                 if homepage_url and homepage_url.startswith("http"):
-                    homepage_status, homepage_response_ms = self._check_homepage(homepage_url)
+                    homepage_status, homepage_response_ms = self._check_homepage(
+                        homepage_url
+                    )
 
                 community_health = {
                     "stargazer_count": stargazer_count,
@@ -428,28 +493,42 @@ query RepoMetadata($owner: String!, $name: String!) {
                 }
 
                 self.cache.set(
-                    "community_health", username, community_health,
-                    repo=repo_name, week=cache_key,
+                    "community_health",
+                    username,
+                    community_health,
+                    repo=repo_name,
+                    week=cache_key,
                     metadata={**meta_base, "category": "community_health"},
                 )
                 results.append(
-                    RefreshResult(repo_name=repo_name, category="community_health",
-                                 was_cached=False, refreshed=True)
+                    RefreshResult(
+                        repo_name=repo_name,
+                        category="community_health",
+                        was_cached=False,
+                        refreshed=True,
+                    )
                 )
 
             return results
         except Exception as error:
-            self.logger.warning(f"Batch metadata refresh failed for {repo_name}: {error}")
+            self.logger.warning(
+                f"Batch metadata refresh failed for {repo_name}: {error}"
+            )
             for cat in needed:
                 results.append(
                     RefreshResult(
-                        repo_name=repo_name, category=cat, was_cached=False,
-                        refreshed=False, error=str(error),
+                        repo_name=repo_name,
+                        category=cat,
+                        was_cached=False,
+                        refreshed=False,
+                        error=str(error),
                     )
                 )
             return results
 
-    def _fetch_commit_activity_with_retry(self, repo, repo_name: str, max_retries: int = 4):
+    def _fetch_commit_activity_with_retry(
+        self, repo, repo_name: str, max_retries: int = 4
+    ):
         """Fetch commit activity stats via direct REST to avoid PyGithub's infinite 202 retry.
 
         PyGithub internally retries 202 responses recursively with no limit,
@@ -464,10 +543,10 @@ query RepoMetadata($owner: String!, $name: String!) {
             self.logger.warning(f"No fetcher available for commit_activity {repo_name}")
             return None
 
-        full_name = repo.full_name if hasattr(repo, 'full_name') else str(repo)
+        full_name = repo.full_name if hasattr(repo, "full_name") else str(repo)
 
         for attempt in range(max_retries):
-            backoff = 2 ** attempt  # 1, 2, 4, 8
+            backoff = 2**attempt  # 1, 2, 4, 8
             try:
                 self._increment_api_calls()
                 resp = self.fetcher._rest_get(
@@ -570,16 +649,25 @@ query RepoMetadata($owner: String!, $name: String!) {
             )
             return None
 
-    def refresh_commit_counts(self, username: str, repo_name: str, pushed_at: datetime) -> RefreshResult:
+    def refresh_commit_counts(
+        self, username: str, repo_name: str, pushed_at: datetime
+    ) -> RefreshResult:
         cache_key = sanitize_timestamp_for_filename(pushed_at)
         category = "commit_counts"
         cached = self.cache.get(category, username, repo=repo_name, week=cache_key)
         if cached:
             # If the cached entry already has daily_commits (new format), use it
             if isinstance(cached.get("daily_commits"), dict):
-                return RefreshResult(repo_name=repo_name, category=category, was_cached=True, refreshed=False)
+                return RefreshResult(
+                    repo_name=repo_name,
+                    category=category,
+                    was_cached=True,
+                    refreshed=False,
+                )
             # Older cache entries lack daily_commits — re-fetch to upgrade format
-            self.logger.info(f"Upgrading {repo_name}/commit_counts cache to include daily_commits")
+            self.logger.info(
+                f"Upgrading {repo_name}/commit_counts cache to include daily_commits"
+            )
 
         try:
             repo = self._get_repo(username, repo_name)
@@ -600,9 +688,21 @@ query RepoMetadata($owner: String!, $name: String!) {
                 for week_stat in weekly_stats:
                     # REST returns dicts; PyGithub returns objects — support both
                     w = week_stat if isinstance(week_stat, dict) else week_stat.__dict__
-                    week_ts = w.get("week", 0) if isinstance(w, dict) else getattr(week_stat, "week", 0)
-                    week_total = w.get("total", 0) if isinstance(w, dict) else getattr(week_stat, "total", 0)
-                    days_list = w.get("days", []) if isinstance(w, dict) else getattr(week_stat, "days", [])
+                    week_ts = (
+                        w.get("week", 0)
+                        if isinstance(w, dict)
+                        else getattr(week_stat, "week", 0)
+                    )
+                    week_total = (
+                        w.get("total", 0)
+                        if isinstance(w, dict)
+                        else getattr(week_stat, "total", 0)
+                    )
+                    days_list = (
+                        w.get("days", [])
+                        if isinstance(w, dict)
+                        else getattr(week_stat, "days", [])
+                    )
                     week_start = datetime.fromtimestamp(week_ts, tz=timezone.utc)
                     total_commits += week_total
 
@@ -620,7 +720,9 @@ query RepoMetadata($owner: String!, $name: String!) {
                         if day_count > 0:
                             day = week_start + timedelta(days=day_offset)
                             day_key = day.strftime("%Y-%m-%d")
-                            daily_commits[day_key] = daily_commits.get(day_key, 0) + day_count
+                            daily_commits[day_key] = (
+                                daily_commits.get(day_key, 0) + day_count
+                            )
                             if last_commit_date is None or day > last_commit_date:
                                 last_commit_date = day
             else:
@@ -649,9 +751,11 @@ query RepoMetadata($owner: String!, $name: String!) {
                 "recent_90d": commits_90d,
                 "recent_180d": commits_180d,
                 "recent_365d": commits_365d,
-                "last_commit_date": last_commit_date.isoformat()
-                if isinstance(last_commit_date, datetime)
-                else last_commit_date,
+                "last_commit_date": (
+                    last_commit_date.isoformat()
+                    if isinstance(last_commit_date, datetime)
+                    else last_commit_date
+                ),
                 "daily_commits": daily_commits,
             }
             metadata = {
@@ -660,18 +764,39 @@ query RepoMetadata($owner: String!, $name: String!) {
                 "pushed_at": pushed_at.isoformat(),
                 "ttl_enforced": False,
             }
-            self.cache.set(category, username, result, repo=repo_name, week=cache_key, metadata=metadata)
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=True)
+            self.cache.set(
+                category,
+                username,
+                result,
+                repo=repo_name,
+                week=cache_key,
+                metadata=metadata,
+            )
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=False, refreshed=True
+            )
         except Exception as error:
-            self.logger.warning(f"Failed to refresh {category} for {repo_name}: {error}")
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=False, error=str(error))
+            self.logger.warning(
+                f"Failed to refresh {category} for {repo_name}: {error}"
+            )
+            return RefreshResult(
+                repo_name=repo_name,
+                category=category,
+                was_cached=False,
+                refreshed=False,
+                error=str(error),
+            )
 
-    def refresh_commits_stats(self, username: str, repo_name: str, pushed_at: datetime) -> RefreshResult:
+    def refresh_commits_stats(
+        self, username: str, repo_name: str, pushed_at: datetime
+    ) -> RefreshResult:
         cache_key = sanitize_timestamp_for_filename(pushed_at)
         category = "commits_stats"
         cached = self.cache.get(category, username, repo=repo_name, week=cache_key)
         if cached is not None:
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=True, refreshed=False)
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=True, refreshed=False
+            )
 
         if self.fetcher is None:
             return RefreshResult(
@@ -689,7 +814,9 @@ query RepoMetadata($owner: String!, $name: String!) {
                 repo_pushed_at=pushed_at,
                 force_refresh=True,
             )
-            refreshed_cache = self.cache.get(category, username, repo=repo_name, week=cache_key)
+            refreshed_cache = self.cache.get(
+                category, username, repo=repo_name, week=cache_key
+            )
             if refreshed_cache is None:
                 return RefreshResult(
                     repo_name=repo_name,
@@ -699,17 +826,31 @@ query RepoMetadata($owner: String!, $name: String!) {
                     error="Commit stats were not written to cache",
                 )
 
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=True)
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=False, refreshed=True
+            )
         except Exception as error:
-            self.logger.warning(f"Failed to refresh {category} for {repo_name}: {error}")
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=False, error=str(error))
+            self.logger.warning(
+                f"Failed to refresh {category} for {repo_name}: {error}"
+            )
+            return RefreshResult(
+                repo_name=repo_name,
+                category=category,
+                was_cached=False,
+                refreshed=False,
+                error=str(error),
+            )
 
-    def refresh_languages(self, username: str, repo_name: str, pushed_at: datetime) -> RefreshResult:
+    def refresh_languages(
+        self, username: str, repo_name: str, pushed_at: datetime
+    ) -> RefreshResult:
         cache_key = sanitize_timestamp_for_filename(pushed_at)
         category = "languages"
         cached = self.cache.get(category, username, repo=repo_name, week=cache_key)
         if cached:
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=True, refreshed=False)
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=True, refreshed=False
+            )
 
         try:
             repo = self._get_repo(username, repo_name)
@@ -721,18 +862,39 @@ query RepoMetadata($owner: String!, $name: String!) {
                 "pushed_at": pushed_at.isoformat(),
                 "ttl_enforced": False,
             }
-            self.cache.set(category, username, languages, repo=repo_name, week=cache_key, metadata=metadata)
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=True)
+            self.cache.set(
+                category,
+                username,
+                languages,
+                repo=repo_name,
+                week=cache_key,
+                metadata=metadata,
+            )
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=False, refreshed=True
+            )
         except Exception as error:
-            self.logger.warning(f"Failed to refresh {category} for {repo_name}: {error}")
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=False, error=str(error))
+            self.logger.warning(
+                f"Failed to refresh {category} for {repo_name}: {error}"
+            )
+            return RefreshResult(
+                repo_name=repo_name,
+                category=category,
+                was_cached=False,
+                refreshed=False,
+                error=str(error),
+            )
 
-    def refresh_readme(self, username: str, repo_name: str, pushed_at: datetime) -> RefreshResult:
+    def refresh_readme(
+        self, username: str, repo_name: str, pushed_at: datetime
+    ) -> RefreshResult:
         cache_key = sanitize_timestamp_for_filename(pushed_at)
         category = "readme"
         cached = self.cache.get(category, username, repo=repo_name, week=cache_key)
         if cached is not None:
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=True, refreshed=False)
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=True, refreshed=False
+            )
 
         try:
             repo = self._get_repo(username, repo_name)
@@ -751,18 +913,39 @@ query RepoMetadata($owner: String!, $name: String!) {
                 "pushed_at": pushed_at.isoformat(),
                 "ttl_enforced": False,
             }
-            self.cache.set(category, username, content, repo=repo_name, week=cache_key, metadata=metadata)
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=True)
+            self.cache.set(
+                category,
+                username,
+                content,
+                repo=repo_name,
+                week=cache_key,
+                metadata=metadata,
+            )
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=False, refreshed=True
+            )
         except Exception as error:
-            self.logger.warning(f"Failed to refresh {category} for {repo_name}: {error}")
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=False, error=str(error))
+            self.logger.warning(
+                f"Failed to refresh {category} for {repo_name}: {error}"
+            )
+            return RefreshResult(
+                repo_name=repo_name,
+                category=category,
+                was_cached=False,
+                refreshed=False,
+                error=str(error),
+            )
 
-    def refresh_quality_indicators(self, username: str, repo_name: str, pushed_at: datetime) -> RefreshResult:
+    def refresh_quality_indicators(
+        self, username: str, repo_name: str, pushed_at: datetime
+    ) -> RefreshResult:
         cache_key = sanitize_timestamp_for_filename(pushed_at)
         category = "quality_indicators"
         cached = self.cache.get(category, username, repo=repo_name, week=cache_key)
         if cached is not None:
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=True, refreshed=False)
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=True, refreshed=False
+            )
 
         try:
             repo = self._get_repo(username, repo_name)
@@ -814,18 +997,39 @@ query RepoMetadata($owner: String!, $name: String!) {
                 "pushed_at": pushed_at.isoformat(),
                 "ttl_enforced": False,
             }
-            self.cache.set(category, username, quality_data, repo=repo_name, week=cache_key, metadata=metadata)
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=True)
+            self.cache.set(
+                category,
+                username,
+                quality_data,
+                repo=repo_name,
+                week=cache_key,
+                metadata=metadata,
+            )
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=False, refreshed=True
+            )
         except Exception as error:
-            self.logger.warning(f"Failed to refresh {category} for {repo_name}: {error}")
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=False, error=str(error))
+            self.logger.warning(
+                f"Failed to refresh {category} for {repo_name}: {error}"
+            )
+            return RefreshResult(
+                repo_name=repo_name,
+                category=category,
+                was_cached=False,
+                refreshed=False,
+                error=str(error),
+            )
 
-    def refresh_dependency_files(self, username: str, repo_name: str, pushed_at: datetime) -> RefreshResult:
+    def refresh_dependency_files(
+        self, username: str, repo_name: str, pushed_at: datetime
+    ) -> RefreshResult:
         cache_key = sanitize_timestamp_for_filename(pushed_at)
         category = "dependency_files"
         cached = self.cache.get(category, username, repo=repo_name, week=cache_key)
         if cached is not None:
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=True, refreshed=False)
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=True, refreshed=False
+            )
 
         dependency_files: Dict[str, str] = {}
         target_files = [
@@ -849,10 +1053,14 @@ query RepoMetadata($owner: String!, $name: String!) {
                         pattern = filename.replace("*", "")
                         for item in contents:
                             if item.name.endswith(pattern):
-                                dependency_files[item.name] = item.decoded_content.decode("utf-8")
+                                dependency_files[item.name] = (
+                                    item.decoded_content.decode("utf-8")
+                                )
                     else:
                         file_content = repo.get_contents(filename)
-                        dependency_files[filename] = file_content.decoded_content.decode("utf-8")
+                        dependency_files[filename] = (
+                            file_content.decoded_content.decode("utf-8")
+                        )
                 except GithubException as error:
                     if getattr(error, "status", None) == 404:
                         continue
@@ -866,55 +1074,107 @@ query RepoMetadata($owner: String!, $name: String!) {
                 "pushed_at": pushed_at.isoformat(),
                 "ttl_enforced": False,
             }
-            self.cache.set(category, username, dependency_files, repo=repo_name, week=cache_key, metadata=metadata)
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=True)
+            self.cache.set(
+                category,
+                username,
+                dependency_files,
+                repo=repo_name,
+                week=cache_key,
+                metadata=metadata,
+            )
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=False, refreshed=True
+            )
         except Exception as error:
-            self.logger.warning(f"Failed to refresh {category} for {repo_name}: {error}")
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=False, error=str(error))
+            self.logger.warning(
+                f"Failed to refresh {category} for {repo_name}: {error}"
+            )
+            return RefreshResult(
+                repo_name=repo_name,
+                category=category,
+                was_cached=False,
+                refreshed=False,
+                error=str(error),
+            )
 
-    def refresh_ai_summary(self, username: str, repo_data: Dict[str, Any], pushed_at: datetime) -> RefreshResult:
+    def refresh_ai_summary(
+        self, username: str, repo_data: Dict[str, Any], pushed_at: datetime
+    ) -> RefreshResult:
         repo_name = repo_data["name"]
         cache_key = sanitize_timestamp_for_filename(pushed_at)
         category = "ai_summary"
         cached = self.cache.get(category, username, repo=repo_name, week=cache_key)
         if cached:
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=True, refreshed=False)
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=True, refreshed=False
+            )
 
         if self.summarizer is None:
             if self.ai_model is None:
                 from spark.exceptions import ConfigurationError
+
                 raise ConfigurationError(
                     "CacheRefreshExecutor requires ai_model for AI summary generation. "
                     "Set analyzer.ai_model in spark.yml.",
                     field="analyzer.ai_model",
                 )
-            self.summarizer = RepositorySummarizer(cache=self.cache, model=self.ai_model)
+            self.summarizer = RepositorySummarizer(
+                cache=self.cache, model=self.ai_model
+            )
 
         try:
-            commit_data = self.cache.get("commit_counts", username, repo=repo_name, week=cache_key)
+            commit_data = self.cache.get(
+                "commit_counts", username, repo=repo_name, week=cache_key
+            )
             if commit_data is None:
                 self.refresh_commit_counts(username, repo_name, pushed_at)
-                commit_data = self.cache.get("commit_counts", username, repo=repo_name, week=cache_key) or {}
+                commit_data = (
+                    self.cache.get(
+                        "commit_counts", username, repo=repo_name, week=cache_key
+                    )
+                    or {}
+                )
 
-            language_stats = self.cache.get("languages", username, repo=repo_name, week=cache_key)
+            language_stats = self.cache.get(
+                "languages", username, repo=repo_name, week=cache_key
+            )
             if language_stats is None:
                 self.refresh_languages(username, repo_name, pushed_at)
-                language_stats = self.cache.get("languages", username, repo=repo_name, week=cache_key) or {}
+                language_stats = (
+                    self.cache.get(
+                        "languages", username, repo=repo_name, week=cache_key
+                    )
+                    or {}
+                )
             language_stats = self._sanitize_language_stats(language_stats)
 
-            readme_content = self.cache.get("readme", username, repo=repo_name, week=cache_key)
+            readme_content = self.cache.get(
+                "readme", username, repo=repo_name, week=cache_key
+            )
             if readme_content is None:
                 self.refresh_readme(username, repo_name, pushed_at)
-                readme_content = self.cache.get("readme", username, repo=repo_name, week=cache_key) or ""
+                readme_content = (
+                    self.cache.get("readme", username, repo=repo_name, week=cache_key)
+                    or ""
+                )
 
-            dependency_files = self.cache.get("dependency_files", username, repo=repo_name, week=cache_key)
+            dependency_files = self.cache.get(
+                "dependency_files", username, repo=repo_name, week=cache_key
+            )
             if dependency_files is None:
                 self.refresh_dependency_files(username, repo_name, pushed_at)
-                dependency_files = self.cache.get("dependency_files", username, repo=repo_name, week=cache_key) or {}
+                dependency_files = (
+                    self.cache.get(
+                        "dependency_files", username, repo=repo_name, week=cache_key
+                    )
+                    or {}
+                )
 
             tech_stack = None
             if dependency_files:
-                dep_report = self.dependency_analyzer.analyze_repository(dependency_files)
+                dep_report = self.dependency_analyzer.analyze_repository(
+                    dependency_files
+                )
                 if dep_report.total_dependencies > 0:
                     tech_stack = self.dependency_analyzer.build_technology_stack(
                         repository_name=repo_name,
@@ -927,7 +1187,9 @@ query RepoMetadata($owner: String!, $name: String!) {
             repo.has_readme = bool(readme_content)
 
             commit_data["repository_name"] = repo_name
-            commit_history = CommitHistory.from_dict(commit_data) if commit_data else None
+            commit_history = (
+                CommitHistory.from_dict(commit_data) if commit_data else None
+            )
 
             summary = self.summarizer.summarize_repository(
                 repo=repo,
@@ -944,9 +1206,11 @@ query RepoMetadata($owner: String!, $name: String!) {
                 cache_payload = {
                     "ai_summary": summary.ai_summary,
                     "generation_method": summary.generation_method,
-                    "generation_timestamp": summary.generation_timestamp.isoformat()
-                    if summary.generation_timestamp
-                    else datetime.now().isoformat(),
+                    "generation_timestamp": (
+                        summary.generation_timestamp.isoformat()
+                        if summary.generation_timestamp
+                        else datetime.now().isoformat()
+                    ),
                     "model_used": summary.model_used,
                     "tokens_used": summary.tokens_used,
                     "confidence_score": summary.confidence_score,
@@ -956,20 +1220,49 @@ query RepoMetadata($owner: String!, $name: String!) {
                     repository_owner=username,
                     cache_date=pushed_at,
                 )
-                self.cache.set(category, username, cache_payload, repo=repo_name, week=cache_key, metadata=metadata)
-                return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=True)
+                self.cache.set(
+                    category,
+                    username,
+                    cache_payload,
+                    repo=repo_name,
+                    week=cache_key,
+                    metadata=metadata,
+                )
+                return RefreshResult(
+                    repo_name=repo_name,
+                    category=category,
+                    was_cached=False,
+                    refreshed=True,
+                )
 
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=False)
+            return RefreshResult(
+                repo_name=repo_name,
+                category=category,
+                was_cached=False,
+                refreshed=False,
+            )
         except Exception as error:
-            self.logger.warning(f"Failed to refresh {category} for {repo_name}: {error}")
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=False, error=str(error))
+            self.logger.warning(
+                f"Failed to refresh {category} for {repo_name}: {error}"
+            )
+            return RefreshResult(
+                repo_name=repo_name,
+                category=category,
+                was_cached=False,
+                refreshed=False,
+                error=str(error),
+            )
 
-    def refresh_pull_request_summary(self, username: str, repo_name: str, pushed_at: datetime) -> RefreshResult:
+    def refresh_pull_request_summary(
+        self, username: str, repo_name: str, pushed_at: datetime
+    ) -> RefreshResult:
         cache_key = sanitize_timestamp_for_filename(pushed_at)
         category = "pull_request_summary"
         cached = self.cache.get(category, username, repo=repo_name, week=cache_key)
         if cached is not None:
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=True, refreshed=False)
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=True, refreshed=False
+            )
 
         if self.fetcher is None:
             return RefreshResult(
@@ -993,19 +1286,40 @@ query RepoMetadata($owner: String!, $name: String!) {
                 "pushed_at": pushed_at.isoformat(),
                 "ttl_enforced": False,
             }
-            self.cache.set(category, username, summary, repo=repo_name, week=cache_key, metadata=metadata)
+            self.cache.set(
+                category,
+                username,
+                summary,
+                repo=repo_name,
+                week=cache_key,
+                metadata=metadata,
+            )
             self._increment_api_calls()
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=True)
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=False, refreshed=True
+            )
         except Exception as error:
-            self.logger.warning(f"Failed to refresh {category} for {repo_name}: {error}")
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=False, error=str(error))
+            self.logger.warning(
+                f"Failed to refresh {category} for {repo_name}: {error}"
+            )
+            return RefreshResult(
+                repo_name=repo_name,
+                category=category,
+                was_cached=False,
+                refreshed=False,
+                error=str(error),
+            )
 
-    def refresh_security_summary(self, username: str, repo_name: str, pushed_at: datetime) -> RefreshResult:
+    def refresh_security_summary(
+        self, username: str, repo_name: str, pushed_at: datetime
+    ) -> RefreshResult:
         cache_key = sanitize_timestamp_for_filename(pushed_at)
         category = "security_summary"
         cached = self.cache.get(category, username, repo=repo_name, week=cache_key)
         if cached is not None:
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=True, refreshed=False)
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=True, refreshed=False
+            )
 
         if self.fetcher is None:
             return RefreshResult(
@@ -1029,19 +1343,40 @@ query RepoMetadata($owner: String!, $name: String!) {
                 "pushed_at": pushed_at.isoformat(),
                 "ttl_enforced": False,
             }
-            self.cache.set(category, username, summary, repo=repo_name, week=cache_key, metadata=metadata)
+            self.cache.set(
+                category,
+                username,
+                summary,
+                repo=repo_name,
+                week=cache_key,
+                metadata=metadata,
+            )
             self._increment_api_calls()
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=True)
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=False, refreshed=True
+            )
         except Exception as error:
-            self.logger.warning(f"Failed to refresh {category} for {repo_name}: {error}")
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=False, error=str(error))
+            self.logger.warning(
+                f"Failed to refresh {category} for {repo_name}: {error}"
+            )
+            return RefreshResult(
+                repo_name=repo_name,
+                category=category,
+                was_cached=False,
+                refreshed=False,
+                error=str(error),
+            )
 
-    def refresh_diagnostics_summary(self, username: str, repo_name: str, pushed_at: datetime) -> RefreshResult:
+    def refresh_diagnostics_summary(
+        self, username: str, repo_name: str, pushed_at: datetime
+    ) -> RefreshResult:
         cache_key = sanitize_timestamp_for_filename(pushed_at)
         category = "diagnostics_summary"
         cached = self.cache.get(category, username, repo=repo_name, week=cache_key)
         if cached is not None:
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=True, refreshed=False)
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=True, refreshed=False
+            )
 
         if self.fetcher is None:
             return RefreshResult(
@@ -1065,19 +1400,38 @@ query RepoMetadata($owner: String!, $name: String!) {
                 "pushed_at": pushed_at.isoformat(),
                 "ttl_enforced": False,
             }
-            self.cache.set(category, username, summary, repo=repo_name, week=cache_key, metadata=metadata)
+            self.cache.set(
+                category,
+                username,
+                summary,
+                repo=repo_name,
+                week=cache_key,
+                metadata=metadata,
+            )
             self._increment_api_calls()
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=True)
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=False, refreshed=True
+            )
         except Exception as error:
-            self.logger.warning(f"Failed to refresh {category} for {repo_name}: {error}")
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=False, error=str(error))
+            self.logger.warning(
+                f"Failed to refresh {category} for {repo_name}: {error}"
+            )
+            return RefreshResult(
+                repo_name=repo_name,
+                category=category,
+                was_cached=False,
+                refreshed=False,
+                error=str(error),
+            )
 
     # ------------------------------------------------------------------
     # Web scraping — extracts signals from public GitHub pages without
     # consuming API rate limits.
     # ------------------------------------------------------------------
 
-    def refresh_web_signals(self, username: str, repo_name: str, pushed_at: datetime) -> RefreshResult:
+    def refresh_web_signals(
+        self, username: str, repo_name: str, pushed_at: datetime
+    ) -> RefreshResult:
         """Scrape the public GitHub page for signals not in the API."""
         from spark.web_scraper import scrape_repo_signals
 
@@ -1085,7 +1439,9 @@ query RepoMetadata($owner: String!, $name: String!) {
         category = "web_signals"
         cached = self.cache.get(category, username, repo=repo_name, week=cache_key)
         if cached is not None:
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=True, refreshed=False)
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=True, refreshed=False
+            )
 
         try:
             signals = scrape_repo_signals(username, repo_name)
@@ -1095,13 +1451,32 @@ query RepoMetadata($owner: String!, $name: String!) {
                 "pushed_at": pushed_at.isoformat(),
                 "ttl_enforced": False,
             }
-            self.cache.set(category, username, signals, repo=repo_name, week=cache_key, metadata=metadata)
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=True)
+            self.cache.set(
+                category,
+                username,
+                signals,
+                repo=repo_name,
+                week=cache_key,
+                metadata=metadata,
+            )
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=False, refreshed=True
+            )
         except Exception as error:
-            self.logger.warning(f"Failed to refresh {category} for {repo_name}: {error}")
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=False, error=str(error))
+            self.logger.warning(
+                f"Failed to refresh {category} for {repo_name}: {error}"
+            )
+            return RefreshResult(
+                repo_name=repo_name,
+                category=category,
+                was_cached=False,
+                refreshed=False,
+                error=str(error),
+            )
 
-    def refresh_homepage_health(self, username: str, repo_name: str, pushed_at: datetime, homepage_url: str) -> RefreshResult:
+    def refresh_homepage_health(
+        self, username: str, repo_name: str, pushed_at: datetime, homepage_url: str
+    ) -> RefreshResult:
         """Check the health of a repository's homepage URL."""
         from spark.web_scraper import check_homepage_health
 
@@ -1109,7 +1484,9 @@ query RepoMetadata($owner: String!, $name: String!) {
         category = "homepage_health"
         cached = self.cache.get(category, username, repo=repo_name, week=cache_key)
         if cached is not None:
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=True, refreshed=False)
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=True, refreshed=False
+            )
 
         try:
             health = check_homepage_health(homepage_url)
@@ -1119,11 +1496,28 @@ query RepoMetadata($owner: String!, $name: String!) {
                 "pushed_at": pushed_at.isoformat(),
                 "ttl_enforced": False,
             }
-            self.cache.set(category, username, health, repo=repo_name, week=cache_key, metadata=metadata)
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=True)
+            self.cache.set(
+                category,
+                username,
+                health,
+                repo=repo_name,
+                week=cache_key,
+                metadata=metadata,
+            )
+            return RefreshResult(
+                repo_name=repo_name, category=category, was_cached=False, refreshed=True
+            )
         except Exception as error:
-            self.logger.warning(f"Failed to refresh {category} for {repo_name}: {error}")
-            return RefreshResult(repo_name=repo_name, category=category, was_cached=False, refreshed=False, error=str(error))
+            self.logger.warning(
+                f"Failed to refresh {category} for {repo_name}: {error}"
+            )
+            return RefreshResult(
+                repo_name=repo_name,
+                category=category,
+                was_cached=False,
+                refreshed=False,
+                error=str(error),
+            )
 
     # ------------------------------------------------------------------
     # Derived scores — computed from already-cached data, no API calls.
@@ -1151,8 +1545,14 @@ query RepoMetadata($owner: String!, $name: String!) {
                 break
 
         if not readme_text:
-            return {"score": 0, "length": 0, "has_headings": False, "has_code_blocks": False,
-                    "has_images": False, "has_install_section": False}
+            return {
+                "score": 0,
+                "length": 0,
+                "has_headings": False,
+                "has_code_blocks": False,
+                "has_images": False,
+                "has_install_section": False,
+            }
 
         length = len(readme_text)
         headings = len(_re.findall(r"^#{1,3}\s+", readme_text, _re.MULTILINE))
@@ -1160,7 +1560,13 @@ query RepoMetadata($owner: String!, $name: String!) {
         links = len(_re.findall(r"\[([^\]]+)\]\(([^)]+)\)", readme_text))
         images = len(_re.findall(r"!\[", readme_text))
 
-        install_keywords = {"install", "getting started", "usage", "quick start", "setup"}
+        install_keywords = {
+            "install",
+            "getting started",
+            "usage",
+            "quick start",
+            "setup",
+        }
         has_install = any(kw in readme_text.lower() for kw in install_keywords)
 
         score = 0
@@ -1186,9 +1592,15 @@ query RepoMetadata($owner: String!, $name: String!) {
         """Quick HEAD check on a URL. Returns (status_code, response_ms)."""
         import time as _time
         import requests as _requests
+
         try:
             t0 = _time.time()
-            resp = _requests.head(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=8, allow_redirects=True)
+            resp = _requests.head(
+                url,
+                headers={"User-Agent": "Mozilla/5.0"},
+                timeout=8,
+                allow_redirects=True,
+            )
             elapsed_ms = int((_time.time() - t0) * 1000)
             return resp.status_code, elapsed_ms
         except Exception:

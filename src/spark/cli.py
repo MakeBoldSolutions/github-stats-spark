@@ -1,6 +1,5 @@
 """Command-line interface for Stats Spark local usage."""
 
-import argparse
 import sys
 
 from spark.cli_argument_builders import build_main_parser

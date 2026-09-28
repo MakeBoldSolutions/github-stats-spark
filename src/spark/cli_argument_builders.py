@@ -2,7 +2,6 @@
 
 import argparse
 
-
 CLI_EPILOG = """
 Examples:
   ALL-IN-ONE: Generate unified data + SVGs + reports in a single optimized run:
@@ -55,7 +54,9 @@ def _add_unified_parser(subparsers: argparse._SubParsersAction) -> None:
         "unified",
         help="ALL-IN-ONE: Generate unified data, SVGs, and markdown reports in a single optimized run",
     )
-    parser.add_argument("--user", type=str, required=True, help="GitHub username to analyze")
+    parser.add_argument(
+        "--user", type=str, required=True, help="GitHub username to analyze"
+    )
     parser.add_argument(
         "--output-dir",
         type=str,
@@ -93,8 +94,12 @@ def _add_unified_parser(subparsers: argparse._SubParsersAction) -> None:
 
 
 def _add_analyze_parser(subparsers: argparse._SubParsersAction) -> None:
-    parser = subparsers.add_parser("analyze", help="Analyze repositories and generate report")
-    parser.add_argument("--user", type=str, required=True, help="GitHub username to analyze")
+    parser = subparsers.add_parser(
+        "analyze", help="Analyze repositories and generate report"
+    )
+    parser.add_argument(
+        "--user", type=str, required=True, help="GitHub username to analyze"
+    )
     parser.add_argument(
         "--output",
         type=str,
@@ -133,7 +138,9 @@ def _add_analyze_parser(subparsers: argparse._SubParsersAction) -> None:
 
 def _add_generate_parser(subparsers: argparse._SubParsersAction) -> None:
     parser = subparsers.add_parser("generate", help="Generate statistics")
-    parser.add_argument("--user", type=str, required=True, help="GitHub username to analyze")
+    parser.add_argument(
+        "--user", type=str, required=True, help="GitHub username to analyze"
+    )
     parser.add_argument(
         "--output-dir",
         type=str,
@@ -177,8 +184,12 @@ def _add_preview_parser(subparsers: argparse._SubParsersAction) -> None:
 
 def _add_config_parser(subparsers: argparse._SubParsersAction) -> None:
     parser = subparsers.add_parser("config", help="Manage configuration")
-    parser.add_argument("--validate", action="store_true", help="Validate configuration file")
-    parser.add_argument("--show", action="store_true", help="Show current configuration")
+    parser.add_argument(
+        "--validate", action="store_true", help="Validate configuration file"
+    )
+    parser.add_argument(
+        "--show", action="store_true", help="Show current configuration"
+    )
     parser.add_argument(
         "--file",
         type=str,
@@ -196,7 +207,9 @@ def _add_cache_parser(subparsers: argparse._SubParsersAction) -> None:
         help="Prune old cache entries (keep last 2 weeks)",
     )
     parser.add_argument("--info", action="store_true", help="Show cache information")
-    parser.add_argument("--status", action="store_true", help="Show cache status for repositories")
+    parser.add_argument(
+        "--status", action="store_true", help="Show cache status for repositories"
+    )
     parser.add_argument(
         "--update-status",
         action="store_true",
@@ -217,8 +230,12 @@ def _add_cache_parser(subparsers: argparse._SubParsersAction) -> None:
         action="store_true",
         help="Migrate ai_summary cache keys to timestamp-only format",
     )
-    parser.add_argument("--user", type=str, help="GitHub username (required for status commands)")
-    parser.add_argument("--dir", type=str, default=".cache", help="Cache directory (default: .cache)")
+    parser.add_argument(
+        "--user", type=str, help="GitHub username (required for status commands)"
+    )
+    parser.add_argument(
+        "--dir", type=str, default=".cache", help="Cache directory (default: .cache)"
+    )
 
 
 def _add_refresh_parser(subparsers: argparse._SubParsersAction) -> None:

@@ -131,6 +131,7 @@ export default function ContributionHeatmap({ activityCalendar, className }) {
                     <div
                       key={cell.date}
                       className={`${styles.cell} ${styles[`intensity${cell.intensity}`]}`}
+                      role="img"
                       aria-label={`${cell.date}: ${cell.count} commit${cell.count !== 1 ? "s" : ""}`}
                       onMouseEnter={(e) =>
                         setTooltip({

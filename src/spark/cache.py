@@ -16,9 +16,9 @@ import os
 import shutil
 import hashlib
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Optional, Dict, List, Union
+from typing import Any, Optional, Dict, List
 
 from spark.config import SparkConfig
 
@@ -107,16 +107,16 @@ class CacheManifest:
             self.data["entries"][key] = {
                 "latest_week": week,
                 "weeks": [week],
-                "updated_at": datetime.now(timezone.utc).isoformat()
+                "updated_at": datetime.now(timezone.utc).isoformat(),
             }
             self._dirty = True
         else:
             entry = self.data["entries"][key]
             if week not in entry["weeks"]:
                 entry["weeks"].append(week)
-                entry["weeks"].sort(reverse=True) # Keep newest first
+                entry["weeks"].sort(reverse=True)  # Keep newest first
                 self._dirty = True
-            
+
             if entry.get("latest_week") != week:
                 # Only update latest_week if the new one is "newer" or we just treat the last written as latest?
                 # For now, let's assume the caller knows what they are doing.
@@ -124,7 +124,7 @@ class CacheManifest:
                 if week > entry.get("latest_week", ""):
                     entry["latest_week"] = week
                     self._dirty = True
-            
+
             entry["updated_at"] = datetime.now(timezone.utc).isoformat()
 
     def get_entry(self, key: str) -> Optional[Dict[str, Any]]:
@@ -161,12 +161,12 @@ class APICache:
         self.config = config or SparkConfig()
         # Ensure config is loaded if passed empty
         if not self.config.config and Path("config/spark.yml").exists():
-             self.config.load()
+            self.config.load()
 
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self._lock_path = self.cache_dir / ".cache.lock"
         self.logger = logging.getLogger(__name__)
-        
+
         self.manifest = CacheManifest(self.cache_dir)
         with self._acquire_lock():
             self.manifest.load()
@@ -180,7 +180,9 @@ class APICache:
             return f"{owner}/{repo}/{category}"
         return f"{owner}/_global_/{category}"
 
-    def _get_fs_path(self, category: str, owner: str, repo: Optional[str], week: str) -> Path:
+    def _get_fs_path(
+        self, category: str, owner: str, repo: Optional[str], week: str
+    ) -> Path:
         """Generate the filesystem path."""
         if repo:
             return self.cache_dir / owner / repo / category / f"{week}.json"
@@ -191,7 +193,13 @@ class APICache:
         serialized = json.dumps(data, sort_keys=True)
         return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
-    def get(self, category: str, owner: str, repo: Optional[str] = None, week: Optional[str] = None) -> Optional[Any]:
+    def get(
+        self,
+        category: str,
+        owner: str,
+        repo: Optional[str] = None,
+        week: Optional[str] = None,
+    ) -> Optional[Any]:
         """Retrieve a cached value.
 
         Args:
@@ -204,7 +212,7 @@ class APICache:
             Cached value or None
         """
         key = self._get_key_path(category, owner, repo)
-        
+
         with self._acquire_lock():
             self.manifest.load()
             # If week not specified, look up latest in manifest
@@ -215,7 +223,7 @@ class APICache:
                 week = entry["latest_week"]
 
             cache_path = self._get_fs_path(category, owner, repo, week)
-            
+
             if not cache_path.exists():
                 return None
 
@@ -249,7 +257,13 @@ class APICache:
 
             return value
 
-    def has_entry(self, category: str, owner: str, repo: Optional[str] = None, week: Optional[str] = None) -> bool:
+    def has_entry(
+        self,
+        category: str,
+        owner: str,
+        repo: Optional[str] = None,
+        week: Optional[str] = None,
+    ) -> bool:
         """Check if a cache entry exists."""
         key = self._get_key_path(category, owner, repo)
         with self._acquire_lock():
@@ -261,28 +275,40 @@ class APICache:
                 return week in entry.get("weeks", [])
             return bool(entry.get("latest_week"))
 
-    def get_entry_info(self, category: str, owner: str, repo: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    def get_entry_info(
+        self, category: str, owner: str, repo: Optional[str] = None
+    ) -> Optional[Dict[str, Any]]:
         """Get info about a cache entry from manifest."""
         key = self._get_key_path(category, owner, repo)
         with self._acquire_lock():
             self.manifest.load()
             return self.manifest.get_entry(key)
 
-    def set(self, category: str, owner: str, value: Any, repo: Optional[str] = None, week: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None) -> None:
+    def set(
+        self,
+        category: str,
+        owner: str,
+        value: Any,
+        repo: Optional[str] = None,
+        week: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> None:
         """Store a value in the cache."""
         if week is None:
             # For user-level data (repositories list, user profile), use a simple default
             # For repo-specific data, week should ALWAYS be provided based on repo_pushed_at
             if repo and not repo.startswith("list_"):
                 # This is repo-specific data - week parameter is required
-                raise ValueError(f"week parameter is required for repo-specific data (category: {category}, repo: {repo}). Cache keys must be based on repo_pushed_at, not time-based.")
-            
+                raise ValueError(
+                    f"week parameter is required for repo-specific data (category: {category}, repo: {repo}). Cache keys must be based on repo_pushed_at, not time-based."
+                )
+
             # User-level data: use a simple cache key (refreshed when list changes)
             week = "current"
-            
+
         key = self._get_key_path(category, owner, repo)
         cache_path = self._get_fs_path(category, owner, repo, week)
-        
+
         payload = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "value": value,
@@ -291,7 +317,7 @@ class APICache:
             "category": category,
             "owner": owner,
             "repo": repo,
-            "week": week
+            "week": week,
         }
 
         with self._acquire_lock():
@@ -300,19 +326,22 @@ class APICache:
             try:
                 # Atomic write
                 import tempfile
-                with tempfile.NamedTemporaryFile("w", delete=False, dir=self.cache_dir, encoding="utf-8") as tmp:
+
+                with tempfile.NamedTemporaryFile(
+                    "w", delete=False, dir=self.cache_dir, encoding="utf-8"
+                ) as tmp:
                     json.dump(payload, tmp, indent=2)
                     temp_name = tmp.name
-                
+
                 # Move to final location
                 if os.path.exists(cache_path):
                     os.remove(cache_path)
                 shutil.move(temp_name, cache_path)
-                
+
                 # Update manifest
                 self.manifest.update_entry(key, week)
                 self.manifest.save()
-                
+
             except Exception as exc:
                 self.logger.error(f"Failed to write cache file {cache_path}: {exc}")
                 if "temp_name" in locals() and os.path.exists(temp_name):
@@ -322,21 +351,19 @@ class APICache:
     def prune(self, keep_weeks: int = 2):
         """Prune old cache entries."""
         self.logger.info("Running cache janitor...")
-        
+
         with self._acquire_lock():
             # Reload manifest to be safe
             self.manifest.load()
-            
-            entries_to_remove = []
-            
+
             for key, entry in self.manifest.data["entries"].items():
                 weeks = entry.get("weeks", [])
                 if len(weeks) > keep_weeks:
                     # Sort weeks descending
                     weeks.sort(reverse=True)
-                    weeks_to_keep = weeks[:keep_weeks]
+                    weeks[:keep_weeks]
                     weeks_to_remove = weeks[keep_weeks:]
-                    
+
                     parts = key.split("/")
                     if len(parts) == 3:
                         owner, repo, category = parts
@@ -353,7 +380,7 @@ class APICache:
                             self.manifest.remove_week(key, week)
                         except OSError as e:
                             self.logger.warning(f"Failed to delete {path}: {e}")
-            
+
             self.manifest.save()
 
     def clear(self) -> None:
@@ -371,7 +398,7 @@ class APICache:
                         item.unlink()
                 except OSError as e:
                     self.logger.warning(f"Failed to delete {item}: {e}")
-            
+
             # Reset manifest
             self.manifest.data = {"entries": {}}
             self.manifest.save()
@@ -380,7 +407,7 @@ class APICache:
         """Clear all cache entries related to a specific repository."""
         count = 0
         repo_dir = self.cache_dir / username / repo_name
-        
+
         with self._acquire_lock():
             self.manifest.load()
             if repo_dir.exists():
@@ -388,24 +415,26 @@ class APICache:
                 for _ in repo_dir.rglob("*.json"):
                     count += 1
                 shutil.rmtree(repo_dir)
-                
+
                 # Update manifest
                 keys_to_remove = []
                 prefix = f"{username}/{repo_name}/"
                 for key in self.manifest.data["entries"]:
                     if key.startswith(prefix):
                         keys_to_remove.append(key)
-                
+
                 for key in keys_to_remove:
                     del self.manifest.data["entries"][key]
-                
+
                 if keys_to_remove:
                     self.manifest._dirty = True
                     self.manifest.save()
-                    
+
         return count
 
-    def collect_garbage(self, owner: str, active_repo_names: List[str]) -> Dict[str, Any]:
+    def collect_garbage(
+        self, owner: str, active_repo_names: List[str]
+    ) -> Dict[str, Any]:
         """Remove cache entries for repositories that no longer exist.
 
         Compares cached repository directories against the current list of
@@ -457,8 +486,7 @@ class APICache:
                     # Clean manifest entries for this repo
                     prefix = f"{owner}/{repo_name}/"
                     keys_to_remove = [
-                        k for k in self.manifest.data["entries"]
-                        if k.startswith(prefix)
+                        k for k in self.manifest.data["entries"] if k.startswith(prefix)
                     ]
                     for key in keys_to_remove:
                         del self.manifest.data["entries"][key]

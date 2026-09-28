@@ -3,7 +3,7 @@
 import logging
 import re
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import TypedDict, Dict, List, Optional, Tuple
 
 import requests
 from packaging.version import InvalidVersion, Version
@@ -14,6 +14,7 @@ from .parser import DependencyParser, Dependency
 @dataclass
 class DependencyStatus:
     """Status of a single dependency."""
+
     name: str
     current_version: str
     ecosystem: str
@@ -31,9 +32,19 @@ class DependencyStatus:
 @dataclass
 class RepositoryDependencyReport:
     """Dependency analysis report for a repository."""
+
     total_dependencies: int
     ecosystems: List[str]
     details: List[DependencyStatus]
+
+
+class VersionLookupSettings(TypedDict):
+    """Validated dependency registry lookup options."""
+
+    enabled: bool
+    max_dependencies: int
+    timeout_seconds: float
+    supported_ecosystems: set[str]
 
 
 class RepositoryDependencyAnalyzer:
@@ -48,12 +59,16 @@ class RepositoryDependencyAnalyzer:
         self.parser = DependencyParser()
         self.logger = logging.getLogger(__name__)
         self.config = config or {}
-        self._registry_cache: Dict[Tuple[str, str], Tuple[Optional[str], str, Optional[str]]] = {}
+        self._registry_cache: Dict[
+            Tuple[str, str], Tuple[Optional[str], str, Optional[str]]
+        ] = {}
         self._session = requests.Session()
 
-    def _version_lookup_settings(self) -> Dict[str, object]:
+    def _version_lookup_settings(self) -> VersionLookupSettings:
         lookup = self.config.get("dependency_version_lookup", {})
-        supported = lookup.get("supported_ecosystems", ["npm", "pypi", "rubygems", "nuget"])
+        supported = lookup.get(
+            "supported_ecosystems", ["npm", "pypi", "rubygems", "nuget"]
+        )
         return {
             "enabled": lookup.get("enabled", True),
             "max_dependencies": int(lookup.get("max_dependencies", 25)),
@@ -61,7 +76,9 @@ class RepositoryDependencyAnalyzer:
             "supported_ecosystems": set(supported),
         }
 
-    def _normalize_current_version(self, version_constraint: str) -> Tuple[str, bool, Optional[str]]:
+    def _normalize_current_version(
+        self, version_constraint: str
+    ) -> Tuple[str, bool, Optional[str]]:
         raw_value = (version_constraint or "").strip()
         if not raw_value:
             return "unknown", False, None
@@ -94,6 +111,7 @@ class RepositoryDependencyAnalyzer:
         if cache_key in self._registry_cache:
             return self._registry_cache[cache_key]
 
+        result: Tuple[Optional[str], str, Optional[str]]
         try:
             if ecosystem == "npm":
                 response = self._session.get(
@@ -127,7 +145,11 @@ class RepositoryDependencyAnalyzer:
                 response.raise_for_status()
                 payload = response.json()
                 versions = payload.get("versions") or []
-                result = (versions[-1] if versions else None, "resolved" if versions else "not_found", "nuget")
+                result = (
+                    versions[-1] if versions else None,
+                    "resolved" if versions else "not_found",
+                    "nuget",
+                )
             else:
                 result = (None, "unsupported_ecosystem", None)
         except requests.HTTPError as exc:
@@ -172,10 +194,10 @@ class RepositoryDependencyAnalyzer:
         dep: Dependency,
         source_file: Optional[str],
         lookup_enabled: bool,
-        settings: Dict[str, object],
+        settings: VersionLookupSettings,
     ) -> DependencyStatus:
-        current_version, current_version_known, version_requirement = self._normalize_current_version(
-            dep.version_constraint
+        current_version, current_version_known, version_requirement = (
+            self._normalize_current_version(dep.version_constraint)
         )
 
         latest_version = None
@@ -184,10 +206,12 @@ class RepositoryDependencyAnalyzer:
         if dep.ecosystem not in settings["supported_ecosystems"]:
             latest_version_status = "unsupported_ecosystem"
         elif lookup_enabled:
-            latest_version, latest_version_status, latest_version_source = self._fetch_latest_version(
-                dep.ecosystem,
-                dep.name,
-                settings["timeout_seconds"],
+            latest_version, latest_version_status, latest_version_source = (
+                self._fetch_latest_version(
+                    dep.ecosystem,
+                    dep.name,
+                    settings["timeout_seconds"],
+                )
             )
         else:
             latest_version_status = "skipped_limit"
@@ -213,7 +237,9 @@ class RepositoryDependencyAnalyzer:
             source_file=source_file,
         )
 
-    def analyze_repository(self, dependency_files: Dict[str, str]) -> RepositoryDependencyReport:
+    def analyze_repository(
+        self, dependency_files: Dict[str, str]
+    ) -> RepositoryDependencyReport:
         """Parse dependencies from repository files.
 
         Args:
@@ -222,7 +248,7 @@ class RepositoryDependencyAnalyzer:
         Returns:
             RepositoryDependencyReport with parsed dependencies
         """
-        ecosystems = set()
+        ecosystems: set[str] = set()
         settings = self._version_lookup_settings()
         parsed_dependencies: List[Tuple[str, Dependency]] = []
 
@@ -234,12 +260,13 @@ class RepositoryDependencyAnalyzer:
 
         if not parsed_dependencies:
             return RepositoryDependencyReport(
-                total_dependencies=0,
-                ecosystems=[],
-                details=[]
+                total_dependencies=0, ecosystems=[], details=[]
             )
 
-        lookup_enabled = bool(settings["enabled"]) and len(parsed_dependencies) <= settings["max_dependencies"]
+        lookup_enabled = (
+            bool(settings["enabled"])
+            and len(parsed_dependencies) <= settings["max_dependencies"]
+        )
 
         # Convert to status objects
         statuses = []
@@ -255,7 +282,7 @@ class RepositoryDependencyAnalyzer:
         return RepositoryDependencyReport(
             total_dependencies=len(parsed_dependencies),
             ecosystems=sorted(list(ecosystems)),
-            details=statuses
+            details=statuses,
         )
 
     def get_dependency_summary(self, report: RepositoryDependencyReport) -> str:
@@ -275,7 +302,7 @@ class RepositoryDependencyAnalyzer:
         lines.append(f"Ecosystems: {', '.join(report.ecosystems)}")
 
         # Group by ecosystem
-        by_ecosystem = {}
+        by_ecosystem: Dict[str, List[DependencyStatus]] = {}
         for dep in report.details:
             if dep.ecosystem not in by_ecosystem:
                 by_ecosystem[dep.ecosystem] = []
@@ -335,16 +362,15 @@ class RepositoryDependencyAnalyzer:
         Returns:
             TechnologyStack object with dependency analysis, or None if no dependencies
         """
-        from spark.models.tech_stack import TechnologyStack
 
         # Known dependency files to check
         dependency_files_to_check = [
-            'package.json',  # NPM
-            'requirements.txt',  # PyPI
-            'pyproject.toml',  # PyPI (modern)
-            'Gemfile',  # RubyGems
-            'go.mod',  # Go
-            'pom.xml',  # Maven
+            "package.json",  # NPM
+            "requirements.txt",  # PyPI
+            "pyproject.toml",  # PyPI (modern)
+            "Gemfile",  # RubyGems
+            "go.mod",  # Go
+            "pom.xml",  # Maven
         ]
 
         dependency_files = {}
@@ -353,8 +379,8 @@ class RepositoryDependencyAnalyzer:
         for filename in dependency_files_to_check:
             try:
                 file_content = github_repo.get_contents(filename)
-                if file_content and hasattr(file_content, 'decoded_content'):
-                    content = file_content.decoded_content.decode('utf-8')
+                if file_content and hasattr(file_content, "decoded_content"):
+                    content = file_content.decoded_content.decode("utf-8")
                     dependency_files[filename] = content
                     self.logger.debug(f"Found dependency file: {filename}")
             except Exception as e:
@@ -366,11 +392,11 @@ class RepositoryDependencyAnalyzer:
         try:
             contents = github_repo.get_contents("")
             for item in contents:
-                if item.name.endswith('.csproj') and item.type == 'file':
+                if item.name.endswith(".csproj") and item.type == "file":
                     try:
                         file_content = github_repo.get_contents(item.name)
-                        if file_content and hasattr(file_content, 'decoded_content'):
-                            content = file_content.decoded_content.decode('utf-8')
+                        if file_content and hasattr(file_content, "decoded_content"):
+                            content = file_content.decoded_content.decode("utf-8")
                             dependency_files[item.name] = content
                             self.logger.debug(f"Found .NET project file: {item.name}")
                             break  # Only process first .csproj found

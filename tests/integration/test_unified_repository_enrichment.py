@@ -42,7 +42,14 @@ def _create_config(tmp_path):
             {
                 "users": ["markhazleton"],
                 "stats": {
-                    "enabled": ["overview", "heatmap", "languages", "fun", "streaks", "release"],
+                    "enabled": [
+                        "overview",
+                        "heatmap",
+                        "languages",
+                        "fun",
+                        "streaks",
+                        "release",
+                    ],
                     "thresholds": {
                         "graveyard_months": 6,
                         "starter_commits": 50,
@@ -51,7 +58,10 @@ def _create_config(tmp_path):
                         "early_bird_hours": [5, 6, 7, 8, 9],
                     },
                 },
-                "visualization": {"theme": "spark-dark", "effects": {"glow": True, "gradient": True}},
+                "visualization": {
+                    "theme": "spark-dark",
+                    "effects": {"glow": True, "gradient": True},
+                },
                 "cache": {"enabled": True, "directory": str(tmp_path / ".cache")},
                 "repositories": {
                     "max_count": 500,
@@ -63,7 +73,11 @@ def _create_config(tmp_path):
                     "top_n": 50,
                     "ai_provider": "anthropic",
                     "ai_model": "claude-haiku-4-5",
-                    "ranking_weights": {"popularity": 0.30, "activity": 0.45, "health": 0.25},
+                    "ranking_weights": {
+                        "popularity": 0.30,
+                        "activity": 0.45,
+                        "health": 0.25,
+                    },
                 },
                 "github": {
                     "api_version": {
@@ -109,9 +123,29 @@ def test_unified_data_generator_emits_enrichment_fields(tmp_path, monkeypatch):
     pushed_at = datetime.fromisoformat(repo["pushed_at"].replace("Z", "+00:00"))
     cache_key = sanitize_timestamp_for_filename(pushed_at)
 
-    cache.set("commit_counts", "markhazleton", {"total": 3, "recent_90d": 3, "recent_180d": 3, "recent_365d": 3, "last_commit_date": repo["pushed_at"]}, repo=repo["name"], week=cache_key)
-    cache.set("languages", "markhazleton", {"Python": 100}, repo=repo["name"], week=cache_key)
-    cache.set("quality_indicators", "markhazleton", {"has_license": True, "has_ci_cd": True, "has_tests": True, "has_docs": False}, repo=repo["name"], week=cache_key)
+    cache.set(
+        "commit_counts",
+        "markhazleton",
+        {
+            "total": 3,
+            "recent_90d": 3,
+            "recent_180d": 3,
+            "recent_365d": 3,
+            "last_commit_date": repo["pushed_at"],
+        },
+        repo=repo["name"],
+        week=cache_key,
+    )
+    cache.set(
+        "languages", "markhazleton", {"Python": 100}, repo=repo["name"], week=cache_key
+    )
+    cache.set(
+        "quality_indicators",
+        "markhazleton",
+        {"has_license": True, "has_ci_cd": True, "has_tests": True, "has_docs": False},
+        repo=repo["name"],
+        week=cache_key,
+    )
     cache.set(
         "pull_request_summary",
         "markhazleton",
@@ -142,7 +176,13 @@ def test_unified_data_generator_emits_enrichment_fields(tmp_path, monkeypatch):
                 "dependency_alerts": "enabled",
                 "automated_security_fixes": "enabled",
             },
-            "active_alert_counts": {"total_open": 1, "critical": 1, "high": 0, "medium": 0, "low": 0},
+            "active_alert_counts": {
+                "total_open": 1,
+                "critical": 1,
+                "high": 0,
+                "medium": 0,
+                "low": 0,
+            },
             "sources": ["rest.dependabot.alerts"],
         },
         repo=repo["name"],
@@ -153,7 +193,14 @@ def test_unified_data_generator_emits_enrichment_fields(tmp_path, monkeypatch):
     monkeypatch.setattr(
         generator.cache_manager,
         "refresh_user_data",
-        lambda **kwargs: RefreshSummary(total_repos=1, repos_refreshed=0, repos_unchanged=1, repos_failed=0, results=[], api_calls_made=0),
+        lambda **kwargs: RefreshSummary(
+            total_repos=1,
+            repos_refreshed=0,
+            repos_unchanged=1,
+            repos_failed=0,
+            results=[],
+            api_calls_made=0,
+        ),
     )
 
     unified = generator.generate()

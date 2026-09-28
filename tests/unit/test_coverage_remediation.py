@@ -12,7 +12,13 @@ from github import GithubException
 
 from spark.cache import APICache
 from spark.fetcher import GitHubFetcher
-from spark.models import CommitHistory, GitHubData, Repository, RepositorySummary, UserProfile
+from spark.models import (
+    CommitHistory,
+    GitHubData,
+    Repository,
+    RepositorySummary,
+    UserProfile,
+)
 from spark.models.report import UnifiedReport
 from spark.models.tech_stack import TechnologyStack
 from spark.summarizer import RepositorySummarizer, UserProfileGenerator
@@ -67,7 +73,11 @@ def test_fetcher_static_helpers_and_dependency_error_paths(tmp_path, monkeypatch
     assert fetcher._map_failure_reason(500) == "api_error"
 
     # Repo access failure branch
-    monkeypatch.setattr(fetcher.github, "get_repo", lambda _: (_ for _ in ()).throw(GithubException(404, {}, None)))
+    monkeypatch.setattr(
+        fetcher.github,
+        "get_repo",
+        lambda _: (_ for _ in ()).throw(GithubException(404, {}, None)),
+    )
     assert fetcher.fetch_dependency_files("markhazleton", "repo-one") == {}
 
 
@@ -78,7 +88,9 @@ def test_fetcher_commit_counts_handles_invalid_commit_objects(tmp_path, monkeypa
     # First object has missing commit attr; second is valid.
     invalid = SimpleNamespace()
     valid = SimpleNamespace(
-        commit=SimpleNamespace(author=SimpleNamespace(date=datetime.now(timezone.utc) - timedelta(days=5)))
+        commit=SimpleNamespace(
+            author=SimpleNamespace(date=datetime.now(timezone.utc) - timedelta(days=5))
+        )
     )
     repo = SimpleNamespace(get_commits=lambda: [invalid, valid])
     monkeypatch.setattr(fetcher.github, "get_repo", lambda _: repo)
@@ -103,9 +115,13 @@ def test_fetcher_readme_decode_and_rate_limit_branches(tmp_path, monkeypatch):
         remaining = 0
         reset = datetime.now() + timedelta(seconds=1)
 
-    monkeypatch.setattr(fetcher.github, "get_rate_limit", lambda: SimpleNamespace(core=_Rate()))
+    monkeypatch.setattr(
+        fetcher.github, "get_rate_limit", lambda: SimpleNamespace(core=_Rate())
+    )
     sleep_calls = []
-    monkeypatch.setattr("spark.fetcher.time.sleep", lambda seconds: sleep_calls.append(seconds))
+    monkeypatch.setattr(
+        "spark.fetcher.time.sleep", lambda seconds: sleep_calls.append(seconds)
+    )
     fetcher.handle_rate_limit()
     assert sleep_calls
 
@@ -114,7 +130,11 @@ def test_fetcher_rest_get_fallback_and_success(tmp_path, monkeypatch):
     monkeypatch.setenv("GITHUB_TOKEN", "test-token")
     fetcher = GitHubFetcher(
         cache=APICache(cache_dir=str(tmp_path / "cache")),
-        api_version_settings={"enabled": True, "version": "2026-03-10", "fallback_to_default": True},
+        api_version_settings={
+            "enabled": True,
+            "version": "2026-03-10",
+            "fallback_to_default": True,
+        },
     )
 
     calls = []
@@ -131,7 +151,9 @@ def test_fetcher_rest_get_fallback_and_success(tmp_path, monkeypatch):
 
     monkeypatch.setattr("spark.fetcher.requests.get", _fake_get)
 
-    resp = fetcher._rest_get("/repos/markhazleton/github-stats-spark", params={"p": 1}, include_version=True)
+    resp = fetcher._rest_get(
+        "/repos/markhazleton/github-stats-spark", params={"p": 1}, include_version=True
+    )
     assert resp.status_code == 200
     assert len(calls) == 2
     assert "X-GitHub-Api-Version" in calls[0][1]
@@ -144,7 +166,9 @@ def test_fetcher_rest_get_fallback_and_success(tmp_path, monkeypatch):
         return _Resp(200)
 
     monkeypatch.setattr("spark.fetcher.requests.get", _ok_get)
-    resp = fetcher._rest_get("/repos/markhazleton/github-stats-spark", include_version=False)
+    resp = fetcher._rest_get(
+        "/repos/markhazleton/github-stats-spark", include_version=False
+    )
     assert resp.status_code == 200
     assert "X-GitHub-Api-Version" not in calls[0][1]
 
@@ -159,8 +183,12 @@ def test_cache_integrity_and_migration_paths(tmp_path):
 
     cache.set("cat", "markhazleton", {"v": 1}, repo="repo-one", week="2026W01")
     assert cache.has_entry("cat", "markhazleton", repo="repo-one") is True
-    assert cache.has_entry("cat", "markhazleton", repo="repo-one", week="2026W01") is True
-    assert cache.has_entry("cat", "markhazleton", repo="repo-one", week="2026W99") is False
+    assert (
+        cache.has_entry("cat", "markhazleton", repo="repo-one", week="2026W01") is True
+    )
+    assert (
+        cache.has_entry("cat", "markhazleton", repo="repo-one", week="2026W99") is False
+    )
 
     # Corrupt file path handling.
     corrupt_path = cache_dir / "markhazleton" / "repo-one" / "cat" / "2026W02.json"
@@ -190,7 +218,13 @@ def test_cache_integrity_and_migration_paths(tmp_path):
     assert cache.get("cat", "markhazleton", repo="repo-one", week="2026W03") is None
 
     # Migration path for ai_summary key format.
-    cache.set("ai_summary", "markhazleton", {"ai_summary": "x"}, repo="repo-one", week="2026-03-01T10-00-00+00-00_abcd")
+    cache.set(
+        "ai_summary",
+        "markhazleton",
+        {"ai_summary": "x"},
+        repo="repo-one",
+        week="2026-03-01T10-00-00+00-00_abcd",
+    )
     result = cache.migrate_ai_summary_cache_keys()
     assert result["moved"] >= 1
 
@@ -198,12 +232,16 @@ def test_cache_integrity_and_migration_paths(tmp_path):
     assert cleared >= 1
 
 
-def test_summarizer_cache_hit_prompt_and_profile_generation(tmp_path, sample_repo, sample_commit_history):
+def test_summarizer_cache_hit_prompt_and_profile_generation(
+    tmp_path, sample_repo, sample_commit_history
+):
     cache = APICache(cache_dir=str(tmp_path / "cache"))
     summarizer = RepositorySummarizer(cache=cache, enable_ai=False)
 
     # Cache-hit branch in _generate_ai_summary.
-    cache_key = sample_repo.pushed_at.replace(microsecond=0).isoformat().replace(":", "-")
+    cache_key = (
+        sample_repo.pushed_at.replace(microsecond=0).isoformat().replace(":", "-")
+    )
     cache.set(
         "ai_summary",
         "markhazleton",
@@ -238,7 +276,9 @@ def test_summarizer_cache_hit_prompt_and_profile_generation(tmp_path, sample_rep
     assert "Repository: repo-one" in prompt
     assert "Languages:" in prompt
 
-    assert "Feature A" in summarizer._extract_features("## Features\n- Feature A\n- Feature B")
+    assert "Feature A" in summarizer._extract_features(
+        "## Features\n- Feature A\n- Feature B"
+    )
     assert summarizer._extract_description("# Title\n\nFirst paragraph.")
 
     before = summarizer.total_cost
@@ -252,12 +292,16 @@ def test_summarizer_cache_hit_prompt_and_profile_generation(tmp_path, sample_rep
     repositories = [sample_repo]
     histories = {sample_repo.name: sample_commit_history}
     tech_stacks = {sample_repo.name: TechnologyStack(repository_name=sample_repo.name)}
-    profile = profile_gen.generate_profile("markhazleton", repositories, histories, tech_stacks)
+    profile = profile_gen.generate_profile(
+        "markhazleton", repositories, histories, tech_stacks
+    )
     assert profile.username == "markhazleton"
     assert profile.total_repos == 1
 
 
-def test_summarizer_ai_generation_and_model_fallback(tmp_path, sample_repo, sample_commit_history):
+def test_summarizer_ai_generation_and_model_fallback(
+    tmp_path, sample_repo, sample_commit_history
+):
     cache = APICache(cache_dir=str(tmp_path / "cache"))
     summarizer = RepositorySummarizer(cache=cache, enable_ai=False)
 
@@ -343,11 +387,15 @@ def test_summarizer_summarize_repository_branching(sample_repo, sample_commit_hi
     summarizer = RepositorySummarizer(enable_ai=False)
 
     # readme available -> enhanced fallback
-    summary = summarizer.summarize_repository(sample_repo, "# Title\n\nDesc", sample_commit_history, allow_ai=False)
+    summary = summarizer.summarize_repository(
+        sample_repo, "# Title\n\nDesc", sample_commit_history, allow_ai=False
+    )
     assert summary.generation_method == "enhanced-template"
 
     # readme missing -> basic fallback
-    summary_no_readme = summarizer.summarize_repository(sample_repo, None, sample_commit_history, allow_ai=False)
+    summary_no_readme = summarizer.summarize_repository(
+        sample_repo, None, sample_commit_history, allow_ai=False
+    )
     assert summary_no_readme.generation_method == "basic-template"
 
 
@@ -388,9 +436,13 @@ def test_user_profile_generator_detects_patterns_and_template_text(sample_repo):
             recent_365d=120,
             last_commit_date=now - timedelta(days=1),
         )
-        tech_stacks[repo.name] = TechnologyStack(repository_name=repo.name, frameworks=["react", "pytest"])
+        tech_stacks[repo.name] = TechnologyStack(
+            repository_name=repo.name, frameworks=["react", "pytest"]
+        )
 
-    profile = profile_gen.generate_profile("markhazleton", repos, histories, tech_stacks)
+    profile = profile_gen.generate_profile(
+        "markhazleton", repos, histories, tech_stacks
+    )
     assert profile.activity_patterns
     template = profile_gen._generate_template_impression(profile)
     assert "markhazleton" in template
@@ -412,14 +464,21 @@ def test_user_profile_generator_ai_impression_success_and_fallback(sample_repo):
     # AI success path
     summarizer.anthropic = SimpleNamespace(
         messages=SimpleNamespace(
-            create=lambda **kwargs: SimpleNamespace(content=[SimpleNamespace(text="AI profile impression")])
+            create=lambda **kwargs: SimpleNamespace(
+                content=[SimpleNamespace(text="AI profile impression")]
+            )
         )
     )
-    assert profile_gen._generate_ai_impression(profile, [sample_repo]) == "AI profile impression"
+    assert (
+        profile_gen._generate_ai_impression(profile, [sample_repo])
+        == "AI profile impression"
+    )
 
     # AI failure fallback path in generate_profile
     summarizer.anthropic = SimpleNamespace(
-        messages=SimpleNamespace(create=lambda **kwargs: (_ for _ in ()).throw(RuntimeError("boom")))
+        messages=SimpleNamespace(
+            create=lambda **kwargs: (_ for _ in ()).throw(RuntimeError("boom"))
+        )
     )
     history = CommitHistory(
         repository_name=sample_repo.name,
@@ -438,34 +497,39 @@ def test_user_profile_generator_ai_impression_success_and_fallback(sample_repo):
     assert generated.overall_impression
 
 
-def test_unified_workflow_fetch_generate_report_paths(spark_config_factory, tmp_path, sample_repo, sample_commit_history):
+def test_unified_workflow_fetch_generate_report_paths(
+    spark_config_factory, tmp_path, sample_repo, sample_commit_history
+):
     config = spark_config_factory(theme="spark-light")
-    workflow = UnifiedReportWorkflow(config, cache=APICache(cache_dir=str(tmp_path / ".cache")), cache_only=False)
+    workflow = UnifiedReportWorkflow(
+        config, cache=APICache(cache_dir=str(tmp_path / ".cache")), cache_only=False
+    )
 
     username = "markhazleton"
-    variant = "list_True_True_True"
-    cache_key = sample_repo.pushed_at.replace(microsecond=0).isoformat().replace(":", "-")
+    (sample_repo.pushed_at.replace(microsecond=0).isoformat().replace(":", "-"))
 
     class _Cache:
         def get(self, category, owner, repo=None, week=None):
             if category == "user_profile":
                 return {"username": username, "public_repos": 1}
             if category == "repositories":
-                return [{
-                    "name": sample_repo.name,
-                    "full_name": f"{username}/{sample_repo.name}",
-                    "description": sample_repo.description,
-                    "language": "Python",
-                    "stars": 1,
-                    "forks": 0,
-                    "watchers": 0,
-                    "created_at": sample_repo.created_at.isoformat(),
-                    "updated_at": sample_repo.updated_at.isoformat(),
-                    "pushed_at": sample_repo.pushed_at.isoformat(),
-                    "is_fork": False,
-                    "is_private": False,
-                    "is_archived": False,
-                }]
+                return [
+                    {
+                        "name": sample_repo.name,
+                        "full_name": f"{username}/{sample_repo.name}",
+                        "description": sample_repo.description,
+                        "language": "Python",
+                        "stars": 1,
+                        "forks": 0,
+                        "watchers": 0,
+                        "created_at": sample_repo.created_at.isoformat(),
+                        "updated_at": sample_repo.updated_at.isoformat(),
+                        "pushed_at": sample_repo.pushed_at.isoformat(),
+                        "is_fork": False,
+                        "is_private": False,
+                        "is_archived": False,
+                    }
+                ]
             if category == "commit_counts":
                 return {
                     "total": 10,
@@ -475,19 +539,26 @@ def test_unified_workflow_fetch_generate_report_paths(spark_config_factory, tmp_
                     "last_commit_date": datetime.now(timezone.utc).isoformat(),
                 }
             if category == "commits":
-                return [{"date": datetime.now(timezone.utc).isoformat(), "repo": sample_repo.name}]
+                return [
+                    {
+                        "date": datetime.now(timezone.utc).isoformat(),
+                        "repo": sample_repo.name,
+                    }
+                ]
             if category == "languages":
                 return {"Python": 1000}
             return None
 
     workflow.cache = _Cache()
-    workflow.fetcher = SimpleNamespace(fetch_commit_counts=lambda *args, **kwargs: {
-        "total": 0,
-        "recent_90d": 0,
-        "recent_180d": 0,
-        "recent_365d": 0,
-        "last_commit_date": None,
-    })
+    workflow.fetcher = SimpleNamespace(
+        fetch_commit_counts=lambda *args, **kwargs: {
+            "total": 0,
+            "recent_90d": 0,
+            "recent_180d": 0,
+            "recent_365d": 0,
+            "last_commit_date": None,
+        }
+    )
 
     data = workflow._fetch_github_data(username)
     assert data.cache_hit_count >= 3
@@ -500,7 +571,14 @@ def test_unified_workflow_fetch_generate_report_paths(spark_config_factory, tmp_
         generate_languages=lambda **kwargs: "<svg/>",
         generate_fun_stats=lambda **kwargs: "<svg/>",
     )
-    workflow.config.get_enabled_stats = lambda: ["overview", "heatmap", "streaks", "release", "languages", "fun"]
+    workflow.config.get_enabled_stats = lambda: [
+        "overview",
+        "heatmap",
+        "streaks",
+        "release",
+        "languages",
+        "fun",
+    ]
     workflow.output_dir = Path(tmp_path / "output")
     generated = workflow._generate_svgs(username, data)
     assert len(generated) == 6
@@ -509,27 +587,35 @@ def test_unified_workflow_fetch_generate_report_paths(spark_config_factory, tmp_
     assert report.username == username
 
 
-def test_unified_workflow_execute_and_internal_branches(spark_config_factory, tmp_path, sample_repo, sample_commit_history):
+def test_unified_workflow_execute_and_internal_branches(
+    spark_config_factory, tmp_path, sample_repo, sample_commit_history
+):
     config = spark_config_factory(theme="spark-light")
-    workflow = UnifiedReportWorkflow(config, cache=APICache(cache_dir=str(tmp_path / ".cache")), cache_only=False)
+    workflow = UnifiedReportWorkflow(
+        config, cache=APICache(cache_dir=str(tmp_path / ".cache")), cache_only=False
+    )
 
     github_data = GitHubData(
         username="markhazleton",
         profile=UserProfile.from_dict({"username": "markhazleton", "public_repos": 1}),
         repositories=[sample_repo],
         commit_histories={sample_repo.name: sample_commit_history},
-        fetch_timestamp=datetime.utcnow(),
+        fetch_timestamp=datetime.now(timezone.utc),
         api_call_count=1,
         cache_hit_count=1,
     )
 
     # Cover execute with partial-failure handling branches.
     workflow._fetch_github_data = lambda username: github_data
-    workflow._generate_svgs = lambda username, data: (_ for _ in ()).throw(RuntimeError("svg failure"))
-    workflow._analyze_repositories = lambda username, repos, commits: (_ for _ in ()).throw(RuntimeError("analysis failure"))
+    workflow._generate_svgs = lambda username, data: (_ for _ in ()).throw(
+        RuntimeError("svg failure")
+    )
+    workflow._analyze_repositories = lambda username, repos, commits: (
+        _ for _ in ()
+    ).throw(RuntimeError("analysis failure"))
     workflow._generate_unified_report = lambda **kwargs: UnifiedReport(
         username="markhazleton",
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.utc),
         repositories=[],
         available_svgs=[],
     )
@@ -538,9 +624,11 @@ def test_unified_workflow_execute_and_internal_branches(spark_config_factory, tm
     assert any("SVG generation failed" in w for w in report.warnings)
     assert any("Repository analysis failed" in w for w in report.warnings)
 
-    workflow._analyze_repositories = UnifiedReportWorkflow._analyze_repositories.__get__(
-        workflow,
-        UnifiedReportWorkflow,
+    workflow._analyze_repositories = (
+        UnifiedReportWorkflow._analyze_repositories.__get__(
+            workflow,
+            UnifiedReportWorkflow,
+        )
     )
 
     # Cover _generate_single_svg dispatch and unknown branch.
@@ -558,12 +646,20 @@ def test_unified_workflow_execute_and_internal_branches(spark_config_factory, tm
         workflow._generate_single_svg("unknown", "markhazleton", {})
 
     # Cover analyze path with cached summary present.
-    workflow.ranker = SimpleNamespace(rank_repositories=lambda repos, histories, top_n=50: [(sample_repo, 88.5)])
+    workflow.ranker = SimpleNamespace(
+        rank_repositories=lambda repos, histories, top_n=50: [(sample_repo, 88.5)]
+    )
     workflow.dependency_analyzer = SimpleNamespace(
         analyze_repository=lambda files: {},
-        build_technology_stack=lambda repository_name, report: TechnologyStack(repository_name=repository_name),
+        build_technology_stack=lambda repository_name, report: TechnologyStack(
+            repository_name=repository_name
+        ),
     )
-    workflow.summarizer = SimpleNamespace(summarize_repository=lambda **kwargs: RepositorySummary(repo_id=sample_repo.name, fallback_summary="fallback"))
+    workflow.summarizer = SimpleNamespace(
+        summarize_repository=lambda **kwargs: RepositorySummary(
+            repo_id=sample_repo.name, fallback_summary="fallback"
+        )
+    )
 
     class _MapCache:
         def __init__(self, key):
@@ -588,6 +684,8 @@ def test_unified_workflow_execute_and_internal_branches(spark_config_factory, tm
             return None
 
     workflow.cache = _MapCache(sample_repo.pushed_at)
-    analyses = workflow._analyze_repositories("markhazleton", [sample_repo], {sample_repo.name: sample_commit_history})
+    analyses = workflow._analyze_repositories(
+        "markhazleton", [sample_repo], {sample_repo.name: sample_commit_history}
+    )
     assert len(analyses) == 1
     assert analyses[0].summary.ai_summary == "cached"

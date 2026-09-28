@@ -19,13 +19,16 @@ import os
 import re
 from datetime import datetime
 from typing import Optional, Dict, List, Any
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+)
 
-try:
-    from anthropic import NotFoundError
-except ImportError:
-    NotFoundError = Exception
+from anthropic import NotFoundError
 
+from spark.ai_response import extract_response_text
 from spark.models.repository import Repository
 from spark.models.commit import CommitHistory
 from spark.models.summary import RepositorySummary
@@ -87,10 +90,15 @@ class RepositorySummarizer:
         if enable_ai and self.api_key:
             try:
                 import anthropic
+
                 self.anthropic = anthropic.Anthropic(api_key=self.api_key)
-                self.logger.info(f"Initialized Anthropic client with model {self.model}")
+                self.logger.info(
+                    f"Initialized Anthropic client with model {self.model}"
+                )
             except ImportError:
-                self.logger.warning("anthropic package not installed, using fallback summaries only")
+                self.logger.warning(
+                    "anthropic package not installed, using fallback summaries only"
+                )
             except Exception as e:
                 self.logger.warning(f"Failed to initialize Anthropic client: {e}")
 
@@ -183,11 +191,15 @@ class RepositorySummarizer:
                     write_cache,
                 )
             except Exception as e:
-                self.logger.warning(f"AI summary failed for {repo.name}: {e}, using fallback")
+                self.logger.warning(
+                    f"AI summary failed for {repo.name}: {e}, using fallback"
+                )
 
         # Fallback 1: Enhanced template with README
         if readme_content:
-            return self._generate_enhanced_fallback(repo, readme_content, commit_history)
+            return self._generate_enhanced_fallback(
+                repo, readme_content, commit_history
+            )
 
         # Fallback 2: Basic template (metadata only)
         return self._generate_basic_fallback(repo, commit_history)
@@ -226,33 +238,45 @@ class RepositorySummarizer:
         # Create cache key from repository push date (invalidate ONLY when repo changes)
         # Import sanitization function from shared utilities
         from spark.time_utils import sanitize_timestamp_for_filename
-        
+
         # Use repo_pushed_at if available, fallback to last_commit_date or updated_at
-        cache_timestamp = repo_pushed_at or (commit_history.last_commit_date if commit_history and commit_history.last_commit_date else repo.updated_at)
+        cache_timestamp = repo_pushed_at or (
+            commit_history.last_commit_date
+            if commit_history and commit_history.last_commit_date
+            else repo.updated_at
+        )
 
         # Cache key: sanitized timestamp only (per repo last commit/update)
         # This ensures cache invalidation ONLY when repository changes (new push)
         cache_key = sanitize_timestamp_for_filename(cache_timestamp)
 
         # Check cache first (SAVES TOKENS!)
-        cached_summary = self.cache.get("ai_summary", repository_owner, repo=repo.name, week=cache_key)
+        cached_summary = self.cache.get(
+            "ai_summary", repository_owner or "unknown", repo=repo.name, week=cache_key
+        )
         if cached_summary:
             self.cache_hits += 1
-            self.logger.debug(f"Cache HIT for {repo.name} (saved ~{cached_summary.get('tokens_used', 0)} tokens)")
+            self.logger.debug(
+                f"Cache HIT for {repo.name} (saved ~{cached_summary.get('tokens_used', 0)} tokens)"
+            )
 
             return RepositorySummary(
                 repo_id=repo.name,
-                ai_summary=cached_summary['ai_summary'],
-                generation_method=cached_summary['generation_method'],
-                generation_timestamp=datetime.fromisoformat(cached_summary['generation_timestamp']),
-                model_used=cached_summary['model_used'],
-                tokens_used=cached_summary['tokens_used'],
-                confidence_score=cached_summary['confidence_score'],
+                ai_summary=cached_summary["ai_summary"],
+                generation_method=cached_summary["generation_method"],
+                generation_timestamp=datetime.fromisoformat(
+                    cached_summary["generation_timestamp"]
+                ),
+                model_used=cached_summary["model_used"],
+                tokens_used=cached_summary["tokens_used"],
+                confidence_score=cached_summary["confidence_score"],
             )
 
         # Cache miss - call Claude API. Retry across a small model fallback chain
         # when Anthropic rejects a specific model identifier.
         self.cache_misses += 1
+        if self.anthropic is None:
+            raise RuntimeError("Anthropic client is not configured")
         response = None
         active_model = self.model
         last_not_found_error: Optional[Exception] = None
@@ -277,7 +301,9 @@ class RepositorySummarizer:
         if response is None and last_not_found_error is not None:
             raise last_not_found_error
 
-        summary_text = response.content[0].text
+        if response is None:
+            raise RuntimeError("No Anthropic model produced a response")
+        summary_text = extract_response_text(response.content)
         input_tokens = self._coerce_token_count(response.usage.input_tokens, "input")
         output_tokens = self._coerce_token_count(response.usage.output_tokens, "output")
         tokens_used = input_tokens + output_tokens
@@ -305,7 +331,11 @@ class RepositorySummarizer:
             cache_payload = {
                 "ai_summary": summary_text,
                 "generation_method": summary.generation_method,
-                "generation_timestamp": summary.generation_timestamp.isoformat(),
+                "generation_timestamp": (
+                    summary.generation_timestamp.isoformat()
+                    if summary.generation_timestamp
+                    else None
+                ),
                 "model_used": summary.model_used,
                 "tokens_used": summary.tokens_used,
                 "confidence_score": summary.confidence_score,
@@ -369,7 +399,11 @@ class RepositorySummarizer:
         if repo.stars > 100:
             summary_parts.append(f"Popular project with {repo.stars} stars.")
 
-        summary_text = " ".join(summary_parts) if summary_parts else repo.description or "No description available."
+        summary_text = (
+            " ".join(summary_parts)
+            if summary_parts
+            else repo.description or "No description available."
+        )
 
         return RepositorySummary(
             repo_id=repo.name,
@@ -411,7 +445,9 @@ class RepositorySummarizer:
 
         # Add activity info
         if commit_history and commit_history.recent_90d > 0:
-            summary_parts.append(f"{commit_history.recent_90d} commits in the last 90 days.")
+            summary_parts.append(
+                f"{commit_history.recent_90d} commits in the last 90 days."
+            )
 
         summary_text = " ".join(summary_parts)
 
@@ -460,10 +496,17 @@ Size: {repo.size_kb} KB | Created: {repo.created_at.strftime('%Y-%m-%d') if repo
                     normalized_language_stats.append((lang, bytes_count))
 
             if normalized_language_stats:
-                total_bytes = sum(bytes_count for _, bytes_count in normalized_language_stats)
-                top_langs = sorted(normalized_language_stats, key=lambda x: x[1], reverse=True)[:5]
+                total_bytes = sum(
+                    bytes_count for _, bytes_count in normalized_language_stats
+                )
+                top_langs = sorted(
+                    normalized_language_stats, key=lambda x: x[1], reverse=True
+                )[:5]
                 lang_breakdown = ", ".join(
-                    [f"{lang} ({bytes_count / total_bytes * 100:.1f}%)" for lang, bytes_count in top_langs]
+                    [
+                        f"{lang} ({bytes_count / total_bytes * 100:.1f}%)"
+                        for lang, bytes_count in top_langs
+                    ]
                 )
                 prompt += f"Languages: {lang_breakdown}\n"
 
@@ -491,7 +534,9 @@ Size: {repo.size_kb} KB | Created: {repo.created_at.strftime('%Y-%m-%d') if repo
             dep_count = len(tech_stack.dependencies)
             frameworks = [dep.name for dep in tech_stack.dependencies][:5]
             if frameworks:
-                prompt += f"Key Dependencies ({dep_count} total): {', '.join(frameworks)}\n"
+                prompt += (
+                    f"Key Dependencies ({dep_count} total): {', '.join(frameworks)}\n"
+                )
             if tech_stack.currency_score is not None:
                 prompt += f"Tech Stack Currency: {tech_stack.currency_score}/100\n"
 
@@ -561,7 +606,9 @@ Be informative and technical. Focus on giving readers a clear understanding of t
                 continue
 
             # Stop at next heading or code block
-            if in_description and (stripped.startswith("#") or stripped.startswith("```")):
+            if in_description and (
+                stripped.startswith("#") or stripped.startswith("```")
+            ):
                 break
 
             # Collect non-empty lines
@@ -575,7 +622,8 @@ Be informative and technical. Focus on giving readers a clear understanding of t
         description = " ".join(description_lines)
         # Remove any remaining HTML tags using regex
         import re
-        description = re.sub(r'<[^>]+>', '', description)
+
+        description = re.sub(r"<[^>]+>", "", description)
         return description[:300] if description else None  # Max 300 chars
 
     def _extract_features(self, readme: str) -> List[str]:
@@ -663,7 +711,8 @@ Be informative and technical. Focus on giving readers a clear understanding of t
             "cache_hits": self.cache_hits,
             "cache_misses": self.cache_misses,
             "cache_hit_rate": f"{hit_rate:.1f}%",
-            "tokens_saved_estimate": self.cache_hits * 450,  # ~450 tokens avg per summary
+            "tokens_saved_estimate": self.cache_hits
+            * 450,  # ~450 tokens avg per summary
         }
 
 
@@ -704,11 +753,12 @@ class UserProfileGenerator:
         active_repos = sum(
             1
             for repo in repositories
-            if commit_histories.get(repo.name) and commit_histories[repo.name].recent_90d > 0
+            if commit_histories.get(repo.name)
+            and commit_histories[repo.name].recent_90d > 0
         )
 
         # Aggregate languages across all repos
-        language_totals = {}
+        language_totals: Dict[str, int] = {}
         for repo in repositories:
             if repo.language_stats:
                 for lang, bytes_count in repo.language_stats.items():
@@ -722,17 +772,21 @@ class UserProfileGenerator:
 
                     if normalized_bytes_count <= 0:
                         continue
-                    language_totals[lang] = language_totals.get(lang, 0) + normalized_bytes_count
+                    language_totals[lang] = (
+                        language_totals.get(lang, 0) + normalized_bytes_count
+                    )
 
         # Aggregate frameworks
-        framework_counts = {}
+        framework_counts: Dict[str, int] = {}
         for tech_stack in tech_stacks.values():
             for framework in tech_stack.frameworks:
                 framework_counts[framework] = framework_counts.get(framework, 0) + 1
 
         # Calculate average commit frequency
         total_frequency = sum(
-            ch.commit_frequency for ch in commit_histories.values() if ch.commit_frequency > 0
+            ch.commit_frequency
+            for ch in commit_histories.values()
+            if ch.commit_frequency > 0
         )
         avg_commit_frequency = total_frequency / max(1, len(commit_histories))
 
@@ -756,7 +810,9 @@ class UserProfileGenerator:
         # Generate AI impression if available
         if self.summarizer.anthropic:
             try:
-                profile.overall_impression = self._generate_ai_impression(profile, repositories)
+                profile.overall_impression = self._generate_ai_impression(
+                    profile, repositories
+                )
             except Exception as e:
                 self.logger.warning(f"Failed to generate AI impression: {e}")
                 profile.overall_impression = self._generate_template_impression(profile)
@@ -789,7 +845,9 @@ class UserProfileGenerator:
         if profile.top_languages:
             top_lang = profile.top_languages[0]
             lang_percentage = (
-                profile.primary_languages[top_lang] / sum(profile.primary_languages.values()) * 100
+                profile.primary_languages[top_lang]
+                / sum(profile.primary_languages.values())
+                * 100
             )
             if lang_percentage > 60:
                 patterns.append(
@@ -803,9 +861,7 @@ class UserProfileGenerator:
 
         # Pattern 2: Commit consistency
         consistent_repos = sum(
-            1
-            for ch in commit_histories.values()
-            if "consistent" in ch.patterns
+            1 for ch in commit_histories.values() if "consistent" in ch.patterns
         )
         if consistent_repos >= 3:
             patterns.append(
@@ -823,7 +879,10 @@ class UserProfileGenerator:
                 ActivityPattern(
                     pattern_type="project_diversity",
                     description=f"High technology diversity across {len(profile.primary_languages)} languages",
-                    evidence={"tech_diversity": profile.tech_diversity, "languages": len(profile.primary_languages)},
+                    evidence={
+                        "tech_diversity": profile.tech_diversity,
+                        "languages": len(profile.primary_languages),
+                    },
                     confidence=80,
                 )
             )
@@ -862,13 +921,15 @@ Provide an overall impression that:
 
 Keep it concise and professional."""
 
+        if self.summarizer.anthropic is None:
+            raise RuntimeError("Anthropic client is not configured")
         response = self.summarizer.anthropic.messages.create(
             model=self.summarizer.model,
             max_tokens=300,
             messages=[{"role": "user", "content": prompt}],
         )
 
-        return response.content[0].text
+        return extract_response_text(response.content)
 
     def _generate_template_impression(self, profile: UserProfile) -> str:
         """Generate template-based impression.
@@ -890,21 +951,29 @@ Keep it concise and professional."""
             "experimenter": "an experimenter exploring various technologies",
             "developer": "a developer",
         }
-        parts.append(f"{profile.username} is {style_desc.get(profile.contribution_classification, 'a developer')}")
+        parts.append(
+            f"{profile.username} is {style_desc.get(profile.contribution_classification, 'a developer')}"
+        )
 
         # Primary focus
         if profile.top_languages:
-            parts.append(f"with primary focus on {', '.join(profile.top_languages[:2])}")
+            parts.append(
+                f"with primary focus on {', '.join(profile.top_languages[:2])}"
+            )
 
         # Activity level
         if profile.active_repos / max(1, profile.total_repos) > 0.5:
-            parts.append("Maintains an active development presence with regular contributions.")
+            parts.append(
+                "Maintains an active development presence with regular contributions."
+            )
         else:
             parts.append("Maintains a selective set of active projects.")
 
         # Diversity comment
         if profile.tech_diversity > 70:
-            parts.append("Demonstrates strong technical breadth across multiple ecosystems.")
+            parts.append(
+                "Demonstrates strong technical breadth across multiple ecosystems."
+            )
         elif profile.tech_diversity < 30:
             parts.append("Demonstrates deep specialization in core technologies.")
 

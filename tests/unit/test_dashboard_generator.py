@@ -1,8 +1,5 @@
 """Regression coverage for dashboard generator profile aggregation."""
 
-import tempfile
-from pathlib import Path
-
 import yaml
 import pytest
 
@@ -37,7 +34,10 @@ def full_config(tmp_path) -> SparkConfig:
                 "early_bird_hours": [5, 6, 7, 8, 9],
             },
         },
-        "visualization": {"theme": "spark-dark", "effects": {"glow": True, "gradient": True}},
+        "visualization": {
+            "theme": "spark-dark",
+            "effects": {"glow": True, "gradient": True},
+        },
         "cache": {"enabled": True, "directory": str(tmp_path / ".cache")},
         "analyzer": {
             "top_n": 50,
@@ -71,7 +71,9 @@ def full_config(tmp_path) -> SparkConfig:
     return cfg
 
 
-def test_generate_user_profile_aggregates_included_repository_totals(full_config, dashboard_repositories):
+def test_generate_user_profile_aggregates_included_repository_totals(
+    full_config, dashboard_repositories
+):
     generator = DashboardGenerator(full_config, "markhazleton")
     generator.fetcher = StubFetcher()
 
@@ -82,10 +84,14 @@ def test_generate_user_profile_aggregates_included_repository_totals(full_config
     assert profile.total_forks == 5
 
 
-def test_generate_uses_repository_set_for_profile_totals(monkeypatch, full_config, dashboard_repositories):
+def test_generate_uses_repository_set_for_profile_totals(
+    monkeypatch, full_config, dashboard_repositories
+):
     generator = DashboardGenerator(full_config, "markhazleton")
     generator.fetcher = StubFetcher()
-    monkeypatch.setattr(generator, "generate_dashboard_data", lambda: dashboard_repositories)
+    monkeypatch.setattr(
+        generator, "generate_dashboard_data", lambda: dashboard_repositories
+    )
 
     dashboard_data = generator.generate()
 

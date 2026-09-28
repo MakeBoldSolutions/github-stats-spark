@@ -22,10 +22,13 @@ def sanitize_timestamp_for_filename(timestamp: Optional[Union[datetime, str]]) -
 
     if isinstance(timestamp, str):
         try:
-            timestamp = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+            parsed_timestamp = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
         except ValueError:
             return timestamp.replace(":", "-")
 
-    timestamp_no_micro = timestamp.replace(microsecond=0)
+    else:
+        parsed_timestamp = timestamp
+
+    timestamp_no_micro = parsed_timestamp.replace(microsecond=0)
     iso_str = timestamp_no_micro.isoformat()
     return iso_str.replace(":", "-")

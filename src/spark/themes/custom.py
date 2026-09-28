@@ -49,14 +49,19 @@ class CustomTheme(Theme):
     @property
     def effects(self) -> Dict[str, Any]:
         """Effects configuration from config."""
-        return self._config.get("effects", {
-            "glow": True,
-            "gradient": True,
-            "animations": False,
-        })
+        return self._config.get(
+            "effects",
+            {
+                "glow": True,
+                "gradient": True,
+                "animations": False,
+            },
+        )
 
     @classmethod
-    def load_from_yaml(cls, themes_config: Dict[str, Any], theme_name: str) -> "CustomTheme":
+    def load_from_yaml(
+        cls, themes_config: Dict[str, Any], theme_name: str
+    ) -> "CustomTheme":
         """Load a custom theme from YAML configuration.
 
         Args:

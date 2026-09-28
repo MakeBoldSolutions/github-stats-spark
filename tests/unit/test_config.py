@@ -159,7 +159,8 @@ class TestSparkConfig:
             "stats": {"enabled": ["overview"]},
             "visualization": {"theme": "spark-dark"},
         }
-        import tempfile, yaml
+        import tempfile
+        import yaml
         from pathlib import Path
 
         tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False)
@@ -181,7 +182,8 @@ class TestSparkConfig:
             "stats": {"enabled": ["overview"]},
             "visualization": {"theme": "spark-dark"},
         }
-        import tempfile, yaml
+        import tempfile
+        import yaml
         from pathlib import Path
 
         tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False)

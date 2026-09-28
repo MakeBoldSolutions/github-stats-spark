@@ -9,12 +9,7 @@ from typing import Any, Dict, List, Optional
 import requests
 from bs4 import BeautifulSoup
 
-try:
-    from PIL import Image, ImageStat
-except ImportError:  # pragma: no cover - optional dependency at runtime
-    Image = None
-    ImageStat = None
-
+from PIL import Image, ImageStat
 
 STRONG_404_MARKERS = (
     "there isn't a github pages site here",
@@ -26,7 +21,7 @@ STRONG_404_MARKERS = (
 
 
 def _analyze_http_response(website_url: str, timeout: int = 20) -> Dict[str, Any]:
-    audit = {
+    audit: Dict[str, Any] = {
         "status_code": None,
         "final_url": website_url,
         "page_title": None,
@@ -90,7 +85,9 @@ def _analyze_image(image_path: Path) -> Dict[str, Any]:
     return audit
 
 
-def audit_screenshot_outputs(repositories: List[Dict[str, Any]], workspace_root: Path) -> Dict[str, Any]:
+def audit_screenshot_outputs(
+    repositories: List[Dict[str, Any]], workspace_root: Path
+) -> Dict[str, Any]:
     """Audit screenshot outputs and linked websites for broken captures.
 
     Returns a payload suitable for embedding in repositories.json metadata and
@@ -161,13 +158,18 @@ def audit_screenshot_outputs(repositories: List[Dict[str, Any]], workspace_root:
                         "variance": image_audit.get("variance"),
                     }
                 )
-            image_analysis_available = image_analysis_available or image_audit.get("image_analysis_available", False)
+            image_analysis_available = image_analysis_available or image_audit.get(
+                "image_analysis_available", False
+            )
         elif website_url:
             audit_entry["flags"].append("missing_screenshot")
             missing_screenshots.append({"repo": repo_name, "website_url": website_url})
 
         if audit_entry["flags"]:
-            if any(flag in {"likely_404", "website_unreachable", "missing_screenshot"} for flag in audit_entry["flags"]):
+            if any(
+                flag in {"likely_404", "website_unreachable", "missing_screenshot"}
+                for flag in audit_entry["flags"]
+            ):
                 audit_entry["status"] = "error"
             else:
                 audit_entry["status"] = "warning"
@@ -182,7 +184,9 @@ def audit_screenshot_outputs(repositories: List[Dict[str, Any]], workspace_root:
         "likely_404_pages": likely_404_pages,
         "likely_black_or_blank": likely_black_or_blank,
         "missing_screenshots": missing_screenshots,
-        "flagged_repository_count": sum(1 for value in per_repo.values() if value["flags"]),
+        "flagged_repository_count": sum(
+            1 for value in per_repo.values() if value["flags"]
+        ),
         "repositories": per_repo,
     }
 
@@ -193,9 +197,15 @@ def build_screenshot_audit_markdown(audit_payload: Optional[Dict[str, Any]]) -> 
         return ""
 
     lines = ["## Screenshot Audit", ""]
-    lines.append(f"- Repositories with websites: {audit_payload.get('repos_with_website', 0)}")
-    lines.append(f"- Screenshots present: {audit_payload.get('repos_with_screenshot', 0)}")
-    lines.append(f"- Flagged repositories: {audit_payload.get('flagged_repository_count', 0)}")
+    lines.append(
+        f"- Repositories with websites: {audit_payload.get('repos_with_website', 0)}"
+    )
+    lines.append(
+        f"- Screenshots present: {audit_payload.get('repos_with_screenshot', 0)}"
+    )
+    lines.append(
+        f"- Flagged repositories: {audit_payload.get('flagged_repository_count', 0)}"
+    )
     lines.append("")
 
     likely_404_pages = audit_payload.get("likely_404_pages", [])

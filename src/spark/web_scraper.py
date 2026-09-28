@@ -15,7 +15,7 @@ Signals extracted:
 
 import re
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import requests
 from bs4 import BeautifulSoup
@@ -76,7 +76,7 @@ def scrape_repo_signals(owner: str, repo_name: str) -> Dict[str, Any]:
 
         # --- Total commits ---
         for a in soup.find_all("a", href=True):
-            if "/commits/" in a.get("href", ""):
+            if "/commits/" in str(a.get("href", "") or ""):
                 text = a.get_text(strip=True)
                 match = re.search(r"([\d,]+)", text)
                 if match:
@@ -85,7 +85,7 @@ def scrape_repo_signals(owner: str, repo_name: str) -> Dict[str, Any]:
 
         # --- Stars, forks, watchers from link text ---
         for a in soup.find_all("a", href=True):
-            href = a.get("href", "")
+            href = str(a.get("href", "") or "")
             text = a.get_text(strip=True)
             if not text:
                 continue
@@ -102,7 +102,7 @@ def scrape_repo_signals(owner: str, repo_name: str) -> Dict[str, Any]:
         # Forks fallback (sometimes "0forks" without space)
         if result["forks"] is None:
             for a in soup.find_all("a", href=True):
-                if "/forks" in a.get("href", ""):
+                if "/forks" in str(a.get("href", "") or ""):
                     text = a.get_text(strip=True)
                     match = re.search(r"(\d+)", text)
                     if match:
@@ -114,7 +114,7 @@ def scrape_repo_signals(owner: str, repo_name: str) -> Dict[str, Any]:
             parent = span.parent
             if not parent:
                 continue
-            parent_href = parent.get("href", "")
+            parent_href = str(parent.get("href", "") or "")
             text = span.get_text(strip=True)
             if not text:
                 continue
@@ -146,7 +146,7 @@ def scrape_repo_signals(owner: str, repo_name: str) -> Dict[str, Any]:
         # --- Description from og:description ---
         og_desc = soup.find("meta", attrs={"property": "og:description"})
         if og_desc:
-            desc = og_desc.get("content", "")
+            desc = str(og_desc.get("content", "") or "")
             # GitHub prepends "Contribute to..." for repos without description
             if not desc.startswith("Contribute to"):
                 result["description"] = desc
@@ -154,7 +154,7 @@ def scrape_repo_signals(owner: str, repo_name: str) -> Dict[str, Any]:
         # --- Social preview (custom og:image vs default) ---
         og_img = soup.find("meta", attrs={"property": "og:image"})
         if og_img:
-            img_url = og_img.get("content", "")
+            img_url = str(og_img.get("content", "") or "")
             # Default images use opengraph.githubassets.com
             result["has_social_preview"] = "repository-images" in img_url
 

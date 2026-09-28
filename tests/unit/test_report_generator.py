@@ -2,7 +2,6 @@
 
 import pytest
 from datetime import datetime
-from pathlib import Path
 from spark.report_generator import ReportGenerator
 from spark.models.report import Report, RepositoryAnalysis
 from spark.models.repository import Repository
@@ -109,18 +108,29 @@ class TestReportGenerator:
             commit_frequency=20.5,
         )
 
-        profile.add_pattern(ActivityPattern(
-            pattern_type="technology_focus",
-            description="Strong focus on Python (71% of codebase)",
-            evidence={"language": "Python", "percentage": 71.4},
-            confidence=90,
-        ))
+        profile.add_pattern(
+            ActivityPattern(
+                pattern_type="technology_focus",
+                description="Strong focus on Python (71% of codebase)",
+                evidence={"language": "Python", "percentage": 71.4},
+                confidence=90,
+            )
+        )
 
-        profile.overall_impression = "testuser is an active maintainer with primary focus on Python."
+        profile.overall_impression = (
+            "testuser is an active maintainer with primary focus on Python."
+        )
         return profile
 
     @pytest.fixture
-    def sample_report(self, sample_repository, sample_commit_history, sample_summary, sample_tech_stack, sample_user_profile):
+    def sample_report(
+        self,
+        sample_repository,
+        sample_commit_history,
+        sample_summary,
+        sample_tech_stack,
+        sample_user_profile,
+    ):
         """Create sample report."""
         analysis = RepositoryAnalysis(
             repository=sample_repository,

@@ -10,7 +10,7 @@ import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from spark.cache import APICache
 from spark.logger import get_logger
@@ -93,7 +93,9 @@ def build_repo_detail(
     # Trim readme to first 3000 chars for LLM context efficiency
     if detail.get("readme") and isinstance(detail["readme"], str):
         if len(detail["readme"]) > 3000:
-            detail["readme"] = detail["readme"][:3000] + "\n\n[... truncated for LLM context ...]"
+            detail["readme"] = (
+                detail["readme"][:3000] + "\n\n[... truncated for LLM context ...]"
+            )
 
     return detail
 
@@ -128,6 +130,8 @@ def write_repo_details(
             json.dump(detail, f, indent=2, default=str)
 
         written.append(str(file_path))
-        logger.info(f"  Wrote {file_path.name} ({os.path.getsize(file_path) // 1024}KB)")
+        logger.info(
+            f"  Wrote {file_path.name} ({os.path.getsize(file_path) // 1024}KB)"
+        )
 
     return written

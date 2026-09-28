@@ -20,7 +20,7 @@ class ConfigurationError(Exception):
         self,
         message: str,
         field: Optional[str] = None,
-        cause: Optional[Exception] = None
+        cause: Optional[Exception] = None,
     ):
         """Initialize configuration error with context.
 
@@ -59,10 +59,7 @@ class WorkflowError(Exception):
     """
 
     def __init__(
-        self,
-        message: str,
-        stage: str = "unknown",
-        cause: Optional[Exception] = None
+        self, message: str, stage: str = "unknown", cause: Optional[Exception] = None
     ):
         """Initialize workflow error with context.
 

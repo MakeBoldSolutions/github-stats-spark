@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from spark.models.profile import UserProfile
 from spark.models.repository import Repository
@@ -37,7 +37,9 @@ class RepositoryAnalysis:
         """Serialize repository analysis to dictionary."""
         return {
             "repository": self.repository.to_dict(),
-            "commit_history": self.commit_history.to_dict() if self.commit_history else None,
+            "commit_history": (
+                self.commit_history.to_dict() if self.commit_history else None
+            ),
             "tech_stack": self.tech_stack.to_dict() if self.tech_stack else None,
             "summary": self.summary.to_dict() if self.summary else None,
             "rank": self.rank,
@@ -69,7 +71,7 @@ class Report:
     user_profile: Optional[UserProfile] = None
     repositories: List[RepositoryAnalysis] = field(default_factory=list)
     generation_timestamp: datetime = field(default_factory=datetime.now)
-    metadata: Dict[str, any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
     errors: List[str] = field(default_factory=list)
     partial_results: bool = False
     total_api_calls: int = 0
@@ -83,9 +85,15 @@ class Report:
                 "stats_spark_version": "1.0.0",
                 "report_type": "repository_analysis",
                 "top_n": len(self.repositories),
-                "ai_summaries_count": sum(1 for ra in self.repositories if ra.summary and ra.summary.is_ai_generated),
+                "ai_summaries_count": sum(
+                    1
+                    for ra in self.repositories
+                    if ra.summary and ra.summary.is_ai_generated
+                ),
                 "fallback_summaries_count": sum(
-                    1 for ra in self.repositories if ra.summary and not ra.summary.is_ai_generated
+                    1
+                    for ra in self.repositories
+                    if ra.summary and not ra.summary.is_ai_generated
                 ),
             }
 
@@ -129,7 +137,9 @@ class Report:
         """
         if not self.repositories:
             return 0.0
-        ai_summaries = sum(1 for ra in self.repositories if ra.summary and ra.summary.is_ai_generated)
+        ai_summaries = sum(
+            1 for ra in self.repositories if ra.summary and ra.summary.is_ai_generated
+        )
         return round((ai_summaries / len(self.repositories)) * 100, 1)
 
     @property
@@ -225,7 +235,9 @@ class UnifiedReport:
             + 6  # SVG generations (attempts)
         )
         failed_operations = len(self.errors)
-        return round(((total_operations - failed_operations) / total_operations) * 100.0, 1)
+        return round(
+            ((total_operations - failed_operations) / total_operations) * 100.0, 1
+        )
 
     def _calculate_ai_summary_rate(self) -> float:
         """Calculate percentage of repositories with AI-generated summaries.
@@ -257,16 +269,32 @@ class UnifiedReport:
 
         # FR-004: Repository limit validation
         if len(self.repositories) > 50:
-            errors.append(f"Repository count exceeds limit of 50 (got {len(self.repositories)})")
+            errors.append(
+                f"Repository count exceeds limit of 50 (got {len(self.repositories)})"
+            )
 
         # FR-003: SVG validation
-        valid_svg_types = {"overview", "heatmap", "languages", "fun", "streaks", "release"}
+        valid_svg_types = {
+            "overview",
+            "heatmap",
+            "languages",
+            "fun",
+            "streaks",
+            "release",
+        }
         invalid_svgs = set(self.available_svgs) - valid_svg_types
         if invalid_svgs:
             errors.append(f"Invalid SVG types: {invalid_svgs}")
 
         # FR-017: SVG ordering validation
-        expected_order = ["overview", "heatmap", "streaks", "release", "languages", "fun"]
+        expected_order = [
+            "overview",
+            "heatmap",
+            "streaks",
+            "release",
+            "languages",
+            "fun",
+        ]
         if self.available_svgs:
             filtered_expected = [s for s in expected_order if s in self.available_svgs]
             if self.available_svgs != filtered_expected:
@@ -318,9 +346,21 @@ class UnifiedReport:
             repositories=[
                 RepositoryAnalysis(
                     repository=Repository.from_dict(r["repository"]),
-                    commit_history=CommitHistory.from_dict(r["commit_history"]) if r.get("commit_history") else None,
-                    tech_stack=TechnologyStack.from_dict(r["tech_stack"]) if r.get("tech_stack") else None,
-                    summary=RepositorySummary.from_dict(r["summary"]) if r.get("summary") else None,
+                    commit_history=(
+                        CommitHistory.from_dict(r["commit_history"])
+                        if r.get("commit_history")
+                        else None
+                    ),
+                    tech_stack=(
+                        TechnologyStack.from_dict(r["tech_stack"])
+                        if r.get("tech_stack")
+                        else None
+                    ),
+                    summary=(
+                        RepositorySummary.from_dict(r["summary"])
+                        if r.get("summary")
+                        else None
+                    ),
                     rank=r.get("rank", 0),
                     composite_score=r.get("composite_score", 0.0),
                 )

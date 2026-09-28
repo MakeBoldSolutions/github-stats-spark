@@ -2,7 +2,7 @@
 
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import yaml
 
@@ -10,7 +10,14 @@ import yaml
 class SparkConfig:
     """Manages Stats Spark configuration from YAML files."""
 
-    VALID_STATS_CATEGORIES = ["overview", "heatmap", "languages", "fun", "streaks", "release"]
+    VALID_STATS_CATEGORIES = [
+        "overview",
+        "heatmap",
+        "languages",
+        "fun",
+        "streaks",
+        "release",
+    ]
     BUILT_IN_THEMES = ["spark-dark", "spark-light"]
 
     def __init__(self, config_path: str = "config/spark.yml"):
@@ -91,7 +98,7 @@ class SparkConfig:
         from spark.exceptions import ConfigurationError
 
         keys = key.split(".")
-        value = self.config
+        value: Any = self.config
         for k in keys:
             if isinstance(value, dict):
                 value = value.get(k)
@@ -228,7 +235,7 @@ class SparkConfig:
             Configuration value or default
         """
         keys = key.split(".")
-        value = self.config
+        value: Any = self.config
         for k in keys:
             if isinstance(value, dict):
                 value = value.get(k)
@@ -250,5 +257,7 @@ class SparkConfig:
         return {
             "enabled": self.require("github.api_version.enabled"),
             "version": self.require("github.api_version.version"),
-            "fallback_to_default": self.require("github.api_version.fallback_to_default"),
+            "fallback_to_default": self.require(
+                "github.api_version.fallback_to_default"
+            ),
         }

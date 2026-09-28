@@ -1,0 +1,6 @@
+[flake8]
+# Black owns wrapping and whitespace; enforce Python correctness and style.
+select = E,F,W
+extend-ignore = E203,E226,E501,W503
+max-line-length = 88
+exclude = .venv,node_modules,.git,.validation

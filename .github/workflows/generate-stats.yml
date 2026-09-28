@@ -58,6 +58,13 @@ jobs:
           pip install -r requirements.txt
           pip install -e .
 
+      - name: Resolve output paths
+        env:
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+        run: |
+          USER_SLUG=$(python -c 'import os; from spark.cli_output_layout import slugify_username; print(slugify_username(os.environ["REPOSITORY_OWNER"]))')
+          echo "USER_SLUG=$USER_SLUG" >> "$GITHUB_ENV"
+
       - name: Restore CI cache
         uses: actions/cache@v4
         with:
@@ -130,13 +137,16 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Check if data changed
         id: data-check
         run: |
           DATA_CHANGED=false
-          if ! git diff --quiet data/users/${{ github.repository_owner }}/repositories.json; then
+          test -s "data/users/${USER_SLUG}/repositories.json"
+          if [ -n "$(git status --porcelain -- data/users/ output/users/)" ]; then
             DATA_CHANGED=true
           fi
           # Also rebuild if docs/ is missing or empty (e.g. after accidental deletion)
@@ -161,7 +171,7 @@ jobs:
       - name: Install frontend dependencies
         if: steps.data-check.outputs.changed == 'true'
         working-directory: ./frontend
-        run: npm install
+        run: npm ci
 
       - name: Build dashboard
         if: steps.data-check.outputs.changed == 'true'
@@ -172,16 +182,16 @@ jobs:
         if: steps.data-check.outputs.changed == 'true'
         run: |
           echo "Copying user data to docs..."
-          mkdir -p docs/data/users/${{ github.repository_owner }}
-          cp -r data/users/${{ github.repository_owner }}/repositories.json docs/data/users/${{ github.repository_owner }}/
-          ls -la docs/data/users/${{ github.repository_owner }}/
+          mkdir -p docs/data/users/${USER_SLUG}
+          cp -r data/users/${USER_SLUG}/repositories.json docs/data/users/${USER_SLUG}/
+          ls -la docs/data/users/${USER_SLUG}/
 
       - name: Verify build output
         run: |
           echo "Checking build output..."
           ls -la docs/
           ls -la docs/assets/
-          ls -la docs/data/users/${{ github.repository_owner }}/
+          ls -la docs/data/users/${USER_SLUG}/
           if [ -d "docs/output/screenshots" ]; then
             echo "Screenshots copied successfully:"
             ls -la docs/output/screenshots/
@@ -206,8 +216,8 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add output/users/ data/users/ docs/
           # Add screenshots if they exist
-          if [ -d "output/users/${{ github.repository_owner }}/screenshots" ]; then
-            git add output/users/${{ github.repository_owner }}/screenshots/
+          if [ -d "output/users/${USER_SLUG}/screenshots" ]; then
+            git add output/users/${USER_SLUG}/screenshots/
           fi
           git diff --staged --quiet || git commit -m "Update GitHub statistics and dashboard [skip ci]"
 
@@ -222,7 +232,7 @@ jobs:
         if: always()
         with:
           name: generated-statistics
-          path: output/*.svg
+          path: output/users/**/*.svg
           retention-days: 1
 
 # Setup Instructions:

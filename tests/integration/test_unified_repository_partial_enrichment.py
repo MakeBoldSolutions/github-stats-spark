@@ -18,7 +18,14 @@ def _create_config(tmp_path):
             {
                 "users": ["markhazleton"],
                 "stats": {
-                    "enabled": ["overview", "heatmap", "languages", "fun", "streaks", "release"],
+                    "enabled": [
+                        "overview",
+                        "heatmap",
+                        "languages",
+                        "fun",
+                        "streaks",
+                        "release",
+                    ],
                     "thresholds": {
                         "graveyard_months": 6,
                         "starter_commits": 50,
@@ -27,7 +34,10 @@ def _create_config(tmp_path):
                         "early_bird_hours": [5, 6, 7, 8, 9],
                     },
                 },
-                "visualization": {"theme": "spark-dark", "effects": {"glow": True, "gradient": True}},
+                "visualization": {
+                    "theme": "spark-dark",
+                    "effects": {"glow": True, "gradient": True},
+                },
                 "cache": {"enabled": True, "directory": str(tmp_path / ".cache")},
                 "repositories": {
                     "max_count": 500,
@@ -39,7 +49,11 @@ def _create_config(tmp_path):
                     "top_n": 50,
                     "ai_provider": "anthropic",
                     "ai_model": "claude-haiku-4-5",
-                    "ranking_weights": {"popularity": 0.30, "activity": 0.45, "health": 0.25},
+                    "ranking_weights": {
+                        "popularity": 0.30,
+                        "activity": 0.45,
+                        "health": 0.25,
+                    },
                 },
                 "github": {
                     "api_version": {
@@ -108,7 +122,9 @@ def test_unified_data_generator_preserves_unavailable_states(tmp_path, monkeypat
 
     push_key = sanitize_timestamp_for_filename(datetime.fromisoformat(now))
     cache.set(
-        "pull_request_summary", "markhazleton", {
+        "pull_request_summary",
+        "markhazleton",
+        {
             "availability": "unavailable",
             "reason": "permission_denied",
             "has_open_pull_requests": False,
@@ -117,10 +133,14 @@ def test_unified_data_generator_preserves_unavailable_states(tmp_path, monkeypat
             "review_requested_count": 0,
             "oldest_open_age_days": None,
             "source": "rest.pulls.list",
-        }, repo="repo-unavailable", week=push_key,
+        },
+        repo="repo-unavailable",
+        week=push_key,
     )
     cache.set(
-        "security_summary", "markhazleton", {
+        "security_summary",
+        "markhazleton",
+        {
             "availability": "partial",
             "reason": "api_error",
             "overall_state": "clear",
@@ -131,16 +151,31 @@ def test_unified_data_generator_preserves_unavailable_states(tmp_path, monkeypat
                 "dependency_alerts": "disabled",
                 "automated_security_fixes": "disabled",
             },
-            "active_alert_counts": {"total_open": 0, "critical": 0, "high": 0, "medium": 0, "low": 0},
+            "active_alert_counts": {
+                "total_open": 0,
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0,
+            },
             "sources": ["rest.repos.get"],
-        }, repo="repo-unavailable", week=push_key,
+        },
+        repo="repo-unavailable",
+        week=push_key,
     )
 
     monkeypatch.setattr(generator, "_fetch_repository_list", lambda: [repo])
     monkeypatch.setattr(
         generator.cache_manager,
         "refresh_user_data",
-        lambda **kwargs: RefreshSummary(total_repos=1, repos_refreshed=1, repos_unchanged=0, repos_failed=0, results=[], api_calls_made=2),
+        lambda **kwargs: RefreshSummary(
+            total_repos=1,
+            repos_refreshed=1,
+            repos_unchanged=0,
+            repos_failed=0,
+            results=[],
+            api_calls_made=2,
+        ),
     )
 
     unified = generator.generate()

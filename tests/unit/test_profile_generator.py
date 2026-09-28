@@ -7,7 +7,6 @@ from spark.summarizer import UserProfileGenerator, RepositorySummarizer
 from spark.models.repository import Repository
 from spark.models.commit import CommitHistory
 from spark.models.tech_stack import TechnologyStack
-from spark.models.profile import UserProfile
 
 
 class TestUserProfileGenerator:
@@ -131,7 +130,11 @@ class TestUserProfileGenerator:
         }
 
     def test_generate_profile_basic(
-        self, generator, sample_repositories, sample_commit_histories, sample_tech_stacks
+        self,
+        generator,
+        sample_repositories,
+        sample_commit_histories,
+        sample_tech_stacks,
     ):
         """Test basic profile generation."""
         profile = generator.generate_profile(
@@ -148,7 +151,11 @@ class TestUserProfileGenerator:
         assert profile.tech_diversity > 0
 
     def test_technology_diversity_calculation(
-        self, generator, sample_repositories, sample_commit_histories, sample_tech_stacks
+        self,
+        generator,
+        sample_repositories,
+        sample_commit_histories,
+        sample_tech_stacks,
     ):
         """Test technology diversity calculation."""
         profile = generator.generate_profile(
@@ -165,7 +172,11 @@ class TestUserProfileGenerator:
         assert profile.primary_languages["JavaScript"] == 85000  # 5k + 80k
 
     def test_framework_aggregation(
-        self, generator, sample_repositories, sample_commit_histories, sample_tech_stacks
+        self,
+        generator,
+        sample_repositories,
+        sample_commit_histories,
+        sample_tech_stacks,
     ):
         """Test framework usage aggregation."""
         profile = generator.generate_profile(
@@ -181,7 +192,11 @@ class TestUserProfileGenerator:
         assert profile.framework_usage["Flask"] == 1
 
     def test_activity_pattern_detection_technology_focus(
-        self, generator, sample_repositories, sample_commit_histories, sample_tech_stacks
+        self,
+        generator,
+        sample_repositories,
+        sample_commit_histories,
+        sample_tech_stacks,
     ):
         """Test technology focus pattern detection."""
         # Modify repos to have strong Python focus
@@ -196,12 +211,18 @@ class TestUserProfileGenerator:
         )
 
         # Should detect Python focus
-        focus_patterns = [p for p in profile.activity_patterns if p.pattern_type == "technology_focus"]
+        focus_patterns = [
+            p for p in profile.activity_patterns if p.pattern_type == "technology_focus"
+        ]
         assert len(focus_patterns) > 0
         assert "Python" in focus_patterns[0].description
 
     def test_activity_pattern_detection_consistency(
-        self, generator, sample_repositories, sample_commit_histories, sample_tech_stacks
+        self,
+        generator,
+        sample_repositories,
+        sample_commit_histories,
+        sample_tech_stacks,
     ):
         """Test commit consistency pattern detection."""
         profile = generator.generate_profile(
@@ -213,13 +234,19 @@ class TestUserProfileGenerator:
 
         # Should detect consistent patterns (all 3 repos have "consistent")
         consistency_patterns = [
-            p for p in profile.activity_patterns if p.pattern_type == "commit_consistency"
+            p
+            for p in profile.activity_patterns
+            if p.pattern_type == "commit_consistency"
         ]
         assert len(consistency_patterns) > 0
         assert "3 repositories" in consistency_patterns[0].description
 
     def test_template_impression_generation(
-        self, generator, sample_repositories, sample_commit_histories, sample_tech_stacks
+        self,
+        generator,
+        sample_repositories,
+        sample_commit_histories,
+        sample_tech_stacks,
     ):
         """Test template-based impression generation."""
         profile = generator.generate_profile(
@@ -235,7 +262,11 @@ class TestUserProfileGenerator:
         assert "testuser" in profile.overall_impression
 
     def test_contribution_classification(
-        self, generator, sample_repositories, sample_commit_histories, sample_tech_stacks
+        self,
+        generator,
+        sample_repositories,
+        sample_commit_histories,
+        sample_tech_stacks,
     ):
         """Test contribution classification."""
         profile = generator.generate_profile(
@@ -284,9 +315,13 @@ class TestUserProfileGenerator:
         assert profile.active_repos == 0
         assert profile.commit_frequency >= 0
 
-    @patch('spark.summarizer.RepositorySummarizer')
+    @patch("spark.summarizer.RepositorySummarizer")
     def test_ai_impression_generation(
-        self, mock_summarizer_class, sample_repositories, sample_commit_histories, sample_tech_stacks
+        self,
+        mock_summarizer_class,
+        sample_repositories,
+        sample_commit_histories,
+        sample_tech_stacks,
     ):
         """Test AI-powered impression generation."""
         # Create mock with AI enabled
@@ -312,7 +347,11 @@ class TestUserProfileGenerator:
         assert mock_anthropic.messages.create.called
 
     def test_top_languages_property(
-        self, generator, sample_repositories, sample_commit_histories, sample_tech_stacks
+        self,
+        generator,
+        sample_repositories,
+        sample_commit_histories,
+        sample_tech_stacks,
     ):
         """Test top languages property."""
         profile = generator.generate_profile(

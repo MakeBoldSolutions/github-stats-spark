@@ -20,6 +20,8 @@ def is_excluded_repo(repo_data: Dict[str, Any]) -> bool:
     return bool(is_private) or bool(is_fork) or bool(is_archived)
 
 
-def filter_refreshable_repositories(repo_list: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def filter_refreshable_repositories(
+    repo_list: Iterable[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
     """Filter out repositories excluded by constitution or repo flags."""
     return [repo for repo in repo_list if not is_excluded_repo(repo)]

@@ -95,8 +95,19 @@ def test_repository_from_dict_preserves_enrichment_objects():
                 "security": {
                     "availability": "partial",
                     "reason": "not_supported",
-                    "dependabot": {"total_open": 2, "critical": 1, "high": 1, "medium": 0, "low": 0},
-                    "code_scanning": {"total_open": 0, "error": 0, "warning": 0, "note": 0},
+                    "dependabot": {
+                        "total_open": 2,
+                        "critical": 1,
+                        "high": 1,
+                        "medium": 0,
+                        "low": 0,
+                    },
+                    "code_scanning": {
+                        "total_open": 0,
+                        "error": 0,
+                        "warning": 0,
+                        "note": 0,
+                    },
                 },
                 "actions": {
                     "availability": "available",
@@ -187,7 +198,11 @@ def test_repository_from_github_repo_extracts_quality_and_activity_indicators():
 
         @staticmethod
         def get_contents(path):
-            return [FakeContent("tests", "dir"), FakeContent("docs", "dir"), FakeContent("CHANGELOG.md", "file")]
+            return [
+                FakeContent("tests", "dir"),
+                FakeContent("docs", "dir"),
+                FakeContent("CHANGELOG.md", "file"),
+            ]
 
         @staticmethod
         def get_license():
@@ -195,7 +210,16 @@ def test_repository_from_github_repo_extracts_quality_and_activity_indicators():
 
         @staticmethod
         def get_releases():
-            return type("Releases", (), {"totalCount": 1, "__getitem__": lambda self, idx: type("Release", (), {"created_at": now})()})()
+            return type(
+                "Releases",
+                (),
+                {
+                    "totalCount": 1,
+                    "__getitem__": lambda self, idx: type(
+                        "Release", (), {"created_at": now}
+                    )(),
+                },
+            )()
 
     repo = Repository.from_github_repo(FakeGitHubRepo())
 

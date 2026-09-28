@@ -78,7 +78,7 @@ export default function ThemeToggle() {
       type="button"
       className={styles.toggle}
       onClick={toggleTheme}
-      aria-label={LABELS[theme]}
+      aria-label={`${theme.charAt(0).toUpperCase() + theme.slice(1)} — ${LABELS[theme]}`}
       title={LABELS[theme]}
     >
       <span className={styles.icon}>{ICONS[theme]}</span>

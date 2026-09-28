@@ -20,7 +20,7 @@ class CommitMetric:
     """
 
     sha: str
-    date: datetime
+    date: Optional[datetime]
     size: int
     files_changed: int = 0
     lines_added: int = 0
@@ -30,7 +30,9 @@ class CommitMetric:
         """Convert CommitMetric to dictionary for JSON serialization."""
         return {
             "sha": self.sha,
-            "date": self.date.isoformat() if isinstance(self.date, datetime) else self.date,
+            "date": (
+                self.date.isoformat() if isinstance(self.date, datetime) else self.date
+            ),
             "size": self.size,
             "files_changed": self.files_changed,
             "lines_added": self.lines_added,
@@ -64,8 +66,8 @@ class DashboardRepository:
 
     name: str
     language: str
-    created_at: datetime
-    last_commit_date: datetime
+    created_at: Optional[datetime]
+    last_commit_date: Optional[datetime]
     commit_count: int
     url: str
 
@@ -100,7 +102,8 @@ class DashboardRepository:
             ),
             "first_commit_date": (
                 self.first_commit_date.isoformat()
-                if self.first_commit_date and isinstance(self.first_commit_date, datetime)
+                if self.first_commit_date
+                and isinstance(self.first_commit_date, datetime)
                 else self.first_commit_date
             ),
             "commit_count": self.commit_count,
@@ -179,9 +182,11 @@ class DashboardMetadata:
             "schema_version": self.schema_version,
             "repository_count": self.repository_count,
             "data_source": self.data_source,
-            "cache_hit_rate": round(self.cache_hit_rate, 2)
-            if self.cache_hit_rate is not None
-            else None,
+            "cache_hit_rate": (
+                round(self.cache_hit_rate, 2)
+                if self.cache_hit_rate is not None
+                else None
+            ),
         }
 
 
@@ -248,9 +253,7 @@ class DashboardData:
         repositories = [
             DashboardRepository(**repo) for repo in data.get("repositories", [])
         ]
-        profile = (
-            UserProfile(**data["profile"]) if data.get("profile") else None
-        )
+        profile = UserProfile(**data["profile"]) if data.get("profile") else None
         metadata = (
             DashboardMetadata(**data["metadata"]) if data.get("metadata") else None
         )

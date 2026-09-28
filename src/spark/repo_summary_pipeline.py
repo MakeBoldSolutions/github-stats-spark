@@ -13,8 +13,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
+from spark.ai_response import extract_response_text
 from spark.cache import APICache
 from spark.logger import get_logger
 from spark.time_utils import sanitize_timestamp_for_filename
@@ -85,7 +85,8 @@ def _build_prompt(detail: Dict[str, Any]) -> str:
         total = sum(langs.values())
         top = sorted(langs.items(), key=lambda x: -x[1])[:8]
         languages_section = "\n".join(
-            f"  {lang}: {bytes_val:,} bytes ({bytes_val/total*100:.1f}%)" for lang, bytes_val in top
+            f"  {lang}: {bytes_val:,} bytes ({bytes_val/total*100:.1f}%)"
+            for lang, bytes_val in top
         )
     else:
         languages_section = "  (none detected)"
@@ -126,7 +127,11 @@ def _build_prompt(detail: Dict[str, Any]) -> str:
         has_code_of_conduct=ch.get("has_code_of_conduct", False),
         homepage_url=ch.get("homepage_url") or base.get("homepage") or "(none)",
         homepage_status=ch.get("homepage_status") or "N/A",
-        readme_quality_score=ch.get("readme_quality_score", {}).get("score", "?") if isinstance(ch.get("readme_quality_score"), dict) else "?",
+        readme_quality_score=(
+            ch.get("readme_quality_score", {}).get("score", "?")
+            if isinstance(ch.get("readme_quality_score"), dict)
+            else "?"
+        ),
         dependencies_section=dependencies_section,
         readme_excerpt=readme_excerpt,
     )
@@ -138,7 +143,7 @@ def generate_summaries(
     username: str,
     api_key: Optional[str] = None,
     model: str = "claude-haiku-4-5",
-) -> Dict[str, Dict[str, Any]]:
+) -> Dict[str, Optional[Dict[str, Any]]]:
     """Generate LLM summaries for all repo detail files.
 
     Args:
@@ -160,7 +165,7 @@ def generate_summaries(
 
     client = anthropic.Anthropic(api_key=api_key)
     detail_path = Path(detail_dir)
-    summaries: Dict[str, Dict[str, Any]] = {}
+    summaries: Dict[str, Optional[Dict[str, Any]]] = {}
     total_tokens = 0
     cache_hits = 0
 
@@ -202,7 +207,7 @@ def generate_summaries(
             total_tokens += tokens
 
             # Parse JSON response
-            raw_text = response.content[0].text.strip()
+            raw_text = extract_response_text(response.content).strip()
             # Strip markdown fencing if present
             if raw_text.startswith("```"):
                 raw_text = raw_text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
@@ -215,12 +220,18 @@ def generate_summaries(
             summaries[repo_name] = summary_data
 
             # Cache it
-            cache.set("llm_summary", username, summary_data, repo=repo_name, week=cache_key)
+            cache.set(
+                "llm_summary", username, summary_data, repo=repo_name, week=cache_key
+            )
 
-            logger.info(f"  [{i:2d}/{len(files)}] {repo_name:35s} {elapsed:.1f}s  {tokens} tokens")
+            logger.info(
+                f"  [{i:2d}/{len(files)}] {repo_name:35s} {elapsed:.1f}s  {tokens} tokens"
+            )
 
         except json.JSONDecodeError as e:
-            logger.warning(f"  [{i:2d}/{len(files)}] {repo_name:35s} JSON parse error: {e}")
+            logger.warning(
+                f"  [{i:2d}/{len(files)}] {repo_name:35s} JSON parse error: {e}"
+            )
             # Store raw text as fallback
             summaries[repo_name] = {
                 "summary": raw_text[:300],
@@ -236,7 +247,9 @@ def generate_summaries(
             logger.warning(f"  [{i:2d}/{len(files)}] {repo_name:35s} ERROR: {e}")
             summaries[repo_name] = None
 
-    logger.info(f"  Done: {len(summaries)} summaries, {cache_hits} cached, {total_tokens} tokens used")
+    logger.info(
+        f"  Done: {len(summaries)} summaries, {cache_hits} cached, {total_tokens} tokens used"
+    )
     return summaries
 
 
@@ -278,7 +291,7 @@ def build_repositories_json(
         ws = detail.get("web_signals") or {}
         ps = detail.get("pull_request_summary") or {}
         ss = detail.get("security_summary") or {}
-        deps = detail.get("dependency_files") or {}
+        detail.get("dependency_files") or {}
 
         # Language stats as percentages
         total_bytes = sum(langs.values()) if langs else 0
@@ -294,7 +307,11 @@ def build_repositories_json(
             "url": f"https://github.com/{username}/{repo_name}",
             "homepage": base.get("homepage") or ch.get("homepage_url") or "",
             "has_pages": base.get("has_pages", False),
-            "pages_url": f"https://{username}.github.io/{repo_name}/" if base.get("has_pages") else None,
+            "pages_url": (
+                f"https://{username}.github.io/{repo_name}/"
+                if base.get("has_pages")
+                else None
+            ),
             "stars": ws.get("stars", base.get("stars", 0)),
             "forks": ws.get("forks", base.get("forks", 0)),
             "watchers": ws.get("watchers", base.get("watchers", 0)),
@@ -329,11 +346,17 @@ def build_repositories_json(
             "has_contributing": ch.get("has_contributing", False),
             "has_code_of_conduct": ch.get("has_code_of_conduct", False),
             "has_security_policy": ch.get("has_security_policy", False),
-            "readme_quality_score": ch.get("readme_quality_score", {}).get("score") if isinstance(ch.get("readme_quality_score"), dict) else None,
+            "readme_quality_score": (
+                ch.get("readme_quality_score", {}).get("score")
+                if isinstance(ch.get("readme_quality_score"), dict)
+                else None
+            ),
             "homepage_status": ch.get("homepage_status"),
             "homepage_response_ms": ch.get("homepage_response_ms"),
             # Pull request summary
-            "pull_request_summary": ps if ps.get("availability") == "available" else None,
+            "pull_request_summary": (
+                ps if ps.get("availability") == "available" else None
+            ),
             # Security summary
             "security_summary": ss if ss.get("availability") != "unavailable" else None,
             # AI summary
@@ -343,7 +366,9 @@ def build_repositories_json(
         # Compute age and recency
         if base.get("created_at"):
             try:
-                created = datetime.fromisoformat(base["created_at"].replace("Z", "+00:00"))
+                created = datetime.fromisoformat(
+                    base["created_at"].replace("Z", "+00:00")
+                )
                 entry["age_days"] = (datetime.now(timezone.utc) - created).days
             except (ValueError, TypeError):
                 entry["age_days"] = None
@@ -352,8 +377,12 @@ def build_repositories_json(
 
         if base.get("pushed_at"):
             try:
-                pushed = datetime.fromisoformat(base["pushed_at"].replace("Z", "+00:00"))
-                entry["days_since_last_push"] = (datetime.now(timezone.utc) - pushed).days
+                pushed = datetime.fromisoformat(
+                    base["pushed_at"].replace("Z", "+00:00")
+                )
+                entry["days_since_last_push"] = (
+                    datetime.now(timezone.utc) - pushed
+                ).days
             except (ValueError, TypeError):
                 entry["days_since_last_push"] = None
         else:
@@ -392,5 +421,7 @@ def build_repositories_json(
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2, default=str, ensure_ascii=False)
 
-    logger.info(f"Wrote {out_file} ({os.path.getsize(out_file) // 1024}KB, {len(repositories)} repos)")
+    logger.info(
+        f"Wrote {out_file} ({os.path.getsize(out_file) // 1024}KB, {len(repositories)} repos)"
+    )
     return str(out_file)

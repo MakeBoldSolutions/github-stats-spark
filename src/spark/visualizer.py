@@ -11,7 +11,6 @@
 
 from typing import Dict, List, Any, Optional, Tuple
 import svgwrite
-from svgwrite import Drawing
 from datetime import datetime
 
 from spark.themes import Theme
@@ -61,15 +60,17 @@ class StatisticsVisualizer:
 
         # Title
         title_y = 40
-        dwg.add(dwg.text(
-            f"GitHub Stats - {username}",
-            insert=(width // 2, title_y),
-            text_anchor="middle",
-            font_size="28px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.text_color,
-            font_weight="bold",
-        ))
+        dwg.add(
+            dwg.text(
+                f"GitHub Stats - {username}",
+                insert=(width // 2, title_y),
+                text_anchor="middle",
+                font_size="28px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.text_color,
+                font_weight="bold",
+            )
+        )
 
         # Spark Score section
         score_y = 100
@@ -79,41 +80,49 @@ class StatisticsVisualizer:
         # Spark Score circle
         circle_x = 150
         circle_r = 60
-        dwg.add(dwg.circle(
-            center=(circle_x, score_y + 60),
-            r=circle_r,
-            fill=self.theme.primary_color,
-            opacity=0.2,
-        ))
-        dwg.add(dwg.circle(
-            center=(circle_x, score_y + 60),
-            r=circle_r - 5,
-            fill="none",
-            stroke=self.theme.primary_color,
-            stroke_width=3,
-        ))
+        dwg.add(
+            dwg.circle(
+                center=(circle_x, score_y + 60),
+                r=circle_r,
+                fill=self.theme.primary_color,
+                opacity=0.2,
+            )
+        )
+        dwg.add(
+            dwg.circle(
+                center=(circle_x, score_y + 60),
+                r=circle_r - 5,
+                fill="none",
+                stroke=self.theme.primary_color,
+                stroke_width=3,
+            )
+        )
 
         # Score text
-        dwg.add(dwg.text(
-            f"{score}",
-            insert=(circle_x, score_y + 70),
-            text_anchor="middle",
-            font_size="36px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.accent_color,
-            font_weight="bold",
-        ))
+        dwg.add(
+            dwg.text(
+                f"{score}",
+                insert=(circle_x, score_y + 70),
+                text_anchor="middle",
+                font_size="36px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.accent_color,
+                font_weight="bold",
+            )
+        )
 
         # Lightning bolts
         bolts = "⚡" * rating
-        dwg.add(dwg.text(
-            bolts,
-            insert=(circle_x, score_y + 140),
-            text_anchor="middle",
-            font_size="24px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.accent_color,
-        ))
+        dwg.add(
+            dwg.text(
+                bolts,
+                insert=(circle_x, score_y + 140),
+                text_anchor="middle",
+                font_size="24px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.accent_color,
+            )
+        )
 
         # Metrics section
         metrics_x = 300
@@ -128,34 +137,40 @@ class StatisticsVisualizer:
 
         for i, (label, value) in enumerate(metrics):
             y = metrics_y + (i * 35)
-            dwg.add(dwg.text(
-                f"{label}:",
-                insert=(metrics_x, y),
-                font_size="14px",
-                font_family="Arial, sans-serif",
-                fill=self.theme.text_color,
-            ))
-            dwg.add(dwg.text(
-                str(value),
-                insert=(metrics_x + 150, y),
-                font_size="16px",
-                font_family="Arial, sans-serif",
-                fill=self.theme.primary_color,
-                font_weight="bold",
-            ))
+            dwg.add(
+                dwg.text(
+                    f"{label}:",
+                    insert=(metrics_x, y),
+                    font_size="14px",
+                    font_family="Arial, sans-serif",
+                    fill=self.theme.text_color,
+                )
+            )
+            dwg.add(
+                dwg.text(
+                    str(value),
+                    insert=(metrics_x + 150, y),
+                    font_size="16px",
+                    font_family="Arial, sans-serif",
+                    fill=self.theme.primary_color,
+                    font_weight="bold",
+                )
+            )
 
         # Top languages
         lang_x = 520
         lang_y = score_y + 20
 
-        dwg.add(dwg.text(
-            "Top Languages",
-            insert=(lang_x, lang_y),
-            font_size="16px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.text_color,
-            font_weight="bold",
-        ))
+        dwg.add(
+            dwg.text(
+                "Top Languages",
+                insert=(lang_x, lang_y),
+                font_size="16px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.text_color,
+                font_weight="bold",
+            )
+        )
 
         for i, lang in enumerate(languages[:4]):
             y = lang_y + 30 + (i * 30)
@@ -166,27 +181,33 @@ class StatisticsVisualizer:
             bar_width = 150
             bar_filled = int(bar_width * percentage / 100)
 
-            dwg.add(dwg.rect(
-                (lang_x, y - 12),
-                (bar_width, 18),
-                fill=self.theme.border_color,
-                rx=2,
-            ))
-            dwg.add(dwg.rect(
-                (lang_x, y - 12),
-                (bar_filled, 18),
-                fill=self.theme.primary_color,
-                rx=2,
-            ))
+            dwg.add(
+                dwg.rect(
+                    (lang_x, y - 12),
+                    (bar_width, 18),
+                    fill=self.theme.border_color,
+                    rx=2,
+                )
+            )
+            dwg.add(
+                dwg.rect(
+                    (lang_x, y - 12),
+                    (bar_filled, 18),
+                    fill=self.theme.primary_color,
+                    rx=2,
+                )
+            )
 
             # Label
-            dwg.add(dwg.text(
-                f"{lang_name} {percentage}%",
-                insert=(lang_x + bar_width + 10, y),
-                font_size="12px",
-                font_family="Arial, sans-serif",
-                fill=self.theme.text_color,
-            ))
+            dwg.add(
+                dwg.text(
+                    f"{lang_name} {percentage}%",
+                    insert=(lang_x + bar_width + 10, y),
+                    font_size="12px",
+                    font_family="Arial, sans-serif",
+                    fill=self.theme.text_color,
+                )
+            )
 
         # Time pattern
         pattern = time_pattern.get("category", "unknown")
@@ -197,25 +218,29 @@ class StatisticsVisualizer:
             "unknown": "⏰ Pattern Unknown",
         }
 
-        dwg.add(dwg.text(
-            pattern_labels.get(pattern, "⏰ Pattern Unknown"),
-            insert=(width // 2, height - 40),
-            text_anchor="middle",
-            font_size="16px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.accent_color,
-        ))
+        dwg.add(
+            dwg.text(
+                pattern_labels.get(pattern, "⏰ Pattern Unknown"),
+                insert=(width // 2, height - 40),
+                text_anchor="middle",
+                font_size="16px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.accent_color,
+            )
+        )
 
         # Powered by footer
-        dwg.add(dwg.text(
-            "⚡ Generated with Stats Spark",
-            insert=(width - 10, height - 10),
-            text_anchor="end",
-            font_size="10px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.border_color,
-            opacity=0.7,
-        ))
+        dwg.add(
+            dwg.text(
+                "⚡ Generated with Stats Spark",
+                insert=(width - 10, height - 10),
+                text_anchor="end",
+                font_size="10px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.border_color,
+                opacity=0.7,
+            )
+        )
 
         return dwg.tostring()
 
@@ -233,15 +258,15 @@ class StatisticsVisualizer:
         Returns:
             SVG content as string
         """
-        from datetime import datetime, timedelta
-        
+        from datetime import timedelta
+
         # Calculate dimensions
         cell_size = 12
         cell_gap = 2
         weeks_to_show = 53  # Show full year
         start_x = 80
         start_y = 80
-        
+
         width = start_x + (weeks_to_show * (cell_size + cell_gap)) + 40
         height = start_y + (7 * (cell_size + cell_gap)) + 60
 
@@ -249,65 +274,69 @@ class StatisticsVisualizer:
         dwg.add(dwg.rect((0, 0), (width, height), fill=self.theme.background_color))
 
         # Title
-        dwg.add(dwg.text(
-            f"Commit Activity Heatmap - {username}",
-            insert=(width // 2, 35),
-            text_anchor="middle",
-            font_size="22px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.text_color,
-            font_weight="bold",
-        ))
+        dwg.add(
+            dwg.text(
+                f"Commit Activity Heatmap - {username}",
+                insert=(width // 2, 35),
+                text_anchor="middle",
+                font_size="22px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.text_color,
+                font_weight="bold",
+            )
+        )
 
         # Day labels (Sun-Sat)
-        day_labels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        day_labels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
         for i, label in enumerate(day_labels):
             if i % 2 == 1:  # Show every other day to avoid clutter
                 y = start_y + (i * (cell_size + cell_gap)) + cell_size // 2 + 4
-                dwg.add(dwg.text(
-                    label,
-                    insert=(start_x - 35, y),
-                    font_size="10px",
-                    font_family="Arial, sans-serif",
-                    fill=self.theme.border_color,
-                    text_anchor="end",
-                ))
+                dwg.add(
+                    dwg.text(
+                        label,
+                        insert=(start_x - 35, y),
+                        font_size="10px",
+                        font_family="Arial, sans-serif",
+                        fill=self.theme.border_color,
+                        text_anchor="end",
+                    )
+                )
 
         # Calculate max commits for intensity scaling
         max_commits = max(commits_by_date.values()) if commits_by_date else 1
-        
+
         # Get date range (last 365 days)
         end_date = datetime.now()
         start_date = end_date - timedelta(days=364)
-        
+
         # Create date grid
         current_date = start_date
         week_index = 0
         date_to_position = {}
-        
+
         # Build grid positions
         while current_date <= end_date:
             day_of_week = current_date.weekday()
             # Convert to Sunday-based week (0=Sunday)
             day_index = (day_of_week + 1) % 7
             date_str = current_date.strftime("%Y-%m-%d")
-            
+
             date_to_position[date_str] = (week_index, day_index)
-            
+
             # Move to next week on Saturday
             if day_index == 6:
                 week_index += 1
-            
+
             current_date += timedelta(days=1)
 
         # Draw cells
         for date_str, (week, day) in date_to_position.items():
             x = start_x + (week * (cell_size + cell_gap))
             y = start_y + (day * (cell_size + cell_gap))
-            
+
             # Get commit count for this date
             commit_count = commits_by_date.get(date_str, 0)
-            
+
             # Calculate intensity based on commits
             if commit_count == 0:
                 opacity = 0.1
@@ -317,55 +346,68 @@ class StatisticsVisualizer:
                 intensity = min(commit_count / max_commits, 1.0)
                 opacity = 0.3 + (0.7 * intensity)
                 fill_color = self.theme.primary_color
-            
-            dwg.add(dwg.rect(
-                (x, y),
-                (cell_size, cell_size),
-                fill=fill_color,
-                opacity=opacity,
-                rx=2,
-            ))
+
+            dwg.add(
+                dwg.rect(
+                    (x, y),
+                    (cell_size, cell_size),
+                    fill=fill_color,
+                    opacity=opacity,
+                    rx=2,
+                )
+            )
 
         # Legend
         legend_y = height - 35
         legend_x = start_x
-        dwg.add(dwg.text(
-            "Less",
-            insert=(legend_x, legend_y + 12),
-            font_size="10px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.border_color,
-        ))
-        
+        dwg.add(
+            dwg.text(
+                "Less",
+                insert=(legend_x, legend_y + 12),
+                font_size="10px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.border_color,
+            )
+        )
+
         for i in range(5):
             x = legend_x + 35 + (i * (cell_size + cell_gap + 2))
             opacity = 0.2 + (i * 0.2)
-            dwg.add(dwg.rect(
-                (x, legend_y),
-                (cell_size, cell_size),
-                fill=self.theme.primary_color,
-                opacity=opacity,
-                rx=2,
-            ))
-        
-        dwg.add(dwg.text(
-            "More",
-            insert=(legend_x + 35 + (5 * (cell_size + cell_gap + 2)) + 5, legend_y + 12),
-            font_size="10px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.border_color,
-        ))
+            dwg.add(
+                dwg.rect(
+                    (x, legend_y),
+                    (cell_size, cell_size),
+                    fill=self.theme.primary_color,
+                    opacity=opacity,
+                    rx=2,
+                )
+            )
+
+        dwg.add(
+            dwg.text(
+                "More",
+                insert=(
+                    legend_x + 35 + (5 * (cell_size + cell_gap + 2)) + 5,
+                    legend_y + 12,
+                ),
+                font_size="10px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.border_color,
+            )
+        )
 
         # Powered by footer
-        dwg.add(dwg.text(
-            "⚡ Generated with Stats Spark",
-            insert=(width - 10, height - 10),
-            text_anchor="end",
-            font_size="10px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.border_color,
-            opacity=0.7,
-        ))
+        dwg.add(
+            dwg.text(
+                "⚡ Generated with Stats Spark",
+                insert=(width - 10, height - 10),
+                text_anchor="end",
+                font_size="10px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.border_color,
+                opacity=0.7,
+            )
+        )
 
         return dwg.tostring()
 
@@ -390,15 +432,17 @@ class StatisticsVisualizer:
         dwg.add(dwg.rect((0, 0), (width, height), fill=self.theme.background_color))
 
         # Title
-        dwg.add(dwg.text(
-            f"Language Breakdown - {username}",
-            insert=(width // 2, 30),
-            text_anchor="middle",
-            font_size="20px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.text_color,
-            font_weight="bold",
-        ))
+        dwg.add(
+            dwg.text(
+                f"Language Breakdown - {username}",
+                insert=(width // 2, 30),
+                text_anchor="middle",
+                font_size="20px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.text_color,
+                font_weight="bold",
+            )
+        )
 
         # Language bars
         bar_height = 30
@@ -413,41 +457,49 @@ class StatisticsVisualizer:
 
             # Bar
             bar_width = int(max_bar_width * percentage / 100)
-            dwg.add(dwg.rect(
-                (100, y),
-                (bar_width, bar_height),
-                fill=self.theme.primary_color,
-                rx=4,
-            ))
+            dwg.add(
+                dwg.rect(
+                    (100, y),
+                    (bar_width, bar_height),
+                    fill=self.theme.primary_color,
+                    rx=4,
+                )
+            )
 
             # Label
-            dwg.add(dwg.text(
-                lang_name,
-                insert=(10, y + bar_height // 2 + 5),
-                font_size="14px",
-                font_family="Arial, sans-serif",
-                fill=self.theme.text_color,
-            ))
+            dwg.add(
+                dwg.text(
+                    lang_name,
+                    insert=(10, y + bar_height // 2 + 5),
+                    font_size="14px",
+                    font_family="Arial, sans-serif",
+                    fill=self.theme.text_color,
+                )
+            )
 
             # Percentage
-            dwg.add(dwg.text(
-                f"{percentage}%",
-                insert=(110 + bar_width, y + bar_height // 2 + 5),
-                font_size="12px",
-                font_family="Arial, sans-serif",
-                fill=self.theme.accent_color,
-            ))
+            dwg.add(
+                dwg.text(
+                    f"{percentage}%",
+                    insert=(110 + bar_width, y + bar_height // 2 + 5),
+                    font_size="12px",
+                    font_family="Arial, sans-serif",
+                    fill=self.theme.accent_color,
+                )
+            )
 
         # Powered by footer
-        dwg.add(dwg.text(
-            "⚡ Generated with Stats Spark",
-            insert=(width - 10, height - 10),
-            text_anchor="end",
-            font_size="10px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.border_color,
-            opacity=0.7,
-        ))
+        dwg.add(
+            dwg.text(
+                "⚡ Generated with Stats Spark",
+                insert=(width - 10, height - 10),
+                text_anchor="end",
+                font_size="10px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.border_color,
+                opacity=0.7,
+            )
+        )
 
         return dwg.tostring()
 
@@ -464,36 +516,42 @@ class StatisticsVisualizer:
         dwg.add(dwg.rect((0, 0), (width, height), fill=self.theme.background_color))
 
         # Title
-        dwg.add(dwg.text(
-            f"Release Cadence - {username}",
-            insert=(width // 2, 40),
-            text_anchor="middle",
-            font_size="26px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.text_color,
-            font_weight="bold",
-        ))
+        dwg.add(
+            dwg.text(
+                f"Release Cadence - {username}",
+                insert=(width // 2, 40),
+                text_anchor="middle",
+                font_size="26px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.text_color,
+                font_weight="bold",
+            )
+        )
 
         unique_repos = cadence.get("unique_repos", 0)
-        dwg.add(dwg.text(
-            f"Unique repositories touched in period: {unique_repos}",
-            insert=(width // 2, 70),
-            text_anchor="middle",
-            font_size="14px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.border_color,
-        ))
+        dwg.add(
+            dwg.text(
+                f"Unique repositories touched in period: {unique_repos}",
+                insert=(width // 2, 70),
+                text_anchor="middle",
+                font_size="14px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.border_color,
+            )
+        )
 
         start_y = 100
         if cadence.get("is_estimated"):
-            dwg.add(dwg.text(
-                "Using latest known repository activity because detailed commit timelines were unavailable",
-                insert=(width // 2, 90),
-                text_anchor="middle",
-                font_size="12px",
-                font_family="Arial, sans-serif",
-                fill=self.theme.border_color,
-            ))
+            dwg.add(
+                dwg.text(
+                    "Using latest known repository activity because detailed commit timelines were unavailable",
+                    insert=(width // 2, 90),
+                    text_anchor="middle",
+                    font_size="12px",
+                    font_family="Arial, sans-serif",
+                    fill=self.theme.border_color,
+                )
+            )
             start_y = 115
 
         panel_width = 360
@@ -502,40 +560,54 @@ class StatisticsVisualizer:
         gutter = 80
 
         sections = [
-            ("Weekly Repo Diversity", cadence.get("weekly", []), cadence.get("max_weekly", 0)),
-            ("Monthly Repo Diversity", cadence.get("monthly", []), cadence.get("max_monthly", 0)),
+            (
+                "Weekly Repo Diversity",
+                cadence.get("weekly", []),
+                cadence.get("max_weekly", 0),
+            ),
+            (
+                "Monthly Repo Diversity",
+                cadence.get("monthly", []),
+                cadence.get("max_monthly", 0),
+            ),
         ]
 
         for index, (title, series, max_value) in enumerate(sections):
             panel_x = start_x + index * (panel_width + gutter)
             panel_y = start_y
 
-            dwg.add(dwg.rect(
-                (panel_x, panel_y),
-                (panel_width, panel_height),
-                fill=self.theme.border_color,
-                opacity=0.15,
-                rx=16,
-            ))
+            dwg.add(
+                dwg.rect(
+                    (panel_x, panel_y),
+                    (panel_width, panel_height),
+                    fill=self.theme.border_color,
+                    opacity=0.15,
+                    rx=16,
+                )
+            )
 
-            dwg.add(dwg.text(
-                title,
-                insert=(panel_x + 20, panel_y + 30),
-                font_size="18px",
-                font_family="Arial, sans-serif",
-                fill=self.theme.text_color,
-                font_weight="bold",
-            ))
+            dwg.add(
+                dwg.text(
+                    title,
+                    insert=(panel_x + 20, panel_y + 30),
+                    font_size="18px",
+                    font_family="Arial, sans-serif",
+                    fill=self.theme.text_color,
+                    font_weight="bold",
+                )
+            )
 
             if not series:
-                dwg.add(dwg.text(
-                    "No activity yet",
-                    insert=(panel_x + panel_width / 2, panel_y + panel_height / 2),
-                    text_anchor="middle",
-                    font_size="14px",
-                    font_family="Arial, sans-serif",
-                    fill=self.theme.border_color,
-                ))
+                dwg.add(
+                    dwg.text(
+                        "No activity yet",
+                        insert=(panel_x + panel_width / 2, panel_y + panel_height / 2),
+                        text_anchor="middle",
+                        font_size="14px",
+                        font_family="Arial, sans-serif",
+                        fill=self.theme.border_color,
+                    )
+                )
                 continue
 
             max_value = max(1, max_value)
@@ -545,16 +617,22 @@ class StatisticsVisualizer:
             chart_left = panel_x + 20
             chart_right = panel_x + panel_width - 20
 
-            dwg.add(dwg.line(
-                start=(chart_left, chart_bottom),
-                end=(chart_right, chart_bottom),
-                stroke=self.theme.border_color,
-                stroke_width=1,
-                opacity=0.4,
-            ))
+            dwg.add(
+                dwg.line(
+                    start=(chart_left, chart_bottom),
+                    end=(chart_right, chart_bottom),
+                    stroke=self.theme.border_color,
+                    stroke_width=1,
+                    opacity=0.4,
+                )
+            )
 
             point_count = len(series)
-            step = 0 if point_count <= 1 else (chart_right - chart_left) / (point_count - 1)
+            step = (
+                0
+                if point_count <= 1
+                else (chart_right - chart_left) / (point_count - 1)
+            )
 
             points: List[Tuple[float, float]] = []
             for idx, point in enumerate(series):
@@ -564,65 +642,84 @@ class StatisticsVisualizer:
                 y_pos = chart_bottom - (ratio * chart_height)
                 points.append((x_pos, y_pos))
 
-            dwg.add(dwg.polyline(
-                points=points,
-                fill="none",
-                stroke=self.theme.primary_color,
-                stroke_width=3,
-                stroke_linejoin="round",
-                stroke_linecap="round",
-            ))
+            dwg.add(
+                dwg.polyline(
+                    points=points,
+                    fill="none",
+                    stroke=self.theme.primary_color,
+                    stroke_width=3,
+                    stroke_linejoin="round",
+                    stroke_linecap="round",
+                )
+            )
 
-            for (x_pos, y_pos), point in zip(points, series):
-                marker = dwg.circle(center=(x_pos, y_pos), r=4, fill=self.theme.accent_color)
-                marker.set_desc(title=f"{point.get('label')}: {point.get('repos', 0)} repos")
+            for (marker_x, marker_y), point in zip(points, series):
+                marker = dwg.circle(
+                    center=(marker_x, marker_y), r=4, fill=self.theme.accent_color
+                )
+                marker.set_desc(
+                    title=f"{point.get('label')}: {point.get('repos', 0)} repos"
+                )
                 dwg.add(marker)
 
-            baseline_points = points + [(chart_right, chart_bottom), (chart_left, chart_bottom)]
-            dwg.add(dwg.polygon(
-                points=baseline_points,
-                fill=self.theme.primary_color,
-                opacity=0.1,
-            ))
+            baseline_points = points + [
+                (chart_right, chart_bottom),
+                (chart_left, chart_bottom),
+            ]
+            dwg.add(
+                dwg.polygon(
+                    points=baseline_points,
+                    fill=self.theme.primary_color,
+                    opacity=0.1,
+                )
+            )
 
             first_label = series[0].get("label", "")
             last_label = series[-1].get("label", "")
 
-            dwg.add(dwg.text(
-                first_label,
-                insert=(chart_left, chart_bottom + 20),
-                font_size="12px",
-                font_family="Arial, sans-serif",
-                fill=self.theme.text_color,
-            ))
+            dwg.add(
+                dwg.text(
+                    first_label,
+                    insert=(chart_left, chart_bottom + 20),
+                    font_size="12px",
+                    font_family="Arial, sans-serif",
+                    fill=self.theme.text_color,
+                )
+            )
 
-            dwg.add(dwg.text(
-                last_label,
-                insert=(chart_right, chart_bottom + 20),
-                font_size="12px",
-                font_family="Arial, sans-serif",
-                fill=self.theme.text_color,
-                text_anchor="end",
-            ))
+            dwg.add(
+                dwg.text(
+                    last_label,
+                    insert=(chart_right, chart_bottom + 20),
+                    font_size="12px",
+                    font_family="Arial, sans-serif",
+                    fill=self.theme.text_color,
+                    text_anchor="end",
+                )
+            )
 
             peak_point = max(series, key=lambda item: item.get("repos", 0))
-            dwg.add(dwg.text(
-                f"Peak: {peak_point.get('repos', 0)} repos ({peak_point.get('label', '')})",
-                insert=(panel_x + 20, panel_y + panel_height - 20),
-                font_size="12px",
+            dwg.add(
+                dwg.text(
+                    f"Peak: {peak_point.get('repos', 0)} repos ({peak_point.get('label', '')})",
+                    insert=(panel_x + 20, panel_y + panel_height - 20),
+                    font_size="12px",
+                    font_family="Arial, sans-serif",
+                    fill=self.theme.border_color,
+                )
+            )
+
+        dwg.add(
+            dwg.text(
+                "⚡ Generated with Stats Spark",
+                insert=(width - 10, height - 10),
+                text_anchor="end",
+                font_size="10px",
                 font_family="Arial, sans-serif",
                 fill=self.theme.border_color,
-            ))
-
-        dwg.add(dwg.text(
-            "⚡ Generated with Stats Spark",
-            insert=(width - 10, height - 10),
-            text_anchor="end",
-            font_size="10px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.border_color,
-            opacity=0.7,
-        ))
+                opacity=0.7,
+            )
+        )
 
         return dwg.tostring()
 
@@ -647,25 +744,27 @@ class StatisticsVisualizer:
         dwg.add(dwg.rect((0, 0), (width, height), fill=self.theme.background_color))
 
         # Title with flair
-        dwg.add(dwg.text(
-            f"⚡ Lightning Round Stats - {username}",
-            insert=(width // 2, 30),
-            text_anchor="middle",
-            font_size="22px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.accent_color,
-            font_weight="bold",
-        ))
+        dwg.add(
+            dwg.text(
+                f"⚡ Lightning Round Stats - {username}",
+                insert=(width // 2, 30),
+                text_anchor="middle",
+                font_size="22px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.accent_color,
+                font_weight="bold",
+            )
+        )
 
         # Extract stats
-        most_active_hour = stats.get('most_active_hour', 0)
-        pattern = stats.get('pattern', 'Unknown')
-        total_repos = stats.get('total_repos', 0)
-        account_age_days = stats.get('account_age_days', 0)
-        total_commits = stats.get('total_commits', 0)
-        languages_count = stats.get('languages_count', 0)
-        total_stars = stats.get('total_stars', 0)
-        avg_commits_per_day = stats.get('avg_commits_per_day', 0)
+        most_active_hour = stats.get("most_active_hour", 0)
+        pattern = stats.get("pattern", "Unknown")
+        total_repos = stats.get("total_repos", 0)
+        account_age_days = stats.get("account_age_days", 0)
+        total_commits = stats.get("total_commits", 0)
+        languages_count = stats.get("languages_count", 0)
+        total_stars = stats.get("total_stars", 0)
+        avg_commits_per_day = stats.get("avg_commits_per_day", 0)
 
         # Generate creative fun facts with personality
         facts = []
@@ -706,7 +805,9 @@ class StatisticsVisualizer:
         elif languages_count > 2:
             facts.append(f"💻 Versatile: {languages_count} languages")
         else:
-            facts.append(f"🎨 Specialist: {languages_count} language{'s' if languages_count != 1 else ''}")
+            facts.append(
+                f"🎨 Specialist: {languages_count} language{'s' if languages_count != 1 else ''}"
+            )
 
         # Stars and popularity
         if total_stars > 1000:
@@ -772,13 +873,15 @@ class StatisticsVisualizer:
                 y = start_y + ((i - 4) * spacing)
 
             # Add fact with icon and text
-            dwg.add(dwg.text(
-                fact,
-                insert=(x, y),
-                font_size="16px",
-                font_family="Arial, sans-serif",
-                fill=self.theme.text_color,
-            ))
+            dwg.add(
+                dwg.text(
+                    fact,
+                    insert=(x, y),
+                    font_size="16px",
+                    font_family="Arial, sans-serif",
+                    fill=self.theme.text_color,
+                )
+            )
 
         # Add a fun footer message
         footer_messages = [
@@ -789,30 +892,35 @@ class StatisticsVisualizer:
             "Building the future, one commit at a time 🚀",
         ]
         import random
+
         random.seed(hash(username))  # Consistent message per user
         footer_msg = random.choice(footer_messages)
 
-        dwg.add(dwg.text(
-            footer_msg,
-            insert=(width // 2, height - 40),
-            text_anchor="middle",
-            font_size="14px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.primary_color,
-            opacity=0.8,
-            font_style="italic",
-        ))
+        dwg.add(
+            dwg.text(
+                footer_msg,
+                insert=(width // 2, height - 40),
+                text_anchor="middle",
+                font_size="14px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.primary_color,
+                opacity=0.8,
+                font_style="italic",
+            )
+        )
 
         # Powered by footer
-        dwg.add(dwg.text(
-            "⚡ Generated with Stats Spark",
-            insert=(width - 10, height - 10),
-            text_anchor="end",
-            font_size="10px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.border_color,
-            opacity=0.7,
-        ))
+        dwg.add(
+            dwg.text(
+                "⚡ Generated with Stats Spark",
+                insert=(width - 10, height - 10),
+                text_anchor="end",
+                font_size="10px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.border_color,
+                opacity=0.7,
+            )
+        )
 
         return dwg.tostring()
 
@@ -837,60 +945,72 @@ class StatisticsVisualizer:
         dwg.add(dwg.rect((0, 0), (width, height), fill=self.theme.background_color))
 
         # Title
-        dwg.add(dwg.text(
-            f"Coding Streaks - {username}",
-            insert=(width // 2, 30),
-            text_anchor="middle",
-            font_size="20px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.text_color,
-            font_weight="bold",
-        ))
+        dwg.add(
+            dwg.text(
+                f"Coding Streaks - {username}",
+                insert=(width // 2, 30),
+                text_anchor="middle",
+                font_size="20px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.text_color,
+                font_weight="bold",
+            )
+        )
 
         # Current streak
-        dwg.add(dwg.text(
-            "🔥 Current Streak",
-            insert=(100, 100),
-            font_size="16px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.text_color,
-        ))
-        dwg.add(dwg.text(
-            f"{streaks.get('current_streak', 0)} days",
-            insert=(100, 130),
-            font_size="32px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.accent_color,
-            font_weight="bold",
-        ))
+        dwg.add(
+            dwg.text(
+                "🔥 Current Streak",
+                insert=(100, 100),
+                font_size="16px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.text_color,
+            )
+        )
+        dwg.add(
+            dwg.text(
+                f"{streaks.get('current_streak', 0)} days",
+                insert=(100, 130),
+                font_size="32px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.accent_color,
+                font_weight="bold",
+            )
+        )
 
         # Longest streak
-        dwg.add(dwg.text(
-            "🏆 Longest Streak",
-            insert=(400, 100),
-            font_size="16px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.text_color,
-        ))
-        dwg.add(dwg.text(
-            f"{streaks.get('longest_streak', 0)} days",
-            insert=(400, 130),
-            font_size="32px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.primary_color,
-            font_weight="bold",
-        ))
+        dwg.add(
+            dwg.text(
+                "🏆 Longest Streak",
+                insert=(400, 100),
+                font_size="16px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.text_color,
+            )
+        )
+        dwg.add(
+            dwg.text(
+                f"{streaks.get('longest_streak', 0)} days",
+                insert=(400, 130),
+                font_size="32px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.primary_color,
+                font_weight="bold",
+            )
+        )
 
         # Powered by footer
-        dwg.add(dwg.text(
-            "⚡ Generated with Stats Spark",
-            insert=(width - 10, height - 10),
-            text_anchor="end",
-            font_size="10px",
-            font_family="Arial, sans-serif",
-            fill=self.theme.border_color,
-            opacity=0.7,
-        ))
+        dwg.add(
+            dwg.text(
+                "⚡ Generated with Stats Spark",
+                insert=(width - 10, height - 10),
+                text_anchor="end",
+                font_size="10px",
+                font_family="Arial, sans-serif",
+                fill=self.theme.border_color,
+                opacity=0.7,
+            )
+        )
 
         return dwg.tostring()
 
@@ -911,7 +1031,9 @@ def get_theme(theme_name: str, themes_config: Optional[Dict[str, Any]] = None) -
         return SparkLightTheme()
     else:
         if not themes_config:
-            raise ValueError(f"Theme '{theme_name}' requires a configured themes.yml entry")
+            raise ValueError(
+                f"Theme '{theme_name}' requires a configured themes.yml entry"
+            )
 
         custom_themes = themes_config.get("custom_themes", {})
         if theme_name not in custom_themes:

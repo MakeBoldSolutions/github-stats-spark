@@ -1,7 +1,5 @@
 """Markdown report generator for repository analysis."""
 
-from datetime import datetime
-from typing import List, Optional
 from spark.models.report import Report, RepositoryAnalysis
 from spark.logger import get_logger
 
@@ -87,20 +85,28 @@ class ReportGenerator:
             Markdown profile section
         """
         profile = report.user_profile
+        if profile is None:
+            return ""
         lines = ["## Developer Profile", ""]
 
         lines.append(f"**Username**: {profile.username}")
         lines.append(f"**Total Public Repositories**: {profile.total_repos}")
         lines.append(f"**Active Repositories (90d)**: {profile.active_repos}")
         lines.append(f"**Technology Diversity**: {profile.tech_diversity}/100")
-        lines.append(f"**Contribution Style**: {profile.contribution_classification.replace('_', ' ').title()}")
+        lines.append(
+            f"**Contribution Style**: {profile.contribution_classification.replace('_', ' ').title()}"
+        )
         lines.append("")
 
         # Top languages
         if profile.top_languages:
             lines.append("### Primary Technologies")
             for lang in profile.top_languages[:5]:
-                percentage = (profile.primary_languages[lang] / sum(profile.primary_languages.values()) * 100)
+                percentage = (
+                    profile.primary_languages[lang]
+                    / sum(profile.primary_languages.values())
+                    * 100
+                )
                 lines.append(f"- **{lang}**: {percentage:.1f}% of codebase")
             lines.append("")
 
@@ -200,10 +206,15 @@ class ReportGenerator:
             release_info = f"**Releases**: {repo.release_count}"
             if repo.latest_release_date:
                 from datetime import datetime, timezone
+
                 now = datetime.now(timezone.utc)
-                latest_release = repo.latest_release_date if repo.latest_release_date.tzinfo else repo.latest_release_date.replace(tzinfo=timezone.utc)
+                latest_release = (
+                    repo.latest_release_date
+                    if repo.latest_release_date.tzinfo
+                    else repo.latest_release_date.replace(tzinfo=timezone.utc)
+                )
                 days_since_release = (now - latest_release).days
-                release_date_str = latest_release.strftime('%Y-%m-%d')
+                release_date_str = latest_release.strftime("%Y-%m-%d")
                 if days_since_release == 0:
                     release_info += f" | Latest: {release_date_str} (today)"
                 elif days_since_release == 1:
@@ -227,13 +238,13 @@ class ReportGenerator:
         from datetime import datetime, timezone
 
         # Created date with days ago
-        created_str = repo.created_at.strftime('%Y-%m-%d')
+        created_str = repo.created_at.strftime("%Y-%m-%d")
         created_days_ago = repo.age_days
         lines.append(f"**Created**: {created_str} ({created_days_ago:,} days ago)")
 
         # Last modified (pushed) date with days ago
         if repo.pushed_at:
-            pushed_str = repo.pushed_at.strftime('%Y-%m-%d')
+            pushed_str = repo.pushed_at.strftime("%Y-%m-%d")
             pushed_days_ago = repo.days_since_last_push
             if pushed_days_ago is not None:
                 if pushed_days_ago == 0:
@@ -241,7 +252,9 @@ class ReportGenerator:
                 elif pushed_days_ago == 1:
                     lines.append(f"**Last Modified**: {pushed_str} (yesterday)")
                 else:
-                    lines.append(f"**Last Modified**: {pushed_str} ({pushed_days_ago:,} days ago)")
+                    lines.append(
+                        f"**Last Modified**: {pushed_str} ({pushed_days_ago:,} days ago)"
+                    )
 
         if repo.is_archived:
             lines.append("⚠️ **Archived**")
@@ -263,7 +276,9 @@ class ReportGenerator:
 
         # Currency indicator
         currency_emoji = self._get_currency_emoji(tech_stack.currency_score)
-        lines.append(f"**Technology Stack Currency**: {currency_emoji} {tech_stack.currency_score}/100")
+        lines.append(
+            f"**Technology Stack Currency**: {currency_emoji} {tech_stack.currency_score}/100"
+        )
 
         # Dependency summary
         current_count = tech_stack.total_dependencies - tech_stack.outdated_count
@@ -315,12 +330,16 @@ class ReportGenerator:
             Markdown metadata
         """
         lines = ["## Report Metadata", ""]
-        lines.append(f"- **Generation Time**: {report.generation_time_seconds:.1f} seconds")
+        lines.append(
+            f"- **Generation Time**: {report.generation_time_seconds:.1f} seconds"
+        )
         lines.append(f"- **Total API Calls**: {report.total_api_calls}")
         lines.append(f"- **Total AI Tokens**: {report.total_ai_tokens}")
         lines.append(f"- **Success Rate**: {report.success_rate:.1f}%")
         lines.append("")
-        lines.append("*Generated by [Stats Spark](https://github.com/MakeBoldSolutions/github-stats-spark)*")
+        lines.append(
+            "*Generated by [Stats Spark](https://github.com/MakeBoldSolutions/github-stats-spark)*"
+        )
         return "\n".join(lines)
 
     def _generate_errors_section(self, report: Report) -> str:

@@ -14,9 +14,17 @@ def remediation_repo_list():
     """Repository payloads covering public, private, fork, and archived cases."""
     return [
         {"name": "public-repo", "pushed_at": "2026-03-01T12:00:00+00:00"},
-        {"name": "private-repo", "private": True, "pushed_at": "2026-03-01T12:00:00+00:00"},
+        {
+            "name": "private-repo",
+            "private": True,
+            "pushed_at": "2026-03-01T12:00:00+00:00",
+        },
         {"name": "fork-repo", "fork": True, "pushed_at": "2026-03-01T12:00:00+00:00"},
-        {"name": "archived-repo", "archived": True, "pushed_at": "2026-03-01T12:00:00+00:00"},
+        {
+            "name": "archived-repo",
+            "archived": True,
+            "pushed_at": "2026-03-01T12:00:00+00:00",
+        },
     ]
 
 
@@ -66,7 +74,14 @@ def spark_config_factory(tmp_path):
         config_data = {
             "users": ["testuser"],
             "stats": {
-                "enabled": ["overview", "heatmap", "languages", "fun", "streaks", "release"],
+                "enabled": [
+                    "overview",
+                    "heatmap",
+                    "languages",
+                    "fun",
+                    "streaks",
+                    "release",
+                ],
                 "thresholds": {
                     "graveyard_months": 6,
                     "starter_commits": 50,
@@ -75,7 +90,10 @@ def spark_config_factory(tmp_path):
                     "early_bird_hours": [5, 6, 7, 8, 9],
                 },
             },
-            "visualization": {"theme": theme, "effects": {"glow": True, "gradient": True}},
+            "visualization": {
+                "theme": theme,
+                "effects": {"glow": True, "gradient": True},
+            },
             "cache": {"enabled": True, "directory": str(tmp_path / ".cache")},
             "repositories": {
                 "max_count": 500,
@@ -87,7 +105,11 @@ def spark_config_factory(tmp_path):
                 "top_n": 50,
                 "ai_provider": "anthropic",
                 "ai_model": "claude-haiku-4-5",
-                "ranking_weights": {"popularity": 0.30, "activity": 0.45, "health": 0.25},
+                "ranking_weights": {
+                    "popularity": 0.30,
+                    "activity": 0.45,
+                    "health": 0.25,
+                },
             },
             "github": {
                 "api_version": {

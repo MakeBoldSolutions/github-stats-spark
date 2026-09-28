@@ -65,10 +65,16 @@ def test_rest_get_no_fallback_when_disabled(tmp_path, monkeypatch):
     cache = APICache(cache_dir=str(tmp_path / "cache-no-fallback"))
     fetcher = GitHubFetcher(
         cache=cache,
-        api_version_settings={"enabled": True, "version": "2026-03-10", "fallback_to_default": False},
+        api_version_settings={
+            "enabled": True,
+            "version": "2026-03-10",
+            "fallback_to_default": False,
+        },
     )
 
-    monkeypatch.setattr("spark.fetcher.requests.get", lambda *args, **kwargs: DummyResponse(400))
+    monkeypatch.setattr(
+        "spark.fetcher.requests.get", lambda *args, **kwargs: DummyResponse(400)
+    )
 
     response = fetcher._rest_get("/repos/markhazleton/github-stats-spark")
 

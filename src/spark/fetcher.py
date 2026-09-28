@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 
 import requests
 
-from github import Auth, Github, GithubException, RateLimitExceededException
+from github import Auth, Github, GithubException
 from github.Repository import Repository
 
 from spark.cache import APICache
@@ -46,14 +46,18 @@ class GitHubFetcher:
         self.logger = get_logger()
         self.token = token or os.getenv("GITHUB_TOKEN")
         if not self.token:
-            raise ValueError("GitHub token required (GITHUB_TOKEN environment variable or token parameter)")
+            raise ValueError(
+                "GitHub token required (GITHUB_TOKEN environment variable or token parameter)"
+            )
 
         self.github = Github(auth=Auth.Token(self.token), timeout=30)
         self.cache = cache or APICache()
-        self.cache_status_tracker = CacheStatusTracker(cache_dir=self.cache.cache_dir)
+        self.cache_status_tracker = CacheStatusTracker(
+            cache_dir=str(self.cache.cache_dir)
+        )
         self.max_repos = max_repos
         self.use_cache_status = use_cache_status
-        self.api_version_settings = {
+        self.api_version_settings: Dict[str, Any] = {
             "enabled": False,
             "version": "2026-03-10",
             "fallback_to_default": True,
@@ -68,7 +72,9 @@ class GitHubFetcher:
             "Accept": "application/vnd.github+json",
         }
         if include_version and self.api_version_settings.get("enabled", False):
-            headers["X-GitHub-Api-Version"] = self.api_version_settings.get("version", "2026-03-10")
+            headers["X-GitHub-Api-Version"] = self.api_version_settings.get(
+                "version", "2026-03-10"
+            )
         return headers
 
     def _rest_get(
@@ -79,7 +85,12 @@ class GitHubFetcher:
     ) -> requests.Response:
         """Issue direct REST API GET request with optional version-header fallback."""
         url = f"https://api.github.com{path}"
-        response = requests.get(url, headers=self._build_rest_headers(include_version=include_version), params=params, timeout=30)
+        response = requests.get(
+            url,
+            headers=self._build_rest_headers(include_version=include_version),
+            params=params,
+            timeout=30,
+        )
         if response.status_code < 400:
             return response
 
@@ -93,7 +104,12 @@ class GitHubFetcher:
             self.logger.warning(
                 f"API version request failed for {path} ({response.status_code}); retrying without explicit version header"
             )
-            fallback = requests.get(url, headers=self._build_rest_headers(include_version=False), params=params, timeout=30)
+            fallback = requests.get(
+                url,
+                headers=self._build_rest_headers(include_version=False),
+                params=params,
+                timeout=30,
+            )
             return fallback
 
         return response
@@ -254,7 +270,7 @@ class GitHubFetcher:
                     "following": user.following,
                 }
             except GithubException as e:
-                self.logger.error(f"Failed to fetch authenticated user", e)
+                self.logger.error(f"Failed to fetch authenticated user: {e}")
                 raise
 
         return self.fetch_user_profile(username)
@@ -299,7 +315,7 @@ class GitHubFetcher:
             return profile_data
 
         except GithubException as e:
-            self.logger.error(f"Failed to fetch user profile for {username}", e)
+            self.logger.error(f"Failed to fetch user profile for {username}: {e}")
             raise
 
     def fetch_repositories(
@@ -330,7 +346,7 @@ class GitHubFetcher:
 
         try:
             user = self.github.get_user(username)
-            repos = []
+            repos: List[Dict[str, Any]] = []
 
             for repo in user.get_repos():
                 if not self._should_include_repository(
@@ -343,7 +359,9 @@ class GitHubFetcher:
 
                 # Stop if we've hit the max
                 if len(repos) >= self.max_repos:
-                    self.logger.warning(f"Reached maximum repository limit ({self.max_repos})")
+                    self.logger.warning(
+                        f"Reached maximum repository limit ({self.max_repos})"
+                    )
                     break
 
                 repos.append(self._serialize_repository(repo))
@@ -353,7 +371,7 @@ class GitHubFetcher:
             return repos
 
         except GithubException as e:
-            self.logger.error(f"Failed to fetch repositories for {username}", e)
+            self.logger.error(f"Failed to fetch repositories for {username}: {e}")
             raise
 
     def fetch_commits(
@@ -376,18 +394,22 @@ class GitHubFetcher:
         """
         # Use pushed_at hash for cache key (change-based invalidation, not time-based)
         push_key = sanitize_timestamp_for_filename(repo_pushed_at)
-        self.logger.debug(f"fetch_commits cache lookup: {username}/{repo_name} with key={push_key}")
+        self.logger.debug(
+            f"fetch_commits cache lookup: {username}/{repo_name} with key={push_key}"
+        )
         cached = self.cache.get("commits", username, repo=repo_name, week=push_key)
         if cached:
             self.logger.debug(f"Cache HIT for commits: {username}/{repo_name}")
             return cached
 
-        self.logger.debug(f"Cache MISS for commits: {username}/{repo_name}, fetching from GitHub...")
+        self.logger.debug(
+            f"Cache MISS for commits: {username}/{repo_name}, fetching from GitHub..."
+        )
         self.logger.debug(f"Fetching commits for {username}/{repo_name}")
 
         try:
             repo = self.github.get_repo(f"{username}/{repo_name}")
-            commits = []
+            commits: List[Dict[str, Any]] = []
 
             for commit in repo.get_commits(author=username):
                 if len(commits) >= max_commits:
@@ -396,8 +418,14 @@ class GitHubFetcher:
                 commit_data = {
                     "sha": commit.sha,
                     "message": commit.commit.message,
-                    "author": commit.commit.author.name if commit.commit.author else username,
-                    "date": commit.commit.author.date.isoformat() if commit.commit.author else None,
+                    "author": (
+                        commit.commit.author.name if commit.commit.author else username
+                    ),
+                    "date": (
+                        commit.commit.author.date.isoformat()
+                        if commit.commit.author
+                        else None
+                    ),
                     "repo": repo_name,
                 }
                 commits.append(commit_data)
@@ -439,7 +467,7 @@ class GitHubFetcher:
         # Include push date in cache key for smart invalidation
         # Use pushed_at hash for cache key (change-based invalidation, not time-based)
         push_key = sanitize_timestamp_for_filename(repo_pushed_at)
-        
+
         # Check cache status if enabled and not forcing refresh
         if self.use_cache_status and not force_refresh:
             pushed_at_str = repo_pushed_at.isoformat() if repo_pushed_at else None
@@ -448,24 +476,34 @@ class GitHubFetcher:
                 repo_name=repo_name,
                 pushed_at=pushed_at_str,
             )
-            
+
             # If refresh not needed and cache exists, return cached data
             if not cache_status.get("refresh_needed", True):
-                cached = self.cache.get("commits_stats", username, repo=repo_name, week=push_key)
+                cached = self.cache.get(
+                    "commits_stats", username, repo=repo_name, week=push_key
+                )
                 if cached:
-                    self.logger.info(f"Skipping {repo_name} - cache is up-to-date (age: {cache_status.get('cache_age_hours', 0):.1f}h)")
+                    self.logger.info(
+                        f"Skipping {repo_name} - cache is up-to-date (age: {cache_status.get('cache_age_hours', 0):.1f}h)"
+                    )
                     return cached
-        
-        cached = self.cache.get("commits_stats", username, repo=repo_name, week=push_key)
+
+        cached = self.cache.get(
+            "commits_stats", username, repo=repo_name, week=push_key
+        )
         if cached:
-            self.logger.debug(f"Using cached commit stats for {username}/{repo_name} (pushed_at: {push_key})")
+            self.logger.debug(
+                f"Using cached commit stats for {username}/{repo_name} (pushed_at: {push_key})"
+            )
             return cached
 
-        self.logger.info(f"Fetching commit statistics for {username}/{repo_name} (max: {max_commits})")
+        self.logger.info(
+            f"Fetching commit statistics for {username}/{repo_name} (max: {max_commits})"
+        )
 
         try:
             repo = self.github.get_repo(f"{username}/{repo_name}")
-            commits_with_stats = []
+            commits_with_stats: List[Dict[str, Any]] = []
 
             # Get commits - do not filter by author here as GitHub API's author parameter is flaky
             for i, commit in enumerate(repo.get_commits()):
@@ -478,22 +516,37 @@ class GitHubFetcher:
                     files_count = 0
                     additions = 0
                     deletions = 0
-                    
+
                     try:
-                        if hasattr(commit, 'stats') and commit.stats:
+                        if hasattr(commit, "stats") and commit.stats:
                             additions = commit.stats.additions
                             deletions = commit.stats.deletions
                             # Files count is the sum of changed files
-                            files_count = commit.stats.total if hasattr(commit.stats, 'total') else 0
+                            files_count = (
+                                commit.stats.total
+                                if hasattr(commit.stats, "total")
+                                else 0
+                            )
                     except Exception as stats_err:
-                        self.logger.debug(f"Could not fetch stats for commit {commit.sha}: {stats_err}")
+                        self.logger.debug(
+                            f"Could not fetch stats for commit {commit.sha}: {stats_err}"
+                        )
 
                     commit_data = {
                         "sha": commit.sha,
                         "commit": {
                             "author": {
-                                "name": commit.commit.author.name if commit.commit.author else username,
-                                "date": commit.commit.author.date.isoformat() if commit.commit.author and commit.commit.author.date else None,
+                                "name": (
+                                    commit.commit.author.name
+                                    if commit.commit.author
+                                    else username
+                                ),
+                                "date": (
+                                    commit.commit.author.date.isoformat()
+                                    if commit.commit.author
+                                    and commit.commit.author.date
+                                    else None
+                                ),
                             },
                             "message": commit.commit.message if commit.commit else "",
                         },
@@ -508,22 +561,39 @@ class GitHubFetcher:
 
                     # Log progress every 10 commits
                     if (i + 1) % 10 == 0:
-                        self.logger.debug(f"  Processed {i + 1}/{max_commits} commits for {repo_name}")
+                        self.logger.debug(
+                            f"  Processed {i + 1}/{max_commits} commits for {repo_name}"
+                        )
 
                 except GithubException as e:
-                    self.logger.warning(f"Failed to fetch stats for commit {commit.sha}: {e}")
+                    self.logger.warning(
+                        f"Failed to fetch stats for commit {commit.sha}: {e}"
+                    )
                     continue
 
-            self.logger.info(f"Fetched {len(commits_with_stats)} commits with stats for {repo_name}")
-            metadata = self._build_repo_metadata(username, repo_name, repo_pushed_at, "commits_stats")
-            self.cache.set("commits_stats", username, commits_with_stats, repo=repo_name, week=push_key, metadata=metadata)
+            self.logger.info(
+                f"Fetched {len(commits_with_stats)} commits with stats for {repo_name}"
+            )
+            metadata = self._build_repo_metadata(
+                username, repo_name, repo_pushed_at, "commits_stats"
+            )
+            self.cache.set(
+                "commits_stats",
+                username,
+                commits_with_stats,
+                repo=repo_name,
+                week=push_key,
+                metadata=metadata,
+            )
             return commits_with_stats
 
         except GithubException as e:
             self.logger.error(f"Could not fetch commit stats for {repo_name}: {e}")
             return []
 
-    def fetch_languages(self, username: str, repo_name: str, repo_pushed_at: Optional[datetime] = None) -> Dict[str, int]:
+    def fetch_languages(
+        self, username: str, repo_name: str, repo_pushed_at: Optional[datetime] = None
+    ) -> Dict[str, int]:
         """Fetch language statistics for a repository.
 
         Args:
@@ -551,7 +621,9 @@ class GitHubFetcher:
             self.logger.debug(f"Could not fetch languages for {repo_name}: {e}")
             return {}
 
-    def fetch_readme(self, username: str, repo_name: str, repo_pushed_at: Optional[datetime] = None) -> Optional[str]:
+    def fetch_readme(
+        self, username: str, repo_name: str, repo_pushed_at: Optional[datetime] = None
+    ) -> Optional[str]:
         """Fetch README content for a repository.
 
         Args:
@@ -571,10 +643,10 @@ class GitHubFetcher:
         try:
             repo = self.github.get_repo(f"{username}/{repo_name}")
             readme = repo.get_readme()
-            
+
             # Decode content from base64
-            content = readme.decoded_content.decode('utf-8')
-            
+            content = readme.decoded_content.decode("utf-8")
+
             # Cache writes now handled by CacheManager
             return content
 
@@ -585,7 +657,9 @@ class GitHubFetcher:
             self.logger.debug(f"Error decoding README for {repo_name}: {e}")
             return None
 
-    def fetch_dependency_files(self, username: str, repo_name: str, repo_pushed_at: Optional[datetime] = None) -> Dict[str, str]:
+    def fetch_dependency_files(
+        self, username: str, repo_name: str, repo_pushed_at: Optional[datetime] = None
+    ) -> Dict[str, str]:
         """Fetch dependency files from a repository.
 
         Looks for common dependency files like package.json, requirements.txt, etc.
@@ -600,28 +674,30 @@ class GitHubFetcher:
         """
         # Use pushed_at hash for cache key (change-based invalidation, not time-based)
         push_key = sanitize_timestamp_for_filename(repo_pushed_at)
-        cached = self.cache.get("dependency_files", username, repo=repo_name, week=push_key)
+        cached = self.cache.get(
+            "dependency_files", username, repo=repo_name, week=push_key
+        )
         if cached is not None:
             return cached
 
         dependency_files = {}
-        
+
         # Common dependency file names to look for
         target_files = [
-            "package.json",           # npm/JavaScript
-            "requirements.txt",       # pip/Python
-            "pyproject.toml",         # Python poetry/modern
-            "Gemfile",                # Ruby
-            "go.mod",                 # Go
-            "pom.xml",                # Maven/Java
-            "*.csproj",               # .NET C#
-            "Cargo.toml",             # Rust
-            "composer.json",          # PHP
+            "package.json",  # npm/JavaScript
+            "requirements.txt",  # pip/Python
+            "pyproject.toml",  # Python poetry/modern
+            "Gemfile",  # Ruby
+            "go.mod",  # Go
+            "pom.xml",  # Maven/Java
+            "*.csproj",  # .NET C#
+            "Cargo.toml",  # Rust
+            "composer.json",  # PHP
         ]
 
         try:
             repo = self.github.get_repo(f"{username}/{repo_name}")
-            
+
             # Try to get each file
             for filename in target_files:
                 try:
@@ -629,19 +705,25 @@ class GitHubFetcher:
                         # Handle wildcard patterns like *.csproj
                         contents = repo.get_contents("")
                         pattern = filename.replace("*", "")
+                        if not isinstance(contents, list):
+                            continue
                         for item in contents:
                             if item.name.endswith(pattern):
-                                content = item.decoded_content.decode('utf-8')
+                                content = item.decoded_content.decode("utf-8")
                                 dependency_files[item.name] = content
                     else:
                         file_content = repo.get_contents(filename)
-                        content = file_content.decoded_content.decode('utf-8')
+                        if isinstance(file_content, list):
+                            continue
+                        content = file_content.decoded_content.decode("utf-8")
                         dependency_files[filename] = content
                 except GithubException:
                     # File doesn't exist, continue
                     continue
                 except Exception as e:
-                    self.logger.debug(f"Error fetching {filename} from {repo_name}: {e}")
+                    self.logger.debug(
+                        f"Error fetching {filename} from {repo_name}: {e}"
+                    )
                     continue
 
             # Cache writes now handled by CacheManager
@@ -656,7 +738,7 @@ class GitHubFetcher:
 
     def fetch_commit_counts(
         self, username: str, repo_name: str, repo_pushed_at: Optional[datetime] = None
-    ) -> Dict[str, int]:
+    ) -> Dict[str, Any]:
         """Fetch time-windowed commit counts for ranking algorithm.
 
         Returns commits in multiple time windows:
@@ -675,7 +757,9 @@ class GitHubFetcher:
         """
         # Use pushed_at hash for cache key (change-based invalidation, not time-based)
         push_key = sanitize_timestamp_for_filename(repo_pushed_at)
-        cached = self.cache.get("commit_counts", username, repo=repo_name, week=push_key)
+        cached = self.cache.get(
+            "commit_counts", username, repo=repo_name, week=push_key
+        )
         if cached:
             return cached
 
@@ -684,6 +768,7 @@ class GitHubFetcher:
 
             # Use timezone-aware datetime to match GitHub API
             from datetime import timedelta, timezone
+
             now = datetime.now(timezone.utc)
 
             # Calculate time window boundaries
@@ -711,7 +796,11 @@ class GitHubFetcher:
 
                 # Safely access commit author date
                 try:
-                    commit_date = commit.commit.author.date if commit.commit and commit.commit.author else None
+                    commit_date = (
+                        commit.commit.author.date
+                        if commit.commit and commit.commit.author
+                        else None
+                    )
                 except (AttributeError, IndexError):
                     continue
 
@@ -735,7 +824,9 @@ class GitHubFetcher:
                 "recent_90d": commits_90d,
                 "recent_180d": commits_180d,
                 "recent_365d": commits_365d,
-                "last_commit_date": last_commit_date.isoformat() if last_commit_date else None,
+                "last_commit_date": (
+                    last_commit_date.isoformat() if last_commit_date else None
+                ),
             }
 
             # Cache writes now handled by CacheManager
@@ -761,7 +852,9 @@ class GitHubFetcher:
         """Fetch compact open pull request summary for a repository."""
         push_key = sanitize_timestamp_for_filename(repo_pushed_at)
         if not force_refresh:
-            cached = self.cache.get("pull_request_summary", username, repo=repo_name, week=push_key)
+            cached = self.cache.get(
+                "pull_request_summary", username, repo=repo_name, week=push_key
+            )
             if cached:
                 return cached
 
@@ -813,7 +906,9 @@ class GitHubFetcher:
 
             oldest_open_age_days = None
             if oldest_open is not None:
-                oldest_open_age_days = max(0, (datetime.now(timezone.utc) - oldest_open).days)
+                oldest_open_age_days = max(
+                    0, (datetime.now(timezone.utc) - oldest_open).days
+                )
 
             if availability == "unavailable":
                 total_open = 0
@@ -832,7 +927,9 @@ class GitHubFetcher:
                 "source": "rest.pulls.list",
             }
         except Exception as error:
-            self.logger.warning(f"Failed to fetch pull request summary for {username}/{repo_name}: {error}")
+            self.logger.warning(
+                f"Failed to fetch pull request summary for {username}/{repo_name}: {error}"
+            )
             return {
                 "availability": "unavailable",
                 "reason": "api_error",
@@ -854,7 +951,9 @@ class GitHubFetcher:
         """Fetch compact repository security summary from multiple REST sources."""
         push_key = sanitize_timestamp_for_filename(repo_pushed_at)
         if not force_refresh:
-            cached = self.cache.get("security_summary", username, repo=repo_name, week=push_key)
+            cached = self.cache.get(
+                "security_summary", username, repo=repo_name, week=push_key
+            )
             if cached:
                 return cached
 
@@ -879,18 +978,28 @@ class GitHubFetcher:
                 first_reason = mapped
 
         try:
-            repo_response = self._rest_get(f"/repos/{username}/{repo_name}", include_version=True)
+            repo_response = self._rest_get(
+                f"/repos/{username}/{repo_name}", include_version=True
+            )
             if repo_response.status_code < 400:
                 any_success = True
                 sources.append("rest.repos.get")
                 repo_payload = repo_response.json() or {}
                 security_and_analysis = repo_payload.get("security_and_analysis") or {}
-                advanced_security = security_and_analysis.get("advanced_security", {}).get("status")
-                secret_scanning = security_and_analysis.get("secret_scanning", {}).get("status")
-                push_protection = security_and_analysis.get("secret_scanning_push_protection", {}).get("status")
+                advanced_security = security_and_analysis.get(
+                    "advanced_security", {}
+                ).get("status")
+                secret_scanning = security_and_analysis.get("secret_scanning", {}).get(
+                    "status"
+                )
+                push_protection = security_and_analysis.get(
+                    "secret_scanning_push_protection", {}
+                ).get("status")
                 feature_status["advanced_security"] = advanced_security or "unknown"
                 feature_status["secret_scanning"] = secret_scanning or "unknown"
-                feature_status["secret_scanning_push_protection"] = push_protection or "unknown"
+                feature_status["secret_scanning_push_protection"] = (
+                    push_protection or "unknown"
+                )
             else:
                 mark_failure(repo_response.status_code)
 
@@ -972,7 +1081,9 @@ class GitHubFetcher:
                 "sources": sources,
             }
         except Exception as error:
-            self.logger.warning(f"Failed to fetch security summary for {username}/{repo_name}: {error}")
+            self.logger.warning(
+                f"Failed to fetch security summary for {username}/{repo_name}: {error}"
+            )
             return {
                 "availability": "unavailable",
                 "reason": "api_error",
@@ -992,7 +1103,9 @@ class GitHubFetcher:
         """Fetch a consolidated diagnostics summary for a repository."""
         push_key = sanitize_timestamp_for_filename(repo_pushed_at)
         if not force_refresh:
-            cached = self.cache.get("diagnostics_summary", username, repo=repo_name, week=push_key)
+            cached = self.cache.get(
+                "diagnostics_summary", username, repo=repo_name, week=push_key
+            )
             if cached:
                 return cached
 
@@ -1013,7 +1126,13 @@ class GitHubFetcher:
         security_summary: Dict[str, Any] = {
             "availability": "unavailable",
             "reason": "not_requested",
-            "dependabot": {"total_open": 0, "critical": 0, "high": 0, "medium": 0, "low": 0},
+            "dependabot": {
+                "total_open": 0,
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0,
+            },
             "code_scanning": {"total_open": 0, "error": 0, "warning": 0, "note": 0},
         }
         actions_summary: Dict[str, Any] = {
@@ -1056,10 +1175,14 @@ class GitHubFetcher:
                     pr_summary["total_open"] = len(payload)
                     for pr in payload:
                         created_at = self._parse_iso_datetime(pr.get("created_at"))
-                        if created_at and (oldest_open is None or created_at < oldest_open):
+                        if created_at and (
+                            oldest_open is None or created_at < oldest_open
+                        ):
                             oldest_open = created_at
                 if oldest_open is not None:
-                    pr_summary["oldest_open_age_days"] = max(0, (datetime.now(timezone.utc) - oldest_open).days)
+                    pr_summary["oldest_open_age_days"] = max(
+                        0, (datetime.now(timezone.utc) - oldest_open).days
+                    )
             else:
                 mark_failure(response.status_code)
                 pr_summary["reason"] = self._map_failure_reason(response.status_code)
@@ -1094,7 +1217,9 @@ class GitHubFetcher:
                         created_at = self._parse_iso_datetime(issue.get("created_at"))
                         if created_at is None:
                             continue
-                        age_days = max(0, (datetime.now(timezone.utc) - created_at).days)
+                        age_days = max(
+                            0, (datetime.now(timezone.utc) - created_at).days
+                        )
                         if oldest_open is None or created_at < oldest_open:
                             oldest_open = created_at
                         if age_days >= 30:
@@ -1104,10 +1229,14 @@ class GitHubFetcher:
                 issues_summary["stale_over_30d"] = stale_30
                 issues_summary["stale_over_90d"] = stale_90
                 if oldest_open is not None:
-                    issues_summary["oldest_open_age_days"] = max(0, (datetime.now(timezone.utc) - oldest_open).days)
+                    issues_summary["oldest_open_age_days"] = max(
+                        0, (datetime.now(timezone.utc) - oldest_open).days
+                    )
             else:
                 mark_failure(response.status_code)
-                issues_summary["reason"] = self._map_failure_reason(response.status_code)
+                issues_summary["reason"] = self._map_failure_reason(
+                    response.status_code
+                )
         except Exception:
             any_failure = True
             if first_reason == "none":
@@ -1139,7 +1268,9 @@ class GitHubFetcher:
                             security_summary["dependabot"][severity] += 1
             else:
                 mark_failure(dep_response.status_code)
-                security_summary["reason"] = self._map_failure_reason(dep_response.status_code)
+                security_summary["reason"] = self._map_failure_reason(
+                    dep_response.status_code
+                )
 
             code_response = self._rest_get(
                 f"/repos/{username}/{repo_name}/code-scanning/alerts",
@@ -1161,13 +1292,19 @@ class GitHubFetcher:
                 # Code scanning endpoints are often unavailable due to feature/permission state.
                 if security_summary["availability"] == "available":
                     security_summary["availability"] = "partial"
-                    security_summary["reason"] = self._map_failure_reason(code_response.status_code)
+                    security_summary["reason"] = self._map_failure_reason(
+                        code_response.status_code
+                    )
                 else:
                     mark_failure(code_response.status_code)
-                    security_summary["reason"] = self._map_failure_reason(code_response.status_code)
+                    security_summary["reason"] = self._map_failure_reason(
+                        code_response.status_code
+                    )
             else:
                 mark_failure(code_response.status_code)
-                security_summary["reason"] = self._map_failure_reason(code_response.status_code)
+                security_summary["reason"] = self._map_failure_reason(
+                    code_response.status_code
+                )
         except Exception:
             any_failure = True
             if first_reason == "none":
@@ -1197,7 +1334,13 @@ class GitHubFetcher:
                     conclusion = (run.get("conclusion") or "").lower()
                     if conclusion == "success":
                         actions_summary["success_count"] += 1
-                    elif conclusion in {"failure", "timed_out", "cancelled", "action_required", "startup_failure"}:
+                    elif conclusion in {
+                        "failure",
+                        "timed_out",
+                        "cancelled",
+                        "action_required",
+                        "startup_failure",
+                    }:
                         actions_summary["failure_count"] += 1
 
                 if runs:
@@ -1206,10 +1349,14 @@ class GitHubFetcher:
                     actions_summary["last_run_conclusion"] = latest.get("conclusion")
                     created_at = self._parse_iso_datetime(latest.get("created_at"))
                     if created_at:
-                        actions_summary["last_run_age_days"] = max(0, (datetime.now(timezone.utc) - created_at).days)
+                        actions_summary["last_run_age_days"] = max(
+                            0, (datetime.now(timezone.utc) - created_at).days
+                        )
             else:
                 mark_failure(response.status_code)
-                actions_summary["reason"] = self._map_failure_reason(response.status_code)
+                actions_summary["reason"] = self._map_failure_reason(
+                    response.status_code
+                )
         except Exception:
             any_failure = True
             if first_reason == "none":
@@ -1245,7 +1392,7 @@ class GitHubFetcher:
         rate_limit = self.github.get_rate_limit()
 
         # Handle different PyGithub API versions
-        if hasattr(rate_limit, 'core'):
+        if hasattr(rate_limit, "core"):
             core_rate = rate_limit.core
         else:
             core_rate = rate_limit.resources.core
@@ -1268,7 +1415,7 @@ class GitHubFetcher:
         rate_limit = self.github.get_rate_limit()
 
         # Handle different PyGithub API versions
-        if hasattr(rate_limit, 'core'):
+        if hasattr(rate_limit, "core"):
             core_rate = rate_limit.core
         else:
             # Newer PyGithub version uses dict-like access

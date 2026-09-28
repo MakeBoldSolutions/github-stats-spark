@@ -137,12 +137,32 @@ class TestSVGGeneration:
 
         cadence = {
             "weekly": [
-                {"label": "W01", "repos": 1, "start": "2025-01-01", "range_label": "Jan 01 - Jan 07"},
-                {"label": "W02", "repos": 3, "start": "2025-01-08", "range_label": "Jan 08 - Jan 14"},
+                {
+                    "label": "W01",
+                    "repos": 1,
+                    "start": "2025-01-01",
+                    "range_label": "Jan 01 - Jan 07",
+                },
+                {
+                    "label": "W02",
+                    "repos": 3,
+                    "start": "2025-01-08",
+                    "range_label": "Jan 08 - Jan 14",
+                },
             ],
             "monthly": [
-                {"label": "Jan", "repos": 2, "start": "2025-01-01", "range_label": "Jan 2025"},
-                {"label": "Feb", "repos": 4, "start": "2025-02-01", "range_label": "Feb 2025"},
+                {
+                    "label": "Jan",
+                    "repos": 2,
+                    "start": "2025-01-01",
+                    "range_label": "Jan 2025",
+                },
+                {
+                    "label": "Feb",
+                    "repos": 4,
+                    "start": "2025-02-01",
+                    "range_label": "Feb 2025",
+                },
             ],
             "max_weekly": 3,
             "max_monthly": 4,
@@ -230,7 +250,11 @@ class TestThemeApplication:
                             "text": "#E0F2FE",
                             "border": "#075985",
                         },
-                        "effects": {"glow": True, "gradient": True, "animations": False},
+                        "effects": {
+                            "glow": True,
+                            "gradient": True,
+                            "animations": False,
+                        },
                     }
                 }
             },
@@ -241,7 +265,10 @@ class TestThemeApplication:
     def test_get_theme_rejects_unknown_theme(self):
         """Test that unknown themes fail with a deterministic error."""
         with pytest.raises(ValueError):
-            get_theme("missing-theme", {"custom_themes": {"ocean": {"colors": {}, "effects": {}}}})
+            get_theme(
+                "missing-theme",
+                {"custom_themes": {"ocean": {"colors": {}, "effects": {}}}},
+            )
 
 
 class TestCommitMessageSanitization:
@@ -328,7 +355,13 @@ class TestEdgeCases:
         visualizer = StatisticsVisualizer(theme)
 
         svg = visualizer.generate_release_cadence(
-            {"weekly": [], "monthly": [], "max_weekly": 0, "max_monthly": 0, "unique_repos": 0},
+            {
+                "weekly": [],
+                "monthly": [],
+                "max_weekly": 0,
+                "max_monthly": 0,
+                "unique_repos": 0,
+            },
             "testuser",
         )
 
@@ -341,8 +374,22 @@ class TestEdgeCases:
 
         svg = visualizer.generate_release_cadence(
             {
-                "weekly": [{"label": "W06", "repos": 1, "start": "2025-02-03", "range_label": "Feb 03 - Feb 09"}],
-                "monthly": [{"label": "Feb", "repos": 1, "start": "2025-02-01", "range_label": "Feb 2025"}],
+                "weekly": [
+                    {
+                        "label": "W06",
+                        "repos": 1,
+                        "start": "2025-02-03",
+                        "range_label": "Feb 03 - Feb 09",
+                    }
+                ],
+                "monthly": [
+                    {
+                        "label": "Feb",
+                        "repos": 1,
+                        "start": "2025-02-01",
+                        "range_label": "Feb 2025",
+                    }
+                ],
                 "max_weekly": 1,
                 "max_monthly": 1,
                 "unique_repos": 1,

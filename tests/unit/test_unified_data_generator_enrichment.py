@@ -20,7 +20,14 @@ def _create_config(tmp_path):
             {
                 "users": ["markhazleton"],
                 "stats": {
-                    "enabled": ["overview", "heatmap", "languages", "fun", "streaks", "release"],
+                    "enabled": [
+                        "overview",
+                        "heatmap",
+                        "languages",
+                        "fun",
+                        "streaks",
+                        "release",
+                    ],
                     "thresholds": {
                         "graveyard_months": 6,
                         "starter_commits": 50,
@@ -29,7 +36,10 @@ def _create_config(tmp_path):
                         "early_bird_hours": [5, 6, 7, 8, 9],
                     },
                 },
-                "visualization": {"theme": "spark-dark", "effects": {"glow": True, "gradient": True}},
+                "visualization": {
+                    "theme": "spark-dark",
+                    "effects": {"glow": True, "gradient": True},
+                },
                 "cache": {"enabled": True, "directory": str(tmp_path / ".cache")},
                 "repositories": {
                     "max_count": 500,
@@ -41,7 +51,11 @@ def _create_config(tmp_path):
                     "top_n": 50,
                     "ai_provider": "anthropic",
                     "ai_model": "claude-haiku-4-5",
-                    "ranking_weights": {"popularity": 0.30, "activity": 0.45, "health": 0.25},
+                    "ranking_weights": {
+                        "popularity": 0.30,
+                        "activity": 0.45,
+                        "health": 0.25,
+                    },
                 },
                 "github": {
                     "api_version": {
@@ -117,7 +131,9 @@ def test_fetch_repository_list_uses_configured_filters(generator, monkeypatch):
         calls.update(kwargs)
         return []
 
-    monkeypatch.setattr(generator.fetcher, "fetch_repositories", fake_fetch_repositories)
+    monkeypatch.setattr(
+        generator.fetcher, "fetch_repositories", fake_fetch_repositories
+    )
 
     result = generator._fetch_repository_list()
 
@@ -127,15 +143,26 @@ def test_fetch_repository_list_uses_configured_filters(generator, monkeypatch):
     assert calls["exclude_archived"] is False
 
 
-def test_generate_skips_invalid_repository_payload_and_continues(generator, monkeypatch):
+def test_generate_skips_invalid_repository_payload_and_continues(
+    generator, monkeypatch
+):
     valid_repo = _build_repo_payload("repo-valid")
     invalid_repo = {"name": "repo-invalid", "created_at": "not-a-date"}
 
-    monkeypatch.setattr(generator, "_fetch_repository_list", lambda: [invalid_repo, valid_repo])
+    monkeypatch.setattr(
+        generator, "_fetch_repository_list", lambda: [invalid_repo, valid_repo]
+    )
     monkeypatch.setattr(
         generator.cache_manager,
         "refresh_user_data",
-        lambda **kwargs: RefreshSummary(total_repos=2, repos_refreshed=0, repos_unchanged=2, repos_failed=0, results=[], api_calls_made=0),
+        lambda **kwargs: RefreshSummary(
+            total_repos=2,
+            repos_refreshed=0,
+            repos_unchanged=2,
+            repos_failed=0,
+            results=[],
+            api_calls_made=0,
+        ),
     )
 
     unified = generator.generate()
@@ -144,7 +171,9 @@ def test_generate_skips_invalid_repository_payload_and_continues(generator, monk
     assert unified["repositories"][0]["name"] == "repo-valid"
 
 
-def test_generate_uses_cached_ai_summary_and_handles_invalid_commit_dates(generator, monkeypatch):
+def test_generate_uses_cached_ai_summary_and_handles_invalid_commit_dates(
+    generator, monkeypatch
+):
     repo = _build_repo_payload("repo-cached")
     pushed_at = datetime.fromisoformat(repo["pushed_at"].replace("Z", "+00:00"))
     cache_key = sanitize_timestamp_for_filename(pushed_at)
@@ -152,17 +181,31 @@ def test_generate_uses_cached_ai_summary_and_handles_invalid_commit_dates(genera
     generator.cache.set(
         "commit_counts",
         "markhazleton",
-        {"total": 3, "recent_90d": 3, "recent_180d": 3, "recent_365d": 3, "last_commit_date": repo["pushed_at"]},
+        {
+            "total": 3,
+            "recent_90d": 3,
+            "recent_180d": 3,
+            "recent_365d": 3,
+            "last_commit_date": repo["pushed_at"],
+        },
         repo=repo["name"],
         week=cache_key,
     )
-    generator.cache.set("languages", "markhazleton", {"Python": 100}, repo=repo["name"], week=cache_key)
+    generator.cache.set(
+        "languages", "markhazleton", {"Python": 100}, repo=repo["name"], week=cache_key
+    )
     generator.cache.set(
         "commits_stats",
         "markhazleton",
         [
-            {"commit": {"author": {"date": "2026-03-01T00:00:00Z"}}, "stats": {"total": 1, "additions": 2, "deletions": 1}},
-            {"commit": {"author": {"date": "invalid-date"}}, "stats": {"total": 1, "additions": 1, "deletions": 0}},
+            {
+                "commit": {"author": {"date": "2026-03-01T00:00:00Z"}},
+                "stats": {"total": 1, "additions": 2, "deletions": 1},
+            },
+            {
+                "commit": {"author": {"date": "invalid-date"}},
+                "stats": {"total": 1, "additions": 1, "deletions": 0},
+            },
         ],
         repo=repo["name"],
         week=cache_key,
@@ -186,7 +229,14 @@ def test_generate_uses_cached_ai_summary_and_handles_invalid_commit_dates(genera
     monkeypatch.setattr(
         generator.cache_manager,
         "refresh_user_data",
-        lambda **kwargs: RefreshSummary(total_repos=1, repos_refreshed=0, repos_unchanged=1, repos_failed=0, results=[], api_calls_made=0),
+        lambda **kwargs: RefreshSummary(
+            total_repos=1,
+            repos_refreshed=0,
+            repos_unchanged=1,
+            repos_failed=0,
+            results=[],
+            api_calls_made=0,
+        ),
     )
 
     unified = generator.generate()
@@ -203,26 +253,54 @@ def test_generate_emits_diagnostics_summary(generator, monkeypatch):
     generator.cache.set(
         "commit_counts",
         "markhazleton",
-        {"total": 1, "recent_90d": 1, "recent_180d": 1, "recent_365d": 1, "last_commit_date": repo["pushed_at"]},
+        {
+            "total": 1,
+            "recent_90d": 1,
+            "recent_180d": 1,
+            "recent_365d": 1,
+            "last_commit_date": repo["pushed_at"],
+        },
         repo=repo["name"],
         week=cache_key,
     )
-    generator.cache.set("languages", "markhazleton", {"Python": 100}, repo=repo["name"], week=cache_key)
+    generator.cache.set(
+        "languages", "markhazleton", {"Python": 100}, repo=repo["name"], week=cache_key
+    )
     generator.cache.set(
         "diagnostics_summary",
         "markhazleton",
         {
             "availability": "available",
             "reason": "none",
-            "pull_requests": {"availability": "available", "reason": "none", "total_open": 2},
-            "issues": {"availability": "available", "reason": "none", "total_open": 3, "stale_over_90d": 1},
+            "pull_requests": {
+                "availability": "available",
+                "reason": "none",
+                "total_open": 2,
+            },
+            "issues": {
+                "availability": "available",
+                "reason": "none",
+                "total_open": 3,
+                "stale_over_90d": 1,
+            },
             "security": {
                 "availability": "partial",
                 "reason": "not_supported",
-                "dependabot": {"total_open": 1, "critical": 0, "high": 1, "medium": 0, "low": 0},
+                "dependabot": {
+                    "total_open": 1,
+                    "critical": 0,
+                    "high": 1,
+                    "medium": 0,
+                    "low": 0,
+                },
                 "code_scanning": {"total_open": 0, "error": 0, "warning": 0, "note": 0},
             },
-            "actions": {"availability": "available", "reason": "none", "recent_runs": 5, "failure_count": 1},
+            "actions": {
+                "availability": "available",
+                "reason": "none",
+                "recent_runs": 5,
+                "failure_count": 1,
+            },
             "sources": ["rest.pulls.list", "rest.issues.list"],
         },
         repo=repo["name"],
@@ -233,21 +311,44 @@ def test_generate_emits_diagnostics_summary(generator, monkeypatch):
     monkeypatch.setattr(
         generator.cache_manager,
         "refresh_user_data",
-        lambda **kwargs: RefreshSummary(total_repos=1, repos_refreshed=0, repos_unchanged=1, repos_failed=0, results=[], api_calls_made=0),
+        lambda **kwargs: RefreshSummary(
+            total_repos=1,
+            repos_refreshed=0,
+            repos_unchanged=1,
+            repos_failed=0,
+            results=[],
+            api_calls_made=0,
+        ),
     )
 
     unified = generator.generate()
 
-    assert unified["repositories"][0]["diagnostics_summary"]["availability"] == "available"
-    assert unified["repositories"][0]["diagnostics_summary"]["issues"]["total_open"] == 3
+    assert (
+        unified["repositories"][0]["diagnostics_summary"]["availability"] == "available"
+    )
+    assert (
+        unified["repositories"][0]["diagnostics_summary"]["issues"]["total_open"] == 3
+    )
 
 
-def test_save_writes_output_and_uses_generate_when_input_missing(generator, monkeypatch):
+def test_save_writes_output_and_uses_generate_when_input_missing(
+    generator, monkeypatch
+):
     now = datetime.now(timezone.utc).isoformat()
     payload = {
-        "profile": {"username": "markhazleton", "total_repositories": 0, "total_stars": 0, "total_forks": 0, "total_commits": 0},
+        "profile": {
+            "username": "markhazleton",
+            "total_repositories": 0,
+            "total_stars": 0,
+            "total_forks": 0,
+            "total_commits": 0,
+        },
         "repositories": [],
-        "metadata": {"generated_at": now, "schema_version": "2.2.0", "generator": "test"},
+        "metadata": {
+            "generated_at": now,
+            "schema_version": "2.2.0",
+            "generator": "test",
+        },
     }
     monkeypatch.setattr(generator, "generate", lambda: payload)
 
@@ -260,9 +361,19 @@ def test_save_writes_output_and_uses_generate_when_input_missing(generator, monk
 
 def test_save_raises_if_write_fails(generator, monkeypatch):
     payload = {
-        "profile": {"username": "markhazleton", "total_repositories": 0, "total_stars": 0, "total_forks": 0, "total_commits": 0},
+        "profile": {
+            "username": "markhazleton",
+            "total_repositories": 0,
+            "total_stars": 0,
+            "total_forks": 0,
+            "total_commits": 0,
+        },
         "repositories": [],
-        "metadata": {"generated_at": datetime.now(timezone.utc).isoformat(), "schema_version": "2.2.0", "generator": "test"},
+        "metadata": {
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "schema_version": "2.2.0",
+            "generator": "test",
+        },
     }
 
     def fail_open(*args, **kwargs):

@@ -25,6 +25,7 @@ import "@/styles/global.css";
 if ("serviceWorker" in navigator && !import.meta.env.DEV) {
   // Guard against double-reload when controllerchange fires after SKIP_WAITING
   let reloadPending = false;
+  const hadController = Boolean(navigator.serviceWorker.controller);
 
   window.addEventListener("load", () => {
     navigator.serviceWorker
@@ -74,7 +75,7 @@ if ("serviceWorker" in navigator && !import.meta.env.DEV) {
 
     // Reload once when the new SW takes control (triggered by SKIP_WAITING)
     navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (reloadPending) return; // prevent double-reload
+      if (!hadController || reloadPending) return; // prevent double-reload
       reloadPending = true;
       console.log("[Service Worker] Controller changed, reloading page");
       window.location.reload();

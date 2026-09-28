@@ -91,7 +91,9 @@ class TechnologyStack:
         self.resolved_latest_versions_count = sum(
             1 for dep in self.dependencies if dep.latest_version_status == "resolved"
         )
-        self.unknown_versions_count = self.total_dependencies - self.known_versions_count
+        self.unknown_versions_count = (
+            self.total_dependencies - self.known_versions_count
+        )
         self.currency_score = self._calculate_currency_score()
 
     def _calculate_currency_score(self) -> int:
@@ -105,8 +107,12 @@ class TechnologyStack:
 
         # Count dependencies by status
         current_count = sum(1 for dep in self.dependencies if dep.status == "current")
-        minor_outdated = sum(1 for dep in self.dependencies if dep.status == "minor_outdated")
-        major_outdated = sum(1 for dep in self.dependencies if dep.status == "major_outdated")
+        minor_outdated = sum(
+            1 for dep in self.dependencies if dep.status == "minor_outdated"
+        )
+        major_outdated = sum(
+            1 for dep in self.dependencies if dep.status == "major_outdated"
+        )
 
         # Weighted scoring:
         # - Current: 100% credit
@@ -117,7 +123,13 @@ class TechnologyStack:
             current_count * 100
             + minor_outdated * 70
             + major_outdated * 30
-            + (self.total_dependencies - current_count - minor_outdated - major_outdated) * 50
+            + (
+                self.total_dependencies
+                - current_count
+                - minor_outdated
+                - major_outdated
+            )
+            * 50
         )
 
         return min(100, int(total_score / self.total_dependencies))
@@ -185,8 +197,28 @@ class TechnologyStack:
         self.resolved_latest_versions_count = sum(
             1 for dep in self.dependencies if dep.latest_version_status == "resolved"
         )
-        self.unknown_versions_count = self.total_dependencies - self.known_versions_count
+        self.unknown_versions_count = (
+            self.total_dependencies - self.known_versions_count
+        )
         self.currency_score = self._calculate_currency_score()
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "TechnologyStack":
+        """Restore nested dependency models and recalculate derived scores."""
+        values = {
+            key: value for key, value in data.items() if key in cls.__dataclass_fields__
+        }
+        values["dependencies"] = [
+            DependencyInfo(
+                **{
+                    key: value
+                    for key, value in item.items()
+                    if key in DependencyInfo.__dataclass_fields__
+                }
+            )
+            for item in data.get("dependencies", [])
+        ]
+        return cls(**values)
 
     def to_dict(self) -> dict:
         """Serialize technology stack to dictionary format.

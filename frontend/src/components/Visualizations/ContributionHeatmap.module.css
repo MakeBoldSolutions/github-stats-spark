@@ -25,7 +25,7 @@
 
 .heatmap {
   font-size: 11px;
-  color: var(--color-fg-muted, #666);
+  color: var(--color-text-muted);
   overflow: visible;
   position: relative;
 }
@@ -49,7 +49,7 @@
 .dayLabel {
   line-height: var(--cell-size);
   font-size: 10px;
-  color: var(--color-fg-muted, #666);
+  color: var(--color-text-muted);
   padding-right: 4px;
 }
 
@@ -67,7 +67,7 @@
 
 .monthLabel {
   font-size: 10px;
-  color: var(--color-fg-muted, #666);
+  color: var(--color-text-muted);
   white-space: nowrap;
   overflow: visible;
 }
@@ -123,7 +123,7 @@
 
 .legendLabel {
   font-size: 10px;
-  color: var(--color-fg-muted, #666);
+  color: var(--color-text-muted);
 }
 
 .legendCell {
@@ -146,7 +146,7 @@
 
 /* Empty state */
 .empty {
-  color: var(--color-fg-muted, #888);
+  color: var(--color-text-muted);
   font-style: italic;
   text-align: center;
   padding: 16px 0;

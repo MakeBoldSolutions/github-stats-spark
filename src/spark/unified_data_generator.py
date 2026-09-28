@@ -37,9 +37,8 @@ from spark.logger import get_logger
 from spark.models import (
     CommitHistory,
     Repository,
-    UserProfile,
 )
-from spark.models.tech_stack import TechnologyStack, DependencyInfo
+from spark.models.tech_stack import TechnologyStack
 from spark.ranker import RepositoryRanker
 from spark.summarizer import RepositorySummarizer
 from spark.time_utils import sanitize_timestamp_for_filename
@@ -50,7 +49,7 @@ logger = get_logger(__name__)
 
 class UnifiedDataGenerator:
     """Generates unified repository data using clean 4-phase architecture.
-    
+
     Clean Architecture:
     1. Fetch: Get current repository list from GitHub
     2. Refresh: Update caches for repos with changes
@@ -68,7 +67,7 @@ class UnifiedDataGenerator:
         include_ai_summaries: bool = False,
     ):
         """Initialize unified data generator.
-        
+
         Args:
             username: GitHub username
             config: SparkConfig instance
@@ -81,25 +80,31 @@ class UnifiedDataGenerator:
         self.config = config
         self.output_dir = Path(output_dir)
         self.force_refresh = force_refresh
-        
+
         # All values come from config (no fallbacks — raise if missing)
-        self.max_repositories = config.require("dashboard.data_generation.max_repositories")
+        self.max_repositories = config.require(
+            "dashboard.data_generation.max_repositories"
+        )
         self.top_n_repos = config.require("analyzer.top_n")
-        self.include_ai_summaries = include_ai_summaries or config.require("dashboard.data_generation.include_ai_summaries")
-        
+        self.include_ai_summaries = include_ai_summaries or config.require(
+            "dashboard.data_generation.include_ai_summaries"
+        )
+
         # Initialize components
-        self.cache = cache if cache is not None else APICache(cache_dir=config.get_cache_dir())
+        self.cache = (
+            cache if cache is not None else APICache(cache_dir=config.get_cache_dir())
+        )
         self.fetcher = GitHubFetcher(
             cache=self.cache,
             max_repos=self.max_repositories,
             api_version_settings=self.config.get_github_api_version_config(),
         )
         self.ranker = RepositoryRanker(config=config.get_ranking_weights())
-        
+
         logger.info(f"UnifiedDataGenerator initialized for user: {username}")
         logger.info(f"Max repositories: {self.max_repositories}")
         logger.info(f"Include AI summaries: {self.include_ai_summaries}")
-        
+
         # Initialize cache manager for Phase 2 (pass ai_model for lazy summarizer creation)
         self.cache_manager = CacheManager(
             self.fetcher.github,
@@ -109,9 +114,12 @@ class UnifiedDataGenerator:
         )
 
     @staticmethod
-    def _derive_weekly_activity(activity_calendar: Dict[str, int]) -> List[Dict[str, Any]]:
+    def _derive_weekly_activity(
+        activity_calendar: Dict[str, int],
+    ) -> List[Dict[str, Any]]:
         """Derive weekly_activity array from activity_calendar for trailing 52 weeks."""
         from datetime import timedelta, date as date_type
+
         today = datetime.now(timezone.utc).date()
         # Start from Monday of 52 weeks ago
         start = today - timedelta(weeks=52)
@@ -125,7 +133,12 @@ class UnifiedDataGenerator:
             if week_key not in weeks:
                 # Cross-platform label: "Jan 6" (no leading zero, no %-d dependency)
                 label = current.strftime("%b") + " " + str(current.day)
-                weeks[week_key] = {"week": week_key, "label": label, "commits": 0, "active_repos": 0}
+                weeks[week_key] = {
+                    "week": week_key,
+                    "label": label,
+                    "commits": 0,
+                    "active_repos": 0,
+                }
             current += timedelta(days=1)
 
         for day_str, count in activity_calendar.items():
@@ -140,7 +153,9 @@ class UnifiedDataGenerator:
             if week_key in weeks:
                 weeks[week_key]["commits"] += count
                 if count > 0:
-                    weeks[week_key]["active_repos"] += 1  # approximation: 1 active repo per day with commits
+                    weeks[week_key][
+                        "active_repos"
+                    ] += 1  # approximation: 1 active repo per day with commits
 
         return sorted(weeks.values(), key=lambda w: w["week"])
 
@@ -218,7 +233,9 @@ class UnifiedDataGenerator:
         }
 
     @staticmethod
-    def _calculate_dependency_attention(tech_stack: Optional[TechnologyStack]) -> Dict[str, Any]:
+    def _calculate_dependency_attention(
+        tech_stack: Optional[TechnologyStack],
+    ) -> Dict[str, Any]:
         if not tech_stack:
             return {
                 "score": 0.0,
@@ -310,32 +327,32 @@ class UnifiedDataGenerator:
 
     def generate(self, single_repository: Optional[str] = None) -> Dict[str, Any]:
         """Generate unified data using clean 4-phase architecture.
-        
+
         Phase 1: Fetch repository list
         Phase 2: Validate & refresh caches (GitHub API)
         Phase 2c: AI summary generation (LLM, runs only when enabled)
         Phase 3: Assemble data from cache
         Phase 4: (handled by caller - output generation)
-        
+
         Args:
             single_repository: Optional name of a single repository to process.
-        
+
         Returns:
             Dict with profile, repositories, and metadata
         """
         from time import time
-        
-        logger.info("="*70)
+
+        logger.info("=" * 70)
         logger.info("Starting Unified Data Generation")
-        logger.info("="*70)
+        logger.info("=" * 70)
         logger.info(f"Force refresh mode: {self.force_refresh}")
         logger.info(f"AI summaries: {self.include_ai_summaries}")
         logger.info(f"Max repositories: {self.max_repositories}")
         if single_repository:
             logger.info(f"Single repository mode: {single_repository}")
-        
+
         total_start = time()
-        
+
         # PHASE 1: Fetch repository list from GitHub
         logger.info("\n[Phase 1] Fetching Repository List")
         phase1_start = time()
@@ -345,7 +362,7 @@ class UnifiedDataGenerator:
             logger.info(f"Filtered to single repository: {single_repository}")
         phase1_time = time() - phase1_start
         logger.info(f"Found {len(raw_repos)} repositories ({phase1_time:.2f}s)")
-        
+
         # PHASE 2: Validate & refresh caches (GitHub API only, no LLM calls)
         logger.info("\n[Phase 2] Cache Validation & Refresh")
         phase2_start = time()
@@ -356,15 +373,17 @@ class UnifiedDataGenerator:
             include_ai_summaries=self.include_ai_summaries,
         )
         phase2_time = time() - phase2_start
-        logger.info(f"Refreshed: {refresh_summary.repos_refreshed}, " 
-                   f"Unchanged: {refresh_summary.repos_unchanged}, "
-                   f"API calls: {refresh_summary.api_calls_made} ({phase2_time:.2f}s)")
-        
+        logger.info(
+            f"Refreshed: {refresh_summary.repos_refreshed}, "
+            f"Unchanged: {refresh_summary.repos_unchanged}, "
+            f"API calls: {refresh_summary.api_calls_made} ({phase2_time:.2f}s)"
+        )
+
         # PHASE 2b: Cache garbage collection — remove orphaned entries
         # Skip GC in single-repository mode to avoid removing other repos' caches.
         if not single_repository:
             try:
-                active_names = [r.get("name") for r in raw_repos if r.get("name")]
+                active_names = [str(r["name"]) for r in raw_repos if r.get("name")]
                 gc_result = self.cache.collect_garbage(self.username, active_names)
                 if gc_result["removed_repos"]:
                     logger.info(
@@ -386,30 +405,34 @@ class UnifiedDataGenerator:
             phase2c_time = time() - phase2c_start
             ai_generated = sum(1 for r in ai_results if r.refreshed)
             ai_failed = sum(1 for r in ai_results if r.error)
-            logger.info(f"AI summaries: {ai_generated} generated, {ai_failed} failed ({phase2c_time:.2f}s)")
+            logger.info(
+                f"AI summaries: {ai_generated} generated, {ai_failed} failed ({phase2c_time:.2f}s)"
+            )
 
         # PHASE 3: Assemble data from cache
         logger.info("\n[Phase 3] Assembling Data from Cache")
         phase3_start = time()
         unified_data = self._assemble_data(raw_repos)
         phase3_time = time() - phase3_start
-        logger.info(f"Assembled data for {len(unified_data['repositories'])} repositories ({phase3_time:.2f}s)")
-        
+        logger.info(
+            f"Assembled data for {len(unified_data['repositories'])} repositories ({phase3_time:.2f}s)"
+        )
+
         total_time = time() - total_start
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info(f"Data Generation Complete: {total_time:.2f}s total")
         logger.info(f"  Phase 1 (Fetch): {phase1_time:.2f}s")
         logger.info(f"  Phase 2 (Refresh): {phase2_time:.2f}s")
         if self.include_ai_summaries:
             logger.info(f"  Phase 2c (AI Summaries): {phase2c_time:.2f}s")
         logger.info(f"  Phase 3 (Assemble): {phase3_time:.2f}s")
-        logger.info("="*70)
-        
+        logger.info("=" * 70)
+
         return unified_data
-    
+
     def _fetch_repository_list(self) -> List[Dict]:
         """Phase 1: Fetch current repository list from GitHub.
-        
+
         Returns:
             List of repository dicts with metadata
         """
@@ -422,62 +445,72 @@ class UnifiedDataGenerator:
             exclude_forks=exclude_forks,
             exclude_archived=exclude_archived,
         )
-    
+
     def _assemble_data(self, raw_repos: List[Dict]) -> Dict[str, Any]:
         """Phase 3: Assemble unified data by reading from cache.
-        
+
         This phase ONLY reads from cache, never writes.
-        
+
         Args:
             raw_repos: List of repository dicts from Phase 1
-            
+
         Returns:
             Dict with 'profile', 'repositories', 'metadata' keys
         """
         repositories = []
         commit_histories = {}
-        repo_daily_commits: Dict[str, Dict[str, int]] = {}  # repo_name -> {"YYYY-MM-DD": count}
-        repo_cache = {}
+        repo_daily_commits: Dict[str, Dict[str, int]] = (
+            {}
+        )  # repo_name -> {"YYYY-MM-DD": count}
+        repo_cache: Dict[str, Dict[str, Any]] = {}
         dependency_analyzer = RepositoryDependencyAnalyzer(
             config=self.config.config.get("analyzer", {})
         )
-        summarizer = RepositorySummarizer(cache=self.cache, enable_ai=False, model=self.config.get_ai_model())
+        summarizer = RepositorySummarizer(
+            cache=self.cache, enable_ai=False, model=self.config.get_ai_model()
+        )
 
         total_repos = min(len(raw_repos), self.max_repositories)
         assembled_ok = 0
         assemble_started_at = datetime.now(timezone.utc)
         logger.info(f"Phase 3 cache assembly progress: 0/{total_repos} repositories")
-        
-        for i, repo_data in enumerate(raw_repos[:self.max_repositories], 1):
+
+        for i, repo_data in enumerate(raw_repos[: self.max_repositories], 1):
             repo_name = repo_data["name"]
-            logger.debug(f"[{i}/{min(len(raw_repos), self.max_repositories)}] Assembling {repo_name}")
+            logger.debug(
+                f"[{i}/{min(len(raw_repos), self.max_repositories)}] Assembling {repo_name}"
+            )
 
             if i == 1 or i % 10 == 0 or i == total_repos:
-                elapsed_seconds = int((datetime.now(timezone.utc) - assemble_started_at).total_seconds())
+                elapsed_seconds = int(
+                    (datetime.now(timezone.utc) - assemble_started_at).total_seconds()
+                )
                 logger.info(
                     f"Phase 3 cache assembly progress: {i}/{total_repos} "
                     f"(assembled={assembled_ok}, elapsed={elapsed_seconds}s) - loading {repo_name}"
                 )
-            
+
             try:
                 # Parse pushed_at
                 pushed_at_str = repo_data.get("pushed_at")
                 if pushed_at_str:
-                    pushed_at = datetime.fromisoformat(pushed_at_str.replace('Z', '+00:00'))
+                    pushed_at = datetime.fromisoformat(
+                        pushed_at_str.replace("Z", "+00:00")
+                    )
                     if pushed_at.tzinfo is None:
                         pushed_at = pushed_at.replace(tzinfo=timezone.utc)
                 else:
                     pushed_at = None
-                
-                cache_key = sanitize_timestamp_for_filename(pushed_at) if pushed_at else None
+
+                cache_key = (
+                    sanitize_timestamp_for_filename(pushed_at) if pushed_at else None
+                )
 
                 # Read commit counts from cache
                 commit_data = self.fetcher.fetch_commit_counts(
-                    self.username,
-                    repo_name,
-                    repo_pushed_at=pushed_at
+                    self.username, repo_name, repo_pushed_at=pushed_at
                 )
-                
+
                 if commit_data:
                     commit_histories[repo_name] = CommitHistory(
                         repository_name=repo_name,
@@ -493,27 +526,37 @@ class UnifiedDataGenerator:
                     )
                     if isinstance(commit_data.get("daily_commits"), dict):
                         repo_daily_commits[repo_name] = commit_data["daily_commits"]
-                
+
                 # Read language stats from cache
-                language_stats = self.fetcher.fetch_languages(
-                    self.username,
-                    repo_name,
-                    repo_pushed_at=pushed_at
-                ) or {}
+                language_stats = (
+                    self.fetcher.fetch_languages(
+                        self.username, repo_name, repo_pushed_at=pushed_at
+                    )
+                    or {}
+                )
 
                 # Read cached AI summary, README, dependency files, and commit stats
                 readme_content = ""
-                dependency_files = {}
+                dependency_files: Dict[str, str] = {}
                 commit_stats = None
                 cached_summary = None
 
                 if cache_key:
-                    readme_content = self.cache.get(
-                        "readme", self.username, repo=repo_name, week=cache_key
-                    ) or ""
-                    dependency_files = self.cache.get(
-                        "dependency_files", self.username, repo=repo_name, week=cache_key
-                    ) or {}
+                    readme_content = (
+                        self.cache.get(
+                            "readme", self.username, repo=repo_name, week=cache_key
+                        )
+                        or ""
+                    )
+                    dependency_files = (
+                        self.cache.get(
+                            "dependency_files",
+                            self.username,
+                            repo=repo_name,
+                            week=cache_key,
+                        )
+                        or {}
+                    )
                     commit_stats = self.cache.get(
                         "commits_stats", self.username, repo=repo_name, week=cache_key
                     )
@@ -522,22 +565,42 @@ class UnifiedDataGenerator:
                     )
                     # Read quality indicators from cache
                     quality_indicators = self.cache.get(
-                        "quality_indicators", self.username, repo=repo_name, week=cache_key
+                        "quality_indicators",
+                        self.username,
+                        repo=repo_name,
+                        week=cache_key,
                     )
                     pull_request_summary = self.cache.get(
-                        "pull_request_summary", self.username, repo=repo_name, week=cache_key
+                        "pull_request_summary",
+                        self.username,
+                        repo=repo_name,
+                        week=cache_key,
                     )
                     security_summary = self.cache.get(
-                        "security_summary", self.username, repo=repo_name, week=cache_key
+                        "security_summary",
+                        self.username,
+                        repo=repo_name,
+                        week=cache_key,
                     )
                     diagnostics_summary = self.cache.get(
-                        "diagnostics_summary", self.username, repo=repo_name, week=cache_key
+                        "diagnostics_summary",
+                        self.username,
+                        repo=repo_name,
+                        week=cache_key,
                     )
                     if quality_indicators:
-                        repo_data["has_license"] = quality_indicators.get("has_license", False)
-                        repo_data["has_ci_cd"] = quality_indicators.get("has_ci_cd", False)
-                        repo_data["has_tests"] = quality_indicators.get("has_tests", False)
-                        repo_data["has_docs"] = quality_indicators.get("has_docs", False)
+                        repo_data["has_license"] = quality_indicators.get(
+                            "has_license", False
+                        )
+                        repo_data["has_ci_cd"] = quality_indicators.get(
+                            "has_ci_cd", False
+                        )
+                        repo_data["has_tests"] = quality_indicators.get(
+                            "has_tests", False
+                        )
+                        repo_data["has_docs"] = quality_indicators.get(
+                            "has_docs", False
+                        )
                     if pull_request_summary:
                         repo_data["pull_request_summary"] = pull_request_summary
                     if security_summary:
@@ -546,7 +609,9 @@ class UnifiedDataGenerator:
                         repo_data["diagnostics_summary"] = diagnostics_summary
 
                 if "pull_request_summary" not in repo_data:
-                    logger.debug(f"No cached pull_request_summary for {repo_name}; using unavailable default")
+                    logger.debug(
+                        f"No cached pull_request_summary for {repo_name}; using unavailable default"
+                    )
                     repo_data["pull_request_summary"] = {
                         "availability": "unavailable",
                         "reason": "not_cached",
@@ -558,7 +623,9 @@ class UnifiedDataGenerator:
                         "source": "rest.pulls.list",
                     }
                 if "security_summary" not in repo_data:
-                    logger.debug(f"No cached security_summary for {repo_name}; using unavailable default")
+                    logger.debug(
+                        f"No cached security_summary for {repo_name}; using unavailable default"
+                    )
                     repo_data["security_summary"] = {
                         "availability": "unavailable",
                         "reason": "not_cached",
@@ -580,7 +647,9 @@ class UnifiedDataGenerator:
                         "sources": [],
                     }
                 if "diagnostics_summary" not in repo_data:
-                    logger.debug(f"No cached diagnostics_summary for {repo_name}; using unavailable default")
+                    logger.debug(
+                        f"No cached diagnostics_summary for {repo_name}; using unavailable default"
+                    )
                     repo_data["diagnostics_summary"] = {
                         "availability": "unavailable",
                         "reason": "not_cached",
@@ -629,7 +698,9 @@ class UnifiedDataGenerator:
                     }
 
                 if cached_summary is None:
-                    cached_summary = self.cache.get("ai_summary", self.username, repo=repo_name)
+                    cached_summary = self.cache.get(
+                        "ai_summary", self.username, repo=repo_name
+                    )
 
                 # Create Repository object
                 repo_data["language_stats"] = language_stats
@@ -649,16 +720,20 @@ class UnifiedDataGenerator:
                 logger.warn(f"Failed to assemble {repo_name}: {e}")
                 continue
 
-        total_elapsed_seconds = int((datetime.now(timezone.utc) - assemble_started_at).total_seconds())
+        total_elapsed_seconds = int(
+            (datetime.now(timezone.utc) - assemble_started_at).total_seconds()
+        )
         logger.info(
             f"Phase 3 cache assembly complete: assembled {assembled_ok}/{total_repos} "
             f"repositories in {total_elapsed_seconds}s"
         )
-        
+
         # Rank repositories
         logger.info(f"Ranking {len(repositories)} repositories...")
-        ranked_repos = self.ranker.rank_repositories(repositories, commit_histories, top_n=self.top_n_repos)
-        
+        ranked_repos = self.ranker.rank_repositories(
+            repositories, commit_histories, top_n=self.top_n_repos
+        )
+
         # Create repository dicts
         unified_repos = []
         for rank, (repo, score) in enumerate(ranked_repos, 1):
@@ -676,7 +751,9 @@ class UnifiedDataGenerator:
             first_commit_date = repo.created_at
 
             if commit_stats:
-                metrics = StatsCalculator.calculate_repository_commit_metrics(commit_stats)
+                metrics = StatsCalculator.calculate_repository_commit_metrics(
+                    commit_stats
+                )
                 commit_metrics = {
                     "avg_size": metrics.get("avg_commit_size", 0.0),
                     "largest_commit": metrics.get("largest_commit"),
@@ -694,7 +771,9 @@ class UnifiedDataGenerator:
                     if not date_str:
                         continue
                     try:
-                        commit_dates.append(datetime.fromisoformat(date_str.replace("Z", "+00:00")))
+                        commit_dates.append(
+                            datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+                        )
                     except ValueError:
                         continue
                 if commit_dates:
@@ -784,7 +863,9 @@ class UnifiedDataGenerator:
                 "updated_at": repo.updated_at.isoformat() if repo.updated_at else None,
                 "pushed_at": repo.pushed_at.isoformat() if repo.pushed_at else None,
                 "total_commits": commit_history.total_commits if commit_history else 0,
-                "recent_commits_90d": commit_history.recent_90d if commit_history else 0,
+                "recent_commits_90d": (
+                    commit_history.recent_90d if commit_history else 0
+                ),
                 "first_commit_date": (
                     first_commit_date.isoformat() if first_commit_date else None
                 ),
@@ -798,7 +879,9 @@ class UnifiedDataGenerator:
                 "avg_commit_size": avg_commit_size,
                 "largest_commit": largest_commit,
                 "smallest_commit": smallest_commit,
-                "commit_velocity": commit_history.commit_frequency if commit_history else None,
+                "commit_velocity": (
+                    commit_history.commit_frequency if commit_history else None
+                ),
                 "tech_stack": tech_stack.to_dict() if tech_stack else None,
                 "has_readme": repo.has_readme,
                 "has_license": repo.has_license,
@@ -830,7 +913,7 @@ class UnifiedDataGenerator:
         )
         for attention_rank, repo_dict in enumerate(attention_sorted, 1):
             repo_dict["attention_rank"] = attention_rank
-        
+
         # Build activity_calendar (T002): aggregate daily_commits across all repos
         # Primary source: daily_commits captured from commit_counts cache during the assembly loop above
         # Fallback source: per-commit dates from commits_stats cache (sparse, only fetched when present)
@@ -840,12 +923,14 @@ class UnifiedDataGenerator:
                 activity_calendar[day_key] = activity_calendar.get(day_key, 0) + count
         # Also pick up any commits_stats data present in repo_cache (legacy/sparse)
         for repo_name, extras in repo_cache.items():
-            for commit in (extras.get("commit_stats") or []):
+            for commit in extras.get("commit_stats") or []:
                 date_str = commit.get("commit", {}).get("author", {}).get("date")
                 if date_str:
                     try:
                         day_key = date_str[:10]  # "YYYY-MM-DD"
-                        activity_calendar[day_key] = activity_calendar.get(day_key, 0) + 1
+                        activity_calendar[day_key] = (
+                            activity_calendar.get(day_key, 0) + 1
+                        )
                     except Exception:
                         pass
 
@@ -862,7 +947,7 @@ class UnifiedDataGenerator:
             "activity_calendar": activity_calendar,
             "weekly_activity": weekly_activity,
         }
-        
+
         # Create metadata
         metadata = {
             "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -873,24 +958,20 @@ class UnifiedDataGenerator:
                 "dependency_version_coverage",
                 "activity_calendar",
             ],
-            "attention_formula_version": "1.0"
+            "attention_formula_version": "1.0",
         }
-        
-        return {
-            "profile": profile,
-            "repositories": unified_repos,
-            "metadata": metadata
-        }
+
+        return {"profile": profile, "repositories": unified_repos, "metadata": metadata}
 
     def save(self, unified_data: Optional[Dict[str, Any]] = None) -> tuple[Path, bool]:
         """Generate and save unified data to repositories.json file.
-        
+
         Phase 4: Output generation (no cache operations).
-        
+
         Args:
             unified_data: Optional pre-generated data dict.
                          If None, will call generate().
-                         
+
         Returns:
             Tuple of (Path to saved JSON file, generation skipped flag)
         """
@@ -899,24 +980,23 @@ class UnifiedDataGenerator:
 
         # Ensure output directory exists
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Write JSON file
         output_path = self.output_dir / "repositories.json"
         logger.info(f"Writing unified data to {output_path}...")
 
         try:
             import json
+
             with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(unified_data, f, indent=2, ensure_ascii=False)
-            
+
             file_size = output_path.stat().st_size
             file_size_kb = file_size / 1024
             logger.info(f"Unified data written successfully ({file_size_kb:.2f} KB)")
-            
+
             return output_path, False
-            
+
         except Exception as e:
             logger.error(f"Failed to write unified data: {e}")
             raise
-
-

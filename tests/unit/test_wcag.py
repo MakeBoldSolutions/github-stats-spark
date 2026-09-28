@@ -3,7 +3,6 @@
 import pytest
 from spark.themes.spark_dark import SparkDarkTheme
 from spark.themes.spark_light import SparkLightTheme
-from spark.themes.custom import CustomTheme
 
 
 def hex_to_rgb(hex_color: str) -> tuple:
@@ -28,6 +27,7 @@ def calculate_relative_luminance(rgb: tuple) -> float:
     Returns:
         Relative luminance (0.0-1.0)
     """
+
     # Convert to sRGB
     def adjust(channel: int) -> float:
         c = channel / 255.0
@@ -72,7 +72,9 @@ class TestWCAGContrastDarkTheme:
         contrast = calculate_contrast_ratio(theme.text_color, theme.background_color)
 
         # WCAG AA requires 4.5:1 for normal text
-        assert contrast >= 4.5, f"Text contrast {contrast:.2f} is below WCAG AA requirement (4.5:1)"
+        assert (
+            contrast >= 4.5
+        ), f"Text contrast {contrast:.2f} is below WCAG AA requirement (4.5:1)"
 
     def test_primary_background_contrast(self):
         """Test primary color on background has sufficient contrast."""
@@ -81,7 +83,9 @@ class TestWCAGContrastDarkTheme:
         contrast = calculate_contrast_ratio(theme.primary_color, theme.background_color)
 
         # For large text and graphics, WCAG AA requires 3:1
-        assert contrast >= 3.0, f"Primary contrast {contrast:.2f} is below minimum (3:1)"
+        assert (
+            contrast >= 3.0
+        ), f"Primary contrast {contrast:.2f} is below minimum (3:1)"
 
     def test_accent_background_contrast(self):
         """Test accent color on background has sufficient contrast."""
@@ -114,7 +118,9 @@ class TestWCAGContrastLightTheme:
         contrast = calculate_contrast_ratio(theme.text_color, theme.background_color)
 
         # WCAG AA requires 4.5:1 for normal text
-        assert contrast >= 4.5, f"Text contrast {contrast:.2f} is below WCAG AA requirement (4.5:1)"
+        assert (
+            contrast >= 4.5
+        ), f"Text contrast {contrast:.2f} is below WCAG AA requirement (4.5:1)"
 
     def test_primary_background_contrast(self):
         """Test primary color on background has sufficient contrast."""
@@ -123,7 +129,9 @@ class TestWCAGContrastLightTheme:
         contrast = calculate_contrast_ratio(theme.primary_color, theme.background_color)
 
         # For large text and graphics, WCAG AA requires 3:1
-        assert contrast >= 3.0, f"Primary contrast {contrast:.2f} is below minimum (3:1)"
+        assert (
+            contrast >= 3.0
+        ), f"Primary contrast {contrast:.2f} is below minimum (3:1)"
 
     def test_accent_background_contrast(self):
         """Test accent color on background has sufficient contrast."""
@@ -192,9 +200,15 @@ class TestCustomThemeValidation:
         }
 
         # Validate all critical combinations
-        text_bg_contrast = calculate_contrast_ratio(test_colors["text"], test_colors["background"])
-        primary_bg_contrast = calculate_contrast_ratio(test_colors["primary"], test_colors["background"])
-        accent_bg_contrast = calculate_contrast_ratio(test_colors["accent"], test_colors["background"])
+        text_bg_contrast = calculate_contrast_ratio(
+            test_colors["text"], test_colors["background"]
+        )
+        primary_bg_contrast = calculate_contrast_ratio(
+            test_colors["primary"], test_colors["background"]
+        )
+        accent_bg_contrast = calculate_contrast_ratio(
+            test_colors["accent"], test_colors["background"]
+        )
 
         assert text_bg_contrast >= 4.5, "Text contrast fails WCAG AA"
         assert primary_bg_contrast >= 3.0, "Primary contrast too low"
@@ -222,7 +236,9 @@ class TestColorCombinations:
             ("#0284C7", "#FFFFFF", 3.0),  # Blue on white (spark-light primary)
         ],
     )
-    def test_color_combination_contrast(self, foreground, background, expected_min_ratio):
+    def test_color_combination_contrast(
+        self, foreground, background, expected_min_ratio
+    ):
         """Test specific color combinations meet minimum contrast ratios."""
         contrast = calculate_contrast_ratio(foreground, background)
 

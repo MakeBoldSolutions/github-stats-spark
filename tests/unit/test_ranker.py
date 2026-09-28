@@ -19,7 +19,9 @@ from spark.ranker import RepositoryRanker
 @pytest.fixture
 def ranker():
     """Create a RepositoryRanker instance for testing."""
-    return RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+    return RepositoryRanker(
+        config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+    )
 
 
 @pytest.fixture
@@ -40,7 +42,7 @@ def create_repository_from_scenario(scenario_data):
     created_at = now - timedelta(days=repo_data["created_days_ago"])
     updated_at = now - timedelta(days=repo_data["updated_days_ago"])
     last_commit_days = commit_data["last_commit_days_ago"]
-    
+
     # For empty repos (no commits ever), set pushed_at to None
     if commit_data["total"] == 0 or last_commit_days > 9000:
         last_commit = None
@@ -66,7 +68,6 @@ def create_repository_from_scenario(scenario_data):
         is_private=repo_data.get("is_private", False),
         size_kb=repo_data.get("size_kb", 1000),
         has_readme=repo_data.get("has_readme", True),
-
     )
 
     # Create CommitHistory object
@@ -79,8 +80,10 @@ def create_repository_from_scenario(scenario_data):
         last_commit_date=last_commit,
         patterns={
             "frequency": "active" if commit_data["recent_90d"] > 20 else "moderate",
-            "consistency": "consistent" if commit_data["recent_90d"] > 0 else "sporadic"
-        }
+            "consistency": (
+                "consistent" if commit_data["recent_90d"] > 0 else "sporadic"
+            ),
+        },
     )
 
     return repository, commit_history
@@ -88,6 +91,7 @@ def create_repository_from_scenario(scenario_data):
 
 class TestPrivacyFilter:
     """Test privacy filter (constitution requirement - T027)."""
+
     # REMOVED: test_private_repos_excluded - Cannot create private Repository anymore
     # Privacy enforcement is now at model level (Repository.__post_init__ raises ValueError)
     # The ranker filter is now defensive code that cannot be reached in production
@@ -109,7 +113,9 @@ class TestPrivacyFilter:
             commit_histories[repo.name] = commits
 
         # Rank public repositories
-        ranked = ranker.rank_repositories(public_repos, commit_histories, top_n=len(public_repos))
+        ranked = ranker.rank_repositories(
+            public_repos, commit_histories, top_n=len(public_repos)
+        )
 
         # All non-empty public repos should be included
         expected_count = len([r for r in public_repos if not r.is_empty])
@@ -133,7 +139,9 @@ class TestCompositeScoring:
 
             if len(ranked) > 0:  # If not filtered out
                 _, score = ranked[0]
-                assert 0 <= score <= 100, f"Score out of range for {scenario['name']}: {score}"
+                assert (
+                    0 <= score <= 100
+                ), f"Score out of range for {scenario['name']}: {score}"
 
     def test_composite_weights_applied(self, ranker):
         """Test that composite score uses correct weights (30/45/25)."""
@@ -174,7 +182,9 @@ class TestRankingIntegration:
         for i in range(len(ranked) - 1):
             _, score1 = ranked[i]
             _, score2 = ranked[i + 1]
-            assert score1 >= score2, f"Scores not in descending order: {score1} < {score2}"
+            assert (
+                score1 >= score2
+            ), f"Scores not in descending order: {score1} < {score2}"
 
     def test_top_n_selection(self, ranker, ranking_scenarios):
         """Test that top_n parameter limits results."""
@@ -243,7 +253,9 @@ class TestEdgeCases:
 
     def test_fork_handling(self, ranker, ranking_scenarios):
         """Test that fork repositories are handled appropriately."""
-        fork_scenarios = [s for s in ranking_scenarios["scenarios"] if "fork" in s["name"]]
+        fork_scenarios = [
+            s for s in ranking_scenarios["scenarios"] if "fork" in s["name"]
+        ]
 
         for scenario in fork_scenarios:
             repo, commits = create_repository_from_scenario(scenario)
@@ -272,7 +284,7 @@ class TestEdgeCases:
             repos = [new_repo, legacy_repo]
             commit_histories = {
                 new_repo.name: new_commits,
-                legacy_repo.name: legacy_commits
+                legacy_repo.name: legacy_commits,
             }
 
             ranked = ranker.rank_repositories(repos, commit_histories, top_n=2)
@@ -365,11 +377,7 @@ class TestConfigurationCustomization:
 
     def test_custom_weights(self):
         """Test that custom weights can be configured."""
-        custom_config = {
-            "popularity": 0.4,
-            "activity": 0.4,
-            "health": 0.2
-        }
+        custom_config = {"popularity": 0.4, "activity": 0.4, "health": 0.2}
 
         ranker = RepositoryRanker(config=custom_config)
 
@@ -379,7 +387,9 @@ class TestConfigurationCustomization:
 
     def test_default_weights(self):
         """Test that weights are loaded from config (no silent defaults)."""
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
 
         assert abs(ranker.weight_popularity - 0.30) < 0.01
         assert abs(ranker.weight_activity - 0.45) < 0.01
@@ -388,6 +398,7 @@ class TestConfigurationCustomization:
     def test_missing_config_raises_error(self):
         """Test that RepositoryRanker raises ConfigurationError when no config provided."""
         from spark.exceptions import ConfigurationError
+
         with pytest.raises(ConfigurationError):
             RepositoryRanker()
 
@@ -421,7 +432,6 @@ class TestErrorHandling:
             is_private=False,
             size_kb=2000,
             has_readme=True,
-
         )
 
         # No commit history provided
@@ -454,6 +464,7 @@ class TestErrorHandling:
 # ---------------------------------------------------------------------------
 # Individual scoring method tests (targeting >80% coverage)
 # ---------------------------------------------------------------------------
+
 
 def _make_repo(**kwargs):
     """Helper to create Repository instances with sensible defaults."""
@@ -499,24 +510,32 @@ class TestPopularityScore:
     """Test _calculate_popularity_score in isolation."""
 
     def test_zero_stars(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo(stars=0, forks=0, watchers=0)
         assert ranker._calculate_popularity_score(repo) == 0.0
 
     def test_moderate_stars(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo(stars=100, forks=20, watchers=50)
         score = ranker._calculate_popularity_score(repo)
         assert 50 < score < 80
 
     def test_mega_repo(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo(stars=50000, forks=10000, watchers=20000)
         score = ranker._calculate_popularity_score(repo)
         assert score == 100.0  # capped
 
     def test_log_scaling_prevents_dominance(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo_10 = _make_repo(stars=10, forks=0, watchers=0)
         repo_10000 = _make_repo(stars=10000, forks=0, watchers=0)
         score_10 = ranker._calculate_popularity_score(repo_10)
@@ -529,10 +548,14 @@ class TestActivityScore:
     """Test _calculate_activity_score in isolation."""
 
     def test_zero_commits(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo(pushed_at=None)
         history = _make_commit_history(
-            recent_90d=0, recent_180d=0, recent_365d=0,
+            recent_90d=0,
+            recent_180d=0,
+            recent_365d=0,
             last_commit_date=None,
         )
         score = ranker._calculate_activity_score(repo, history)
@@ -540,16 +563,22 @@ class TestActivityScore:
         assert score == 0.0
 
     def test_high_activity(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo(pushed_at=datetime.now() - timedelta(days=1))
         history = _make_commit_history(
-            recent_90d=90, recent_180d=180, recent_365d=365,
+            recent_90d=90,
+            recent_180d=180,
+            recent_365d=365,
         )
         score = ranker._calculate_activity_score(repo, history)
         assert score == 100.0  # capped at 100
 
     def test_recency_bonus_applied(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         recent_repo = _make_repo(pushed_at=datetime.now() - timedelta(days=1))
         old_repo = _make_repo(pushed_at=datetime.now() - timedelta(days=400))
         history = _make_commit_history(recent_90d=0, recent_180d=0, recent_365d=0)
@@ -567,11 +596,11 @@ class TestRecencyBonus:
         [
             (None, 0.0),
             (1, 30.0),
-            (7, 30.0),      # threshold: RECENCY_EXCELLENT
+            (7, 30.0),  # threshold: RECENCY_EXCELLENT
             (8, 20.0),
-            (30, 20.0),     # threshold: RECENCY_GOOD
+            (30, 20.0),  # threshold: RECENCY_GOOD
             (31, 10.0),
-            (90, 10.0),     # threshold: RECENCY_FAIR
+            (90, 10.0),  # threshold: RECENCY_FAIR
             (91, 0.0),
             (180, 0.0),
             (181, -20.0),
@@ -581,7 +610,9 @@ class TestRecencyBonus:
         ],
     )
     def test_boundaries(self, days_since, expected):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         if days_since is None:
             repo = _make_repo(pushed_at=None)
         else:
@@ -593,7 +624,9 @@ class TestHealthScore:
     """Test _calculate_health_score in isolation."""
 
     def test_perfect_health(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo(
             has_readme=True,
             stars=10,
@@ -606,15 +639,20 @@ class TestHealthScore:
         assert score >= 70
 
     def test_no_readme_penalty(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         with_readme = _make_repo(has_readme=True)
         without_readme = _make_repo(has_readme=False)
         history = _make_commit_history()
-        assert ranker._calculate_health_score(with_readme, history) > \
-               ranker._calculate_health_score(without_readme, history)
+        assert ranker._calculate_health_score(
+            with_readme, history
+        ) > ranker._calculate_health_score(without_readme, history)
 
     def test_high_issue_ratio_penalty(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo(open_issues=100)
         history = _make_commit_history(recent_90d=5)
         score = ranker._calculate_health_score(repo, history)
@@ -622,7 +660,9 @@ class TestHealthScore:
         assert score < 60
 
     def test_zero_stars_community(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo(stars=0, forks=0)
         history = _make_commit_history()
         score = ranker._calculate_health_score(repo, history)
@@ -630,7 +670,9 @@ class TestHealthScore:
         assert score >= 0
 
     def test_no_recent_activity_with_issues(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo(open_issues=5)
         history = _make_commit_history(recent_90d=0)
         score = ranker._calculate_health_score(repo, history)
@@ -638,7 +680,9 @@ class TestHealthScore:
         assert score >= 0
 
     def test_no_recent_activity_no_issues(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo(open_issues=0)
         history = _make_commit_history(recent_90d=0)
         score = ranker._calculate_health_score(repo, history)
@@ -650,42 +694,66 @@ class TestEdgeCasePenalties:
     """Test _apply_edge_case_penalties."""
 
     def test_archived_low_stars(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo(is_archived=True, stars=50)
-        result = ranker._apply_edge_case_penalties(repo, composite=80.0, activity=50.0, popularity=40.0)
+        result = ranker._apply_edge_case_penalties(
+            repo, composite=80.0, activity=50.0, popularity=40.0
+        )
         assert result == pytest.approx(8.0)  # 80 * 0.1
 
     def test_archived_high_stars(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo(is_archived=True, stars=2000)
-        result = ranker._apply_edge_case_penalties(repo, composite=80.0, activity=50.0, popularity=40.0)
+        result = ranker._apply_edge_case_penalties(
+            repo, composite=80.0, activity=50.0, popularity=40.0
+        )
         assert result == pytest.approx(40.0)  # 80 * 0.5
 
     def test_active_fork(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo(is_fork=True)
         repo.fork_info = {"commits_ahead": 20, "commits_behind": 5}
-        result = ranker._apply_edge_case_penalties(repo, composite=80.0, activity=50.0, popularity=40.0)
+        result = ranker._apply_edge_case_penalties(
+            repo, composite=80.0, activity=50.0, popularity=40.0
+        )
         assert result == pytest.approx(56.0)  # 80 * 0.7
 
     def test_inactive_fork(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo(is_fork=True)
         repo.fork_info = {"commits_ahead": 0, "commits_behind": 50}
-        result = ranker._apply_edge_case_penalties(repo, composite=80.0, activity=50.0, popularity=40.0)
+        result = ranker._apply_edge_case_penalties(
+            repo, composite=80.0, activity=50.0, popularity=40.0
+        )
         assert result == pytest.approx(24.0)  # 80 * 0.3
 
     def test_zero_star_active_boost(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo(stars=0, is_fork=False, is_archived=False)
-        result = ranker._apply_edge_case_penalties(repo, composite=20.0, activity=80.0, popularity=0.0)
+        result = ranker._apply_edge_case_penalties(
+            repo, composite=20.0, activity=80.0, popularity=0.0
+        )
         # boost = (80-0) * 0.3 = 24
         assert result == pytest.approx(44.0)
 
     def test_non_archived_non_fork_no_penalty(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo(stars=10)
-        result = ranker._apply_edge_case_penalties(repo, composite=50.0, activity=40.0, popularity=30.0)
+        result = ranker._apply_edge_case_penalties(
+            repo, composite=50.0, activity=40.0, popularity=30.0
+        )
         assert result == 50.0
 
 
@@ -693,21 +761,36 @@ class TestGetRankingBreakdown:
     """Test get_ranking_breakdown method."""
 
     def test_returns_expected_keys(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo()
         history = _make_commit_history()
         breakdown = ranker.get_ranking_breakdown(repo, history)
         expected_keys = {
-            "repository", "composite_score", "popularity_score",
-            "activity_score", "health_score", "popularity_weight",
-            "activity_weight", "health_weight", "weighted_popularity",
-            "weighted_activity", "weighted_health", "is_archived",
-            "is_fork", "stars", "recent_90d_commits", "days_since_push",
+            "repository",
+            "composite_score",
+            "popularity_score",
+            "activity_score",
+            "health_score",
+            "popularity_weight",
+            "activity_weight",
+            "health_weight",
+            "weighted_popularity",
+            "weighted_activity",
+            "weighted_health",
+            "is_archived",
+            "is_fork",
+            "stars",
+            "recent_90d_commits",
+            "days_since_push",
         }
         assert set(breakdown.keys()) == expected_keys
 
     def test_scores_in_range(self):
-        ranker = RepositoryRanker(config={"popularity": 0.30, "activity": 0.45, "health": 0.25})
+        ranker = RepositoryRanker(
+            config={"popularity": 0.30, "activity": 0.45, "health": 0.25}
+        )
         repo = _make_repo()
         history = _make_commit_history()
         breakdown = ranker.get_ranking_breakdown(repo, history)

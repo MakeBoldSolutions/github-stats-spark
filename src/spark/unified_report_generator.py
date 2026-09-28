@@ -1,7 +1,7 @@
 """Unified markdown report generator."""
 
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 from spark.models import UnifiedReport, RepositoryAnalysis
 from spark.report_generator import ReportGenerator
@@ -59,7 +59,7 @@ class UnifiedReportGenerator:
         markdown_content = self.generate_markdown(report)
 
         # Validate file size constraint (FR: <1MB)
-        content_size = len(markdown_content.encode('utf-8'))
+        content_size = len(markdown_content.encode("utf-8"))
         if content_size >= 1_048_576:
             raise ValueError(
                 f"Report exceeds 1MB size constraint: {content_size:,} bytes"
@@ -102,7 +102,7 @@ class UnifiedReportGenerator:
         Returns:
             str: Markdown header with metadata, navigation
         """
-        timestamp_str = report.timestamp.strftime('%Y-%m-%d %H:%M:%S UTC')
+        timestamp_str = report.timestamp.strftime("%Y-%m-%d %H:%M:%S UTC")
 
         # Calculate top N for navigation link
         top_n = len(report.repositories)
@@ -231,7 +231,7 @@ class UnifiedReportGenerator:
         language_count = len(repo.language_stats) if repo.language_stats else 1
         size_kb = repo.size_kb or 0
 
-        commits_per_month = 0
+        commits_per_month = 0.0
         if analysis.commit_history and analysis.commit_history.recent_90d > 0:
             commits_per_month = round(analysis.commit_history.recent_90d / 3, 1)
 
@@ -245,7 +245,9 @@ class UnifiedReportGenerator:
         quality_badges = []
         # Note: These would come from actual analysis in production
         quality_badges.append("✅ License" if repo.has_license else "❌ License")
-        quality_badges.append("✅ Docs" if repo.has_docs or repo.description else "❌ Docs")
+        quality_badges.append(
+            "✅ Docs" if repo.has_docs or repo.description else "❌ Docs"
+        )
 
         lines.append(f"**Quality**: {' | '.join(quality_badges)}")
         lines.append("")
@@ -274,9 +276,15 @@ class UnifiedReportGenerator:
             pr_total = (diagnostics.pull_requests or {}).get("total_open", 0)
             issue_total = (diagnostics.issues or {}).get("total_open", 0)
             stale_90 = (diagnostics.issues or {}).get("stale_over_90d", 0)
-            dep_critical = ((diagnostics.security or {}).get("dependabot") or {}).get("critical", 0)
-            dep_high = ((diagnostics.security or {}).get("dependabot") or {}).get("high", 0)
-            code_alerts = ((diagnostics.security or {}).get("code_scanning") or {}).get("total_open", 0)
+            dep_critical = ((diagnostics.security or {}).get("dependabot") or {}).get(
+                "critical", 0
+            )
+            dep_high = ((diagnostics.security or {}).get("dependabot") or {}).get(
+                "high", 0
+            )
+            code_alerts = ((diagnostics.security or {}).get("code_scanning") or {}).get(
+                "total_open", 0
+            )
             actions_failures = (diagnostics.actions or {}).get("failure_count", 0)
 
             lines.append("**Diagnostics**")
@@ -291,8 +299,12 @@ class UnifiedReportGenerator:
             lines.append("")
 
         # Dates
-        created_date = repo.created_at.strftime('%Y-%m-%d') if repo.created_at else "Unknown"
-        updated_date = repo.updated_at.strftime('%Y-%m-%d') if repo.updated_at else "Unknown"
+        created_date = (
+            repo.created_at.strftime("%Y-%m-%d") if repo.created_at else "Unknown"
+        )
+        updated_date = (
+            repo.updated_at.strftime("%Y-%m-%d") if repo.updated_at else "Unknown"
+        )
 
         lines.append(f"**Created**: {created_date}")
         lines.append(f"**Last Modified**: {updated_date}")
@@ -341,14 +353,20 @@ class UnifiedReportGenerator:
         lines.append("")
         lines.append("- GitHub API (public repositories only)")
         lines.append("- Anthropic Claude API (repository summaries)")
-        lines.append("- Dependency package registries (npm, PyPI, RubyGems, Go, Maven, NuGet)")
+        lines.append(
+            "- Dependency package registries (npm, PyPI, RubyGems, Go, Maven, NuGet)"
+        )
         lines.append("")
 
         # Report details
         lines.append("### Report Details")
         lines.append("")
-        lines.append("- **Composite Score Weights**: Popularity 30% • Activity 45% • Health 25%")
-        lines.append("- **Technology Currency**: Calculated from latest versions in package registries")
+        lines.append(
+            "- **Composite Score Weights**: Popularity 30% • Activity 45% • Health 25%"
+        )
+        lines.append(
+            "- **Technology Currency**: Calculated from latest versions in package registries"
+        )
         lines.append(f"- **AI Model**: {report.ai_model or 'N/A'}")
         lines.append("")
 
@@ -356,8 +374,10 @@ class UnifiedReportGenerator:
         lines.append("")
 
         # Attribution
-        timestamp_date = report.timestamp.strftime('%Y-%m-%d')
-        lines.append("*Generated by [Stats Spark](https://github.com/MakeBoldSolutions/github-stats-spark)*")
+        timestamp_date = report.timestamp.strftime("%Y-%m-%d")
+        lines.append(
+            "*Generated by [Stats Spark](https://github.com/MakeBoldSolutions/github-stats-spark)*"
+        )
         lines.append(f"*Last updated: {timestamp_date}*")
 
         return "\n".join(lines)

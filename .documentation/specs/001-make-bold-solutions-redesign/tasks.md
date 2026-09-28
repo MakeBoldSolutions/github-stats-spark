@@ -29,8 +29,8 @@
 - [ ] T007 Replace legacy color, typography, radius, shadow, and dark-theme variables with approved token mappings in `frontend/src/styles/global.css`
 - [ ] T008 Create pure display helpers for sanitized excerpts, relative push time, language colors, tier tones, and source-health fallbacks in `frontend/src/utils/repositoryPresentation.js`
 - [ ] T009 [P] Add unit coverage for display helpers in `frontend/tests/repositoryPresentation.test.jsx`
-- [ ] T010 Refactor shared view, selected-repository, active-result-list, toast, export, and refresh ownership in `frontend/src/App.jsx`
-- [ ] T011 Update route and app-shell interaction coverage in `frontend/tests/App.test.jsx`
+- [ ] T010 Refactor shared view, selected-repository, active-result-list, toast, export, refresh, and public `?user=` profile-selection ownership in `frontend/src/App.jsx`
+- [ ] T011 Update route and app-shell interaction coverage in `frontend/tests/App.test.jsx`, including direct non-default public `?user=` loading with loaded-profile identity labels and totals while retaining Make Bold Solutions defaults
 
 **Checkpoint**: Shared brand controls and shell state are ready; the drawer can navigate the visible ordered list that opened it.
 
@@ -151,8 +151,8 @@
 - [ ] T043 Audit rendered UI for legacy GitHub-blue colors, Octocat branding, emoji UI, focus contrast, reduced motion, and keyboard traps across `frontend/src/`
 - [ ] T044 Run formatting, lint, unit, build, and smoke validation from `frontend/package.json` and record results in `.documentation/specs/001-make-bold-solutions-redesign/quickstart.md`
 - [ ] T045 Capture and compare desktop and mobile Overview, Insights, Health, drawer, offline, and error states against `.documentation/design-handoffs/githubspark-redesign/design_handoff_githubspark_redesign/design/GitHubSpark.dc.html`
-- [ ] T046 Run `/devspark.analyze` and record resolution of any cross-artifact findings in `.documentation/specs/001-make-bold-solutions-redesign/analyze.md`
-- [ ] T047 Run `/devspark.critic` and resolve or explicitly acknowledge risk findings in `.documentation/specs/001-make-bold-solutions-redesign/critic.md`
+- [ ] T046 Run `/devspark.analyze` and record resolution of any cross-artifact findings in `.documentation/specs/001-make-bold-solutions-redesign/gates/analyze.md`
+- [ ] T047 Run `/devspark.critic` and resolve or explicitly acknowledge risk findings in `.documentation/specs/001-make-bold-solutions-redesign/gates/critic.md`
 
 ## Dependencies And Execution Order
 

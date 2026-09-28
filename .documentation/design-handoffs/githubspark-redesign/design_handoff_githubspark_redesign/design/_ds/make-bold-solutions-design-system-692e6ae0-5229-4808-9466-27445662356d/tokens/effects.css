@@ -1,0 +1,36 @@
+/* ==========================================================================
+   Make Bold Solutions — Radii, borders, shadows, motion
+   The brand mark is sharp and geometric; the system uses restrained radii
+   and crisp, low-spread shadows. Confident, not soft.
+   ========================================================================== */
+:root {
+  /* Radii — modest; nothing pill-soft except deliberate chips */
+  --radius-none: 0;
+  --radius-xs:  2px;
+  --radius-sm:  4px;
+  --radius-md:  6px;
+  --radius-lg:  10px;
+  --radius-xl:  16px;
+  --radius-pill: 999px;
+
+  /* Border widths */
+  --border-hairline: 1px;
+  --border-thick:    2px;
+  --border-accent:   3px;
+
+  /* Shadows — warm-tinted, tight, finance-grade restraint */
+  --shadow-xs: 0 1px 2px rgba(30, 30, 30, 0.06);
+  --shadow-sm: 0 1px 3px rgba(30, 30, 30, 0.08), 0 1px 2px rgba(30, 30, 30, 0.05);
+  --shadow-md: 0 4px 12px rgba(30, 30, 30, 0.08), 0 2px 4px rgba(30, 30, 30, 0.05);
+  --shadow-lg: 0 12px 28px rgba(30, 30, 30, 0.10), 0 4px 10px rgba(30, 30, 30, 0.06);
+  --shadow-xl: 0 24px 48px rgba(30, 30, 30, 0.14);
+  --shadow-brand: 0 8px 24px rgba(152, 36, 7, 0.20);
+  --ring-focus: 0 0 0 3px var(--focus-ring);
+
+  /* Motion — purposeful, quick, no bounce */
+  --ease-standard: cubic-bezier(0.2, 0, 0.1, 1); /* @kind other */
+  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1); /* @kind other */
+  --dur-fast:   120ms; /* @kind other */
+  --dur-base:   200ms; /* @kind other */
+  --dur-slow:   360ms; /* @kind other */
+}

@@ -1,0 +1,76 @@
+/* ==========================================================================
+   Make Bold Solutions — Base element styles & helpers
+   Lightweight resets and brand defaults built on the tokens.
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  line-height: var(--lh-normal);
+  color: var(--text-body);
+  background: var(--surface-page);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Headings — display face, tight, ink */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 0.5em;
+  font-family: var(--font-display);
+  color: var(--text-strong);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-tight);
+  font-weight: var(--fw-bold);
+  text-wrap: balance;
+}
+h1 { font-size: var(--fs-h1); font-weight: var(--fw-extrabold); }
+h2 { font-size: var(--fs-h2); }
+h3 { font-size: var(--fs-h3); }
+h4 { font-size: var(--fs-h4); font-weight: var(--fw-semibold); }
+
+p { margin: 0 0 1em; text-wrap: pretty; }
+p:last-child { margin-bottom: 0; }
+
+a { color: var(--text-link); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 0.18em; }
+
+strong, b { font-weight: var(--fw-semibold); }
+small { font-size: var(--fs-sm); }
+
+::selection { background: var(--ember-200); color: var(--ink-900); }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+hr { border: 0; border-top: var(--border-hairline) solid var(--border-default); margin: var(--space-8) 0; }
+
+code, kbd, samp { font-family: var(--font-mono); font-size: 0.9em; }
+
+img, svg, video { max-width: 100%; display: block; }
+
+/* ---- Utility helpers ---- */
+.mbs-eyebrow {
+  font-family: var(--font-body);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-sm);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+.mbs-display {
+  font-family: var(--font-display);
+  font-weight: var(--fw-extrabold);
+  font-size: var(--fs-display);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tighter);
+  color: var(--text-strong);
+}
+.mbs-container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}

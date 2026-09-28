@@ -1,0 +1,95 @@
+/* ==========================================================================
+   Make Bold Solutions — Color tokens
+   Brand palette (from Brand Guidelines):
+     Rust   #982407   primary brand / logos / headlines
+     Ember  #C6620C   secondary accent / highlights
+     Ink    #1E1E1E   text, dark surfaces
+     Cream  #F8F6F2   primary light surface / paper
+   Tints, shades and neutrals below are derived harmoniously from these four.
+   ========================================================================== */
+:root {
+  /* ---- Brand: Rust (primary) ---- */
+  --rust-50:  #fbeeea;
+  --rust-100: #f4d2c8;
+  --rust-200: #e6a392;
+  --rust-300: #d4715a;
+  --rust-400: #b8431f;
+  --rust-500: #982407;  /* core brand */
+  --rust-600: #841e05;
+  --rust-700: #6c1804;
+  --rust-800: #531203;
+  --rust-900: #3a0c02;
+
+  /* ---- Brand: Ember (secondary accent / orange) ---- */
+  --ember-50:  #fdf1e6;
+  --ember-100: #f9dabc;
+  --ember-200: #f2b277;
+  --ember-300: #e88f3d;
+  --ember-400: #d97518;
+  --ember-500: #c6620c;  /* core accent */
+  --ember-600: #a8520a;
+  --ember-700: #864108;
+  --ember-800: #653106;
+  --ember-900: #452104;
+
+  /* ---- Ink / neutral grays (warm, anchored on #1E1E1E) ---- */
+  --ink-900: #1e1e1e;   /* core ink */
+  --ink-800: #2c2c2b;
+  --ink-700: #3d3d3b;
+  --ink-600: #56544f;
+  --ink-500: #76736c;
+  --ink-400: #9b988f;
+  --ink-300: #c2bfb6;
+  --ink-200: #ddd9d0;
+  --ink-100: #ece9e2;
+  --ink-50:  #f4f2ec;
+
+  /* ---- Cream / paper ---- */
+  --cream:   #f8f6f2;   /* core surface */
+  --cream-deep: #efece4;
+  --white:   #ffffff;
+
+  /* ---- Semantic status (kept muted to suit a finance brand) ---- */
+  --positive: #2f6f4c;
+  --positive-soft: #e4efe7;
+  --caution:  #b8821a;
+  --caution-soft: #f6edd6;
+  --critical: #a8321a;
+  --critical-soft: #f6e2dc;
+  --info:     #2f5a8f;
+  --info-soft: #e2e9f2;
+
+  /* ==== Semantic aliases ==== */
+  --brand:           var(--rust-500);
+  --brand-strong:    var(--rust-600);
+  --brand-soft:      var(--rust-50);
+  --accent:          var(--ember-500);
+  --accent-strong:   var(--ember-600);
+  --accent-soft:     var(--ember-50);
+
+  /* Text */
+  --text-strong:   var(--ink-900);
+  --text-body:     var(--ink-800);
+  --text-muted:    var(--ink-500);
+  --text-subtle:   var(--ink-400);
+  --text-on-brand: var(--cream);
+  --text-on-dark:  var(--cream);
+  --text-link:     var(--rust-500);
+
+  /* Surfaces */
+  --surface-page:    var(--cream);
+  --surface-card:    var(--white);
+  --surface-sunken:  var(--cream-deep);
+  --surface-dark:    var(--ink-900);
+  --surface-dark-2:  var(--ink-800);
+  --surface-brand:   var(--rust-500);
+
+  /* Borders / lines */
+  --border-subtle:  var(--ink-100);
+  --border-default: var(--ink-200);
+  --border-strong:  var(--ink-300);
+  --border-dark:    var(--ink-700);
+
+  /* Focus ring */
+  --focus-ring: color-mix(in srgb, var(--ember-500) 55%, transparent);
+}

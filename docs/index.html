@@ -13,29 +13,25 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="GitHubSpark" />
     
+    <!-- Discover dashboard data before the application bundle finishes loading. -->
+    <script>
+      const selectedUser = new URLSearchParams(location.search).get("user")?.trim().toLowerCase() || "makeboldsolutions";
+      const dataPreload = document.createElement("link");
+      dataPreload.rel = "preload";
+      dataPreload.as = "fetch";
+      dataPreload.crossOrigin = "anonymous";
+      dataPreload.href = `/data/users/${encodeURIComponent(selectedUser)}/repositories.json`;
+      document.head.append(dataPreload);
+      const avatarPreload = document.createElement("link");
+      avatarPreload.rel = "preload";
+      avatarPreload.as = "image";
+      avatarPreload.fetchPriority = "high";
+      avatarPreload.href = `https://avatars.githubusercontent.com/${encodeURIComponent(selectedUser)}?s=192`;
+      document.head.append(avatarPreload);
+    </script>
+
     <!-- Critical CSS for mobile-first (inline for faster FCP) -->
-    <style>
-      /* Mobile-first critical styles */
-      :root {
-        --touch-target-min: 44px;
-        --safe-area-top: env(safe-area-inset-top, 0px);
-        --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-      }
-      * { box-sizing: border-box; }
-      body { 
-        margin: 0; 
-        padding: 0;
-        padding-top: var(--safe-area-top);
-        padding-bottom: var(--safe-area-bottom);
-        font-family: system-ui, -apple-system, sans-serif;
-        overflow-x: hidden;
-        overscroll-behavior-y: contain;
-      }
-      .touch-target {
-        min-width: var(--touch-target-min);
-        min-height: var(--touch-target-min);
-      }
-    </style>
+    <style>:root{--touch-target-min:44px;--safe-area-top:env(safe-area-inset-top,0px);--safe-area-bottom:env(safe-area-inset-bottom,0px)}*{box-sizing:border-box}body{padding:0;padding-top:var(--safe-area-top);padding-bottom:var(--safe-area-bottom);overscroll-behavior-y:contain;margin:0;font-family:system-ui,-apple-system,sans-serif;overflow-x:hidden}.touch-target{min-width:var(--touch-target-min);min-height:var(--touch-target-min)}</style>
 
     <!-- Primary Meta Tags -->
     <title>GitHubSpark — Make Bold Solutions Repository Portfolio</title>
@@ -62,17 +58,14 @@
 
     <!-- GitHub Pages Base URL Configuration -->
     <!-- This is automatically handled by Vite's base config -->
-    <script type="module" crossorigin src="/assets/site-DE3DV55D.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/site-DwynqlJ6.js">
-    <link rel="modulepreload" crossorigin href="/assets/site-CIYDRfG0.js">
-    <link rel="modulepreload" crossorigin href="/assets/site-CjDW6SXs.js">
-    <link rel="stylesheet" crossorigin href="/assets/site-BNpeA1Kd.css">
+    <script type="module" crossorigin src="/assets/site-BHd_4TM4.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/site-r9k7WpoW.css">
   </head>
   <body>
     <!-- Root element for React application -->
     <div id="root"></div>
 
-    <!-- Vite will inject the bundled JavaScript here -->
+    <!-- Vite will inject the bundled JavaScript here -->
 
     <!-- Fallback message for browsers with JavaScript disabled -->
     <noscript>

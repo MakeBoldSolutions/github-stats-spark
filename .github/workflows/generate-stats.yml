@@ -91,8 +91,10 @@ jobs:
           fi
 
       - name: Verify API Keys
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          if [ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
             echo "⚠️  WARNING: ANTHROPIC_API_KEY not set - AI summaries will be skipped"
             echo "To enable AI summaries, add ANTHROPIC_API_KEY to repository secrets"
           else
@@ -104,6 +106,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
         run: |
           echo "Starting unified generation with AI-powered repository summaries..."
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -123,7 +126,11 @@ jobs:
             echo "📸 Screenshots enabled"
           fi
           
-          spark unified --user ${{ github.repository_owner }} --include-ai-summaries $SCREENSHOT_FLAG --verbose
+          AI_FLAGS=()
+          if [ -n "$ANTHROPIC_API_KEY" ]; then
+            AI_FLAGS+=(--include-ai-summaries)
+          fi
+          spark unified --user "$REPOSITORY_OWNER" "${AI_FLAGS[@]}" $SCREENSHOT_FLAG --verbose
           
           echo ""
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

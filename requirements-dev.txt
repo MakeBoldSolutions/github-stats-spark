@@ -17,6 +17,8 @@ mypy>=2.1.0
 
 # Security scanning
 pip-audit>=2.9.0
+# Upgrade vulnerable packaging tools preinstalled on hosted Python runners.
+setuptools>=83.0.0
 
 # Include production dependencies
 -r requirements.txt

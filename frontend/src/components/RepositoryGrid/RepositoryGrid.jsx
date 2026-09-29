@@ -1,60 +1,31 @@
-import React, { useState, useMemo, useId } from "react";
+import { useState, useMemo, useId } from "react";
+import {
+  Search,
+  X,
+  ExternalLink,
+  Star,
+  GitFork,
+  GitCommit,
+  Clock,
+} from "lucide-react";
+import { Card, Badge, Button, Eyebrow } from "@/components/Brand";
+import ExportButton from "@/components/Common/ExportButton";
+import {
+  getLanguageColor,
+  getRepositoryHealthPresentation,
+  getRepositorySummaryExcerpt,
+  getRelativePushLabel,
+} from "@/utils/repositoryPresentation";
 import styles from "./RepositoryGrid.module.css";
 
-const LANGUAGE_COLORS = {
-  "C#": "#178600",
-  TypeScript: "#3178c6",
-  Python: "#3572A5",
-  JavaScript: "#f1e05a",
-  HTML: "#e34c26",
-  CSS: "#563d7c",
-  SCSS: "#c6538c",
-  PowerShell: "#012456",
-  PHP: "#4F5D95",
-  "Visual Basic .NET": "#945db7",
-  Shell: "#89e051",
-  Go: "#00ADD8",
-  Rust: "#dea584",
-  Java: "#b07219",
-  Ruby: "#701516",
-  Markdown: "#083fa1",
-  Vue: "#4FC08D",
-  Swift: "#F05138",
-  Kotlin: "#A97BFF",
-  Dockerfile: "#384d54",
-};
-
-const MATURITY_CONFIG = {
-  stable: { label: "Stable", color: "#22c55e", bg: "rgba(34, 197, 94, 0.1)" },
-  "active-development": {
-    label: "Active Dev",
-    color: "#3b82f6",
-    bg: "rgba(59, 130, 246, 0.1)",
-  },
-  experimental: {
-    label: "Experimental",
-    color: "#f59e0b",
-    bg: "rgba(245, 158, 11, 0.1)",
-  },
-  archived: {
-    label: "Archived",
-    color: "#6b7280",
-    bg: "rgba(107, 114, 128, 0.1)",
-  },
-};
-
-function LanguageDot({ language }) {
-  const color = LANGUAGE_COLORS[language] || "#8b949e";
-  return <span className={styles.langDot} style={{ background: color }} />;
-}
-
-function QualityBadge({ icon, label, active }) {
+function QualityChip({ label, active }) {
   return (
     <span
-      className={`${styles.qualityBadge} ${active ? styles.qualityBadgeActive : styles.qualityBadgeInactive}`}
-      title={label}
+      className={`${styles.qualityChip} ${active ? styles.qualityOn : styles.qualityOff}`}
+      title={active ? `Has ${label}` : `No ${label}`}
     >
-      {icon}
+      <span className={styles.qualityDot} aria-hidden="true" />
+      {label}
     </span>
   );
 }
@@ -62,37 +33,23 @@ function QualityBadge({ icon, label, active }) {
 function RepoCard({ repo, onClick }) {
   const titleId = useId();
   const language = repo.language || "Unknown";
-  const langColor = LANGUAGE_COLORS[language] || "#8b949e";
-  const aiSummary = repo.ai_summary;
-  const maturity = aiSummary?.project_maturity;
-  const maturityConfig = MATURITY_CONFIG[maturity] || null;
-  const summary = aiSummary?.summary || repo.description || "";
-  const summaryExcerpt =
-    summary.length > 140 ? summary.slice(0, 137) + "…" : summary;
-
+  const langColor = getLanguageColor(language);
+  const excerpt = getRepositorySummaryExcerpt(repo);
+  const health = getRepositoryHealthPresentation(repo);
   const daysSincePush = repo.days_since_last_push;
-  const activityLabel =
-    daysSincePush === 0
-      ? "Today"
-      : daysSincePush === 1
-        ? "Yesterday"
-        : daysSincePush <= 7
-          ? `${daysSincePush}d ago`
-          : daysSincePush <= 30
-            ? `${Math.round(daysSincePush / 7)}w ago`
-            : daysSincePush <= 365
-              ? `${Math.round(daysSincePush / 30)}mo ago`
-              : `${Math.round(daysSincePush / 365)}y ago`;
-
-  const isRecent = daysSincePush <= 3;
+  const activityLabel = getRelativePushLabel(daysSincePush);
+  const isRecent = typeof daysSincePush === "number" && daysSincePush <= 3;
 
   const handleClick = (e) => {
-    if (e.target.tagName === "A") return;
+    if (e.target.closest("a")) return;
     onClick?.(repo);
   };
 
   return (
-    <article
+    <Card
+      as="article"
+      interactive
+      padding="none"
       className={styles.card}
       onClick={handleClick}
       role="button"
@@ -105,177 +62,97 @@ function RepoCard({ repo, onClick }) {
         }
       }}
     >
-      <div className={styles.cardAccent} style={{ background: langColor }} />
       <div className={styles.cardBody}>
-        <div className={styles.cardHeader}>
-          <div className={styles.cardTitleRow}>
+        <div className={styles.cardTop}>
+          <span
+            id={titleId}
+            className={styles.cardTitle}
+            data-testid="repo-name"
+          >
+            {repo.name}
+          </span>
+          {repo.homepage && (
             <a
-              href={repo.url}
+              href={repo.homepage}
               target="_blank"
               rel="noopener noreferrer"
-              className={styles.cardTitle}
-              id={titleId}
-              onClick={(e) => e.stopPropagation()}
+              className={styles.liveLink}
+              title="Live site"
+              aria-label={`Open live site for ${repo.name}`}
             >
-              {repo.name}
+              <ExternalLink size={16} aria-hidden="true" />
             </a>
-            {repo.homepage && (
-              <a
-                href={repo.homepage}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.liveLink}
-                onClick={(e) => e.stopPropagation()}
-                title="Live site"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  aria-hidden="true"
-                >
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                  <polyline points="15 3 21 3 21 9" />
-                  <line x1="10" y1="14" x2="21" y2="3" />
-                </svg>
-              </a>
-            )}
-          </div>
-          <div className={styles.cardMeta}>
-            <span className={styles.langChip}>
-              <LanguageDot language={language} />
-              <span className={styles.langName}>{language}</span>
-            </span>
-            {maturityConfig && (
-              <span
-                className={styles.maturityBadge}
-                style={{
-                  color: maturityConfig.color,
-                  background: maturityConfig.bg,
-                  border: `1px solid ${maturityConfig.color}30`,
-                }}
-              >
-                {maturityConfig.label}
-              </span>
-            )}
-            {isRecent && <span className={styles.recentBadge}>🔥 Hot</span>}
-          </div>
+          )}
         </div>
 
-        <p className={styles.cardSummary}>{summaryExcerpt}</p>
+        <div className={styles.cardMeta}>
+          <span className={styles.langChip}>
+            <span
+              className={styles.langDot}
+              style={{ background: langColor }}
+              aria-hidden="true"
+            />
+            {language}
+          </span>
+          {health.tier && <Badge tone={health.tone}>{health.label}</Badge>}
+          {isRecent && <Badge tone="brand">Active this week</Badge>}
+        </div>
 
-        {repo.topics?.length > 0 && (
-          <div className={styles.topics}>
-            {repo.topics.slice(0, 5).map((topic) => (
-              <span key={topic} className={styles.topic}>
-                {topic}
-              </span>
-            ))}
-            {repo.topics.length > 5 && (
-              <span className={styles.topicMore}>
-                +{repo.topics.length - 5}
-              </span>
-            )}
-          </div>
-        )}
+        {excerpt && <p className={styles.cardSummary}>{excerpt}</p>}
+
+        <div className={styles.qualityRow}>
+          <QualityChip label="README" active={repo.has_readme} />
+          <QualityChip label="License" active={repo.has_license} />
+          <QualityChip label="CI/CD" active={repo.has_ci_cd} />
+          <QualityChip label="Tests" active={repo.has_tests} />
+        </div>
 
         <div className={styles.cardFooter}>
-          <div className={styles.footerStats}>
-            <span className={styles.stat} title="Stars">
-              <svg
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-                className={styles.statIcon}
-              >
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-              </svg>
-              {repo.stars}
-            </span>
-            <span className={styles.stat} title="Forks">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                aria-hidden="true"
-                className={styles.statIcon}
-              >
-                <circle cx="12" cy="18" r="3" />
-                <circle cx="6" cy="6" r="3" />
-                <circle cx="18" cy="6" r="3" />
-                <path d="M18 9v1a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9" />
-                <line x1="12" y1="12" x2="12" y2="15" />
-              </svg>
-              {repo.forks}
-            </span>
-            <span className={styles.stat} title="Total commits">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                aria-hidden="true"
-                className={styles.statIcon}
-              >
-                <circle cx="12" cy="12" r="4" />
-                <line x1="1.05" y1="12" x2="7" y2="12" />
-                <line x1="17.01" y1="12" x2="22.96" y2="12" />
-              </svg>
-              {(repo.total_commits || 0).toLocaleString()}
-            </span>
-            <span
-              className={`${styles.stat} ${isRecent ? styles.statRecent : ""}`}
-              title={`Last push ${activityLabel}`}
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                aria-hidden="true"
-                className={styles.statIcon}
-              >
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12 6 12 12 16 14" />
-              </svg>
-              {activityLabel}
-            </span>
-          </div>
-          <div className={styles.qualityIndicators}>
-            <QualityBadge
-              icon="📄"
-              label="Has README"
-              active={repo.has_readme}
-            />
-            <QualityBadge
-              icon="⚖️"
-              label="Has License"
-              active={repo.has_license}
-            />
-            <QualityBadge icon="🔄" label="Has CI/CD" active={repo.has_ci_cd} />
-            <QualityBadge icon="🧪" label="Has Tests" active={repo.has_tests} />
-          </div>
+          <span className={styles.stat} title="Stars">
+            <Star size={14} aria-hidden="true" />
+            {repo.stars ?? 0}
+          </span>
+          <span className={styles.stat} title="Forks">
+            <GitFork size={14} aria-hidden="true" />
+            {repo.forks ?? 0}
+          </span>
+          <span className={styles.stat} title="Total commits">
+            <GitCommit size={14} aria-hidden="true" />
+            {(repo.total_commits || 0).toLocaleString()}
+          </span>
+          <span
+            className={`${styles.stat} ${styles.pushTime} ${isRecent ? styles.pushRecent : ""}`}
+            title={`Last push ${activityLabel}`}
+          >
+            <Clock size={14} aria-hidden="true" />
+            {activityLabel}
+          </span>
         </div>
       </div>
-    </article>
+    </Card>
   );
 }
 
 const SORT_OPTIONS = [
+  { value: "activity", label: "Recent activity" },
   { value: "stars", label: "Stars" },
-  { value: "activity", label: "Recent Activity" },
   { value: "commits", label: "Commits" },
   { value: "name", label: "Name (A–Z)" },
-  { value: "age", label: "Newest First" },
+  { value: "age", label: "Newest first" },
 ];
 
-export default function RepositoryGrid({ repositories, onRepoClick }) {
+const TIER_OPTIONS = [
+  { value: "healthy", label: "Healthy" },
+  { value: "watch", label: "Watch" },
+  { value: "elevated", label: "Elevated" },
+  { value: "critical", label: "Critical" },
+];
+
+export default function RepositoryGrid({ repositories, onRepoClick, onToast }) {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("activity");
   const [filterLang, setFilterLang] = useState("");
-  const [filterMaturity, setFilterMaturity] = useState("");
+  const [filterTier, setFilterTier] = useState("");
 
   const languages = useMemo(() => {
     const langs = new Set(repositories.map((r) => r.language).filter(Boolean));
@@ -301,10 +178,8 @@ export default function RepositoryGrid({ repositories, onRepoClick }) {
       list = list.filter((r) => r.language === filterLang);
     }
 
-    if (filterMaturity) {
-      list = list.filter(
-        (r) => r.ai_summary?.project_maturity === filterMaturity,
-      );
+    if (filterTier) {
+      list = list.filter((r) => r.attention_metrics?.tier === filterTier);
     }
 
     list.sort((a, b) => {
@@ -327,30 +202,35 @@ export default function RepositoryGrid({ repositories, onRepoClick }) {
     });
 
     return list;
-  }, [repositories, search, filterLang, filterMaturity, sortBy]);
+  }, [repositories, search, filterLang, filterTier, sortBy]);
 
-  const maturities = useMemo(() => {
-    const m = new Set(
-      repositories.map((r) => r.ai_summary?.project_maturity).filter(Boolean),
-    );
-    return Array.from(m);
-  }, [repositories]);
+  const hasActiveFilters = Boolean(search || filterLang || filterTier);
+
+  const clearFilters = () => {
+    setSearch("");
+    setFilterLang("");
+    setFilterTier("");
+  };
+
+  const handleCardClick = (repo) => onRepoClick?.(repo, filtered);
 
   return (
     <div className={styles.gridRoot}>
+      <div className={styles.catalogHeader}>
+        <div>
+          <Eyebrow>Repositories</Eyebrow>
+          <h2 className={styles.catalogTitle}>The Spark catalog</h2>
+        </div>
+        <span className={styles.resultCount}>
+          {hasActiveFilters
+            ? `${filtered.length} of ${repositories.length} repositories`
+            : `${repositories.length} repositories`}
+        </span>
+      </div>
+
       <div className={styles.toolbar}>
         <div className={styles.searchWrapper}>
-          <svg
-            className={styles.searchIcon}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            aria-hidden="true"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
+          <Search className={styles.searchIcon} size={18} aria-hidden="true" />
           <input
             type="search"
             className={styles.searchInput}
@@ -364,86 +244,86 @@ export default function RepositoryGrid({ repositories, onRepoClick }) {
               className={styles.searchClear}
               onClick={() => setSearch("")}
               aria-label="Clear search"
+              type="button"
             >
-              ✕
+              <X size={16} aria-hidden="true" />
             </button>
           )}
         </div>
 
-        <div className={styles.toolbarControls}>
-          <select
-            className={styles.select}
-            value={filterLang}
-            onChange={(e) => setFilterLang(e.target.value)}
-            aria-label="Filter by language"
-          >
-            <option value="">All Languages</option>
-            {languages.map((l) => (
-              <option key={l} value={l}>
-                {l}
-              </option>
-            ))}
-          </select>
+        <select
+          className={styles.select}
+          value={filterLang}
+          onChange={(e) => setFilterLang(e.target.value)}
+          aria-label="Filter by language"
+        >
+          <option value="">All languages</option>
+          {languages.map((l) => (
+            <option key={l} value={l}>
+              {l}
+            </option>
+          ))}
+        </select>
 
-          <select
-            className={styles.select}
-            value={filterMaturity}
-            onChange={(e) => setFilterMaturity(e.target.value)}
-            aria-label="Filter by maturity"
-          >
-            <option value="">All Statuses</option>
-            {maturities.map((m) => (
-              <option key={m} value={m}>
-                {MATURITY_CONFIG[m]?.label || m}
-              </option>
-            ))}
-          </select>
+        <select
+          className={styles.select}
+          value={filterTier}
+          onChange={(e) => setFilterTier(e.target.value)}
+          aria-label="Filter by health tier"
+        >
+          <option value="">All health tiers</option>
+          {TIER_OPTIONS.map((t) => (
+            <option key={t.value} value={t.value}>
+              {t.label}
+            </option>
+          ))}
+        </select>
 
-          <select
-            className={styles.select}
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            aria-label="Sort repositories"
-          >
-            {SORT_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
+        <select
+          className={styles.select}
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          aria-label="Sort repositories"
+        >
+          {SORT_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+
+        {hasActiveFilters && (
+          <Button variant="ghost" size="md" onClick={clearFilters}>
+            Clear filters
+          </Button>
+        )}
+
+        <div className={styles.exportSlot}>
+          <ExportButton
+            data={filtered}
+            filename="repositories"
+            label="Export"
+            onToast={onToast}
+          />
         </div>
       </div>
 
-      {(filterLang || filterMaturity || search) && (
-        <div className={styles.activeFilters}>
-          <span className={styles.resultCount}>
-            {filtered.length} of {repositories.length} repositories
-          </span>
-          <button
-            className={styles.clearFilters}
-            onClick={() => {
-              setSearch("");
-              setFilterLang("");
-              setFilterMaturity("");
-            }}
-          >
-            Clear all filters
-          </button>
-        </div>
-      )}
-
       {filtered.length === 0 ? (
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>🔍</div>
           <p className={styles.emptyTitle}>No repositories found</p>
           <p className={styles.emptyDesc}>
             Try adjusting your search or filters.
           </p>
+          {hasActiveFilters && (
+            <Button variant="secondary" size="sm" onClick={clearFilters}>
+              Clear filters
+            </Button>
+          )}
         </div>
       ) : (
         <div className={styles.grid}>
           {filtered.map((repo) => (
-            <RepoCard key={repo.name} repo={repo} onClick={onRepoClick} />
+            <RepoCard key={repo.name} repo={repo} onClick={handleCardClick} />
           ))}
         </div>
       )}

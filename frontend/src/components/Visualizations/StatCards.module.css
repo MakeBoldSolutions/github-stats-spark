@@ -1,0 +1,40 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 11px !important;
+}
+
+.value {
+  font-family: var(--font-display);
+  font-weight: var(--fw-extrabold);
+  font-size: 36px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--text-strong);
+}
+
+.value.brand {
+  color: var(--brand);
+}
+.value.critical {
+  color: var(--critical);
+}
+.value.positive {
+  color: var(--positive);
+}
+
+.sublabel {
+  font-size: 13px;
+  color: var(--text-muted);
+}

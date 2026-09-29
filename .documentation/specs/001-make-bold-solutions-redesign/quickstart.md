@@ -33,3 +33,34 @@ npm run test:smoke
 - Capture desktop and mobile screenshots for Overview, Insights, Health, and the repository drawer against the extracted prototype.
 - Record keyboard traversal through all navigation, filters, export menu, drawer, toast actions, and recovery controls.
 - Confirm no private data, legacy GitHub-blue controls, Octocat branding, or emoji UI appears in the rendered dashboard.
+
+## T044 Validation Run (2026-09-28)
+
+Executed from `frontend/` (production packaging redirected to the whitelisted
+`.validation/site` directory via `SPARK_BUILD_DIR`, so the committed `docs/`
+production output was left untouched during validation):
+
+| Command | Result |
+| --- | --- |
+| `npm run format:check` | ✅ Pass — all files match Prettier style |
+| `npm run lint` | ✅ Pass — 0 warnings/errors (`--max-warnings 0`) |
+| `npx vitest run` | ✅ Pass — 105/105 tests across 16 files |
+| `SPARK_BUILD_DIR=.validation/site npm run build` | ✅ Pass — clean → lint → format:check → vite build → postbuild data copy, exit 0 |
+| `SPARK_BUILD_DIR=.validation/site npm run test:smoke` | ✅ Pass — "Browser smoke passed: data, search, details, charts, health, permanent-light-shell, mobile tab bar." |
+
+Notes:
+
+- The smoke script's repository-card title selector was updated from
+  `article[role=button] a` to `article[role=button] [data-testid=repo-name]`
+  because the redesigned catalog card no longer wraps the repository name in
+  an anchor (the external-link icon is now the only anchor, and only renders
+  when a homepage is set). A `data-testid="repo-name"` attribute was added to
+  `RepositoryGrid.jsx` for this automation hook.
+- T045's visual screenshot comparison against the extracted HTML prototype
+  was not performed in this session — it requires a person (or a
+  screenshot/browser-automation tool) to open both the live app and
+  `design/GitHubSpark.dc.html` side by side and judge pixel/visual fidelity,
+  which is outside what this implementation pass could execute
+  autonomously. All structural/behavioral acceptance criteria (routes,
+  filters, sorts, exports, drawer navigation, keyboard behavior, offline
+  retry, recovery states) are covered by the automated test suite above.

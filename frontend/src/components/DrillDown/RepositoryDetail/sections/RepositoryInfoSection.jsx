@@ -84,7 +84,7 @@ function RepositoryInfoSection({
                 rel="noopener noreferrer"
                 className={styles.link}
               >
-                🌐 Visit Site →
+                Visit Site →
               </a>
             </dd>
           </div>
@@ -101,7 +101,7 @@ function RepositoryInfoSection({
                   rel="noopener noreferrer"
                   className={styles.link}
                 >
-                  📄 View Site →
+                  View Site →
                 </a>
               </dd>
             </div>

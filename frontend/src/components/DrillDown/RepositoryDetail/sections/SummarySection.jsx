@@ -11,7 +11,7 @@ function SummarySection({ summary, expanded, onToggle }) {
       title="AI Summary"
       expanded={expanded}
       onToggle={onToggle}
-      badge={<span className={styles.badgeAi}>✨ AI</span>}
+      badge={<span className={styles.badgeAi}>AI</span>}
     >
       <div className={styles.sectionContent}>
         <MarkdownContent

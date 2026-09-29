@@ -11,14 +11,14 @@ import "./EmptyState.css";
  * - Responsive sizing
  *
  * @param {Object} props
- * @param {string} props.icon - SVG icon or emoji
+ * @param {React.ReactNode} [props.icon] - Optional outline icon (lucide-react)
  * @param {string} props.title - Primary message
  * @param {string} props.description - Optional secondary description
  * @param {string} props.actionLabel - Button text
  * @param {Function} props.onAction - Button click handler
  */
 const EmptyState = ({
-  icon = "📊",
+  icon = null,
   title = "No items found",
   description = "",
   actionLabel = "",
@@ -26,9 +26,11 @@ const EmptyState = ({
 }) => {
   return (
     <div className="empty-state">
-      <div className="empty-state__icon" role="img" aria-label={icon}>
-        {icon}
-      </div>
+      {icon && (
+        <div className="empty-state__icon" aria-hidden="true">
+          {icon}
+        </div>
+      )}
       <h3 className="empty-state__title">{title}</h3>
       {description && <p className="empty-state__description">{description}</p>}
       {actionLabel && onAction && (

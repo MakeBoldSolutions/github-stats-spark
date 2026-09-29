@@ -19,7 +19,7 @@ try {
   await page.goto("http://127.0.0.1:4175/", { waitUntil: "networkidle0" });
   await page.waitForSelector("article[role=button]");
   const title = await page.$eval(
-    "article[role=button] a",
+    "article[role=button] [data-testid=repo-name]",
     (element) => element.textContent,
   );
   const search = "input[aria-label='Search repositories']";
@@ -39,16 +39,32 @@ try {
   await page.waitForSelector("#attention-heading");
   await page.click("button[aria-label='Switch to repository overview']");
   await page.waitForSelector(search);
-  await page.setViewport({ width: 375, height: 667 });
-  const themeButton = "button[aria-label*='Switch to light mode']";
-  await page.click(themeButton);
+
+  // Permanent light shell: one approved theme, no user-facing toggle.
   assert.equal(
     await page.$eval("html", (element) => element.dataset.theme),
     "light",
   );
+  const themeToggleCount = await page.$$eval(
+    "button[aria-label*='Switch to dark mode'], button[aria-label*='Switch to light mode']",
+    (elements) => elements.length,
+  );
+  assert.equal(themeToggleCount, 0, "Theme toggle must not be rendered");
+
+  // Mobile: fixed tab bar replaces the header nav below 768px.
+  await page.setViewport({ width: 375, height: 667 });
+  await page.waitForSelector("nav[aria-label='Primary navigation']");
+  const tabLabels = await page.$$eval(
+    "nav[aria-label='Primary navigation'] button",
+    (elements) => elements.map((el) => el.getAttribute("aria-label")),
+  );
+  assert.deepEqual(tabLabels, ["Overview", "Insights", "Health"]);
+  await page.click("nav[aria-label='Primary navigation'] button[aria-label='Health']");
+  await page.waitForSelector("#attention-heading");
+
   assert.deepEqual(errors, [], "Browser reported uncaught JavaScript errors");
   console.log(
-    "Browser smoke passed: data, search, details, charts, health, mobile, theme.",
+    "Browser smoke passed: data, search, details, charts, health, permanent-light-shell, mobile tab bar.",
   );
 } finally {
   await browser?.close();

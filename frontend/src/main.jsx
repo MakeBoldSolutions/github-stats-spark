@@ -3,6 +3,12 @@ import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import ErrorBoundary from "@/components/ErrorBoundary/ErrorBoundary";
 import { OfflineCacheProvider } from "@/contexts/OfflineCacheContext";
+import "@/styles/brand/fonts.css";
+import "@/styles/brand/colors.css";
+import "@/styles/brand/typography.css";
+import "@/styles/brand/spacing.css";
+import "@/styles/brand/effects.css";
+import "@/styles/brand/base.css";
 import "@/styles/global.css";
 
 /**

@@ -1,89 +1,54 @@
 import { useMemo, useState } from "react";
 import PropTypes from "prop-types";
+import { Card, Badge, Eyebrow } from "@/components/Brand";
+import ExportButton from "@/components/Common/ExportButton";
+import { getTierTone, getTierLabel } from "@/utils/repositoryPresentation";
 import styles from "./AttentionView.module.css";
 
-const tierLabels = {
-  critical: "Critical",
-  elevated: "Elevated",
-  watch: "Watch",
-  healthy: "Healthy",
-};
+const COMPONENT_ROWS = [
+  { key: "pull_requests", label: "Pull requests" },
+  { key: "security", label: "Security findings" },
+  { key: "staleness", label: "Staleness" },
+  { key: "dependencies", label: "Dependency health" },
+];
 
-const tierClassNames = {
-  critical: styles.tierCritical,
-  elevated: styles.tierElevated,
-  watch: styles.tierWatch,
-  healthy: styles.tierHealthy,
-};
+function getComponents(repo) {
+  return repo.attention_metrics?.components || {};
+}
 
-function computeAttentionScore(repo) {
-  let score = 0;
-  const reasons = [];
+function getComponentScore(repo, key) {
+  return getComponents(repo)[key]?.score;
+}
 
-  const staleDays = repo.days_since_last_push ?? 0;
-  if (staleDays > 180) {
-    score += 30;
-    reasons.push("inactive 6+ months");
-  } else if (staleDays > 90) {
-    score += 20;
-    reasons.push("inactive 90+ days");
-  } else if (staleDays > 30) {
-    score += 5;
-  }
+function getSecurityAlerts(repo) {
+  return getComponents(repo).security?.active_alert_counts?.total_open ?? 0;
+}
 
-  if (!repo.has_readme) {
-    score += 20;
-    reasons.push("no README");
-  }
+function getOpenPullRequests(repo) {
+  const prs = getComponents(repo).pull_requests;
+  return prs?.total_open ?? null;
+}
 
-  if (!repo.has_license) {
-    score += 10;
-    reasons.push("no license");
-  }
-  if (!repo.has_ci_cd) {
-    score += 10;
-    reasons.push("no CI/CD");
-  }
-
-  const issues = repo.open_issues ?? 0;
-  score += Math.min(issues * 2, 15);
-  if (issues > 3) reasons.push(`${issues} open issues`);
-
-  const prs =
-    repo.pull_request_summary?.availability === "available"
-      ? (repo.pull_request_summary.total_open ?? 0)
-      : 0;
-  score += Math.min(prs * 3, 15);
-  if (prs > 2) reasons.push(`${prs} open PRs`);
-
-  const alerts = repo.security_summary?.active_alert_counts?.total_open ?? 0;
-  score += Math.min(alerts * 10, 30);
-  if (alerts > 0) reasons.push(`${alerts} security alerts`);
-
-  let tier = "healthy";
-  if (score >= 50) tier = "critical";
-  else if (score >= 30) tier = "elevated";
-  else if (score >= 15) tier = "watch";
-
-  return { score, tier, reasons, needs_attention: score >= 15 };
+function scoreThresholdClass(score) {
+  if (score >= 60) return styles.scoreCritical;
+  if (score >= 30) return styles.scoreCaution;
+  return styles.scorePositive;
 }
 
 function getSortValue(repo, key) {
   switch (key) {
     case "score":
-      return repo._attention.score;
+      return repo.attention_score ?? 0;
     case "name":
       return repo.name.toLowerCase();
     case "tier": {
       const order = { critical: 4, elevated: 3, watch: 2, healthy: 1 };
-      return order[repo._attention.tier] ?? 0;
+      return order[repo.attention_metrics?.tier] ?? 0;
     }
     case "prs":
-      return repo.pull_request_summary?.availability === "available"
-        ? (repo.pull_request_summary.total_open ?? 0)
-        : -1;
+      return getOpenPullRequests(repo) ?? -1;
     case "alerts":
-      return repo.security_summary?.active_alert_counts?.total_open ?? 0;
+      return getSecurityAlerts(repo);
     case "stale":
       return repo.days_since_last_push ?? -1;
     case "readme":
@@ -93,28 +58,45 @@ function getSortValue(repo, key) {
   }
 }
 
-function AttentionView({ repositories, onRepoClick }) {
+function AttentionView({ repositories, onRepoClick, onToast }) {
   const rankedRepositories = useMemo(() => {
-    return [...repositories]
-      .map((repo) => ({ ...repo, _attention: computeAttentionScore(repo) }))
-      .sort((a, b) => b._attention.score - a._attention.score);
+    return [...repositories].sort(
+      (a, b) => (b.attention_score ?? 0) - (a.attention_score ?? 0),
+    );
   }, [repositories]);
 
   const summary = useMemo(() => {
     const needsAttention = rankedRepositories.filter(
-      (r) => r._attention.needs_attention,
+      (r) => r.attention_metrics?.needs_attention,
     );
     return {
       total: needsAttention.length,
-      critical: needsAttention.filter((r) => r._attention.tier === "critical")
-        .length,
+      critical: rankedRepositories.filter(
+        (r) => r.attention_metrics?.tier === "critical",
+      ).length,
       securityBacklog: rankedRepositories.filter(
-        (r) => (r.security_summary?.active_alert_counts?.total_open ?? 0) > 0,
+        (r) => getSecurityAlerts(r) > 0,
       ).length,
       stale: rankedRepositories.filter(
         (r) => (r.days_since_last_push ?? 0) >= 90,
       ).length,
     };
+  }, [rankedRepositories]);
+
+  const methodology = useMemo(() => {
+    const n = rankedRepositories.length || 1;
+    return COMPONENT_ROWS.map(({ key, label }) => {
+      const scores = rankedRepositories
+        .map((r) => getComponentScore(r, key))
+        .filter((s) => typeof s === "number");
+      const average = scores.length
+        ? scores.reduce((sum, s) => sum + s, 0) / scores.length
+        : 0;
+      const hit = rankedRepositories.filter((r) =>
+        r.attention_metrics?.reasons?.includes(key),
+      ).length;
+      return { key, label, hit, total: n, average };
+    });
   }, [rankedRepositories]);
 
   const [sort, setSort] = useState({ key: "score", dir: "desc" });
@@ -137,188 +119,158 @@ function AttentionView({ repositories, onRepoClick }) {
     });
   }, [rankedRepositories, sort]);
 
+  function sortIcon(key) {
+    if (sort.key !== key) return "↕";
+    return sort.dir === "asc" ? "↑" : "↓";
+  }
+
+  const columns = [
+    { key: "name", label: "Repository" },
+    { key: "tier", label: "Tier" },
+    { key: "score", label: "Score" },
+    { key: "prs", label: "PRs" },
+    { key: "alerts", label: "Alerts" },
+    { key: "stale", label: "Stale (days)" },
+    { key: "readme", label: "README" },
+  ];
+
   return (
     <div className={styles.layout}>
       <div className={styles.summaryGrid}>
-        <article className={styles.summaryCard}>
+        <Card padding="md" className={styles.tileNeedsAttention}>
           <span className={styles.summaryLabel}>Need attention</span>
           <strong className={styles.summaryValue}>{summary.total}</strong>
-        </article>
-        <article className={styles.summaryCard}>
+        </Card>
+        <Card padding="md" className={styles.tile}>
           <span className={styles.summaryLabel}>Critical</span>
-          <strong className={styles.summaryValue}>{summary.critical}</strong>
-        </article>
-        <article className={styles.summaryCard}>
+          <strong
+            className={`${styles.summaryValue} ${summary.critical > 0 ? styles.valueCritical : ""}`}
+          >
+            {summary.critical}
+          </strong>
+        </Card>
+        <Card padding="md" className={styles.tile}>
           <span className={styles.summaryLabel}>Security backlog</span>
           <strong className={styles.summaryValue}>
             {summary.securityBacklog}
           </strong>
-        </article>
-        <article className={styles.summaryCard}>
+        </Card>
+        <Card padding="md" className={styles.tile}>
           <span className={styles.summaryLabel}>Stale 90+ days</span>
           <strong className={styles.summaryValue}>{summary.stale}</strong>
-        </article>
+        </Card>
       </div>
 
-      <section className={styles.tableCard}>
-        <div className={styles.tableHeader}>
-          <h3>Maintenance ranking</h3>
-          <p>Higher scores indicate greater need for maintainer attention.</p>
-        </div>
+      <div className={styles.body}>
+        <Card padding="none" className={styles.tableCard}>
+          <div className={styles.tableHeader}>
+            <div>
+              <h3>Maintenance ranking</h3>
+              <p>
+                Higher scores indicate greater need for maintainer attention.
+              </p>
+            </div>
+            <ExportButton
+              data={displayRows}
+              filename="health-ranking"
+              label="Export"
+              onToast={onToast}
+            />
+          </div>
 
-        <div className={styles.tableWrapper}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th
-                  className={styles.sortable}
-                  onClick={() => handleSort("name")}
-                >
-                  Repository
-                  <span className={styles.sortIcon}>
-                    {sort.key === "name"
-                      ? sort.dir === "asc"
-                        ? "↑"
-                        : "↓"
-                      : "↕"}
-                  </span>
-                </th>
-                <th
-                  className={styles.sortable}
-                  onClick={() => handleSort("tier")}
-                >
-                  Tier
-                  <span className={styles.sortIcon}>
-                    {sort.key === "tier"
-                      ? sort.dir === "asc"
-                        ? "↑"
-                        : "↓"
-                      : "↕"}
-                  </span>
-                </th>
-                <th
-                  className={styles.sortable}
-                  onClick={() => handleSort("score")}
-                >
-                  Score
-                  <span className={styles.sortIcon}>
-                    {sort.key === "score"
-                      ? sort.dir === "asc"
-                        ? "↑"
-                        : "↓"
-                      : "↕"}
-                  </span>
-                </th>
-                <th
-                  className={styles.sortable}
-                  onClick={() => handleSort("prs")}
-                >
-                  PRs
-                  <span className={styles.sortIcon}>
-                    {sort.key === "prs"
-                      ? sort.dir === "asc"
-                        ? "↑"
-                        : "↓"
-                      : "↕"}
-                  </span>
-                </th>
-                <th
-                  className={styles.sortable}
-                  onClick={() => handleSort("alerts")}
-                >
-                  Alerts
-                  <span className={styles.sortIcon}>
-                    {sort.key === "alerts"
-                      ? sort.dir === "asc"
-                        ? "↑"
-                        : "↓"
-                      : "↕"}
-                  </span>
-                </th>
-                <th
-                  className={styles.sortable}
-                  onClick={() => handleSort("stale")}
-                >
-                  Stale (days)
-                  <span className={styles.sortIcon}>
-                    {sort.key === "stale"
-                      ? sort.dir === "asc"
-                        ? "↑"
-                        : "↓"
-                      : "↕"}
-                  </span>
-                </th>
-                <th
-                  className={styles.sortable}
-                  onClick={() => handleSort("readme")}
-                >
-                  README
-                  <span className={styles.sortIcon}>
-                    {sort.key === "readme"
-                      ? sort.dir === "asc"
-                        ? "↑"
-                        : "↓"
-                      : "↕"}
-                  </span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayRows.map((repo, index) => {
-                const att = repo._attention;
-                return (
-                  <tr
-                    key={repo.name}
-                    className={styles.row}
-                    onClick={() => onRepoClick && onRepoClick(repo)}
-                  >
-                    <td>{index + 1}</td>
-                    <td>
-                      <div className={styles.repoCell}>
-                        <strong>{repo.name}</strong>
-                        <span>{repo.language || "Unknown"}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <span
-                        className={`${styles.tierBadge} ${
-                          tierClassNames[att.tier] || styles.tierHealthy
-                        }`}
-                      >
-                        {tierLabels[att.tier] || att.tier}
+          <div className={styles.tableWrapper}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  {columns.map((col) => (
+                    <th
+                      key={col.key}
+                      className={`${styles.sortable} ${sort.key === col.key ? styles.sortActive : ""}`}
+                      onClick={() => handleSort(col.key)}
+                    >
+                      {col.label}
+                      <span className={styles.sortIcon}>
+                        {sortIcon(col.key)}
                       </span>
-                    </td>
-                    <td>{att.score.toFixed(0)}</td>
-                    <td>
-                      {repo.pull_request_summary?.availability === "available"
-                        ? repo.pull_request_summary.total_open
-                        : "n/a"}
-                    </td>
-                    <td>
-                      {repo.security_summary?.active_alert_counts?.total_open ??
-                        0}
-                    </td>
-                    <td>{repo.days_since_last_push ?? "n/a"}</td>
-                    <td>{repo.has_readme ? "Yes" : "No"}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </section>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {displayRows.map((repo, index) => {
+                  const tier = repo.attention_metrics?.tier;
+                  const score = repo.attention_score ?? 0;
+                  const openPrs = getOpenPullRequests(repo);
+                  return (
+                    <tr
+                      key={repo.name}
+                      className={styles.row}
+                      onClick={() => onRepoClick?.(repo, displayRows)}
+                    >
+                      <td>{index + 1}</td>
+                      <td>
+                        <div className={styles.repoCell}>
+                          <strong>{repo.name}</strong>
+                          <span>{repo.language || "Unknown"}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <Badge tone={getTierTone(tier)}>
+                          {getTierLabel(tier)}
+                        </Badge>
+                      </td>
+                      <td>
+                        <div className={styles.scoreCell}>
+                          <span
+                            className={`${styles.scoreBar} ${scoreThresholdClass(score)}`}
+                          />
+                          {score.toFixed(0)}
+                        </div>
+                      </td>
+                      <td>{openPrs ?? "n/a"}</td>
+                      <td>{getSecurityAlerts(repo)}</td>
+                      <td>{repo.days_since_last_push ?? "n/a"}</td>
+                      <td
+                        className={!repo.has_readme ? styles.readmeMissing : ""}
+                      >
+                        {repo.has_readme ? "Yes" : "No"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Card>
 
-      <aside className={styles.explainerCard}>
-        <h3>What drives the score</h3>
-        <ul className={styles.explainerList}>
-          <li>Staleness: up to 30 pts for repos inactive 6+ months.</li>
-          <li>Missing README adds 20 pts.</li>
-          <li>Missing license or CI/CD each add 10 pts.</li>
-          <li>Open issues contribute up to 15 pts; open PRs up to 15 pts.</li>
-          <li>Security alerts contribute up to 30 pts.</li>
-        </ul>
-      </aside>
+        <aside className={styles.explainerCard}>
+          <Eyebrow color="onDark">Methodology</Eyebrow>
+          <h3 className={styles.explainerTitle}>What drives the score</h3>
+          <ul className={styles.explainerList}>
+            {methodology.map(({ key, label, hit, total, average }) => (
+              <li key={key} className={styles.methodologyRow}>
+                <div className={styles.methodologyLabelRow}>
+                  <span>{label}</span>
+                  <span className={styles.methodologyCount}>
+                    {hit} of {total} repos
+                  </span>
+                </div>
+                <div className={styles.methodologyTrack}>
+                  <div
+                    className={styles.methodologyFill}
+                    style={{ width: `${Math.min(average, 100)}%` }}
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+          <p className={styles.explainerFootnote}>
+            Bars show average component score across the portfolio. Tiers:
+            Healthy, Watch, Elevated, Critical.
+          </p>
+        </aside>
+      </div>
     </div>
   );
 }

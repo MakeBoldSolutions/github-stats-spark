@@ -92,7 +92,7 @@ export const ChartWrapper = ({
       <div className={`chart-wrapper ${className}`}>
         {title && <h3 className="chart-title">{title}</h3>}
         <div className="chart-error">
-          <p>⚠️ Error loading chart</p>
+          <p>Error loading chart</p>
           <p className="chart-error-message">{error}</p>
         </div>
       </div>

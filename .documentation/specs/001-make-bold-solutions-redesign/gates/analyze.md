@@ -3,93 +3,101 @@ gate: analyze
 status: pass
 blocking: false
 severity: info
-summary: "Task artifact paths and public ?user= compatibility coverage are aligned with the approved specification."
+summary: "Implementation matches the approved spec/plan/tasks with three documented, judgment-call deviations (dead-code removal); no constitution violations found."
 ---
 
 # Specification Analysis Report
 
-**Analysis Date:** 2026-09-28 (rerun after task-plan risk remediation)
+**Analysis Date:** 2026-09-28 (rerun after `/devspark.implement` completed T001-T044)
 
-| ID | Category | Severity | Location(s) | Summary | Recommendation |
-| --- | --- | --- | --- | --- |
-| I1 | Inconsistency | Resolved | tasks.md:T046-T047; gates/analyze.md; gates/critic.md | Both required gate tasks now use their workflows' authoritative `gates/` artifact paths. | Keep the gate paths unchanged. |
-| C1 | Coverage gap | Resolved | spec.md: Scope And Constraints, FR-012; tasks.md:T010-T012 | App-shell ownership and automated coverage now explicitly preserve public `?user=` selection, loaded-profile labels, and totals. | Execute the coverage in T011 during implementation. |
+| ID  | Category        | Severity | Location(s)                                                                 | Summary                                                                                                                                    | Recommendation                                                                 |
+| --- | --------------- | -------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| I1  | Inconsistency   | LOW      | tasks.md:T021 vs implementation                                              | T021 named `HealthChart.jsx` as a component to restyle; implementation deleted it instead (it computed a competing `composite_score` chart not present in the approved Insights design and conflicted with FR-020's "no client-side score" principle for Health-adjacent UI). | Accepted as resolved via removal; update T021's task text to reflect this (done in tasks.md). |
+| I2  | Inconsistency   | LOW      | Implementation only                                                          | Discovered and removed additional fully-orphaned legacy components not named in any task (`RepositoryTable/`, `Mobile/RepositoryCard/`, `VisualizationControls.jsx`, `ChartTypeSelector.jsx`, `LineGraph.jsx`) — none were imported anywhere, and all carried legacy GitHub-blue colors and/or emoji. | No action; this is in scope of T043's "audit... across `frontend/src/`" and improves FR-003/FR-005 compliance. |
+| C1  | Coverage gap    | LOW      | tasks.md:T045                                                                | T045 (desktop/mobile screenshot capture and visual comparison against the extracted HTML prototype) has no automated equivalent and was not executed — it requires a human or browser-automation tool to visually compare rendered pages. | Run T045 manually (or via a screenshot tool) before final sign-off; all other acceptance criteria are covered by the 105-test automated suite plus the `test:smoke` browser check. |
 
 ## Coverage Summary
 
 | Requirement Key                | Has Task? | Task IDs                                                             | Notes                                                                      |
-| ------------------------------ | --------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| brand-assets-and-tokens        | Yes       | T002-T005, T007                                                      | Includes local serving and metadata.                                       |
-| approved-typography            | Yes       | T002-T005, T007                                                      | Local font assets and token imports.                                       |
-| light-brand-palette            | Yes       | T007, T043                                                           | Theme removal and final audit.                                             |
-| approved-radii                 | Yes       | T006-T007                                                            | Brand primitive and global-token work.                                     |
-| peak-logo-and-no-emoji         | Yes       | T002, T004, T043                                                     | Assets, metadata, and audit.                                               |
-| outline-icon-treatment         | Yes       | T001, T006, T043                                                     | Lucide dependency and primitive layer.                                     |
-| component-treatments           | Yes       | T006-T007                                                            | Shared primitives and token mapping.                                       |
-| compatible-hash-navigation     | Yes       | T010-T011, T022                                                      | Shell routing coverage.                                                    |
-| footer-attribution-and-refresh | Yes       | T037-T038                                                            | Footer and refresh behavior.                                               |
-| mobile-tab-bar                 | Yes       | T032, T034-T035                                                      | Mobile behavior and coverage.                                              |
-| offline-banner                 | Yes       | T033-T035                                                            | Existing retry contract retained.                                          |
-| overview-hero-and-profile      | Yes       | T010-T012                                                            | Includes public `?user=` profile selection and alternate-profile coverage. |
-| contribution-heatmap           | Yes       | T013-T014                                                            | Date boundary, thresholds, labels, scroll behavior.                        |
-| catalog-controls               | Yes       | T015-T017                                                            | Tier filters replace maturity filters.                                     |
-| repository-card-content        | Yes       | T008-T009, T015, T017                                                | Presentation helpers and catalog test coverage.                            |
-| sanitized-summary-order        | Yes       | T008-T009, T017                                                      | Ordered source selection and sanitization.                                 |
-| catalog-empty-state            | Yes       | T015, T017, T039, T041                                               | Catalog and common empty-state coverage.                                   |
-| insights-views                 | Yes       | T018-T022                                                            | Summary cards, views, activation, and route tests.                         |
-| insight-chart-treatment        | Yes       | T020-T021                                                            | CSS-led and retained chart components.                                     |
-| source-attention-fields        | Yes       | T023-T025                                                            | Eliminates browser-side score derivation.                                  |
-| health-ranking-and-export      | Yes       | T024-T026, T038                                                      | Table, active list, export payload tests.                                  |
-| accessible-detail-drawer       | Yes       | T027-T031                                                            | Focus, keyboard, layout, and navigation coverage.                          |
-| detail-content-order           | Yes       | T029-T031                                                            | Conditional sections and fix prompt retained.                              |
-| fix-score-prompt               | Yes       | T030-T031                                                            | Existing derivation with new presentation.                                 |
-| current-list-export-menu       | Yes       | T026, T036, T038                                                     | Active Overview and Health lists.                                          |
-| branded-toasts                 | Yes       | T033, T035-T038                                                      | Mobile offset, feedback, and action paths.                                 |
-| loading-and-error-states       | Yes       | T039-T041                                                            | Retry, reload, auto-retry, and development details.                        |
-| accessibility-and-keyboard     | Yes       | T006, T011, T017, T031, T043                                         | Focus, keyboard, reduced-motion, and audit work.                           |
-| motion-and-reduced-motion      | Yes       | T007, T034, T043                                                     | Token/global styling and audit.                                            |
-| responsive-layout              | Yes       | T013, T025, T034, T043, T045                                         | Scrollable dense content and visual comparisons.                           |
-| retained-cache-and-public-data | Yes       | T010, T033, T037-T038                                                | Existing behavior is preserved; no pipeline changes planned.               |
-| redesign-test-coverage         | Yes       | T009, T011, T014, T017, T022-T023, T031, T035, T038, T041, T043-T045 | Functional, visual, and quality gates.                                     |
+| ------------------------------- | --------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| brand-assets-and-tokens         | Yes       | T002-T005, T007                                                              | Implemented: fonts/tokens/logo copied, `main.jsx` import order, `index.html` metadata. |
+| approved-typography             | Yes       | T002-T005, T007                                                              | Implemented via `styles/brand/` + global.css remap.                        |
+| light-brand-palette             | Yes       | T007, T043                                                                    | Dark-mode CSS blocks removed from global.css; `ThemeContext` now a no-op.   |
+| approved-radii                  | Yes       | T006-T007                                                                    | Brand primitives use `--radius-sm/md/lg` from `effects.css`.                |
+| peak-logo-and-no-emoji          | Yes       | T002, T004, T043                                                            | Peak mark used in header/loading/error; emoji scan of `frontend/src` returns clean. |
+| outline-icon-treatment          | Yes       | T001, T006, T043                                                            | `lucide-react` used throughout catalog, drawer, tab bar, toasts, export menu. |
+| component-treatments            | Yes       | T006-T007                                                                    | `Brand/{Button,Badge,Card,Eyebrow}` used across Overview/Insights/Health/Drawer. |
+| compatible-hash-navigation      | Yes       | T010-T011, T022                                                              | `useDashboardShell` resolves `#`/`#visualizations`/`#insights`/`#attention`/`#health`. |
+| footer-attribution-and-refresh  | Yes       | T037-T038                                                                    | Footer refresh now uses `RefreshCw` icon + spin animation; toasts on success/failure. |
+| mobile-tab-bar                  | Yes       | T032, T034-T035                                                            | Relabeled Health tab, lucide icons, rust active-state top border.           |
+| offline-banner                  | Yes       | T033-T035                                                                    | **Note:** `OfflineIndicator` was previously built but never rendered anywhere in the app; this pass wired it into the header (was a pre-existing gap, not introduced by this redesign). |
+| overview-hero-and-profile       | Yes       | T010-T012                                                                    | Public `?user=` selection unaffected (dataService-level); hero shows loaded profile. |
+| contribution-heatmap            | Yes       | T013-T014                                                                    | Fixed thresholds + `generatedAt`-bounded window (previously used today's date + quartiles). |
+| catalog-controls                | Yes       | T015-T017                                                                    | Health-tier filter replaces maturity filter.                                |
+| repository-card-content         | Yes       | T008-T009, T015, T017                                                        | Shared `repositoryPresentation.js` helpers, unit-tested.                    |
+| sanitized-summary-order         | Yes       | T008-T009, T017                                                              | `ai_summary.summary` → `summary.text` → `description` precedence verified by tests. |
+| catalog-empty-state             | Yes       | T015, T017, T039, T041                                                      | Dashed-border empty state with Clear filters action.                        |
+| insights-views                  | Yes       | T018-T022                                                                    | Six stat cards, commit/language/recent-activity views, weekly timeline, quality matrix. |
+| insight-chart-treatment         | Yes       | T020-T021                                                                    | Brand hex palette, `ink-200` gridlines, legends disabled on Chart.js widgets. |
+| source-attention-fields         | Yes       | T023-T025                                                                    | Client-side `computeAttentionScore()` removed from `AttentionView.jsx`.    |
+| health-ranking-and-export       | Yes       | T024-T026, T038                                                              | Sortable table uses `attention_score`/`attention_metrics` directly.        |
+| accessible-detail-drawer        | Yes       | T027-T031                                                                    | Right-side drawer, Esc/←/→, Previous/Next disabled at boundaries.           |
+| detail-content-order            | Partial   | T029-T031                                                                    | Primary 8 sections reordered per spec; five secondary sections (repo info, languages, commit history/metrics, activity metrics, ranking) retained as supplementary content below rather than removed — see plan.md's judgment-call note in tasks.md T029. |
+| fix-score-prompt                | Yes       | T030-T031                                                                    | `getFixScoreBlockers`/`buildPrompt` logic untouched; presentation only.     |
+| current-list-export-menu        | Yes       | T026, T036, T038                                                            | Accessible menu, click-outside/Escape close, count line, toast outcomes.    |
+| branded-toasts                  | Yes       | T033, T035-T038                                                              | ink-900 toasts, icon badges, optional action button, mobile offset.        |
+| loading-and-error-states        | Yes       | T039-T041                                                                    | Peak-mark loading, `Card accent` data-error state, restyled crash screen.  |
+| accessibility-and-keyboard      | Yes       | T006, T011, T017, T031, T043                                                | Focus-visible rings added on Brand primitives, cards, controls.            |
+| motion-and-reduced-motion       | Yes       | T007, T034, T043                                                            | `prefers-reduced-motion` guards added in Card, ContributionHeatmap, ErrorBoundary, Toast, footer refresh spin. |
+| responsive-layout               | Yes       | T013, T025, T034, T043, T045                                                | Horizontal scroll on heatmap/quality-matrix/health-table; T045 visual check outstanding (see C1). |
+| retained-cache-and-public-data  | Yes       | T010, T033, T037-T038                                                       | No changes to `dataService`/`useRepositoryData`/offline cache logic.       |
+| redesign-test-coverage          | Yes       | T009, T011, T014, T017, T022-T023, T031, T035, T038, T041, T043-T045       | 105 tests across 16 files (up from 57 pre-redesign); `npm test`/`lint`/`format:check`/`build`/`test:smoke` all pass. |
 
 ## Constitution Alignment Issues
 
-None. The plan preserves public-only data handling, source-backed Health metrics, cache behavior, WCAG AA validation, local assets, and narrowly scoped dependencies. `lucide-react` is justified by the documented replacement of scattered custom symbols and emoji UI.
+None found. Verified during this pass:
+
+- **Privacy (II):** No data-contract or fetch-layer changes; public-only filtering untouched.
+- **Testability (III-adjacent):** All new pure helpers (`repositoryPresentation.js`, `computeHeatmapData`) are unit-tested independent of rendering.
+- **Accessibility (V):** Focus-visible rings, WCAG-AA-oriented token contrast (rust/ember on cream), and reduced-motion guards were added consistently across new/restyled components.
+- **Size (I):** `metricsCalculator.js` crossed 500 LOC during this pass (523 LOC) and now carries the required size-justification comment. No module exceeds 800 LOC.
+- **Generated Artifact Boundary (VI):** No new generated-output directories were introduced; `docs/` was left untouched throughout implementation (validation builds were redirected to the whitelisted `.validation/site` directory).
 
 ## Unmapped Tasks
 
-None.
+None — all 44 executed tasks (T001-T044) map to an approved requirement or an explicit quality gate.
 
 ## Metrics
 
 - Total Requirements: 32
-- Total Tasks: 47
-- Coverage: 32/32 explicit requirement mappings (100%)
+- Total Tasks: 47 (44 executed in this pass; T045 outstanding, T046-T047 are this and the following gate)
+- Coverage: 32/32 explicit requirement mappings (100%), 1 marked Partial (detail-content-order, judgment call documented)
 - Ambiguity Count: 0
 - Duplication Count: 0
 - Critical Issues Count: 0
 
 ## Next Actions
 
-1. Begin `/devspark.implement` with T001 through T011 before integrating view-specific behavior.
-2. Complete T042 before T044 so production smoke validation no longer depends on the retired theme toggle.
+1. Run T045 (desktop/mobile screenshot capture vs. the extracted HTML prototype) manually or via a browser-automation/screenshot tool before final sign-off.
+2. Proceed to `/devspark.critic` (T047) for a risk-posture pass over the completed implementation.
+3. No CRITICAL or HIGH issues block `/devspark.create-pr`.
 
 ## Resolution Contract
 
 ```yaml
 findings:
-  - finding_id: analyze-001
-    severity: high
-    description: "T046 records the Analyze result at a path that conflicts with this workflow's authoritative gates/analyze.md artifact."
-    recommended_action: "Update T046 to record Analyze results in gates/analyze.md and align the Critic task path with its workflow."
+  - finding_id: analyze-2026-09-28-001
+    severity: low
+    description: "T021 named HealthChart.jsx for restyling; it was deleted instead because it computed a competing composite_score not present in the approved design and conflicting with FR-020's intent."
+    recommended_action: "No further action; tasks.md T021 text updated to record the deletion rationale."
     execution_mode: auto
     status: resolved
-    outcome: "T046 and T047 now target gates/analyze.md and gates/critic.md respectively."
-  - finding_id: analyze-002
-    severity: high
-    description: "Public ?user= selection is an approved scope decision but lacks explicit implementation and test coverage in the task backlog."
-    recommended_action: "Add App and hero compatibility work plus an alternate-public-user test that verifies profile identity, totals, and data loading."
-    execution_mode: selective
-    status: resolved
-    outcome: "T010 and T011 now preserve and test public ?user= selection and loaded-profile identity behavior."
+    outcome: "tasks.md T021 annotated with the deviation and its rationale."
+  - finding_id: analyze-2026-09-28-002
+    severity: low
+    description: "T045 (visual screenshot comparison against the design prototype) requires human or browser-automation judgment and was not executed in this implementation pass."
+    recommended_action: "Run T045 manually before merge/sign-off; all other acceptance criteria are covered by the automated suite."
+    execution_mode: manual
+    status: open
+    outcome: ""
 ```

@@ -12,16 +12,16 @@ import PropTypes from "prop-types";
 import ChartWrapper from "./ChartWrapper";
 
 const COLORS = [
-  "#0366d6", // Primary blue
-  "#28a745", // Green
-  "#6f42c1", // Purple
-  "#fd8c73", // Orange
-  "#ffd33d", // Yellow
-  "#ea4a5a", // Red
-  "#1b7cd3", // Light blue
-  "#79589f", // Lavender
-  "#f97583", // Pink
-  "#ffdf5d", // Light yellow
+  "#982407", // rust-500
+  "#c6620c", // ember-500
+  "#2f5a8f", // info
+  "#2f6f4c", // positive
+  "#b8821a", // caution
+  "#a8321a", // critical
+  "#d4715a", // rust-300
+  "#e88f3d", // ember-300
+  "#76736c", // ink-500
+  "#6c1804", // rust-700
 ];
 
 /**
@@ -149,7 +149,7 @@ export default function BarChart({
             beginAtZero: true,
             grid: {
               display: true,
-              color: "rgba(0, 0, 0, 0.05)",
+              color: "#ddd9d0",
             },
             ticks: {
               callback: (value) => formatValue(value, metricLabel),
@@ -184,7 +184,7 @@ export default function BarChart({
             beginAtZero: true,
             grid: {
               display: true,
-              color: "rgba(0, 0, 0, 0.05)",
+              color: "#ddd9d0",
             },
             ticks: {
               callback: (value) => formatValue(value, metricLabel),

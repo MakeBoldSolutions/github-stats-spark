@@ -1,0 +1,85 @@
+.wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 16px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: var(--fw-semibold);
+  color: var(--text-strong);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.trigger:hover:not(:disabled) {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.trigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 260px;
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 28px rgba(30, 30, 30, 0.14);
+  padding: 6px;
+  z-index: 50;
+}
+
+.menuCount {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 8px 10px 6px;
+  margin: 0;
+}
+
+.menuItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: 8px 10px;
+  text-align: left;
+  border: none;
+  background: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.menuItem:hover,
+.menuItem:focus-visible {
+  background: var(--rust-50);
+}
+
+.menuItemLabel {
+  font-size: 14px;
+  font-weight: var(--fw-medium);
+  color: var(--text-strong);
+}
+
+.menuItemDesc {
+  font-size: 12px;
+  color: var(--text-muted);
+}

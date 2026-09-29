@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { Badge } from "@/components/Brand";
 import styles from "../../RepositoryDetail.module.css";
-import CollapsibleSection from "../CollapsibleSection";
 
 export const QUALITY_CHECKS = [
   ["README", "has_readme"],
@@ -367,12 +368,12 @@ ${scoringInputAudit}
 Fix the root causes that prevent a perfect score. Account for every missing, low, unavailable, or stale input above before deciding a repository issue is fixed. Do not weaken scoring, delete findings, or hand-edit generated JSON/SVG/screenshot/docs artifacts. If a blocker reflects real external state, such as an intentionally offline website, document it as an accepted external limitation and keep the evaluator honest. Regenerate stats, rebuild dashboard artifacts, and run the repo's verification gates before summarizing the result.`;
 }
 
-function getBadgeClass(severity) {
-  if (severity === "high") return styles.badgeError;
-  if (severity === "external") return styles.badgeInfo;
-  if (severity === "medium") return styles.badgeWarning;
-  return styles.badgeSuccess;
-}
+const SEVERITY_TONE = {
+  high: "critical",
+  medium: "caution",
+  external: "info",
+  low: "positive",
+};
 
 function FixScorePromptSection({ repository, expanded, onToggle }) {
   const [copied, setCopied] = useState(false);
@@ -390,63 +391,79 @@ function FixScorePromptSection({ repository, expanded, onToggle }) {
   };
 
   return (
-    <CollapsibleSection
-      section="remediation"
-      title="Fix Score Prompt"
-      expanded={expanded}
-      onToggle={onToggle}
-      badge={
-        blockers.length > 0 ? (
-          <span className={styles.badgeWarning}>{blockers.length} signals</span>
+    <section className={styles.fixScorePanel}>
+      <h3
+        className={styles.fixScoreHeader}
+        onClick={() => onToggle("remediation")}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onToggle("remediation");
+          }
+        }}
+        aria-expanded={expanded}
+      >
+        <span className={styles.fixScoreHeaderText}>
+          <span>Fix score prompt</span>
+          <code className={styles.fixScoreCommand}>/devspark.fix-score</code>
+        </span>
+        {blockers.length > 0 ? (
+          <Badge tone="caution">{blockers.length} signals</Badge>
         ) : (
-          <span className={styles.badgeSuccess}>ready</span>
-        )
-      }
-    >
-      <div className={styles.sectionContent}>
-        <div className={styles.promptActions}>
-          <code className={styles.promptCommand}>/devspark.fix-score</code>
+          <Badge tone="positive">Ready</Badge>
+        )}
+        {expanded ? (
+          <ChevronUp size={18} aria-hidden="true" />
+        ) : (
+          <ChevronDown size={18} aria-hidden="true" />
+        )}
+      </h3>
+
+      {expanded && (
+        <div className={styles.fixScoreBody}>
+          <div className={styles.blockerList}>
+            {blockers.length > 0 ? (
+              blockers.map((blocker) => (
+                <div
+                  key={`${blocker.label}-${blocker.detail}`}
+                  className={styles.blockerItem}
+                >
+                  <Badge tone={SEVERITY_TONE[blocker.severity] || "neutral"}>
+                    {blocker.severity}
+                  </Badge>
+                  <div>
+                    <div className={styles.blockerTitle}>{blocker.label}</div>
+                    <div className={styles.fixScoreMuted}>{blocker.detail}</div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className={styles.fixScoreMuted}>
+                No dashboard-visible blockers. Run the prompt to inspect the
+                latest audit files and verification gates.
+              </p>
+            )}
+          </div>
+
+          <textarea
+            className={styles.promptText}
+            value={prompt}
+            readOnly
+            aria-label={`Copilot fix score prompt for ${repository.name}`}
+          />
+
           <button
             type="button"
-            className={styles.btnSecondary}
+            className={styles.copyPromptButton}
             onClick={copyPrompt}
           >
-            {copied ? "Copied" : "Copy Prompt"}
+            {copied ? "Copied" : "Copy prompt"}
           </button>
         </div>
-
-        <div className={styles.blockerList}>
-          {blockers.length > 0 ? (
-            blockers.map((blocker) => (
-              <div
-                key={`${blocker.label}-${blocker.detail}`}
-                className={styles.blockerItem}
-              >
-                <span className={getBadgeClass(blocker.severity)}>
-                  {blocker.severity}
-                </span>
-                <div>
-                  <div className={styles.blockerTitle}>{blocker.label}</div>
-                  <div className={styles.textMuted}>{blocker.detail}</div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className={styles.textMuted}>
-              No dashboard-visible blockers. Run the prompt to inspect the
-              latest audit files and verification gates.
-            </p>
-          )}
-        </div>
-
-        <textarea
-          className={styles.promptText}
-          value={prompt}
-          readOnly
-          aria-label={`Copilot fix score prompt for ${repository.name}`}
-        />
-      </div>
-    </CollapsibleSection>
+      )}
+    </section>
   );
 }
 

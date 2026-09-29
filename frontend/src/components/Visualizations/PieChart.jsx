@@ -11,16 +11,16 @@ import PropTypes from "prop-types";
 import ChartWrapper from "./ChartWrapper";
 
 const COLORS = [
-  "#0366d6", // Primary blue
-  "#28a745", // Green
-  "#6f42c1", // Purple
-  "#fd8c73", // Orange
-  "#ffd33d", // Yellow
-  "#ea4a5a", // Red
-  "#1b7cd3", // Light blue
-  "#79589f", // Lavender
-  "#f97583", // Pink
-  "#ffdf5d", // Light yellow
+  "#982407", // rust-500
+  "#c6620c", // ember-500
+  "#2f5a8f", // info
+  "#2f6f4c", // positive
+  "#b8821a", // caution
+  "#a8321a", // critical
+  "#d4715a", // rust-300
+  "#e88f3d", // ember-300
+  "#76736c", // ink-500
+  "#6c1804", // rust-700
 ];
 
 /**
@@ -57,7 +57,7 @@ export default function PieChart({
       {
         data: data.map((item) => item.value),
         backgroundColor: data.map((_, index) => COLORS[index % COLORS.length]),
-        borderColor: "#ffffff",
+        borderColor: "#ffffff", // white card background (surface-card)
         borderWidth: 2,
         hoverOffset: 4,
         hoverBorderWidth: 3,
@@ -78,35 +78,9 @@ export default function PieChart({
       }
     },
     plugins: {
+      // FR-019: no chart legends — DashboardView renders its own swatch/legend row.
       legend: {
-        display: true,
-        position: "bottom",
-        labels: {
-          padding: 16,
-          font: {
-            size: 12,
-          },
-          usePointStyle: true,
-          boxWidth: 12,
-          boxHeight: 12,
-          generateLabels: (chart) => {
-            const datasets = chart.data.datasets;
-            const labels = chart.data.labels;
-
-            return labels.map((label, i) => {
-              const value = datasets[0].data[i];
-              const total = datasets[0].data.reduce((sum, val) => sum + val, 0);
-              const percentage = ((value / total) * 100).toFixed(1);
-
-              return {
-                text: `${label} (${percentage}%)`,
-                fillStyle: datasets[0].backgroundColor[i],
-                hidden: false,
-                index: i,
-              };
-            });
-          },
-        },
+        display: false,
       },
       tooltip: {
         callbacks: {

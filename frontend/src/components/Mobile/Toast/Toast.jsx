@@ -1,18 +1,26 @@
 /**
  * Toast Component
- * Transient feedback notifications positioned at bottom above TabBar
- * Supports success, error, warning, and info variants
+ * Branded transient feedback notification, fixed and centered above the
+ * mobile tab bar. Supports success, error, warning, and info variants.
  */
 
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { Check, X, AlertTriangle, Info } from "lucide-react";
 import "./Toast.css";
+
+const VARIANT_ICON = {
+  success: Check,
+  error: X,
+  warning: AlertTriangle,
+  info: Info,
+};
 
 export function Toast({
   message,
-  variant = "info", // 'success' | 'error' | 'warning' | 'info'
+  variant = "info",
   duration = 3000,
   onClose,
-  icon = null,
+  action = null,
 }) {
   const [isVisible, setIsVisible] = useState(true);
   const [isLeaving, setIsLeaving] = useState(false);
@@ -22,63 +30,18 @@ export function Toast({
     setTimeout(() => {
       setIsVisible(false);
       if (onClose) onClose();
-    }, 300); // Match CSS transition duration
+    }, 300);
   }, [onClose]);
 
   useEffect(() => {
     if (duration <= 0) return;
-
-    const timer = setTimeout(() => {
-      handleClose();
-    }, duration);
-
+    const timer = setTimeout(() => handleClose(), duration);
     return () => clearTimeout(timer);
   }, [duration, handleClose]);
 
   if (!isVisible) return null;
 
-  const getIcon = () => {
-    if (icon) return icon;
-
-    switch (variant) {
-      case "success":
-        return (
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path
-              d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm-2 15l-5-5 1.41-1.41L8 12.17l7.59-7.59L17 6l-9 9z"
-              fill="currentColor"
-            />
-          </svg>
-        );
-      case "error":
-        return (
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path
-              d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm1 15H9v-2h2v2zm0-4H9V5h2v6z"
-              fill="currentColor"
-            />
-          </svg>
-        );
-      case "warning":
-        return (
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path
-              d="M1 17h18L10 2 1 17zm10-2H9v-2h2v2zm0-4H9V9h2v2z"
-              fill="currentColor"
-            />
-          </svg>
-        );
-      default:
-        return (
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path
-              d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm1 15H9v-2h2v2zm0-4H9V5h2v6z"
-              fill="currentColor"
-            />
-          </svg>
-        );
-    }
-  };
+  const Icon = VARIANT_ICON[variant] || VARIANT_ICON.info;
 
   return (
     <div
@@ -86,26 +49,32 @@ export function Toast({
       role="alert"
       aria-live="polite"
     >
-      <div className="toast__icon" aria-hidden="true">
-        {getIcon()}
-      </div>
+      <span className="toast__icon" aria-hidden="true">
+        <Icon size={15} strokeWidth={2.5} />
+      </span>
 
-      <div className="toast__message">{message}</div>
+      <span className="toast__message">{message}</span>
+
+      {action && (
+        <button
+          className="toast__action"
+          onClick={() => {
+            action.onClick?.();
+            handleClose();
+          }}
+          type="button"
+        >
+          {action.label}
+        </button>
+      )}
 
       <button
         className="toast__close"
         onClick={handleClose}
-        aria-label="Close notification"
+        aria-label="Dismiss notification"
         type="button"
       >
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path
-            d="M12.5 3.5L3.5 12.5M3.5 3.5l9 9"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
+        <X size={16} aria-hidden="true" />
       </button>
     </div>
   );
@@ -125,7 +94,7 @@ export function ToastContainer({ toasts = [], onRemove }) {
           message={toast.message}
           variant={toast.variant}
           duration={toast.duration}
-          icon={toast.icon}
+          action={toast.action}
           onClose={() => onRemove(toast.id)}
         />
       ))}

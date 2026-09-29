@@ -109,6 +109,13 @@ function AttentionView({ repositories, onRepoClick, onToast }) {
     );
   }
 
+  function handleKeyboardAction(event, action) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      action();
+    }
+  }
+
   const displayRows = useMemo(() => {
     return [...rankedRepositories].sort((a, b) => {
       const av = getSortValue(a, sort.key);
@@ -187,12 +194,28 @@ function AttentionView({ repositories, onRepoClick, onToast }) {
                     <th
                       key={col.key}
                       className={`${styles.sortable} ${sort.key === col.key ? styles.sortActive : ""}`}
-                      onClick={() => handleSort(col.key)}
+                      aria-sort={
+                        sort.key === col.key
+                          ? sort.dir === "asc"
+                            ? "ascending"
+                            : "descending"
+                          : "none"
+                      }
                     >
-                      {col.label}
-                      <span className={styles.sortIcon}>
-                        {sortIcon(col.key)}
-                      </span>
+                      <button
+                        type="button"
+                        className={styles.sortButton}
+                        onClick={() => handleSort(col.key)}
+                        onKeyDown={(event) =>
+                          handleKeyboardAction(event, () => handleSort(col.key))
+                        }
+                        aria-label={`Sort by ${col.label}`}
+                      >
+                        {col.label}
+                        <span className={styles.sortIcon} aria-hidden="true">
+                          {sortIcon(col.key)}
+                        </span>
+                      </button>
                     </th>
                   ))}
                 </tr>
@@ -203,15 +226,23 @@ function AttentionView({ repositories, onRepoClick, onToast }) {
                   const score = repo.attention_score ?? 0;
                   const openPrs = getOpenPullRequests(repo);
                   return (
-                    <tr
-                      key={repo.name}
-                      className={styles.row}
-                      onClick={() => onRepoClick?.(repo, displayRows)}
-                    >
+                    <tr key={repo.name} className={styles.row}>
                       <td>{index + 1}</td>
                       <td>
                         <div className={styles.repoCell}>
-                          <strong>{repo.name}</strong>
+                          <button
+                            type="button"
+                            className={styles.repoButton}
+                            onClick={() => onRepoClick?.(repo, displayRows)}
+                            onKeyDown={(event) =>
+                              handleKeyboardAction(event, () =>
+                                onRepoClick?.(repo, displayRows),
+                              )
+                            }
+                            aria-label={`Open details for ${repo.name}`}
+                          >
+                            {repo.name}
+                          </button>
                           <span>{repo.language || "Unknown"}</span>
                         </div>
                       </td>

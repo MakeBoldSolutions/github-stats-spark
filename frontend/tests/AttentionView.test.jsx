@@ -72,27 +72,42 @@ describe("<AttentionView />", () => {
     expect(names[0]).toBe("critical-repo");
   });
 
-  it("toggles sort direction when a column header is clicked", () => {
+  it("toggles sort direction with a keyboard-operable header button and exposes aria-sort", () => {
     render(<AttentionView repositories={repositories} onRepoClick={vi.fn()} />);
-    fireEvent.click(screen.getByRole("columnheader", { name: /Repository/i }));
+    const repositoryHeader = screen.getByRole("columnheader", {
+      name: /Repository/i,
+    });
+    const repositorySortButton = screen.getByRole("button", {
+      name: "Sort by Repository",
+    });
+
+    expect(repositoryHeader).toHaveAttribute("aria-sort", "none");
+    fireEvent.keyDown(repositorySortButton, { key: "Enter" });
     let names = screen
       .getAllByText(/critical-repo|healthy-repo/)
       .map((n) => n.textContent);
     expect(names[0]).toBe("healthy-repo"); // name sort defaults to desc
+    expect(repositoryHeader).toHaveAttribute("aria-sort", "descending");
 
-    fireEvent.click(screen.getByRole("columnheader", { name: /Repository/i }));
+    fireEvent.keyDown(repositorySortButton, { key: " " });
     names = screen
       .getAllByText(/critical-repo|healthy-repo/)
       .map((n) => n.textContent);
     expect(names[0]).toBe("critical-repo"); // second click toggles to asc
+    expect(repositoryHeader).toHaveAttribute("aria-sort", "ascending");
   });
 
-  it("opens the drawer for a ranked row and reports the currently ranked order", () => {
+  it("opens the drawer with a keyboard-focusable repository detail button", () => {
     const onRepoClick = vi.fn();
     render(
       <AttentionView repositories={repositories} onRepoClick={onRepoClick} />,
     );
-    fireEvent.click(screen.getByText("critical-repo"));
+    const detailButton = screen.getByRole("button", {
+      name: "Open details for critical-repo",
+    });
+    detailButton.focus();
+    expect(detailButton).toHaveFocus();
+    fireEvent.keyDown(detailButton, { key: "Enter" });
     expect(onRepoClick).toHaveBeenCalledWith(
       expect.objectContaining({ name: "critical-repo" }),
       expect.arrayContaining([

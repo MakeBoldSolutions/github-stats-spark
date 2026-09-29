@@ -13,42 +13,50 @@
 .error-boundary {
   min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: var(--spacing-xl, 32px) var(--spacing-lg, 24px);
-  background-color: var(--background-primary, #ffffff);
+  padding: 96px 24px 32px;
+  background-color: var(--color-background, #ffffff);
 }
 
 .error-boundary__container {
-  max-width: 600px;
-  text-align: center;
+  max-width: 640px;
+  width: 100%;
+  text-align: left;
 }
 
-.error-boundary__icon {
-  font-size: 80px;
-  margin-bottom: var(--spacing-lg, 24px);
-  opacity: 0.8;
+.error-boundary__mark {
+  margin-bottom: 20px;
+}
+
+.error-boundary__eyebrow {
+  font-family: var(--font-body);
+  font-weight: var(--fw-semibold);
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin: 0 0 8px;
 }
 
 .error-boundary__title {
-  font-size: 28px;
-  font-weight: 700;
-  line-height: 1.3;
+  font-family: var(--font-display);
+  font-weight: var(--fw-extrabold);
+  font-size: 32px;
+  line-height: 1.2;
   margin: 0 0 var(--spacing-md, 16px) 0;
-  color: var(--text-primary, #24292e);
+  color: var(--color-text, #24292e);
 }
 
 .error-boundary__message {
   font-size: 16px;
   line-height: 1.6;
   margin: 0 0 var(--spacing-xl, 32px) 0;
-  color: var(--text-secondary, #586069);
+  color: var(--color-text-secondary, #586069);
 }
 
 .error-boundary__actions {
   display: flex;
   gap: var(--spacing-md, 16px);
-  justify-content: center;
   flex-wrap: wrap;
   margin-bottom: var(--spacing-lg, 24px);
 }
@@ -87,56 +95,56 @@
 }
 
 .error-boundary__retry {
-  background-color: var(--color-primary, #0366d6);
-  color: var(--text-on-primary, #ffffff);
+  background-color: var(--brand, #982407);
+  color: var(--text-on-brand, #ffffff);
 }
 
 .error-boundary__retry:active {
   transform: scale(0.98);
-  background-color: var(--color-primary-dark, #0256c2);
+  background-color: var(--brand-strong, #841e05);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .error-boundary__retry:hover {
-    background-color: var(--color-primary-dark, #0256c2);
+    background-color: var(--brand-strong, #841e05);
   }
 }
 
 .error-boundary__reload {
-  background-color: var(--background-secondary, #f6f8fa);
-  color: var(--text-primary, #24292e);
-  border: 1px solid var(--border-color, #d0d7de);
+  background-color: var(--color-surface, #f6f8fa);
+  color: var(--color-text, #24292e);
+  border: 1px solid var(--color-border, #d0d7de);
 }
 
 .error-boundary__reload:active {
   transform: scale(0.98);
-  background-color: var(--background-hover, #e1e4e8);
+  background-color: var(--color-surface-alt, #e1e4e8);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .error-boundary__reload:hover {
-    background-color: var(--background-hover, #e1e4e8);
+    background-color: var(--color-surface-alt, #e1e4e8);
   }
 }
 
 /* Focus visible for keyboard navigation */
 .error-boundary__retry:focus-visible,
 .error-boundary__reload:focus-visible {
-  outline: 2px solid var(--color-primary, #0366d6);
+  outline: 2px solid var(--accent, #0366d6);
   outline-offset: 2px;
 }
 
 .error-boundary__retry-count {
   font-size: 13px;
-  color: var(--text-tertiary, #6a737d);
+  color: var(--color-text-muted, #6a737d);
   margin: 0 0 var(--spacing-md, 16px) 0;
 }
 
 .error-boundary__details {
   margin: var(--spacing-lg, 24px) 0;
   text-align: left;
-  background-color: var(--background-secondary, #f6f8fa);
-  border: 1px solid var(--border-color, #d0d7de);
+  background-color: var(--color-surface, #f6f8fa);
+  border: 1px solid var(--color-border, #d0d7de);
   border-radius: 6px;
   padding: var(--spacing-md, 16px);
 }
@@ -145,42 +153,40 @@
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
-  color: var(--text-secondary, #586069);
+  color: var(--color-text-secondary, #586069);
   margin-bottom: var(--spacing-sm, 8px);
 }
 
 .error-boundary__details summary:hover {
-  color: var(--text-primary, #24292e);
+  color: var(--color-text, #24292e);
 }
 
 .error-boundary__stack {
   font-size: 12px;
   line-height: 1.5;
-  color: var(--text-secondary, #586069);
+  color: var(--color-text-secondary, #586069);
 }
 
 .error-boundary__stack pre {
   overflow-x: auto;
   padding: var(--spacing-sm, 8px);
-  background-color: var(--background-primary, #ffffff);
+  background-color: var(--color-background, #ffffff);
   border-radius: 3px;
-  font-family: "Consolas", "Monaco", "Courier New", monospace;
+  font-family: var(--font-mono);
 }
 
 .error-boundary__help {
   font-size: 14px;
-  color: var(--text-tertiary, #6a737d);
+  color: var(--color-text-muted, #6a737d);
   margin: var(--spacing-xl, 32px) 0 0 0;
+  padding-top: var(--spacing-lg, 24px);
+  border-top: 1px solid var(--border-subtle);
 }
 
 /* Responsive sizing for small screens */
 @media (max-width: 479px) {
   .error-boundary {
-    padding: var(--spacing-lg, 24px) var(--spacing-md, 16px);
-  }
-
-  .error-boundary__icon {
-    font-size: 60px;
+    padding: 56px 16px 24px;
   }
 
   .error-boundary__title {

@@ -1,136 +1,73 @@
-import React, { useMemo, useState } from "react";
+import { useMemo } from "react";
 import PropTypes from "prop-types";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-} from "chart.js";
-import { Line } from "react-chartjs-2";
-import { computeTimelineData } from "../../services/metricsCalculator";
+import { Card } from "@/components/Brand";
 import styles from "./ActivityTimeline.module.css";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-);
-
 /**
- * ActivityTimeline renders a multi-series line chart of weekly activity:
- *  - Series 1: Weekly commit count
- *  - Series 2: Active repositories per week
- *
- * Supports interactive legend toggle via Chart.js built-in behaviour.
+ * Branded weekly activity timeline: one bar per week (ember, rust for the
+ * peak week, a thin stub for empty weeks), with a tick label every 8th week.
  *
  * @param {Object} props
  * @param {Array}  props.weeklyActivity - Array of {week, label, commits, active_repos}
  * @param {string} [props.className]   - Extra CSS class
  */
 export default function ActivityTimeline({ weeklyActivity, className }) {
-  const [, setHiddenDatasets] = useState({});
-
-  const chartData = useMemo(
-    () => computeTimelineData(weeklyActivity),
+  const weeks = useMemo(
+    () => (Array.isArray(weeklyActivity) ? weeklyActivity : []),
     [weeklyActivity],
   );
 
-  if (!Array.isArray(weeklyActivity) || weeklyActivity.length === 0) {
+  if (weeks.length === 0) {
     return (
-      <div className={`${styles.timeline} ${className ?? ""}`.trim()}>
+      <Card
+        padding="lg"
+        className={`${styles.timeline} ${className ?? ""}`.trim()}
+      >
         <p className={styles.empty}>No weekly activity data available.</p>
-      </div>
+      </Card>
     );
   }
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: true,
-    interaction: {
-      mode: "index",
-      intersect: false,
-    },
-    plugins: {
-      legend: {
-        display: true,
-        position: "top",
-        labels: {
-          usePointStyle: true,
-          pointStyleWidth: 16,
-          color: "var(--color-fg-default, #24292f)",
-        },
-        onClick: (e, legendItem, legend) => {
-          const idx = legendItem.datasetIndex;
-          const ci = legend.chart;
-          if (ci.isDatasetVisible(idx)) {
-            ci.hide(idx);
-            legendItem.hidden = true;
-          } else {
-            ci.show(idx);
-            legendItem.hidden = false;
-          }
-          setHiddenDatasets((prev) => ({
-            ...prev,
-            [idx]: !ci.isDatasetVisible(idx),
-          }));
-        },
-      },
-      tooltip: {
-        callbacks: {
-          title: (items) => `Week of ${items[0]?.label ?? ""}`,
-        },
-      },
-    },
-    scales: {
-      x: {
-        ticks: {
-          maxTicksLimit: 13,
-          color: "var(--color-fg-muted, #666)",
-          maxRotation: 0,
-        },
-        grid: { display: false },
-      },
-      yCommits: {
-        type: "linear",
-        display: true,
-        position: "left",
-        title: {
-          display: true,
-          text: "Commits",
-          color: "var(--chart-primary, #2563eb)",
-        },
-        ticks: { color: "var(--color-fg-muted, #666)" },
-        grid: { color: "var(--color-border-muted, rgba(0,0,0,0.08))" },
-      },
-      yRepos: {
-        type: "linear",
-        display: true,
-        position: "right",
-        title: {
-          display: true,
-          text: "Active Repos",
-          color: "var(--chart-secondary, #16a34a)",
-        },
-        ticks: { color: "var(--color-fg-muted, #666)" },
-        grid: { display: false },
-      },
-    },
-  };
+  const maxCommits = Math.max(...weeks.map((w) => w.commits || 0), 1);
+  const peakIndex = weeks.reduce(
+    (best, w, i) => ((w.commits || 0) > (weeks[best].commits || 0) ? i : best),
+    0,
+  );
+  const peakWeek = weeks[peakIndex];
 
   return (
-    <div className={`${styles.timeline} ${className ?? ""}`.trim()}>
-      <Line data={chartData} options={options} />
-    </div>
+    <Card
+      padding="lg"
+      className={`${styles.timeline} ${className ?? ""}`.trim()}
+    >
+      <p className={styles.header}>
+        Peak week: {peakWeek.label ?? peakWeek.week} ·{" "}
+        {(peakWeek.commits || 0).toLocaleString()} commits
+      </p>
+      <div className={styles.chart}>
+        {weeks.map((w, i) => {
+          const commits = w.commits || 0;
+          const heightPct =
+            commits > 0 ? Math.max((commits / maxCommits) * 100, 4) : 0.8;
+          const isPeak = i === peakIndex && commits > 0;
+          return (
+            <div
+              key={w.week ?? i}
+              className={styles.barWrapper}
+              title={`Week of ${w.label ?? w.week}: ${commits} commit${commits !== 1 ? "s" : ""}`}
+            >
+              <div
+                className={`${styles.bar} ${commits === 0 ? styles.barEmpty : ""} ${isPeak ? styles.barPeak : ""}`}
+                style={{ height: `${heightPct}%` }}
+              />
+              {i % 8 === 0 && (
+                <span className={styles.tick}>{w.label ?? w.week}</span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </Card>
   );
 }
 

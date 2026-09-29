@@ -7,16 +7,11 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.72);
+  background-color: rgba(30, 30, 30, 0.5);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   z-index: 1000;
-  padding: var(--spacing-lg);
   animation: fadeIn 0.2s ease-out;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  backdrop-filter: blur(2px);
 }
 
 @keyframes fadeIn {
@@ -29,30 +24,33 @@
 }
 
 .modal {
-  background: var(--color-background, #ffffff);
-  border-radius: var(--radius-lg, 12px);
-  box-shadow:
-    0 24px 64px rgba(0, 0, 0, 0.22),
-    0 6px 20px rgba(0, 0, 0, 0.12);
-  max-width: 1200px;
-  width: 100%;
-  max-height: 90vh;
+  background: var(--surface-page);
+  box-shadow: -12px 0 32px rgba(30, 30, 30, 0.18);
+  width: min(680px, 100%);
+  height: 100%;
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
-  animation: slideUp 0.3s ease-out;
-  margin: auto;
+  animation: slideIn 0.3s var(--ease-out, ease-out);
   position: relative;
   overflow: hidden;
 }
 
-@keyframes slideUp {
+@keyframes slideIn {
   from {
-    transform: translateY(20px);
+    transform: translateX(24px);
     opacity: 0;
   }
   to {
-    transform: translateY(0);
+    transform: translateX(0);
     opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .modal {
+    animation: none;
   }
 }
 
@@ -65,15 +63,17 @@
 
 /* ── Language Accent Bar ── */
 .modalAccent {
-  height: 4px;
+  height: 3px;
   width: 100%;
   flex-shrink: 0;
+  background: var(--brand);
 }
 
 /* Header */
 .modalHeader {
   padding: var(--spacing-md) var(--spacing-lg);
   border-bottom: 1px solid var(--color-border);
+  background: var(--surface-card);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -285,13 +285,14 @@
 .closeButton {
   background: none;
   border: none;
-  font-size: 2rem;
+  font-size: 1.75rem;
   line-height: 1;
   color: var(--color-text-muted);
   cursor: pointer;
   padding: 0;
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -310,8 +311,11 @@
 .modalBody {
   flex: 1;
   overflow-y: auto;
-  padding: var(--spacing-lg);
-  background: var(--color-surface, #f6f8fa);
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: var(--surface-page);
 }
 
 /* Content Grid */
@@ -458,16 +462,28 @@
 }
 
 .qualityBadgeActive {
-  opacity: 1;
-  filter: none;
-  color: var(--color-text);
-  border-color: var(--color-border);
+  background: var(--positive-soft);
+  color: var(--positive);
+}
+.qualityBadgeActive .qualityBadgeDot {
+  background: var(--positive);
 }
 
 .qualityBadgeInactive {
-  opacity: 0.38;
-  filter: grayscale(1);
-  color: var(--color-text-muted);
+  background: var(--ink-50);
+  /* ink-600, not the ink-400 the design spec names: ink-400 fails WCAG AA
+     (Constitution V) on this light background. */
+  color: var(--ink-600);
+}
+.qualityBadgeInactive .qualityBadgeDot {
+  background: var(--ink-300);
+}
+
+.qualityBadgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .qualityBadgeLabel {
@@ -790,17 +806,25 @@
 
 /* Footer */
 .modalFooter {
-  padding: var(--spacing-lg);
+  padding: 16px 28px;
   border-top: 1px solid var(--color-border);
+  background: var(--surface-card);
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: var(--spacing-md);
+  flex-shrink: 0;
 }
 
 .navigationButtons {
   display: flex;
   gap: var(--spacing-sm);
+}
+
+.footerHelp {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
 }
 
 .btnPrimary {
@@ -1155,4 +1179,93 @@
     background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
     padding: var(--spacing-sm);
   }
+}
+
+/* ── Header actions (T028) ── */
+.headerActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.attentionScoreLabel {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── Stats tiles (drawer body item 1) ── */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.statTile {
+  background: var(--surface-card);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statTileValue {
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  font-size: 20px;
+  color: var(--text-strong);
+}
+
+.statTileLabel {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ── Attention breakdown (drawer body item 4) ── */
+.attentionBreakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.attentionRow {
+  display: grid;
+  grid-template-columns: 150px 1fr 40px;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.attentionLabel {
+  color: var(--text-strong);
+}
+
+.attentionTrack {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--ink-100);
+}
+
+.attentionFill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.attentionCritical {
+  background: var(--critical);
+}
+.attentionCaution {
+  background: var(--caution);
+}
+.attentionPositive {
+  background: var(--positive);
+}
+
+.attentionValue {
+  text-align: right;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
 }

@@ -9,7 +9,7 @@ function RankingSection({ repository }) {
       <dl className={styles.detailList}>
         <div className={styles.detailItem}>
           <dt>Has README</dt>
-          <dd>{repository.has_readme ? "✓ Yes" : "✗ No"}</dd>
+          <dd>{repository.has_readme ? "Yes" : "No"}</dd>
         </div>
       </dl>
     </section>

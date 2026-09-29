@@ -1,0 +1,50 @@
+/* ==========================================================================
+   Make Bold Solutions — Typography tokens
+   Display: Be Vietnam Pro  |  Text/UI: Inter Tight
+   ========================================================================== */
+:root {
+  /* Families */
+  --font-display: "Be Vietnam Pro", "Inter Tight", system-ui, sans-serif;
+  --font-body:    "Inter Tight", system-ui, -apple-system, sans-serif;
+  --font-mono:    ui-monospace, "SFMono-Regular", "Menlo", monospace;
+
+  /* Weights */
+  --fw-regular:  400; /* @kind font */
+  --fw-medium:   500; /* @kind font */
+  --fw-semibold: 600; /* @kind font */
+  --fw-bold:     700; /* @kind font */
+  --fw-extrabold:800; /* @kind font */
+  --fw-black:    900; /* @kind font */
+
+  /* Fluid display scale (clamped) */
+  --fs-display:  clamp(3rem, 6vw + 1rem, 5.5rem);     /* @kind other */ /* hero */
+  --fs-h1:       clamp(2.25rem, 3.5vw + 1rem, 3.5rem); /* @kind other */
+  --fs-h2:       clamp(1.75rem, 2vw + 1rem, 2.5rem);   /* @kind other */
+  --fs-h3:       clamp(1.375rem, 1vw + 0.9rem, 1.75rem); /* @kind other */
+  --fs-h4:       1.25rem; /* @kind font */
+
+  /* Text scale */
+  --fs-xs:   0.75rem;   /* @kind font */ /* 12 */
+  --fs-sm:   0.875rem;  /* @kind font */ /* 14 */
+  --fs-base: 1rem;      /* @kind font */ /* 16 */
+  --fs-lg:   1.125rem;  /* @kind font */ /* 18 */
+  --fs-xl:   1.25rem;   /* @kind font */ /* 20 */
+  --fs-2xl:  1.5rem;    /* @kind font */ /* 24 */
+
+  /* Line heights */
+  --lh-tight:   1.05; /* @kind font */
+  --lh-snug:    1.2;  /* @kind font */
+  --lh-heading: 1.15; /* @kind font */
+  --lh-normal:  1.55; /* @kind font */
+  --lh-relaxed: 1.7;  /* @kind font */
+
+  /* Letter spacing */
+  --ls-tighter: -0.03em; /* @kind font */
+  --ls-tight:   -0.015em; /* @kind font */
+  --ls-normal:  0; /* @kind font */
+  --ls-wide:    0.04em; /* @kind font */
+  --ls-eyebrow: 0.18em;   /* @kind font */ /* "SOLUTIONS"-style spaced caps */
+
+  /* Semantic type aliases */
+  --text-eyebrow-transform: uppercase; /* @kind other */
+}

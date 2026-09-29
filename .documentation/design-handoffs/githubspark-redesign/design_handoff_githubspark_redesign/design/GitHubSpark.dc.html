@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>GitHubSpark — Make Bold Solutions Repository Portfolio</title>
+<link rel="icon" href="assets/logo-mark.svg">
+<link rel="stylesheet" href="_ds/make-bold-solutions-design-system-692e6ae0-5229-4808-9466-27445662356d/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/make-bold-solutions-design-system-692e6ae0-5229-4808-9466-27445662356d/tokens/colors.css">
+<link rel="stylesheet" href="_ds/make-bold-solutions-design-system-692e6ae0-5229-4808-9466-27445662356d/tokens/typography.css">
+<link rel="stylesheet" href="_ds/make-bold-solutions-design-system-692e6ae0-5229-4808-9466-27445662356d/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/make-bold-solutions-design-system-692e6ae0-5229-4808-9466-27445662356d/tokens/effects.css">
+<link rel="stylesheet" href="_ds/make-bold-solutions-design-system-692e6ae0-5229-4808-9466-27445662356d/tokens/base.css">
+<link rel="stylesheet" href="_ds/make-bold-solutions-design-system-692e6ae0-5229-4808-9466-27445662356d/styles.css">
+<script src="_ds/make-bold-solutions-design-system-692e6ae0-5229-4808-9466-27445662356d/_ds_bundle.js"></script>
+<style>
+body{margin:0;background:#f8f6f2;color:#1e1e1e;font-family:var(--font-body)}
+a{color:var(--rust-500);text-decoration:none}
+a:hover{color:var(--ember-500)}
+input[type=search]::-webkit-search-cancel-button{display:none}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column;background:var(--cream)">
+
+<header style="position:sticky;top:0;z-index:30;background:rgba(248,246,242,0.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--border-default)">
+  <div style="max-width:1200px;margin:0 auto;padding:0 24px;min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <a href="#" onClick="{{ goOverview }}" aria-label="GitHubSpark — home" style="display:flex;align-items:center;gap:12px;text-decoration:none">
+      <img src="assets/logo-mark.svg" alt="" style="height:30px;width:auto;display:block">
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <span style="font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:-0.02em;line-height:1;color:var(--ink-900)">GitHub<span style="color:var(--rust-500)">Spark</span></span>
+        <span style="font-family:var(--font-body);font-weight:600;font-size:10px;letter-spacing:0.3em;line-height:1;color:var(--text-muted)">MAKE BOLD SPARK</span>
+      </div>
+    </a>
+    <sc-if value="{{ showTopNav }}" hint-placeholder-val="{{ true }}">
+    <nav aria-label="Main navigation" style="display:flex;align-items:stretch;gap:4px;align-self:stretch">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+        <button onClick="{{ t.go }}" aria-current="{{ t.current }}" style="background:none;border:0;border-bottom:2px solid {{ t.bar }};padding:0 14px;min-height:66px;font-family:var(--font-body);font-weight:600;font-size:15px;color:{{ t.color }};cursor:pointer;transition:color 120ms" style-hover="color:var(--rust-500)">{{ t.label }}</button>
+      </sc-for>
+    </nav>
+    </sc-if>
+  </div>
+  <sc-if value="{{ offline }}" hint-placeholder-val="{{ false }}">
+    <div role="alert" style="background:var(--ink-900);color:var(--cream)">
+      <div style="max-width:1200px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:14px">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--ember-300)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01M8.5 16.43a5 5 0 0 1 7 0M5 12.86a10 10 0 0 1 5.17-2.69M19 12.86a10 10 0 0 0-2.01-1.52M2 8.82a15 15 0 0 1 4.18-2.65M22 8.82a15 15 0 0 0-11.29-3.76M2 2l20 20"></path></svg>
+        <strong style="font-weight:600">Offline mode</strong>
+        <span style="color:var(--ink-300)">Showing cached data · Last synced {{ lastSyncLabel }}</span>
+        <button onClick="{{ reconnect }}" style="margin-left:auto;background:none;border:1px solid var(--ink-600);border-radius:6px;color:var(--cream);font-family:var(--font-body);font-size:13px;font-weight:600;padding:5px 12px;cursor:pointer" style-hover="border-color:var(--ember-400);color:var(--ember-300)">Try again</button>
+      </div>
+    </div>
+  </sc-if>
+</header>
+
+<main style="flex:1;width:100%;padding-bottom:{{ mainPad }}">
+
+  <sc-if value="{{ crash }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:640px;margin:0 auto;padding:96px 24px;display:flex;flex-direction:column;align-items:flex-start;gap:20px">
+      <img src="assets/logo-mark.svg" alt="" style="height:40px">
+      <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Eyebrow" hint-size="160px,14px">Unexpected error</x-import>
+      <h1 style="margin:0;font-family:var(--font-display);font-weight:800;font-size:clamp(2.25rem,3vw + 1rem,3.25rem);letter-spacing:-0.03em;line-height:1.05">Something went wrong.</h1>
+      <p style="margin:0;font-size:17px;line-height:1.6;color:var(--ink-600);max-width:52ch">We're sorry for the inconvenience. The application encountered an unexpected error.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Button" onClick="{{ retryCrash }}" hint-size="120px,44px">Try again</x-import>
+        <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Button" onClick="{{ reload }}" variant="secondary" hint-size="130px,44px">Reload page</x-import>
+      </div>
+      <p style="margin:12px 0 0;padding-top:20px;border-top:1px solid var(--border-default);font-size:14px;color:var(--text-muted);width:100%">If the problem persists, please try clearing your browser cache or contact support.</p>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:1200px;margin:0 auto;padding:120px 24px;display:flex;flex-direction:column;align-items:center;gap:18px">
+      <img src="assets/logo-mark.svg" alt="" style="height:44px;opacity:0.9">
+      <p style="margin:0;font-size:15px;color:var(--text-muted)">Loading repository data…</p>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasError }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:720px;margin:0 auto;padding:80px 24px">
+      <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Card" padding="lg" accent="{{ true }}" hint-size="100%,180px">
+        <h3 style="margin:0 0 8px;font-family:var(--font-display);font-weight:700;font-size:22px">Error loading data</h3>
+        <p style="margin:0 0 20px;color:var(--text-muted)">{{ error }}</p>
+        <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Button" onClick="{{ retry }}" hint-size="auto,40px">Retry</x-import>
+      </x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showOverview }}" hint-placeholder-val="{{ true }}">
+
+    <sc-if value="{{ heroCream }}" hint-placeholder-val="{{ true }}">
+      <section style="max-width:1200px;margin:0 auto;padding:64px 24px 48px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:48px;align-items:center">
+        <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+          <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Eyebrow" hint-size="220px,16px">Open-source portfolio</x-import>
+          <h1 style="margin:0;font-family:var(--font-display);font-weight:800;font-size:clamp(2.5rem,4.5vw + 1rem,4.25rem);line-height:1.04;letter-spacing:-0.035em;color:var(--ink-900);text-wrap:balance">Built to scale, <span style="color:var(--rust-500)">in the open.</span></h1>
+          <p style="margin:0;max-width:56ch;font-size:18px;line-height:1.55;color:var(--ink-600);text-wrap:pretty">Explore Make Bold Solutions' public GitHub repositories — an AI-powered analytics dashboard showcasing .NET, React, Python, and more.</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
+            <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Button" onClick="{{ openGithub }}" size="lg" hint-size="180px,48px">View on GitHub</x-import>
+            <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Button" onClick="{{ openSpark }}" variant="secondary" size="lg" hint-size="180px,48px">Visit Make Bold Spark</x-import>
+          </div>
+        </div>
+        <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Card" padding="lg" accent="{{ true }}" hint-size="100%,260px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px">
+            <span style="font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--ink-900)">@{{ username }}</span>
+            <span style="font-size:12px;color:var(--text-muted)">Updated {{ generatedShort }}</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border-subtle)">
+            <sc-for list="{{ heroStats }}" as="s" hint-placeholder-count="4">
+              <div style="padding:18px 0 14px;border-bottom:1px solid var(--border-subtle);display:flex;flex-direction:column;gap:4px">
+                <span style="font-family:var(--font-display);font-weight:800;font-size:40px;line-height:1;letter-spacing:-0.03em;color:var(--ink-900)">{{ s.value }}</span>
+                <span style="font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-muted)">{{ s.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </x-import>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ heroRust }}" hint-placeholder-val="{{ false }}">
+      <section style="background:var(--rust-500);color:var(--cream)">
+        <div style="max-width:1200px;margin:0 auto;padding:72px 24px 56px;display:flex;flex-direction:column;gap:40px">
+          <div style="display:flex;flex-direction:column;gap:20px;max-width:780px">
+            <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Eyebrow" color="onDark" hint-size="220px,16px">Open-source portfolio · @MakeBoldSolutions</x-import>
+            <h1 style="margin:0;font-family:var(--font-display);font-weight:800;font-size:clamp(2.5rem,4.5vw + 1rem,4.5rem);line-height:1.02;letter-spacing:-0.035em;color:var(--cream);text-wrap:balance">Built to scale, in the open.</h1>
+            <p style="margin:0;max-width:58ch;font-size:18px;line-height:1.55;color:var(--rust-50);text-wrap:pretty">Explore Make Bold Solutions' public GitHub repositories — an AI-powered analytics dashboard showcasing .NET, React, Python, and more.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Button" onClick="{{ openGithub }}" variant="dark" size="lg" hint-size="180px,48px">View on GitHub</x-import>
+              <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Button" onClick="{{ openSpark }}" variant="accent" size="lg" hint-size="180px,48px">Visit Make Bold Spark</x-import>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));border-top:1px solid rgba(248,246,242,0.3)">
+            <sc-for list="{{ heroStats }}" as="s" hint-placeholder-count="4">
+              <div style="padding:20px 0 0;display:flex;flex-direction:column;gap:6px">
+                <span style="font-family:var(--font-display);font-weight:800;font-size:48px;line-height:1;letter-spacing:-0.03em;color:var(--cream)">{{ s.value }}</span>
+                <span style="font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--rust-100)">{{ s.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <div style="max-width:1200px;margin:0 auto;padding:0 24px 80px;display:flex;flex-direction:column;gap:48px">
+
+      <sc-if value="{{ showHeatmap }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:8px">
+        <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Card" padding="lg" hint-size="100%,220px">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Eyebrow" hint-size="200px,14px">Contribution activity</x-import>
+              <span style="font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--ink-900)">{{ heatTotal }} contributions across {{ heatActive }} active days</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted)">
+              <span>Less</span>
+              <sc-for list="{{ heatLegend }}" as="c" hint-placeholder-count="5">
+                <span style="width:11px;height:11px;border-radius:2px;background:{{ c }}"></span>
+              </sc-for>
+              <span>More</span>
+            </div>
+          </div>
+          <div style="overflow-x:auto;padding-bottom:4px">
+            <div style="display:flex;gap:3px;min-width:max-content">
+              <sc-for list="{{ heat }}" as="w" hint-placeholder-count="53">
+                <div style="display:flex;flex-direction:column;gap:3px">
+                  <span style="height:14px;font-size:10px;line-height:14px;color:var(--text-muted);white-space:nowrap;width:11px;overflow:visible">{{ w.month }}</span>
+                  <sc-for list="{{ w.days }}" as="d" hint-placeholder-count="7">
+                    <span title="{{ d.title }}" style="width:11px;height:11px;border-radius:2px;background:{{ d.bg }}"></span>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <p style="margin:14px 0 0;font-size:12px;color:var(--text-muted)">Trailing 365 days</p>
+        </x-import>
+        </div>
+      </sc-if>
+
+      <section style="display:flex;flex-direction:column;gap:20px">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Eyebrow" hint-size="140px,14px">Repositories</x-import>
+            <h2 style="margin:0;font-family:var(--font-display);font-weight:800;font-size:clamp(1.75rem,2vw + 1rem,2.25rem);letter-spacing:-0.025em;line-height:1.1;color:var(--ink-900)">The Spark catalog</h2>
+          </div>
+          <span style="font-size:14px;color:var(--text-muted)">{{ resultLabel }}</span>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <label style="flex:1 1 280px;position:relative;display:flex;align-items:center">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:14px;color:var(--ink-500);pointer-events:none"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+            <input type="search" value="{{ search }}" onChange="{{ onSearch }}" placeholder="Search repositories…" aria-label="Search repositories" style="width:100%;height:44px;padding:0 40px 0 42px;border:1px solid var(--border-default);border-radius:6px;background:var(--white);font-family:var(--font-body);font-size:15px;color:var(--ink-900);outline:none;box-sizing:border-box" style-focus="border-color:var(--ember-500);box-shadow:0 0 0 3px rgba(198,98,12,0.18)">
+            <sc-if value="{{ hasSearch }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ clearSearch }}" aria-label="Clear search" style="position:absolute;right:8px;width:28px;height:28px;border:0;background:none;color:var(--ink-500);cursor:pointer;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+            </sc-if>
+          </label>
+          <select value="{{ lang }}" onChange="{{ onLang }}" aria-label="Filter by language" style="height:44px;padding:0 14px;border:1px solid var(--border-default);border-radius:6px;background:var(--white);font-family:var(--font-body);font-size:14px;color:var(--ink-900);cursor:pointer">
+            <option value="">All languages</option>
+            <sc-for list="{{ langOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
+          </select>
+          <select value="{{ tier }}" onChange="{{ onTier }}" aria-label="Filter by health tier" style="height:44px;padding:0 14px;border:1px solid var(--border-default);border-radius:6px;background:var(--white);font-family:var(--font-body);font-size:14px;color:var(--ink-900);cursor:pointer">
+            <option value="">All health tiers</option>
+            <sc-for list="{{ tierOptions }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+          </select>
+          <select value="{{ sort }}" onChange="{{ onSort }}" aria-label="Sort repositories" style="height:44px;padding:0 14px;border:1px solid var(--border-default);border-radius:6px;background:var(--white);font-family:var(--font-body);font-size:14px;color:var(--ink-900);cursor:pointer">
+            <sc-for list="{{ sortOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+          </select>
+          <sc-if value="{{ hasFilters }}" hint-placeholder-val="{{ false }}">
+            <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Button" onClick="{{ clearFilters }}" variant="ghost" size="sm" hint-size="120px,36px">Clear filters</x-import>
+          </sc-if>
+          <div style="position:relative;margin-left:auto">
+            <button onClick="{{ toggleExportO }}" aria-haspopup="true" aria-expanded="{{ exportOverview }}" style="display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;border:1px solid var(--border-strong);border-radius:6px;background:var(--white);font-family:var(--font-body);font-weight:600;font-size:14px;color:var(--ink-900);cursor:pointer" style-hover="border-color:var(--rust-500);color:var(--rust-500)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>Export</button>
+            <sc-if value="{{ exportOverview }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ closeExport }}" style="position:fixed;inset:0;z-index:25"></div>
+              <div role="menu" style="position:absolute;right:0;top:calc(100% + 6px);z-index:26;width:260px;background:var(--white);border:1px solid var(--border-default);border-radius:8px;box-shadow:0 10px 28px rgba(30,30,30,0.14);padding:6px">
+                <p style="margin:0;padding:8px 10px 6px;font-size:12px;color:var(--text-muted)">{{ exportCountO }}</p>
+                <button role="menuitem" onClick="{{ exportCsvO }}" style="display:flex;flex-direction:column;gap:2px;width:100%;padding:10px;border:0;border-radius:6px;background:none;text-align:left;cursor:pointer;font-family:var(--font-body)" style-hover="background:var(--rust-50)"><span style="font-weight:600;font-size:14px;color:var(--ink-900)">Export as CSV</span><span style="font-size:12px;color:var(--text-muted)">Spreadsheet-ready summary columns</span></button>
+                <button role="menuitem" onClick="{{ exportJsonO }}" style="display:flex;flex-direction:column;gap:2px;width:100%;padding:10px;border:0;border-radius:6px;background:none;text-align:left;cursor:pointer;font-family:var(--font-body)" style-hover="background:var(--rust-50)"><span style="font-weight:600;font-size:14px;color:var(--ink-900)">Export as JSON</span><span style="font-size:12px;color:var(--text-muted)">Full repository records</span></button>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+
+        <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:64px 24px;text-align:center;border:1px dashed var(--border-strong);border-radius:8px;display:flex;flex-direction:column;align-items:center;gap:8px">
+            <p style="margin:0;font-family:var(--font-display);font-weight:700;font-size:20px">No repositories found</p>
+            <p style="margin:0 0 12px;color:var(--text-muted)">Try adjusting your search or filters.</p>
+            <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Button" onClick="{{ clearFilters }}" variant="secondary" size="sm" hint-size="120px,36px">Clear filters</x-import>
+          </div>
+        </sc-if>
+
+        <div style="display:grid;grid-template-columns:{{ gridCols }};gap:20px">
+          <sc-for list="{{ cards }}" as="r" hint-placeholder-count="6">
+            <div onClick="{{ r.open }}" onKeyDown="{{ r.key }}" role="button" tabIndex="0" aria-label="{{ r.aria }}" style="cursor:pointer;display:flex;min-width:0;border-radius:8px;outline:none" style-focus="box-shadow:0 0 0 3px rgba(198,98,12,0.35)">
+              <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Card" padding="none" interactive="{{ true }}" style="{{ cardStyle }}" hint-size="100%,240px">
+                <div style="padding:22px 22px 18px;display:flex;flex-direction:column;gap:14px;height:100%;box-sizing:border-box">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+                    <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+                      <span style="font-family:var(--font-display);font-weight:700;font-size:19px;letter-spacing:-0.015em;line-height:1.2;color:var(--ink-900);overflow-wrap:anywhere">{{ r.name }}</span>
+                      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                        <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--ink-600)"><span style="width:9px;height:9px;border-radius:50%;background:{{ r.langColor }}"></span>{{ r.lang }}</span>
+                        <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Badge" tone="{{ r.tierTone }}" hint-size="64px,22px">{{ r.tierLabel }}</x-import>
+                        <sc-if value="{{ r.isRecent }}" hint-placeholder-val="{{ false }}">
+                          <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Badge" tone="brand" hint-size="64px,22px">Active this week</x-import>
+                        </sc-if>
+                      </div>
+                    </div>
+                    <sc-if value="{{ r.hasHome }}" hint-placeholder-val="{{ false }}">
+                      <a href="{{ r.homepage }}" target="_blank" rel="noopener noreferrer" onClick="{{ stop }}" title="Live site" aria-label="{{ r.liveAria }}" style="flex:none;width:34px;height:34px;border:1px solid var(--border-default);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--ink-600)" style-hover="color:var(--rust-500);border-color:var(--rust-200);background:var(--rust-50)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg></a>
+                    </sc-if>
+                  </div>
+                  <p style="margin:0;font-size:14.5px;line-height:1.55;color:var(--ink-600);text-wrap:pretty;flex:1">{{ r.excerpt }}</p>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px">
+                    <sc-for list="{{ r.quality }}" as="q" hint-placeholder-count="4">
+                      <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:4px;font-size:12px;font-weight:500;background:{{ q.bg }};color:{{ q.color }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ q.dot }}"></span>{{ q.label }}</span>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding-top:14px;border-top:1px solid var(--border-subtle);font-size:13px;color:var(--ink-600)">
+                    <span title="Stars" style="display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>{{ r.stars }}</span>
+                    <span title="Forks" style="display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><circle cx="18" cy="6" r="3"></circle><path d="M18 9v2c0 .6-.4 1-1 1H7c-.6 0-1-.4-1-1V9"></path><path d="M12 12v3"></path></svg>{{ r.forks }}</span>
+                    <span title="Total commits" style="display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"></circle><line x1="3" x2="9" y1="12" y2="12"></line><line x1="15" x2="21" y1="12" y2="12"></line></svg>{{ r.commits }}</span>
+                    <span title="Last push" style="display:inline-flex;align-items:center;gap:6px;margin-left:auto;color:{{ r.agoColor }}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>{{ r.ago }}</span>
+                  </div>
+                </div>
+              </x-import>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showInsights }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:1200px;margin:0 auto;padding:56px 24px 80px;display:flex;flex-direction:column;gap:32px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Eyebrow" hint-size="120px,14px">Insights</x-import>
+        <h2 style="margin:0;font-family:var(--font-display);font-weight:800;font-size:clamp(2rem,2.5vw + 1rem,2.75rem);letter-spacing:-0.03em;line-height:1.08">Repository insights</h2>
+        <p style="margin:0;color:var(--text-muted);font-size:16px" role="status">Showing {{ repoCount }} repositories</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px">
+        <sc-for list="{{ statCards }}" as="s" hint-placeholder-count="6">
+          <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Card" padding="md" hint-size="100%,120px">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-muted)">{{ s.label }}</span>
+              <span style="font-family:var(--font-display);font-weight:800;font-size:36px;line-height:1.05;letter-spacing:-0.03em;color:{{ s.color }}">{{ s.value }}</span>
+              <span style="font-size:13px;color:var(--ink-600)">{{ s.sub }}</span>
+            </div>
+          </x-import>
+        </sc-for>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:20px">
+        <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Card" padding="lg" hint-size="100%,420px">
+          <h3 style="margin:0 0 4px;font-family:var(--font-display);font-weight:700;font-size:19px">Total commits</h3>
+          <p style="margin:0 0 20px;font-size:13px;color:var(--text-muted)">All-time, by repository. Select a bar for details.</p>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <sc-for list="{{ commitBars }}" as="b" hint-placeholder-count="10">
+              <button onClick="{{ b.open }}" style="display:grid;grid-template-columns:140px minmax(0,1fr) 44px;align-items:center;gap:12px;background:none;border:0;padding:0;cursor:pointer;text-align:left;font-family:var(--font-body)" style-hover="opacity:0.8">
+                <span style="font-size:13px;color:var(--ink-800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ b.name }}</span>
+                <span style="height:14px;background:var(--ink-50);border-radius:2px;overflow:hidden"><span style="display:block;height:100%;width:{{ b.pct }}%;background:{{ b.color }};border-radius:2px"></span></span>
+                <span style="font-size:13px;font-weight:600;color:var(--ink-900);text-align:right;font-variant-numeric:tabular-nums">{{ b.value }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </x-import>
+
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Card" padding="lg" hint-size="100%,200px">
+            <h3 style="margin:0 0 4px;font-family:var(--font-display);font-weight:700;font-size:19px">Language distribution</h3>
+            <p style="margin:0 0 20px;font-size:13px;color:var(--text-muted)">Primary language per repository</p>
+            <div style="display:flex;height:18px;border-radius:3px;overflow:hidden;gap:2px">
+              <sc-for list="{{ langDist }}" as="l" hint-placeholder-count="6"><span title="{{ l.title }}" style="flex:{{ l.value }};background:{{ l.color }}"></span></sc-for>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px 16px;margin-top:18px">
+              <sc-for list="{{ langDist }}" as="l" hint-placeholder-count="6">
+                <span style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-800)"><span style="width:10px;height:10px;border-radius:2px;background:{{ l.color }}"></span>{{ l.name }}<span style="margin-left:auto;color:var(--text-muted);font-variant-numeric:tabular-nums">{{ l.value }}</span></span>
+              </sc-for>
+            </div>
+          </x-import>
+
+          <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Card" padding="lg" hint-size="100%,200px">
+            <h3 style="margin:0 0 4px;font-family:var(--font-display);font-weight:700;font-size:19px">Commits, last 90 days</h3>
+            <p style="margin:0 0 20px;font-size:13px;color:var(--text-muted)">Where the recent work is happening</p>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <sc-for list="{{ recentBars }}" as="b" hint-placeholder-count="6">
+                <button onClick="{{ b.open }}" style="display:grid;grid-template-columns:140px minmax(0,1fr) 36px;align-items:center;gap:12px;background:none;border:0;padding:0;cursor:pointer;text-align:left;font-family:var(--font-body)" style-hover="opacity:0.8">
+                  <span style="font-size:13px;color:var(--ink-800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ b.name }}</span>
+                  <span style="height:14px;background:var(--ink-50);border-radius:2px;overflow:hidden"><span style="display:block;height:100%;width:{{ b.pct }}%;background:var(--ember-500);border-radius:2px"></span></span>
+                  <span style="font-size:13px;font-weight:600;color:var(--ink-900);text-align:right;font-variant-numeric:tabular-nums">{{ b.value }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </x-import>
+        </div>
+      </div>
+
+      <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Card" padding="lg" hint-size="100%,300px">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px">
+          <div>
+            <h3 style="margin:0 0 4px;font-family:var(--font-display);font-weight:700;font-size:19px">Weekly activity timeline</h3>
+            <p style="margin:0;font-size:13px;color:var(--text-muted)">Commits per week, trailing year</p>
+          </div>
+          <span style="font-size:13px;color:var(--ink-600)">Peak week: <strong style="color:var(--ink-900)">{{ weekPeak }}</strong></span>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:3px;height:180px;border-bottom:1px solid var(--border-default)">
+          <sc-for list="{{ weekly }}" as="w" hint-placeholder-count="52">
+            <span title="{{ w.title }}" style="flex:1;min-width:3px;height:{{ w.h }}%;background:{{ w.color }};border-radius:2px 2px 0 0"></span>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:3px;margin-top:8px">
+          <sc-for list="{{ weekly }}" as="w" hint-placeholder-count="52">
+            <span style="flex:1;min-width:3px;font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:visible">{{ w.tick }}</span>
+          </sc-for>
+        </div>
+      </x-import>
+
+      <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Card" padding="lg" hint-size="100%,400px">
+        <h3 style="margin:0 0 4px;font-family:var(--font-display);font-weight:700;font-size:19px">Quality coverage</h3>
+        <p style="margin:0 0 20px;font-size:13px;color:var(--text-muted)">Documentation and automation signals per repository</p>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:560px">
+            <thead>
+              <tr>
+                <th style="text-align:left;padding:8px 12px 8px 0;font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border-default)">Repository</th>
+                <sc-for list="{{ matrixCols }}" as="c" hint-placeholder-count="5"><th style="padding:8px;font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border-default);text-align:center">{{ c }}</th></sc-for>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ matrix }}" as="m" hint-placeholder-count="10">
+                <tr onClick="{{ m.open }}" style="cursor:pointer" style-hover="background:var(--cream)">
+                  <td style="padding:10px 12px 10px 0;border-bottom:1px solid var(--border-subtle);font-weight:500;color:var(--ink-900)">{{ m.name }}</td>
+                  <sc-for list="{{ m.cells }}" as="c" hint-placeholder-count="5">
+                    <td style="padding:10px 8px;border-bottom:1px solid var(--border-subtle);text-align:center"><span title="{{ c.title }}" style="display:inline-block;width:14px;height:14px;border-radius:3px;background:{{ c.bg }};border:1px solid {{ c.border }}"></span></td>
+                  </sc-for>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showHealth }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:1200px;margin:0 auto;padding:56px 24px 80px;display:flex;flex-direction:column;gap:32px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Eyebrow" hint-size="120px,14px">Health</x-import>
+        <h2 style="margin:0;font-family:var(--font-display);font-weight:800;font-size:clamp(2rem,2.5vw + 1rem,2.75rem);letter-spacing:-0.03em;line-height:1.08">Repositories needing attention</h2>
+        <p style="margin:0;color:var(--text-muted);font-size:16px" role="status">Ranked by pull request pressure, security findings, staleness, and dependency health</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
+        <sc-for list="{{ healthSummary }}" as="s" hint-placeholder-count="4">
+          <div style="background:{{ s.bg }};border:1px solid {{ s.border }};border-radius:8px;padding:22px;display:flex;flex-direction:column;gap:8px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:{{ s.labelColor }}">{{ s.label }}</span>
+            <span style="font-family:var(--font-display);font-weight:800;font-size:44px;line-height:1;letter-spacing:-0.03em;color:{{ s.color }}">{{ s.value }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+        <div style="flex:2 1 620px;min-width:0;max-width:100%">
+          <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Card" padding="none" hint-size="100%,500px">
+            <div style="padding:22px 24px 14px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+              <div>
+                <h3 style="margin:0 0 4px;font-family:var(--font-display);font-weight:700;font-size:19px">Maintenance ranking</h3>
+                <p style="margin:0;font-size:13px;color:var(--text-muted)">Higher scores indicate greater need for maintainer attention.</p>
+              </div>
+              <div style="position:relative">
+                <button onClick="{{ toggleExportH }}" aria-haspopup="true" aria-expanded="{{ exportHealth }}" style="display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border:1px solid var(--border-strong);border-radius:6px;background:var(--white);font-family:var(--font-body);font-weight:600;font-size:13px;color:var(--ink-900);cursor:pointer" style-hover="border-color:var(--rust-500);color:var(--rust-500)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>Export</button>
+                <sc-if value="{{ exportHealth }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ closeExport }}" style="position:fixed;inset:0;z-index:25"></div>
+                  <div role="menu" style="position:absolute;right:0;top:calc(100% + 6px);z-index:26;width:240px;background:var(--white);border:1px solid var(--border-default);border-radius:8px;box-shadow:0 10px 28px rgba(30,30,30,0.14);padding:6px">
+                    <p style="margin:0;padding:8px 10px 6px;font-size:12px;color:var(--text-muted)">{{ exportCountH }}</p>
+                    <button role="menuitem" onClick="{{ exportCsvH }}" style="display:block;width:100%;padding:10px;border:0;border-radius:6px;background:none;text-align:left;cursor:pointer;font-family:var(--font-body);font-weight:600;font-size:14px;color:var(--ink-900)" style-hover="background:var(--rust-50)">Export as CSV</button>
+                    <button role="menuitem" onClick="{{ exportJsonH }}" style="display:block;width:100%;padding:10px;border:0;border-radius:6px;background:none;text-align:left;cursor:pointer;font-family:var(--font-body);font-weight:600;font-size:14px;color:var(--ink-900)" style-hover="background:var(--rust-50)">Export as JSON</button>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+            <div style="overflow-x:auto">
+              <table style="width:100%;border-collapse:collapse;font-size:14px;min-width:640px">
+                <thead>
+                  <tr style="background:var(--cream)">
+                    <th style="padding:10px 12px 10px 24px;text-align:left;font-size:11px;font-weight:600;letter-spacing:0.14em;color:var(--text-muted);border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-default)">#</th>
+                    <sc-for list="{{ hCols }}" as="c" hint-placeholder-count="7">
+                      <th style="padding:0;text-align:left;border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-default)">
+                        <button onClick="{{ c.sort }}" style="display:flex;align-items:center;gap:6px;width:100%;padding:10px 12px;background:none;border:0;cursor:pointer;font-family:var(--font-body);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:{{ c.color }};white-space:nowrap">{{ c.label }}<span style="font-size:12px;letter-spacing:0">{{ c.arrow }}</span></button>
+                      </th>
+                    </sc-for>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ hRows }}" as="r" hint-placeholder-count="10">
+                    <tr onClick="{{ r.open }}" style="cursor:pointer" style-hover="background:var(--rust-50)">
+                      <td style="padding:12px 12px 12px 24px;border-bottom:1px solid var(--border-subtle);color:var(--text-muted);font-variant-numeric:tabular-nums">{{ r.idx }}</td>
+                      <td style="padding:12px;border-bottom:1px solid var(--border-subtle)"><div style="display:flex;flex-direction:column;gap:2px"><strong style="font-weight:600;color:var(--ink-900)">{{ r.name }}</strong><span style="font-size:12px;color:var(--text-muted)">{{ r.lang }}</span></div></td>
+                      <td style="padding:12px;border-bottom:1px solid var(--border-subtle)"><x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Badge" tone="{{ r.tierTone }}" hint-size="64px,22px">{{ r.tierLabel }}</x-import></td>
+                      <td style="padding:12px;border-bottom:1px solid var(--border-subtle)"><div style="display:flex;align-items:center;gap:10px"><span style="width:48px;height:6px;background:var(--ink-100);border-radius:3px;overflow:hidden"><span style="display:block;height:100%;width:{{ r.scorePct }}%;background:{{ r.scoreColor }}"></span></span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ r.score }}</span></div></td>
+                      <td style="padding:12px;border-bottom:1px solid var(--border-subtle);font-variant-numeric:tabular-nums">{{ r.prs }}</td>
+                      <td style="padding:12px;border-bottom:1px solid var(--border-subtle);font-variant-numeric:tabular-nums">{{ r.alerts }}</td>
+                      <td style="padding:12px;border-bottom:1px solid var(--border-subtle);font-variant-numeric:tabular-nums">{{ r.stale }}</td>
+                      <td style="padding:12px;border-bottom:1px solid var(--border-subtle);color:{{ r.readmeColor }}">{{ r.readme }}</td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+          </x-import>
+        </div>
+        <aside style="flex:1 1 300px;min-width:0;box-sizing:border-box;background:var(--ink-900);color:var(--cream);border-radius:8px;padding:28px;display:flex;flex-direction:column;gap:16px">
+          <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Eyebrow" color="onDark" hint-size="160px,14px">Methodology</x-import>
+          <h3 style="margin:0;font-family:var(--font-display);font-weight:700;font-size:22px;letter-spacing:-0.015em;color:var(--cream)">What drives the score</h3>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ drivers }}" as="d" hint-placeholder-count="4">
+              <div style="display:flex;flex-direction:column;gap:6px;padding:14px 0;border-top:1px solid var(--ink-700)">
+                <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px"><span style="font-weight:600">{{ d.label }}</span><span style="color:var(--ink-300);font-variant-numeric:tabular-nums">{{ d.count }}</span></div>
+                <span style="height:4px;background:var(--ink-700);border-radius:2px;overflow:hidden"><span style="display:block;height:100%;width:{{ d.pct }}%;background:var(--ember-400)"></span></span>
+              </div>
+            </sc-for>
+          </div>
+          <p style="margin:0;font-size:13px;line-height:1.55;color:var(--ink-300)">Bars show average component score across the portfolio. Tiers: Healthy, Watch, Elevated, Critical.</p>
+        </aside>
+      </div>
+    </div>
+  </sc-if>
+</main>
+
+<footer style="background:var(--ink-900);color:var(--cream)">
+  <div style="max-width:1200px;margin:0 auto;padding:48px 24px 40px;display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;align-items:flex-end">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <span style="font-family:var(--font-display);font-weight:800;font-size:24px;letter-spacing:-0.02em;line-height:1">GitHub<span style="color:var(--ember-400)">Spark</span></span>
+        <span style="font-size:10px;font-weight:600;letter-spacing:0.3em;color:var(--ink-400)">MAKE BOLD SPARK</span>
+      </div>
+      <p style="margin:0;font-size:14px;color:var(--ink-300);display:flex;gap:8px;flex-wrap:wrap">
+        <span>Built by</span>
+        <a href="https://markhazleton.com" target="_blank" rel="noopener noreferrer" style="color:var(--cream)" style-hover="color:var(--ember-300)">Mark Hazleton</a>
+        <span>·</span>
+        <a href="https://makeboldsolutions.com" target="_blank" rel="noopener noreferrer" style="color:var(--cream)" style-hover="color:var(--ember-300)">Make Bold Solutions</a>
+        <span>·</span>
+        <a href="https://makeboldspark.com" target="_blank" rel="noopener noreferrer" style="color:var(--cream)" style-hover="color:var(--ember-300)">Make Bold Spark</a>
+      </p>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <span style="font-size:13px;color:var(--ink-400)">Data: {{ generatedLong }}</span>
+      <button onClick="{{ refresh }}" disabled="{{ loading }}" style="display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;border:1px solid var(--ink-600);border-radius:6px;background:transparent;color:var(--cream);font-family:var(--font-body);font-weight:600;font-size:14px;cursor:pointer" style-hover="border-color:var(--ember-400);color:var(--ember-300)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>{{ refreshLabel }}</button>
+    </div>
+  </div>
+  <div style="border-top:1px solid var(--ink-800)">
+    <div style="max-width:1200px;margin:0 auto;padding:16px 24px;font-size:12px;color:var(--ink-500);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <span>github-stats.makeboldspark.com</span>
+      <span>Wichita, Kansas</span>
+    </div>
+  </div>
+</footer>
+
+<sc-if value="{{ hasDetail }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeDetail }}" style="position:fixed;inset:0;z-index:50;background:rgba(30,30,30,0.5);display:flex;justify-content:flex-end">
+    <div onClick="{{ stop }}" role="dialog" aria-modal="true" aria-label="{{ d.name }}" style="width:min(680px,100%);height:100%;background:var(--cream);display:flex;flex-direction:column;box-shadow:-12px 0 32px rgba(30,30,30,0.18)">
+      <div style="padding:24px 28px 20px;background:var(--white);border-bottom:1px solid var(--border-default);border-top:3px solid var(--rust-500);display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px">
+          <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+            <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Eyebrow" hint-size="140px,14px">{{ d.position }}</x-import>
+            <h2 style="margin:0;font-family:var(--font-display);font-weight:800;font-size:30px;letter-spacing:-0.025em;line-height:1.1;overflow-wrap:anywhere">{{ d.name }}</h2>
+          </div>
+          <button onClick="{{ closeDetail }}" aria-label="Close" style="flex:none;width:38px;height:38px;border:1px solid var(--border-default);border-radius:6px;background:var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-700)" style-hover="background:var(--rust-50);color:var(--rust-500)"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--ink-600)"><span style="width:9px;height:9px;border-radius:50%;background:{{ d.langColor }}"></span>{{ d.lang }}</span>
+          <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Badge" tone="{{ d.tierTone }}" hint-size="64px,22px">{{ d.tierLabel }}</x-import>
+          <span style="font-size:13px;color:var(--text-muted)">Attention score {{ d.score }}</span>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a href="{{ d.url }}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:6px;background:var(--rust-500);color:var(--cream);font-size:14px;font-weight:600" style-hover="background:var(--rust-600);color:var(--cream)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>Repository</a>
+          <sc-if value="{{ d.hasHome }}" hint-placeholder-val="{{ false }}">
+            <a href="{{ d.homepage }}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:6px;border:1px solid var(--border-strong);color:var(--ink-900);font-size:14px;font-weight:600" style-hover="border-color:var(--rust-500);color:var(--rust-500)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg>Live site</a>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="flex:1;overflow-y:auto;padding:24px 28px 32px;display:flex;flex-direction:column;gap:24px">
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--border-default);border:1px solid var(--border-default);border-radius:8px;overflow:hidden">
+          <sc-for list="{{ d.stats }}" as="s" hint-placeholder-count="6">
+            <div style="background:var(--white);padding:14px 16px;display:flex;flex-direction:column;gap:4px">
+              <span style="font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:-0.02em">{{ s.value }}</span>
+              <span style="font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted)">{{ s.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <section style="display:flex;flex-direction:column;gap:10px">
+          <h3 style="margin:0;font-family:var(--font-display);font-weight:700;font-size:17px">Summary</h3>
+          <p style="margin:0;font-size:15px;line-height:1.65;color:var(--ink-700);text-wrap:pretty">{{ d.summary }}</p>
+        </section>
+
+        <section style="display:flex;flex-direction:column;gap:12px">
+          <h3 style="margin:0;font-family:var(--font-display);font-weight:700;font-size:17px">Quality</h3>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px">
+            <sc-for list="{{ d.quality }}" as="q" hint-placeholder-count="5">
+              <span style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:6px;background:{{ q.bg }};color:{{ q.color }};font-size:13px;font-weight:600"><span style="width:8px;height:8px;border-radius:50%;background:{{ q.dot }}"></span>{{ q.label }}</span>
+            </sc-for>
+          </div>
+        </section>
+
+        <section style="display:flex;flex-direction:column;gap:12px">
+          <h3 style="margin:0;font-family:var(--font-display);font-weight:700;font-size:17px">Attention breakdown</h3>
+          <div style="display:flex;flex-direction:column;gap:12px;background:var(--white);border:1px solid var(--border-default);border-radius:8px;padding:18px">
+            <sc-for list="{{ d.components }}" as="c" hint-placeholder-count="4">
+              <div style="display:grid;grid-template-columns:150px minmax(0,1fr) 40px;gap:12px;align-items:center;font-size:13px">
+                <span style="color:var(--ink-800)">{{ c.label }}</span>
+                <span style="height:8px;background:var(--ink-50);border-radius:4px;overflow:hidden"><span style="display:block;height:100%;width:{{ c.pct }}%;background:{{ c.color }}"></span></span>
+                <span style="text-align:right;font-weight:600;font-variant-numeric:tabular-nums">{{ c.value }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+
+        <section style="background:var(--ink-900);color:var(--cream);border-radius:8px;overflow:hidden">
+          <button onClick="{{ toggleFix }}" aria-expanded="{{ fixOpen }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;background:none;border:0;cursor:pointer;color:var(--cream);font-family:var(--font-body);text-align:left">
+            <span style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-family:var(--font-display);font-weight:700;font-size:17px">Fix score prompt</span>
+              <span style="font-family:var(--font-mono);font-size:12px;color:var(--ember-300)">/devspark.fix-score</span>
+            </span>
+            <span style="display:flex;align-items:center;gap:10px">
+              <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Badge" tone="{{ fix.fixTone }}" hint-size="70px,22px">{{ fix.fixCount }}</x-import>
+              <sc-if value="{{ fixClosed }}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg></sc-if>
+              <sc-if value="{{ fixOpen }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m18 15-6-6-6 6"></path></svg></sc-if>
+            </span>
+          </button>
+          <sc-if value="{{ fixOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:0 18px 18px;display:flex;flex-direction:column;gap:14px">
+              <sc-if value="{{ fix.noBlockers }}" hint-placeholder-val="{{ false }}">
+                <p style="margin:0;font-size:14px;color:var(--ink-300)">No dashboard-visible blockers. Run the prompt to inspect the latest audit files and verification gates.</p>
+              </sc-if>
+              <div style="display:flex;flex-direction:column;border-top:1px solid var(--ink-700)">
+                <sc-for list="{{ fix.blockers }}" as="b" hint-placeholder-count="3">
+                  <div style="display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:1px solid var(--ink-700);align-items:start">
+                    <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Badge" tone="{{ b.tone }}" hint-size="64px,22px">{{ b.sev }}</x-import>
+                    <div style="display:flex;flex-direction:column;gap:3px"><span style="font-weight:600;font-size:14px">{{ b.label }}</span><span style="font-size:13px;color:var(--ink-300);line-height:1.5">{{ b.detail }}</span></div>
+                  </div>
+                </sc-for>
+              </div>
+              <textarea readOnly="{{ true }}" value="{{ fix.prompt }}" aria-label="Fix score prompt" style="width:100%;box-sizing:border-box;height:180px;resize:vertical;padding:12px;border:1px solid var(--ink-700);border-radius:6px;background:var(--ink-800);color:var(--ink-200);font-family:var(--font-mono);font-size:12px;line-height:1.55"></textarea>
+              <div style="display:flex;justify-content:flex-end">
+                <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Button" onClick="{{ copyPrompt }}" variant="accent" size="sm" hint-size="120px,36px">{{ copyLabel }}</x-import>
+              </div>
+            </div>
+          </sc-if>
+        </section>
+
+        <section style="display:flex;flex-direction:column;gap:12px">
+          <h3 style="margin:0;font-family:var(--font-display);font-weight:700;font-size:17px">Signals</h3>
+          <div style="background:var(--white);border:1px solid var(--border-default);border-radius:8px">
+            <sc-for list="{{ d.signals }}" as="s" hint-placeholder-count="5">
+              <div style="display:flex;justify-content:space-between;gap:16px;padding:11px 16px;border-bottom:1px solid var(--border-subtle);font-size:14px"><span style="color:var(--ink-600)">{{ s.label }}</span><span style="font-weight:600;color:var(--ink-900);text-align:right">{{ s.value }}</span></div>
+            </sc-for>
+          </div>
+        </section>
+
+        <sc-if value="{{ d.hasDeps }}" hint-placeholder-val="{{ false }}">
+          <section style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+              <h3 style="margin:0;font-family:var(--font-display);font-weight:700;font-size:17px">Dependencies</h3>
+              <span style="font-size:13px;color:var(--text-muted)">{{ d.depSummary }}</span>
+            </div>
+            <div style="background:var(--white);border:1px solid var(--border-default);border-radius:8px">
+              <sc-for list="{{ d.deps }}" as="p" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:14px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border-subtle);font-size:13px">
+                  <span style="font-weight:600;color:var(--ink-900);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.name }}</span>
+                  <span style="font-family:var(--font-mono);font-size:12px;color:var(--ink-600);white-space:nowrap">{{ p.versions }}</span>
+                  <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Badge" tone="{{ p.tone }}" hint-size="70px,22px">{{ p.status }}</x-import>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+        </sc-if>
+      </div>
+
+      <div style="padding:14px 28px;background:var(--white);border-top:1px solid var(--border-default);display:flex;justify-content:space-between;gap:12px">
+        <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Button" onClick="{{ prevRepo }}" disabled="{{ d.noPrev }}" variant="secondary" size="sm" hint-size="110px,36px">Previous</x-import>
+        <span style="font-size:12px;color:var(--text-muted);align-self:center">Arrow keys to navigate · Esc to close</span>
+        <x-import component-from-global-scope="MakeBoldSolutionsDesignSystem_692e6a.Button" onClick="{{ nextRepo }}" disabled="{{ d.noNext }}" variant="secondary" size="sm" hint-size="110px,36px">Next</x-import>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ showTabBar }}" hint-placeholder-val="{{ false }}">
+  <nav aria-label="Primary navigation" style="position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--white);border-top:1px solid var(--border-default);padding-bottom:env(safe-area-inset-bottom);display:grid;grid-template-columns:repeat(3,1fr)">
+    <sc-for list="{{ mobileTabs }}" as="t" hint-placeholder-count="3">
+      <button onClick="{{ t.go }}" aria-current="{{ t.current }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:64px;background:none;border:0;border-top:2px solid {{ t.bar }};margin-top:-1px;color:{{ t.color }};font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ t.icon }}"></path></svg>
+        {{ t.label }}
+      </button>
+    </sc-for>
+  </nav>
+</sc-if>
+
+<div aria-live="polite" style="position:fixed;left:50%;bottom:{{ toastBottom }};transform:translateX(-50%);z-index:60;display:flex;flex-direction:column;gap:8px;width:min(440px,calc(100% - 32px));pointer-events:none">
+  <sc-for list="{{ toasts }}" as="t" hint-placeholder-count="0">
+    <div role="alert" style="pointer-events:auto;background:var(--ink-900);color:var(--cream);padding:12px 12px 12px 14px;border-radius:8px;font-size:14px;box-shadow:0 10px 28px rgba(30,30,30,0.28);display:flex;align-items:center;gap:12px">
+      <span style="flex:none;width:26px;height:26px;border-radius:50%;background:{{ t.color }};display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#f8f6f2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="{{ t.icon }}"></path></svg></span>
+      <span style="flex:1;line-height:1.4">{{ t.message }}</span>
+      <sc-if value="{{ t.hasAction }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ t.act }}" style="flex:none;background:var(--ember-500);border:0;border-radius:5px;color:var(--white);font-family:var(--font-body);font-weight:600;font-size:13px;padding:6px 12px;cursor:pointer" style-hover="background:var(--ember-600)">{{ t.action }}</button>
+      </sc-if>
+      <button onClick="{{ t.close }}" aria-label="Close notification" style="flex:none;width:28px;height:28px;background:none;border:0;color:var(--ink-400);cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="color:var(--cream)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+    </div>
+  </sc-for>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;heroVariant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;cream&quot;,&quot;rust&quot;],&quot;default&quot;:&quot;cream&quot;,&quot;tsType&quot;:&quot;'cream' | 'rust'&quot;,&quot;section&quot;:&quot;Overview&quot;},&quot;cardLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;grid&quot;,&quot;list&quot;],&quot;default&quot;:&quot;grid&quot;,&quot;tsType&quot;:&quot;'grid' | 'list'&quot;,&quot;section&quot;:&quot;Overview&quot;},&quot;showHeatmap&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Overview&quot;},&quot;previewState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;live&quot;,&quot;offline&quot;,&quot;update-available&quot;,&quot;toasts&quot;,&quot;empty&quot;,&quot;error&quot;,&quot;crash&quot;],&quot;default&quot;:&quot;live&quot;,&quot;tsType&quot;:&quot;'live' | 'offline' | 'update-available' | 'toasts' | 'empty' | 'error' | 'crash'&quot;,&quot;section&quot;:&quot;Preview states&quot;}}">
+const DATA_URL = 'docs/data/users/makeboldsolutions/repositories.json';
+const LANG = { 'C#': '#982407', HTML: '#c6620c', TypeScript: '#2f5a8f', Python: '#2f6f4c', PowerShell: '#56544f', GDScript: '#b8821a', PHP: '#d4715a', JavaScript: '#e88f3d', CSS: '#6c1804', Shell: '#3d3d3b' };
+const TIER = { critical: { label: 'Critical', tone: 'critical' }, elevated: { label: 'Elevated', tone: 'caution' }, watch: { label: 'Watch', tone: 'accent' }, healthy: { label: 'Healthy', tone: 'positive' } };
+const COMP = { pull_requests: 'Pull requests', security: 'Security findings', staleness: 'Staleness', dependencies: 'Dependency health', issues: 'Open issues' };
+const HEAT = ['var(--ink-100)', 'var(--ember-100)', 'var(--ember-300)', 'var(--rust-400)', 'var(--rust-700)'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+const langColor = l => LANG[l] || '#9b988f';
+const fmt = n => (n || 0).toLocaleString();
+const ago = n => n == null ? '—' : n === 0 ? 'Today' : n === 1 ? 'Yesterday' : n <= 7 ? n + 'd ago' : n <= 30 ? Math.round(n / 7) + 'w ago' : n <= 365 ? Math.round(n / 30) + 'mo ago' : Math.round(n / 365) + 'y ago';
+const clean = s => (s || '')
+  .replace(/\[!\[[^\]]*\]\([^)]*\)\]\([^)]*\)/g, '')
+  .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+  .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+  .replace(/\[?!\[[^\]]*\]?(\([^)\s]*\)?)?/g, '')
+  .replace(/\(?https?:\/\/\S+/g, '')
+  .replace(/[\[\]]/g, '')
+  .replace(/[*_`#>|]+/g, '')
+  .replace(/\s+/g, ' ').trim();
+const summaryOf = r => clean(r.ai_summary?.summary || r.summary?.text || r.description || '');
+const prsOf = r => r.pull_request_summary?.availability === 'available' ? (r.pull_request_summary.total_open || 0) : null;
+const alertsOf = r => r.security_summary?.active_alert_counts?.total_open || 0;
+const tierOf = r => r.attention_metrics?.tier || 'healthy';
+const scoreColor = s => s >= 60 ? 'var(--critical)' : s >= 30 ? 'var(--caution)' : 'var(--positive)';
+const qualityChips = r => [['README', r.has_readme], ['License', r.has_license], ['CI/CD', r.has_ci_cd], ['Tests', r.has_tests]].map(([label, on]) => ({
+  label, bg: on ? 'var(--positive-soft)' : 'var(--ink-50)', color: on ? 'var(--positive)' : 'var(--ink-400)', dot: on ? 'var(--positive)' : 'var(--ink-300)'
+}));
+const ICON = {
+  success: 'M20 6 9 17l-5-5', error: 'M18 6 6 18M6 6l12 12',
+  warning: 'M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z',
+  info: 'M12 16v-4M12 8h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z',
+  grid: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z', bars: 'M18 20V10M12 20V4M6 20v-6',
+};
+const TOAST = { success: 'var(--positive)', error: 'var(--critical)', warning: 'var(--caution)', info: 'var(--ember-500)' };
+const fv = (v, fb = 'N/A') => v === undefined || v === null || v === '' ? fb : typeof v === 'boolean' ? (v ? 'yes' : 'no') : Array.isArray(v) ? (v.filter(Boolean).join(', ') || 'none') : v;
+const fixBlockers = r => {
+  const b = [], a = r.attention_metrics || {}, c = a.components || {}, ts = r.tech_stack || {}, dg = r.diagnostics_summary || {}, sec = r.security_summary || {};
+  const missing = [['README', 'has_readme'], ['License', 'has_license'], ['CI/CD', 'has_ci_cd'], ['Tests', 'has_tests'], ['Docs', 'has_docs']].filter(([, k]) => r[k] === false).map(([l]) => l);
+  if ((r.attention_score || 0) > 0) b.push({ label: 'Attention score', detail: `${r.attention_score}/100 from ${fv(a.reasons || ['repository signals'])}`, sev: a.needs_attention ? 'high' : 'medium' });
+  if ((c.pull_requests?.score || 0) > 0) b.push({ label: 'Pull request pressure', detail: `${c.pull_requests.total_open || 0} open, ${c.pull_requests.draft_count || 0} draft, ${c.pull_requests.review_requested_count || 0} review-requested, oldest ${fv(c.pull_requests.oldest_open_age_days)} days`, sev: 'medium' });
+  if ((c.security?.score || 0) > 0) { const n = c.security.active_alert_counts?.total_open || 0; b.push({ label: 'Security pressure', detail: `${n} open alerts; availability ${fv(c.security.availability)} (${fv(c.security.reason, 'none')})`, sev: n > 0 ? 'high' : 'medium' }); }
+  if ((c.staleness?.score || 0) > 0) b.push({ label: 'Staleness', detail: `${fv(c.staleness.days_since_last_push)} days since push, ${c.staleness.recent_commits_90d || 0} commits in 90d, ${c.staleness.open_issues || 0} open issues`, sev: c.staleness.score >= 65 ? 'high' : 'medium' });
+  if ((c.dependencies?.score || 0) > 0) b.push({ label: 'Dependency currency', detail: `${c.dependencies.outdated_count || 0}/${c.dependencies.total_dependencies || 0} outdated, currency ${c.dependencies.currency_score ?? 'N/A'}/100, version coverage ${c.dependencies.version_coverage_percentage ?? 'N/A'}%`, sev: (c.dependencies.outdated_count || 0) > 0 ? 'medium' : 'low' });
+  if ((sec.active_alert_counts?.total_open || 0) > 0) b.push({ label: 'Security alerts', detail: `${sec.active_alert_counts.total_open} open alerts`, sev: 'high' });
+  if ((dg.actions?.failure_count || 0) > 0) b.push({ label: 'Workflow failures', detail: `${dg.actions.failure_count}/${dg.actions.recent_runs || 0} recent workflow runs failed`, sev: 'high' });
+  if ((dg.issues?.stale_over_30d || 0) > 0) b.push({ label: 'Stale issues', detail: `${dg.issues.stale_over_30d} issues stale over 30 days`, sev: 'medium' });
+  if ((r.pull_request_summary?.total_open || 0) > 0) b.push({ label: 'Open pull requests', detail: `${r.pull_request_summary.total_open} open pull requests`, sev: 'medium' });
+  if (missing.length) b.push({ label: 'Quality indicators', detail: `Missing ${fv(missing)}`, sev: 'medium' });
+  return b;
+};
+const fixPrompt = (r, bl) => `/devspark.fix-score repo:${r.name}
+
+Use the repository detail data below as starting context, then inspect the source repository and latest generated audits before making changes.
+
+Target repository:
+- Name: ${r.name}
+- URL: ${r.url || 'N/A'}
+- Homepage: ${r.homepage || r.website_url || 'N/A'}
+- Attention score: ${r.attention_score ?? 'N/A'}
+- Attention rank: ${r.attention_rank ?? 'N/A'}
+- Composite score: ${r.composite_score ?? 'N/A'}
+
+Current score blockers:
+${bl.length ? bl.map(x => `- ${x.label}: ${x.detail} (${x.sev})`).join('\n') : '- No specific blocker is visible in the dashboard data; inspect the latest audit and verification gates.'}
+
+Fix the root causes that prevent a perfect score. Do not weaken scoring, delete findings, or hand-edit generated JSON/SVG/screenshot/docs artifacts. Regenerate stats, rebuild dashboard artifacts, and run the repo's verification gates before summarizing the result.`;
+const CSV_COLS = [['name', 'Repository Name'], ['language', 'Language'], ['stars', 'Stars'], ['forks', 'Forks'], ['watchers', 'Watchers'], ['open_issues', 'Open Issues'], ['created_at', 'Created At'], ['updated_at', 'Last Updated'], ['commit_history.total_commits', 'Total Commits'], ['commit_history.recent_90d', 'Commits (90d)'], ['commit_history.recent_365d', 'Commits (365d)'], ['age_days', 'Age (days)'], ['days_since_last_push', 'Days Since Push'], ['has_readme', 'Has README'], ['has_license', 'Has License'], ['has_ci_cd', 'Has CI/CD'], ['has_tests', 'Has Tests'], ['pull_request_summary.total_open', 'Open Pull Requests'], ['security_summary.overall_state', 'Security Overall State'], ['security_summary.active_alert_counts.total_open', 'Open Security Alerts'], ['attention_score', 'Attention Score'], ['attention_metrics.tier', 'Attention Tier']];
+const toCSV = rows => [CSV_COLS.map(c => `"${c[1]}"`).join(','), ...rows.map(r => CSV_COLS.map(([k]) => { const v = k.split('.').reduce((o, p) => o?.[p], r); return v == null ? '""' : typeof v === 'boolean' ? (v ? 'Yes' : 'No') : typeof v === 'number' ? v : `"${String(v).replace(/"/g, '""')}"`; }).join(','))].join('\n');
+const download = (content, name, type) => { const u = URL.createObjectURL(new Blob([content], { type })); const a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(u); };
+const viewFromHash = () => {
+  const h = window.location.hash.slice(1);
+  if (h === 'insights' || h === 'visualizations') return 'insights';
+  if (h === 'health' || h === 'attention') return 'health';
+  return 'overview';
+};
+
+class Component extends DCLogic {
+  state = { data: null, loading: true, error: null, view: viewFromHash(), search: '', lang: '', tier: '', sort: 'activity', sel: null, hSort: { key: 'score', dir: 'desc' }, toasts: [], vw: window.innerWidth, online: navigator.onLine, lastSync: null, exportOpen: null, fixOpen: false, copied: false, crashDismissed: false };
+
+  componentDidMount() {
+    this.load();
+    this._hash = () => this.setState({ view: viewFromHash() });
+    this._key = e => {
+      if (!this.state.sel) return;
+      if (e.key === 'Escape') this.setState({ sel: null });
+      if (e.key === 'ArrowRight') this.step(1);
+      if (e.key === 'ArrowLeft') this.step(-1);
+    };
+    this._resize = () => this.setState({ vw: window.innerWidth });
+    this._on = () => { this.setState({ online: true }); this.load(true); };
+    this._off = () => this.setState({ online: false });
+    window.addEventListener('hashchange', this._hash);
+    window.addEventListener('keydown', this._key);
+    window.addEventListener('resize', this._resize);
+    window.addEventListener('online', this._on);
+    window.addEventListener('offline', this._off);
+  }
+  componentWillUnmount() {
+    ['hashchange', 'keydown', 'resize', 'online', 'offline'].forEach((e, i) => window.removeEventListener(e, [this._hash, this._key, this._resize, this._on, this._off][i]));
+  }
+  load(bust) {
+    this.setState({ loading: !this.state.data, refreshing: !!bust });
+    return fetch(DATA_URL, { cache: bust ? 'no-store' : 'default' })
+      .then(r => { if (!r.ok) throw new Error('Failed to load repository data (' + r.status + ')'); return r.json(); })
+      .then(data => { this.setState({ data, loading: false, error: null, refreshing: false, lastSync: Date.now() }); if (bust) this.showToast('Data refreshed and cache cleared', 'success'); })
+      .catch(e => { this.setState({ loading: false, refreshing: false, error: this.state.data ? null : e.message }); if (bust) this.showToast('Refresh failed. Check the console for details.', 'error', 4000); });
+  }
+  showToast(message, variant = 'info', duration = 3000) {
+    const id = Date.now() + Math.random();
+    this.setState(s => ({ toasts: [...s.toasts, { id, message, variant }] }));
+    if (duration > 0) setTimeout(() => this.dismiss(id), duration);
+  }
+  dismiss(id) { this.setState(s => ({ toasts: s.toasts.filter(t => t.id !== id) })); }
+  doExport(kind, rows) {
+    this.setState({ exportOpen: null });
+    if (!rows.length) return this.showToast('No data to export', 'warning');
+    const stamp = new Date().toISOString().split('T')[0];
+    if (kind === 'csv') download(toCSV(rows), `repositories-${stamp}.csv`, 'text/csv;charset=utf-8;');
+    else download(JSON.stringify(rows, null, 2), `repositories-${stamp}.json`, 'application/json;charset=utf-8;');
+    this.showToast(`Exported ${rows.length} repositories as ${kind.toUpperCase()}`, 'success');
+  }
+  go(view) { window.location.hash = view === 'overview' ? '' : view; this.setState({ view }); window.scrollTo(0, 0); }
+  filtered() {
+    const repos = this.state.data?.repositories || [];
+    const { search, lang, tier, sort } = this.state;
+    const q = search.trim().toLowerCase();
+    let list = repos.filter(r => (!lang || r.language === lang) && (!tier || tierOf(r) === tier) &&
+      (!q || [r.name, r.description, r.language, summaryOf(r)].some(v => (v || '').toLowerCase().includes(q))));
+    const by = {
+      stars: (a, b) => (b.stars || 0) - (a.stars || 0),
+      activity: (a, b) => (a.days_since_last_push ?? 999) - (b.days_since_last_push ?? 999),
+      commits: (a, b) => (b.total_commits || 0) - (a.total_commits || 0),
+      name: (a, b) => a.name.localeCompare(b.name),
+      age: (a, b) => new Date(b.created_at) - new Date(a.created_at),
+    };
+    return list.sort(by[sort] || by.activity);
+  }
+  navList() { return this.state.view === 'overview' ? this.filtered() : (this.state.data?.repositories || []); }
+  step(dir) {
+    const list = this.navList();
+    const i = list.findIndex(r => r.name === this.state.sel);
+    const n = list[i + dir];
+    if (n) this.setState({ sel: n.name });
+  }
+  open = name => () => this.setState({ sel: name });
+
+  heatmap(profile, genAt) {
+    const cal = profile?.activity_calendar || {};
+    const end = genAt ? new Date(genAt) : new Date();
+    end.setUTCHours(0, 0, 0, 0);
+    const start = new Date(end); start.setUTCDate(start.getUTCDate() - 364 - start.getUTCDay());
+    const weeks = []; let total = 0, active = 0, lastMonth = -1;
+    const cur = new Date(start);
+    while (cur <= end) {
+      const days = [];
+      let month = '';
+      for (let i = 0; i < 7; i++) {
+        const key = cur.toISOString().slice(0, 10);
+        const v = cur <= end ? (cal[key] || 0) : null;
+        if (i === 0 && cur.getUTCMonth() !== lastMonth) { if (lastMonth !== -1 || cur.getUTCDate() <= 7) month = MONTHS[cur.getUTCMonth()]; lastMonth = cur.getUTCMonth(); }
+        if (v) { total += v; active++; }
+        const lvl = v == null ? -1 : v === 0 ? 0 : v <= 3 ? 1 : v <= 10 ? 2 : v <= 20 ? 3 : 4;
+        days.push({ bg: lvl < 0 ? 'transparent' : HEAT[lvl], title: v == null ? '' : `${v} contribution${v === 1 ? '' : 's'} on ${key}` });
+        cur.setUTCDate(cur.getUTCDate() + 1);
+      }
+      weeks.push({ month, days });
+    }
+    return { weeks, total, active };
+  }
+
+  renderVals() {
+    const { data, loading, view, search, lang, tier, sort, sel, hSort, vw, exportOpen, fixOpen, copied } = this.state;
+    const ps = this.props.previewState ?? 'live';
+    const crash = ps === 'crash' && !this.state.crashDismissed;
+    const error = this.state.error || (ps === 'error' ? 'Failed to load repository data' : null);
+    const offline = ps === 'offline' || !this.state.online;
+    const mobile = vw < 768;
+    const repos = data?.repositories || [];
+    const profile = data?.profile || {};
+    const layout = this.props.cardLayout ?? 'grid';
+    const heroVariant = this.props.heroVariant ?? 'cream';
+    const genAt = data?.metadata?.generated_at;
+    const gen = genAt ? new Date(genAt) : null;
+    const ready = !loading && !error && !crash && !!data;
+
+    const tabs = [['overview', 'Overview'], ['insights', 'Insights'], ['health', 'Health']].map(([id, label]) => ({
+      label, go: () => this.go(id), current: view === id ? 'page' : undefined,
+      color: view === id ? 'var(--rust-500)' : 'var(--ink-700)', bar: view === id ? 'var(--rust-500)' : 'transparent'
+    }));
+
+    const list = ps === 'empty' ? [] : this.filtered();
+    const cards = list.map(r => {
+      const t = TIER[tierOf(r)] || TIER.healthy;
+      const s = summaryOf(r);
+      return {
+        name: r.name, aria: 'Open details for ' + r.name, liveAria: r.name + ' live site',
+        lang: r.language || 'Unknown', langColor: langColor(r.language),
+        tierLabel: t.label, tierTone: t.tone,
+        isRecent: (r.days_since_last_push ?? 99) <= 3,
+        hasHome: !!r.homepage, homepage: r.homepage,
+        excerpt: s.length > 150 ? s.slice(0, 147).trim() + '…' : s,
+        stars: fmt(r.stars), forks: fmt(r.forks), commits: fmt(r.total_commits),
+        ago: ago(r.days_since_last_push), agoColor: (r.days_since_last_push ?? 99) <= 3 ? 'var(--rust-500)' : 'var(--ink-600)',
+        quality: qualityChips(r),
+        open: this.open(r.name),
+        key: e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.setState({ sel: r.name }); } },
+      };
+    });
+
+    const heat = this.heatmap(profile, genAt);
+
+    // Insights
+    const totalCommits = repos.reduce((s, r) => s + (r.commit_history?.total_commits || r.total_commits || 0), 0);
+    const langs = [...new Set(repos.map(r => r.language).filter(Boolean))];
+    const active30 = repos.filter(r => (r.days_since_last_push ?? 999) <= 30).length;
+    const readmePct = repos.length ? Math.round(repos.filter(r => r.has_readme).length / repos.length * 100) : 0;
+    const openPRs = repos.reduce((s, r) => s + (prsOf(r) || 0), 0);
+    const prRepos = repos.filter(r => (prsOf(r) || 0) > 0).length;
+    const alerts = repos.reduce((s, r) => s + alertsOf(r), 0);
+    const alertRepos = repos.filter(r => alertsOf(r) > 0).length;
+    const statCards = [
+      { label: 'Repositories', value: repos.length, sub: `${active30} active in 30 days`, color: 'var(--ink-900)' },
+      { label: 'Total commits', value: fmt(totalCommits), sub: 'All-time', color: 'var(--ink-900)' },
+      { label: 'Languages', value: langs.length, sub: 'Primary languages', color: 'var(--ink-900)' },
+      { label: 'README coverage', value: readmePct + '%', sub: 'Repos with a README', color: 'var(--ink-900)' },
+      { label: 'Open pull requests', value: fmt(openPRs), sub: `${prRepos} repos with open PRs`, color: 'var(--rust-500)' },
+      { label: 'Security alerts', value: fmt(alerts), sub: `${alertRepos} repos with alerts`, color: alerts ? 'var(--critical)' : 'var(--positive)' },
+    ];
+    const byCommits = [...repos].sort((a, b) => (b.total_commits || 0) - (a.total_commits || 0));
+    const maxC = byCommits[0]?.total_commits || 1;
+    const commitBars = byCommits.map(r => ({ name: r.name, value: fmt(r.total_commits), pct: Math.max(2, (r.total_commits || 0) / maxC * 100), color: langColor(r.language), open: this.open(r.name) }));
+    const byRecent = repos.filter(r => (r.recent_commits_90d || 0) > 0).sort((a, b) => b.recent_commits_90d - a.recent_commits_90d);
+    const maxR = byRecent[0]?.recent_commits_90d || 1;
+    const recentBars = byRecent.map(r => ({ name: r.name, value: r.recent_commits_90d, pct: r.recent_commits_90d / maxR * 100, open: this.open(r.name) }));
+    const lc = {}; repos.forEach(r => { const l = r.language || 'Unknown'; lc[l] = (lc[l] || 0) + 1; });
+    const langDist = Object.entries(lc).sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ name, value, color: langColor(name), title: `${name}: ${value}` }));
+    const wk = (profile.weekly_activity || []).slice(-52);
+    const maxW = Math.max(1, ...wk.map(w => w.commits || 0));
+    const peak = wk.reduce((p, w) => (w.commits || 0) > (p?.commits || 0) ? w : p, null);
+    const weekly = wk.map((w, i) => ({ h: w.commits ? Math.max(3, w.commits / maxW * 100) : 0.8, color: w.commits ? (w === peak ? 'var(--rust-500)' : 'var(--ember-300)') : 'var(--ink-100)', title: `${w.label}: ${w.commits} commits · ${w.active_repos} repos`, tick: i % 8 === 0 ? w.label : '' }));
+    const matrixCols = ['README', 'License', 'CI/CD', 'Tests', 'Docs'];
+    const matrix = [...repos].sort((a, b) => a.name.localeCompare(b.name)).map(r => ({
+      name: r.name, open: this.open(r.name),
+      cells: [r.has_readme, r.has_license, r.has_ci_cd, r.has_tests, r.has_docs].map((on, i) => ({ bg: on ? 'var(--positive)' : 'transparent', border: on ? 'var(--positive)' : 'var(--ink-300)', title: `${matrixCols[i]}: ${on ? 'yes' : 'no'}` }))
+    }));
+
+    // Health
+    const needs = repos.filter(r => r.attention_metrics?.needs_attention);
+    const critical = repos.filter(r => tierOf(r) === 'critical').length;
+    const stale = repos.filter(r => (r.days_since_last_push ?? 0) >= 90).length;
+    const healthSummary = [
+      { label: 'Need attention', value: needs.length, bg: 'var(--rust-500)', border: 'var(--rust-500)', color: 'var(--cream)', labelColor: 'var(--rust-100)' },
+      { label: 'Critical', value: critical, bg: 'var(--white)', border: 'var(--border-default)', color: critical ? 'var(--critical)' : 'var(--ink-900)', labelColor: 'var(--text-muted)' },
+      { label: 'Security backlog', value: alertRepos, bg: 'var(--white)', border: 'var(--border-default)', color: 'var(--ink-900)', labelColor: 'var(--text-muted)' },
+      { label: 'Stale 90+ days', value: stale, bg: 'var(--white)', border: 'var(--border-default)', color: 'var(--ink-900)', labelColor: 'var(--text-muted)' },
+    ];
+    const tierOrder = { critical: 4, elevated: 3, watch: 2, healthy: 1 };
+    const sv = (r, k) => ({ score: r.attention_score || 0, name: r.name.toLowerCase(), tier: tierOrder[tierOf(r)] || 0, prs: prsOf(r) ?? -1, alerts: alertsOf(r), stale: r.days_since_last_push ?? -1, readme: r.has_readme ? 1 : 0 })[k];
+    const hSorted = [...repos].sort((a, b) => { const av = sv(a, hSort.key), bv = sv(b, hSort.key); const d = av < bv ? -1 : av > bv ? 1 : 0; return hSort.dir === 'asc' ? d : -d; });
+    const hCols = [['name', 'Repository'], ['tier', 'Tier'], ['score', 'Score'], ['prs', 'PRs'], ['alerts', 'Alerts'], ['stale', 'Stale (days)'], ['readme', 'README']].map(([key, label]) => ({
+      label, arrow: hSort.key === key ? (hSort.dir === 'asc' ? '↑' : '↓') : '', color: hSort.key === key ? 'var(--rust-500)' : 'var(--text-muted)',
+      sort: () => this.setState(s => ({ hSort: s.hSort.key === key ? { key, dir: s.hSort.dir === 'desc' ? 'asc' : 'desc' } : { key, dir: 'desc' } }))
+    }));
+    const hRows = hSorted.map((r, i) => {
+      const t = TIER[tierOf(r)] || TIER.healthy; const sc = r.attention_score || 0;
+      return { idx: i + 1, name: r.name, lang: r.language || 'Unknown', tierLabel: t.label, tierTone: t.tone, score: sc.toFixed(0), scorePct: Math.min(100, sc), scoreColor: scoreColor(sc), prs: prsOf(r) ?? 'n/a', alerts: alertsOf(r), stale: r.days_since_last_push ?? 'n/a', readme: r.has_readme ? 'Yes' : 'No', readmeColor: r.has_readme ? 'var(--ink-800)' : 'var(--critical)', open: this.open(r.name) };
+    });
+    const compAgg = {};
+    repos.forEach(r => Object.entries(r.attention_metrics?.components || {}).forEach(([k, v]) => { (compAgg[k] = compAgg[k] || { sum: 0, n: 0, hit: 0 }); compAgg[k].sum += v.score || 0; compAgg[k].n++; if ((v.score || 0) > 0) compAgg[k].hit++; }));
+    const drivers = Object.entries(compAgg).map(([k, v]) => ({ label: COMP[k] || k.replace(/_/g, ' '), pct: v.n ? v.sum / v.n : 0, count: `${v.hit} of ${v.n} repos` })).sort((a, b) => b.pct - a.pct);
+
+    // Detail
+    let d = {}; let d_fix = {};
+    const r = sel ? repos.find(x => x.name === sel) : null;
+    if (r) {
+      const nav = this.navList(); const i = nav.findIndex(x => x.name === sel);
+      const t = TIER[tierOf(r)] || TIER.healthy;
+      const deps = r.tech_stack?.dependencies || [];
+      const depTone = s => s === 'current' ? 'positive' : /major/.test(s || '') ? 'critical' : /outdated/.test(s || '') ? 'caution' : 'neutral';
+      const pr = r.pull_request_summary || {}; const sec = r.security_summary || {};
+      const outdated = deps.filter(p => p.is_outdated).length;
+      const act = r.diagnostics_summary?.actions || {};
+      const bl = fixBlockers(r);
+      const sevTone = { high: 'critical', medium: 'caution', external: 'info', low: 'positive' };
+      d_fix = {
+        fixCount: bl.length ? `${bl.length} signals` : 'Ready', fixTone: bl.length ? 'caution' : 'positive',
+        blockers: bl.map(x => ({ label: x.label, detail: x.detail, sev: x.sev, tone: sevTone[x.sev] || 'neutral' })),
+        hasBlockers: bl.length > 0, noBlockers: bl.length === 0,
+        prompt: fixPrompt(r, bl),
+        actions: act.availability === 'available' ? `${act.success_count || 0} passed · ${act.failure_count || 0} failed of ${act.recent_runs || 0}` : 'Unavailable',
+      };
+      const summary = summaryOf(r);
+      d = {
+        name: r.name, position: `Repository ${i + 1} of ${nav.length}`, url: r.url, homepage: r.homepage, hasHome: !!r.homepage,
+        lang: r.language || 'Unknown', langColor: langColor(r.language), tierLabel: t.label, tierTone: t.tone, score: (r.attention_score || 0).toFixed(1),
+        stats: [
+          { label: 'Stars', value: fmt(r.stars) }, { label: 'Forks', value: fmt(r.forks) }, { label: 'Commits', value: fmt(r.total_commits) },
+          { label: 'Last 90 days', value: fmt(r.recent_commits_90d) }, { label: 'Last push', value: ago(r.days_since_last_push) }, { label: 'Age', value: r.age_days != null ? (r.age_days >= 365 ? (r.age_days / 365).toFixed(1) + ' yrs' : r.age_days + ' days') : '—' },
+        ],
+        summary: summary.length > 900 ? summary.slice(0, 897).trim() + '…' : (summary || 'No summary available.'),
+        quality: [['README', r.has_readme], ['License', r.has_license], ['CI/CD', r.has_ci_cd], ['Tests', r.has_tests], ['Docs', r.has_docs]].map(([label, on]) => ({ label, bg: on ? 'var(--positive-soft)' : 'var(--white)', color: on ? 'var(--positive)' : 'var(--ink-400)', dot: on ? 'var(--positive)' : 'var(--ink-300)' })),
+        components: Object.entries(r.attention_metrics?.components || {}).map(([k, v]) => ({ label: COMP[k] || k.replace(/_/g, ' '), pct: Math.min(100, v.score || 0), value: (v.score || 0).toFixed(0), color: scoreColor(v.score || 0) })),
+        signals: [
+          { label: 'Open pull requests', value: pr.availability === 'available' ? fmt(pr.total_open) : 'Unavailable' },
+          { label: 'Oldest open PR', value: pr.oldest_open_age_days != null && pr.total_open ? pr.oldest_open_age_days + ' days' : '—' },
+          { label: 'Security state', value: sec.overall_state ? sec.overall_state.replace(/_/g, ' ') : 'Unknown' },
+          { label: 'Open security alerts', value: fmt(alertsOf(r)) },
+          { label: 'Recent workflow runs', value: (r.diagnostics_summary?.actions?.availability === 'available') ? `${r.diagnostics_summary.actions.success_count || 0} passed · ${r.diagnostics_summary.actions.failure_count || 0} failed` : 'Unavailable' },
+          { label: 'Created', value: r.created_at ? new Date(r.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '—' },
+        ],
+        hasDeps: deps.length > 0,
+        depSummary: `${outdated} of ${deps.length} outdated`,
+        deps: [...deps].sort((a, b) => (b.is_outdated ? 1 : 0) - (a.is_outdated ? 1 : 0)).slice(0, 10).map(p => ({ name: p.name, versions: p.latest_version && p.latest_version !== p.current_version ? `${p.current_version || '?'} → ${p.latest_version}` : (p.current_version || '—'), status: (p.status || 'unknown').replace(/_/g, ' '), tone: depTone(p.status) })),
+        noPrev: i <= 0, noNext: i >= nav.length - 1,
+      };
+    }
+
+    return {
+      tabs, loading, hasError: !!error && !loading, error, retry: () => this.load(),
+      showOverview: ready && view === 'overview', showInsights: ready && view === 'insights', showHealth: ready && view === 'health',
+      heroCream: heroVariant !== 'rust', heroRust: heroVariant === 'rust', showHeatmap: this.props.showHeatmap ?? true,
+      goOverview: e => { e.preventDefault(); this.go('overview'); },
+      openGithub: () => window.open('https://github.com/MakeBoldSolutions', '_blank', 'noopener'),
+      openSpark: () => window.open('https://makeboldspark.com', '_blank', 'noopener'),
+      username: profile.username || 'MakeBoldSolutions',
+      generatedShort: gen ? gen.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '—',
+      generatedLong: gen ? gen.toLocaleString() : 'Unknown',
+      heroStats: [{ label: 'Repositories', value: fmt(profile.total_repositories) }, { label: 'Commits', value: fmt(profile.total_commits) }, { label: 'Stars', value: fmt(profile.total_stars) }, { label: 'Forks', value: fmt(profile.total_forks) }],
+      heat: heat.weeks, heatTotal: fmt(heat.total), heatActive: heat.active, heatLegend: HEAT,
+      search, lang, tier, sort,
+      onSearch: e => this.setState({ search: e.target.value }), clearSearch: () => this.setState({ search: '' }),
+      onLang: e => this.setState({ lang: e.target.value }), onTier: e => this.setState({ tier: e.target.value }), onSort: e => this.setState({ sort: e.target.value }),
+      hasSearch: !!search, hasFilters: !!(search || lang || tier), clearFilters: () => this.setState({ search: '', lang: '', tier: '' }),
+      langOptions: langs.slice().sort(),
+      tierOptions: Object.keys(TIER).filter(k => repos.some(r => tierOf(r) === k)).map(k => ({ value: k, label: TIER[k].label })),
+      sortOptions: [{ value: 'activity', label: 'Recent activity' }, { value: 'stars', label: 'Stars' }, { value: 'commits', label: 'Commits' }, { value: 'name', label: 'Name (A–Z)' }, { value: 'age', label: 'Newest first' }],
+      resultLabel: list.length === repos.length ? `${repos.length} repositories` : `${list.length} of ${repos.length} repositories`,
+      isEmpty: ready && list.length === 0, cards,
+      gridCols: layout === 'list' ? 'minmax(0,1fr)' : 'repeat(auto-fill,minmax(min(100%,340px),1fr))',
+      cardStyle: { width: '100%', display: 'flex', flexDirection: 'column' },
+      stop: e => e.stopPropagation(),
+      repoCount: repos.length, statCards, commitBars, recentBars, langDist, weekly, weekPeak: peak ? `${peak.label} · ${peak.commits} commits` : '—', matrixCols, matrix,
+      healthSummary, hCols, hRows, drivers,
+      hasDetail: !!r, d, closeDetail: () => this.setState({ sel: null }), prevRepo: () => this.step(-1), nextRepo: () => this.step(1),
+      refresh: () => this.load(true), refreshLabel: this.state.refreshing ? 'Refreshing…' : 'Refresh',
+      fix: d_fix, fixOpen, fixClosed: !fixOpen, toggleFix: () => this.setState(s => ({ fixOpen: !s.fixOpen })),
+      copyLabel: copied ? 'Copied' : 'Copy prompt',
+      copyPrompt: () => { navigator.clipboard?.writeText(d_fix.prompt || ''); this.setState({ copied: true }); setTimeout(() => this.setState({ copied: false }), 1800); },
+      toasts: [
+        ...(ps === 'update-available' ? [{ id: 'sw', message: 'A new version is available.', variant: 'info', action: 'Update', persistent: true }] : []),
+        ...(ps === 'toasts' ? [{ id: 'p1', message: 'Data refreshed successfully', variant: 'success' }, { id: 'p2', message: 'Refresh failed. Check the console for details.', variant: 'error' }, { id: 'p3', message: 'No data to export', variant: 'warning' }] : []),
+        ...this.state.toasts,
+      ].map(t => ({ message: t.message, color: TOAST[t.variant] || TOAST.info, icon: ICON[t.variant] || ICON.info, hasAction: !!t.action, action: t.action, act: () => window.location.reload(), close: () => this.dismiss(t.id) })),
+      hasToasts: true, toastBottom: mobile ? '88px' : '28px',
+      offline, lastSyncLabel: this.state.lastSync ? ago(Math.floor((Date.now() - this.state.lastSync) / 86400000)).replace('Today', 'today') : 'never',
+      reconnect: () => this.load(true),
+      crash, retryCrash: () => this.setState({ crashDismissed: true }), reload: () => window.location.reload(),
+      showTopNav: !mobile, showTabBar: mobile && !crash, mainPad: mobile ? '72px' : '0',
+      mobileTabs: [['overview', 'Overview', ICON.grid], ['insights', 'Insights', ICON.bars], ['health', 'Health', ICON.warning]].map(([id, label, icon]) => ({ label, icon, go: () => this.go(id), current: view === id ? 'page' : undefined, color: view === id ? 'var(--rust-500)' : 'var(--ink-500)', bar: view === id ? 'var(--rust-500)' : 'transparent' })),
+      exportOverview: exportOpen === 'overview', exportHealth: exportOpen === 'health',
+      toggleExportO: () => this.setState(s => ({ exportOpen: s.exportOpen === 'overview' ? null : 'overview' })),
+      toggleExportH: () => this.setState(s => ({ exportOpen: s.exportOpen === 'health' ? null : 'health' })),
+      closeExport: () => this.setState({ exportOpen: null }),
+      exportCsvO: () => this.doExport('csv', list), exportJsonO: () => this.doExport('json', list),
+      exportCsvH: () => this.doExport('csv', hSorted), exportJsonH: () => this.doExport('json', hSorted),
+      exportCountO: `${list.length} repositories in current view`, exportCountH: `${hSorted.length} repositories, ranked`,
+    };
+  }
+}
+</script>
+</body>
+</html>

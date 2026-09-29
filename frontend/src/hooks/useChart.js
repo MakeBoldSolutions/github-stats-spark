@@ -14,6 +14,11 @@ import { debounce } from "@/utils/performance";
 // Register Chart.js components
 Chart.register(...registerables);
 
+// Make Bold Solutions brand type for all charts (FR-019).
+Chart.defaults.font.family =
+  '"Inter Tight", system-ui, -apple-system, sans-serif';
+Chart.defaults.color = "#56544f"; // --ink-600
+
 /**
  * Default Chart.js configuration optimized for mobile
  */

@@ -4,11 +4,11 @@
     "total_repositories": 15,
     "total_stars": 10,
     "total_forks": 5,
-    "total_commits": 1246,
+    "total_commits": 1271,
     "activity_calendar": {
       "2026-09-26": 32,
       "2026-09-27": 13,
-      "2026-09-28": 5,
+      "2026-09-28": 13,
       "2025-11-16": 28,
       "2025-11-17": 10,
       "2025-12-27": 4,
@@ -20,6 +20,9 @@
       "2026-05-15": 11,
       "2026-08-28": 9,
       "2026-08-30": 2,
+      "2025-09-02": 2,
+      "2025-09-06": 3,
+      "2025-09-14": 4,
       "2025-10-05": 3,
       "2025-10-13": 12,
       "2025-10-20": 1,
@@ -44,6 +47,8 @@
       "2026-06-21": 38,
       "2026-07-14": 1,
       "2026-08-17": 11,
+      "2025-09-07": 7,
+      "2025-09-15": 1,
       "2026-01-12": 11,
       "2026-03-30": 25,
       "2026-03-31": 6,
@@ -486,23 +491,231 @@
       {
         "week": "2026-W40",
         "label": "Sep 28",
-        "commits": 5,
+        "commits": 13,
         "active_repos": 1
       }
     ]
   },
   "repositories": [
     {
-      "name": "UISampleSpark",
-      "description": "An application to demonstrate multiple ways of implementing simple maintenance (CRUD) and user interface in ASP.Net using latest public versions. ",
+      "name": "ArrowSpark",
+      "description": "ArrowSpark a game of puzzle solving arrows",
       "summary": {
-        "text": "**Live Site**: [ui.makeboldspark.com](https://ui.makeboldspark.com) Built with HTML. Actively maintained with regular updates.",
+        "text": "*A Make Bold Spark Game* \u2014 created by [Make Bold Solutions](https://makeboldspark.com) Built with GDScript. Actively maintained with regular updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-09-28T16:25:21.777778",
+        "generated_at": "2026-09-28T19:44:51.821466",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
+      },
+      "url": "https://github.com/MakeBoldSolutions/ArrowSpark",
+      "homepage": null,
+      "has_pages": false,
+      "pages_url": null,
+      "website_url": null,
+      "stars": 0,
+      "forks": 0,
+      "watchers": 0,
+      "language": "GDScript",
+      "language_stats": {},
+      "languages": {},
+      "created_at": "2026-09-28T15:25:46+00:00",
+      "updated_at": "2026-09-28T22:18:29+00:00",
+      "pushed_at": "2026-09-28T22:18:24+00:00",
+      "total_commits": 54,
+      "recent_commits_90d": 54,
+      "first_commit_date": "2026-09-28T15:25:46+00:00",
+      "last_commit_date": "2026-09-28T00:00:00+00:00",
+      "commit_history": {
+        "repository_name": "ArrowSpark",
+        "total_commits": 54,
+        "recent_90d": 54,
+        "recent_180d": 54,
+        "recent_365d": 54,
+        "last_commit_date": "2026-09-28T00:00:00+00:00",
+        "patterns": [
+          "highly_active",
+          "recently_updated",
+          "accelerating"
+        ],
+        "commit_frequency": 18.0,
+        "consistency_score": 0,
+        "activity_rate": 0.6,
+        "days_since_last_commit": 1,
+        "first_commit_date": "2026-09-28T15:25:46+00:00"
+      },
+      "commit_metrics": null,
+      "avg_commit_size": null,
+      "largest_commit": null,
+      "smallest_commit": null,
+      "commit_velocity": 18.0,
+      "tech_stack": null,
+      "has_readme": true,
+      "has_license": true,
+      "has_ci_cd": true,
+      "has_tests": true,
+      "has_docs": false,
+      "language_count": 4,
+      "size_kb": 4723,
+      "is_fork": false,
+      "is_private": false,
+      "is_archived": false,
+      "age_days": 0,
+      "days_since_last_push": 0,
+      "ai_summary": null,
+      "attention_score": 3.5,
+      "attention_metrics": {
+        "score": 3.5,
+        "tier": "healthy",
+        "needs_attention": false,
+        "reasons": [],
+        "components": {
+          "pull_requests": {
+            "score": 0.0,
+            "availability": "available",
+            "reason": "none",
+            "total_open": 0,
+            "draft_count": 0,
+            "review_requested_count": 0,
+            "oldest_open_age_days": null
+          },
+          "security": {
+            "score": 10.0,
+            "availability": "partial",
+            "reason": "permission_denied",
+            "overall_state": "clear",
+            "active_alert_counts": {
+              "total_open": 0,
+              "critical": 0,
+              "high": 0,
+              "medium": 0,
+              "low": 0
+            }
+          },
+          "staleness": {
+            "score": 0.0,
+            "days_since_last_push": 0,
+            "recent_commits_90d": 54,
+            "open_issues": 0
+          },
+          "dependencies": {
+            "score": 0.0,
+            "total_dependencies": 0,
+            "outdated_count": 0,
+            "outdated_percentage": 0.0,
+            "currency_score": 100,
+            "version_coverage_percentage": 100.0,
+            "latest_version_coverage_percentage": 100.0,
+            "unknown_versions_count": 0
+          }
+        }
+      },
+      "rank": 1,
+      "composite_score": 66.6,
+      "pull_request_summary": {
+        "availability": "available",
+        "reason": "none",
+        "has_open_pull_requests": false,
+        "total_open": 0,
+        "draft_count": 0,
+        "review_requested_count": 0,
+        "oldest_open_age_days": null,
+        "source": "rest.pulls.list"
+      },
+      "security_summary": {
+        "availability": "partial",
+        "reason": "permission_denied",
+        "overall_state": "clear",
+        "feature_status": {
+          "advanced_security": "unknown",
+          "secret_scanning": "unknown",
+          "secret_scanning_push_protection": "unknown",
+          "dependency_alerts": "unavailable",
+          "automated_security_fixes": "unavailable"
+        },
+        "active_alert_counts": {
+          "total_open": 0,
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "sources": [
+          "rest.repos.get"
+        ]
+      },
+      "diagnostics_summary": {
+        "availability": "partial",
+        "reason": "permission_denied",
+        "pull_requests": {
+          "availability": "available",
+          "reason": "none",
+          "total_open": 0,
+          "oldest_open_age_days": null
+        },
+        "issues": {
+          "availability": "available",
+          "reason": "none",
+          "total_open": 0,
+          "oldest_open_age_days": null,
+          "stale_over_30d": 0,
+          "stale_over_90d": 0
+        },
+        "security": {
+          "availability": "unavailable",
+          "reason": "permission_denied",
+          "dependabot": {
+            "total_open": 0,
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0
+          },
+          "code_scanning": {
+            "total_open": 0,
+            "error": 0,
+            "warning": 0,
+            "note": 0
+          }
+        },
+        "actions": {
+          "availability": "available",
+          "reason": "none",
+          "recent_runs": 0,
+          "success_count": 0,
+          "failure_count": 0,
+          "last_run_status": null,
+          "last_run_conclusion": null,
+          "last_run_age_days": null
+        },
+        "sources": [
+          "rest.pulls.list",
+          "rest.issues.list",
+          "rest.actions.runs"
+        ]
+      },
+      "attention_rank": 15,
+      "screenshot_audit": {
+        "status": "ok",
+        "website_url": null,
+        "screenshot_path": null,
+        "flags": [],
+        "http": null,
+        "image": null
+      }
+    },
+    {
+      "name": "UISampleSpark",
+      "description": "An application to demonstrate multiple ways of implementing simple maintenance (CRUD) and user interface in ASP.Net using latest public versions. ",
+      "summary": {
+        "text": "# Technical Summary: UISampleSpark\n\n**UISampleSpark** is a comprehensive educational reference application built on .NET 10 and ASP.NET Core that demonstrates how to implement identical Employee/Department CRUD functionality across seven distinct front-end UI patterns\u2014MVC, Razor Pages, jQuery AJAX, React, Vue, htmx, and Blazor Server\u2014within a single application. The project showcases modern web development practices including clean architecture with dependency injection, a layered data access pattern using Entity Framework Core, REST/OpenAPI endpoints with Swagger documentation, theming via Bootswatch, and full CI/CD automation through GitHub Actions and Docker containerization. Its architecture employs repository and service abstractions (e.g., `IEmployeeService`), in-memory EF Core databases with mock data generation, health checks, and Application Insights telemetry, alongside comprehensive unit testing across domain and data layers. The unique value proposition lies in its side-by-side comparison methodology\u2014allowing developers to evaluate different UI frameworks and patterns pragmatically using a consistent domain model\u2014combined with production-ready DevOps examples including Docker deployments, Azure Pipelines integration, and API key-based security. Targeted at full-stack developers, architects, and teams evaluating front-end technology choices, this project serves as both a living laboratory for ASP.NET Core modernization (tracking migrations from .NET 5 through .NET 10) and a reference implementation of enterprise-grade web application patterns with real-world deployment considerations.",
+        "ai_generated": true,
+        "generation_method": "claude-haiku-4-5",
+        "generated_at": "2026-08-27T07:59:50.863265",
+        "model_used": "claude-haiku-4-5",
+        "tokens_used": 2733,
+        "confidence_score": 90
       },
       "url": "https://github.com/MakeBoldSolutions/UISampleSpark",
       "homepage": "https://ui.makeboldspark.com",
@@ -536,7 +749,7 @@
         "commit_frequency": 3.67,
         "consistency_score": 0,
         "activity_rate": 0.122,
-        "days_since_last_commit": 77,
+        "days_since_last_commit": 78,
         "first_commit_date": "2019-04-25T18:45:29+00:00"
       },
       "commit_metrics": null,
@@ -555,9 +768,9 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 2712,
+      "age_days": 2713,
       "days_since_last_push": 6,
-      "ai_summary": null,
+      "ai_summary": "# Technical Summary: UISampleSpark\n\n**UISampleSpark** is a comprehensive educational reference application built on .NET 10 and ASP.NET Core that demonstrates how to implement identical Employee/Department CRUD functionality across seven distinct front-end UI patterns\u2014MVC, Razor Pages, jQuery AJAX, React, Vue, htmx, and Blazor Server\u2014within a single application. The project showcases modern web development practices including clean architecture with dependency injection, a layered data access pattern using Entity Framework Core, REST/OpenAPI endpoints with Swagger documentation, theming via Bootswatch, and full CI/CD automation through GitHub Actions and Docker containerization. Its architecture employs repository and service abstractions (e.g., `IEmployeeService`), in-memory EF Core databases with mock data generation, health checks, and Application Insights telemetry, alongside comprehensive unit testing across domain and data layers. The unique value proposition lies in its side-by-side comparison methodology\u2014allowing developers to evaluate different UI frameworks and patterns pragmatically using a consistent domain model\u2014combined with production-ready DevOps examples including Docker deployments, Azure Pipelines integration, and API key-based security. Targeted at full-stack developers, architects, and teams evaluating front-end technology choices, this project serves as both a living laboratory for ASP.NET Core modernization (tracking migrations from .NET 5 through .NET 10) and a reference implementation of enterprise-grade web application patterns with real-world deployment considerations.",
       "attention_score": 28.5,
       "attention_metrics": {
         "score": 28.5,
@@ -607,7 +820,7 @@
           }
         }
       },
-      "rank": 1,
+      "rank": 2,
       "composite_score": 55.1,
       "pull_request_summary": {
         "availability": "available",
@@ -691,19 +904,45 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 3
+      "attention_rank": 6,
+      "screenshot": {
+        "path": "output/users/makeboldsolutions/screenshots/uisamplespark.png",
+        "url": "https://ui.makeboldspark.com",
+        "captured_at": "2026-09-29T00:45:01.176512+00:00",
+        "width": 1280,
+        "height": 720,
+        "file_size_kb": 104.1
+      },
+      "screenshot_audit": {
+        "status": "ok",
+        "website_url": "https://ui.makeboldspark.com",
+        "screenshot_path": "output/users/makeboldsolutions/screenshots/uisamplespark.png",
+        "flags": [],
+        "http": {
+          "status_code": 200,
+          "final_url": "https://ui.makeboldspark.com/",
+          "page_title": "ASP.NET Core UI Patterns Tutorial | Modern UI Pattern Showcase - UISampleSpark",
+          "flags": []
+        },
+        "image": {
+          "image_analysis_available": true,
+          "brightness": 227.51,
+          "variance": 68.22,
+          "flags": []
+        }
+      }
     },
     {
       "name": "github-stats-spark",
       "description": "Automated GitHub profile statistics generator with beautiful SVG visualizations and AI-powered repository analysis",
       "summary": {
-        "text": "> Automated GitHub profile statistics generator with beautiful SVG visualizations and AI-powered repository analysis Built with Python. Actively maintained with regular updates.",
-        "ai_generated": false,
-        "generation_method": "enhanced-template",
-        "generated_at": "2026-09-28T16:25:22.016318",
-        "model_used": null,
-        "tokens_used": 0,
-        "confidence_score": 60
+        "text": "# Technical Analysis: github-stats-spark\n\n## \ud83d\udccb Executive Summary\n\n**Stats Spark** is a sophisticated GitHub analytics and visualization platform that generates automated profile statistics and AI-powered repository analysis. It's a full-stack application combining Python backend services, JavaScript frontend, and cloud deployment infrastructure designed to transform GitHub activity data into actionable insights and beautiful visualizations.\n\n**Status**: Active project with recent updates but declining commit frequency over 90 days. Well-architected for production use with enterprise-ready features.\n\n---\n\n## \ud83c\udfd7\ufe0f Architecture Overview\n\n### Technology Stack Composition\n- **Python (49.6%)**: Core analytics engine and API services\n- **JavaScript (21.6%)**: Frontend dashboard and interactive components\n- **PowerShell (18.7%)**: CI/CD orchestration and deployment automation\n- **CSS (9.1%)**: Styling for web interface\n- **HTML (1.0%)**: Template markup\n\n### Key Technical Dependencies\n\n| Dependency | Purpose | Category |\n|-----------|---------|----------|\n| **PyGithub** | GitHub API client library | Core Integration |\n| **PyYAML** | Configuration management | Infrastructure |\n| **svgwrite** | SVG generation for visualizations | Output |\n| **requests** | HTTP client for external APIs | Networking |\n| **beautifulsoup4** | HTML/XML parsing | Data Processing |\n\n**Tech Currency Score: 68/100** \u2014 Solid foundation with some dependencies approaching maintenance cycles. Recommend monitoring for security updates.\n\n---\n\n## \ud83c\udfaf Core Functionality Breakdown\n\n### 1. **SVG Profile Statistics Generator**\n\n#### Automated Visualization Pipeline\n- **Weekly Updates**: GitHub Actions scheduled execution (UTC midnight, Sundays)\n- **6 Visual Categories**:\n  - Overview Dashboard (Spark Score, key metrics)\n  - Commit Heatmap (GitHub-style contribution calendar)\n  - Language Distribution (technology stack visualization)\n  - Streak Tracking (consistency metrics)\n  - Fun Stats (8 personality-driven achievements)\n  - Release Cadence (sparklines, activity breadth)\n\n#### Spark Score Algorithm (0-100)\n```\nScore = (Consistency \u00d7 0.40) + (Volume \u00d7 0.35) + (Collaboration \u00d7 0.25)\n```\n- Consistency: Contribution pattern regularity\n- Volume: Total commits/activity magnitude\n- Collaboration: Repository diversity, stars, community engagement\n\n#### Rendering Strategy\n- **svgwrite** generates embeddable SVG components\n- Theme support: Dark, light, custom with WCAG AA accessibility\n- Zero-maintenance updates via scheduled workflows\n\n### 2. **AI-Powered Repository Analysis**\n\n#### Intelligent Ranking Algorithm\n```\nRepository Score = (Popularity \u00d7 0.30) + (Activity \u00d7 0.45) + (Health \u00d7 0.25)\n```\n\n**Popularity (30%)**\n- Star count and fork metrics\n- Community engagement signals\n\n**Activity (45%)** \u2014 Primary weight\n- Recent commit frequency (90d, 180d, 365d time decay)\n- Release cadence and active development signals\n\n**Health (25%)**\n- Documentation completeness\n- License presence\n- Maintenance signals and staleness detection\n\n#### AI-Generated Technical Summaries\n- Uses Claude Haiku API for intelligent analysis\n- 97%+ success rate for 500+ repository batches\n- Generates 4-6 sentence technical descriptions capturing:\n  - Project purpose and main functionality\n  - Key features and capabilities\n  - Technology stack and frameworks\n  - Architectural patterns\n  - Unique differentiators\n  - Target user demographics\n\n#### Dependency Analysis\n- **Schema 2.3.0**: Unified repository records include:\n  - `attention_score`, `attention_rank`, `attention_metrics`\n  - `tech_stack` with version tracking and registry resolution coverage\n  - `diagnostics_summary` for maintenance health\n  - `screenshot_audit` for visual documentation\n\n#### Attention Scoring Matrix\nCombines:\n- PR backlog pressure\n- Security alert counts\n- Repository staleness (last commit age)\n- Dependency drift and update gaps\n- Known version coverage in tech stack\n\n### 3. **Interactive Mobile-First Dashboard**\n\n#### Frontend Architecture\n- **React-based** component system\n- **Chart.js + react-chartjs-2** for interactive analytics\n- **Dexie + IndexedDB** for offline-first data persistence\n- **Bottom sheet navigation** (native mobile UX pattern)\n\n#### Mobile Optimization\n- **Viewport Support**: 320px-768px responsive design\n- **Touch Targets**: 44x44px minimum (iOS guidelines)\n- **Gestures**: Swipe interactions, horizontal navigation\n- **Performance**: <2s First Contentful Paint (Lighthouse CI target: 0.9+ score)\n\n#### Key Dashboard Views\n1. **Needs Attention Ranking**: Composite scoring for repositories requiring maintenance\n2. **Visual Analytics**: Interactive charts with touch-optimized tooltips\n3. **Drill-Down Details**: Comprehensive repository analysis with:\n   - Commit history visualization\n   - Enriched dependency coverage display\n   - Markdown-rendered AI summaries\n4. **Export Functionality**: CSV/JSON download for filtered datasets\n\n#### Offline Capabilities\n- 7-day IndexedDB retention\n- Seamless sync on reconnection\n- Works without network connectivity\n\n#### Accessibility\n- WCAG 2.1 AA compliance\n- Screen reader support\n- Keyboard navigation throughout\n\n#### Deployment\n- **GitHub Pages** for static hosting\n- Automatic updates with latest statistics\n- No server infrastructure required\n\n---\n\n## \ud83d\udd27 Technical Implementation Details\n\n### Backend Processing Pipeline\n\n```\nGitHub API (PyGithub)\n    \u2193\n[Data Collection Layer]\n    \u251c\u2500 User profile data\n    \u251c\u2500 Repository metrics\n    \u251c\u2500 Contribution history\n    \u2514\u2500 Language statistics\n    \u2193\n[Analysis Engine]\n    \u251c\u2500 Spark Score calculation\n    \u251c\u2500 Ranking algorithms\n    \u251c\u2500 AI Summarization (Claude API)\n    \u2514\u2500 Dependency analysis\n    \u2193\n[SVG Generation]\n    \u251c\u2500 Profile statistics (svgwrite)\n    \u251c\u2500 Heatmap visualization\n    \u251c\u2500 Language charts\n    \u2514\u2500 Streak visualizations\n    \u2193\n[Report Generation]\n    \u2514\u2500 GitHub-flavored markdown output\n```\n\n### Configuration Management\n- **YAML-based** configuration system (PyYAML",
+        "ai_generated": true,
+        "generation_method": "claude-haiku-4-5",
+        "generated_at": "2026-08-27T23:05:01.721601",
+        "model_used": "claude-haiku-4-5",
+        "tokens_used": 3722,
+        "confidence_score": 90
       },
       "url": "https://github.com/MakeBoldSolutions/github-stats-spark",
       "homepage": "http://github-stats.makeboldspark.com/",
@@ -717,35 +956,35 @@
       "language_stats": {},
       "languages": {},
       "created_at": "2025-12-28T17:01:51+00:00",
-      "updated_at": "2026-09-28T15:24:28+00:00",
-      "pushed_at": "2026-09-28T15:23:20+00:00",
-      "total_commits": 291,
-      "recent_commits_90d": 11,
+      "updated_at": "2026-09-28T16:25:49+00:00",
+      "pushed_at": "2026-09-28T22:42:23+00:00",
+      "total_commits": 292,
+      "recent_commits_90d": 12,
       "first_commit_date": "2025-12-28T17:01:51+00:00",
       "last_commit_date": "2026-09-28T00:00:00+00:00",
       "commit_history": {
         "repository_name": "github-stats-spark",
-        "total_commits": 291,
-        "recent_90d": 11,
-        "recent_180d": 77,
-        "recent_365d": 291,
+        "total_commits": 292,
+        "recent_90d": 12,
+        "recent_180d": 78,
+        "recent_365d": 292,
         "last_commit_date": "2026-09-28T00:00:00+00:00",
         "patterns": [
           "active",
           "recently_updated",
           "declining"
         ],
-        "commit_frequency": 3.67,
+        "commit_frequency": 4.0,
         "consistency_score": 0,
-        "activity_rate": 0.122,
-        "days_since_last_commit": 0,
+        "activity_rate": 0.133,
+        "days_since_last_commit": 1,
         "first_commit_date": "2025-12-28T17:01:51+00:00"
       },
       "commit_metrics": null,
       "avg_commit_size": null,
       "largest_commit": null,
       "smallest_commit": null,
-      "commit_velocity": 3.67,
+      "commit_velocity": 4.0,
       "tech_stack": {
         "repository_name": "github-stats-spark",
         "languages": {},
@@ -838,7 +1077,7 @@
           {
             "name": "anthropic",
             "current_version": "0.101.0",
-            "latest_version": "1.8.0",
+            "latest_version": "1.9.0",
             "ecosystem": "pypi",
             "versions_behind": 1,
             "is_outdated": true,
@@ -940,13 +1179,13 @@
       "has_tests": true,
       "has_docs": true,
       "language_count": 5,
-      "size_kb": 30049,
+      "size_kb": 31340,
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 273,
+      "age_days": 274,
       "days_since_last_push": 0,
-      "ai_summary": null,
+      "ai_summary": "# Technical Analysis: github-stats-spark\n\n## \ud83d\udccb Executive Summary\n\n**Stats Spark** is a sophisticated GitHub analytics and visualization platform that generates automated profile statistics and AI-powered repository analysis. It's a full-stack application combining Python backend services, JavaScript frontend, and cloud deployment infrastructure designed to transform GitHub activity data into actionable insights and beautiful visualizations.\n\n**Status**: Active project with recent updates but declining commit frequency over 90 days. Well-architected for production use with enterprise-ready features.\n\n---\n\n## \ud83c\udfd7\ufe0f Architecture Overview\n\n### Technology Stack Composition\n- **Python (49.6%)**: Core analytics engine and API services\n- **JavaScript (21.6%)**: Frontend dashboard and interactive components\n- **PowerShell (18.7%)**: CI/CD orchestration and deployment automation\n- **CSS (9.1%)**: Styling for web interface\n- **HTML (1.0%)**: Template markup\n\n### Key Technical Dependencies\n\n| Dependency | Purpose | Category |\n|-----------|---------|----------|\n| **PyGithub** | GitHub API client library | Core Integration |\n| **PyYAML** | Configuration management | Infrastructure |\n| **svgwrite** | SVG generation for visualizations | Output |\n| **requests** | HTTP client for external APIs | Networking |\n| **beautifulsoup4** | HTML/XML parsing | Data Processing |\n\n**Tech Currency Score: 68/100** \u2014 Solid foundation with some dependencies approaching maintenance cycles. Recommend monitoring for security updates.\n\n---\n\n## \ud83c\udfaf Core Functionality Breakdown\n\n### 1. **SVG Profile Statistics Generator**\n\n#### Automated Visualization Pipeline\n- **Weekly Updates**: GitHub Actions scheduled execution (UTC midnight, Sundays)\n- **6 Visual Categories**:\n  - Overview Dashboard (Spark Score, key metrics)\n  - Commit Heatmap (GitHub-style contribution calendar)\n  - Language Distribution (technology stack visualization)\n  - Streak Tracking (consistency metrics)\n  - Fun Stats (8 personality-driven achievements)\n  - Release Cadence (sparklines, activity breadth)\n\n#### Spark Score Algorithm (0-100)\n```\nScore = (Consistency \u00d7 0.40) + (Volume \u00d7 0.35) + (Collaboration \u00d7 0.25)\n```\n- Consistency: Contribution pattern regularity\n- Volume: Total commits/activity magnitude\n- Collaboration: Repository diversity, stars, community engagement\n\n#### Rendering Strategy\n- **svgwrite** generates embeddable SVG components\n- Theme support: Dark, light, custom with WCAG AA accessibility\n- Zero-maintenance updates via scheduled workflows\n\n### 2. **AI-Powered Repository Analysis**\n\n#### Intelligent Ranking Algorithm\n```\nRepository Score = (Popularity \u00d7 0.30) + (Activity \u00d7 0.45) + (Health \u00d7 0.25)\n```\n\n**Popularity (30%)**\n- Star count and fork metrics\n- Community engagement signals\n\n**Activity (45%)** \u2014 Primary weight\n- Recent commit frequency (90d, 180d, 365d time decay)\n- Release cadence and active development signals\n\n**Health (25%)**\n- Documentation completeness\n- License presence\n- Maintenance signals and staleness detection\n\n#### AI-Generated Technical Summaries\n- Uses Claude Haiku API for intelligent analysis\n- 97%+ success rate for 500+ repository batches\n- Generates 4-6 sentence technical descriptions capturing:\n  - Project purpose and main functionality\n  - Key features and capabilities\n  - Technology stack and frameworks\n  - Architectural patterns\n  - Unique differentiators\n  - Target user demographics\n\n#### Dependency Analysis\n- **Schema 2.3.0**: Unified repository records include:\n  - `attention_score`, `attention_rank`, `attention_metrics`\n  - `tech_stack` with version tracking and registry resolution coverage\n  - `diagnostics_summary` for maintenance health\n  - `screenshot_audit` for visual documentation\n\n#### Attention Scoring Matrix\nCombines:\n- PR backlog pressure\n- Security alert counts\n- Repository staleness (last commit age)\n- Dependency drift and update gaps\n- Known version coverage in tech stack\n\n### 3. **Interactive Mobile-First Dashboard**\n\n#### Frontend Architecture\n- **React-based** component system\n- **Chart.js + react-chartjs-2** for interactive analytics\n- **Dexie + IndexedDB** for offline-first data persistence\n- **Bottom sheet navigation** (native mobile UX pattern)\n\n#### Mobile Optimization\n- **Viewport Support**: 320px-768px responsive design\n- **Touch Targets**: 44x44px minimum (iOS guidelines)\n- **Gestures**: Swipe interactions, horizontal navigation\n- **Performance**: <2s First Contentful Paint (Lighthouse CI target: 0.9+ score)\n\n#### Key Dashboard Views\n1. **Needs Attention Ranking**: Composite scoring for repositories requiring maintenance\n2. **Visual Analytics**: Interactive charts with touch-optimized tooltips\n3. **Drill-Down Details**: Comprehensive repository analysis with:\n   - Commit history visualization\n   - Enriched dependency coverage display\n   - Markdown-rendered AI summaries\n4. **Export Functionality**: CSV/JSON download for filtered datasets\n\n#### Offline Capabilities\n- 7-day IndexedDB retention\n- Seamless sync on reconnection\n- Works without network connectivity\n\n#### Accessibility\n- WCAG 2.1 AA compliance\n- Screen reader support\n- Keyboard navigation throughout\n\n#### Deployment\n- **GitHub Pages** for static hosting\n- Automatic updates with latest statistics\n- No server infrastructure required\n\n---\n\n## \ud83d\udd27 Technical Implementation Details\n\n### Backend Processing Pipeline\n\n```\nGitHub API (PyGithub)\n    \u2193\n[Data Collection Layer]\n    \u251c\u2500 User profile data\n    \u251c\u2500 Repository metrics\n    \u251c\u2500 Contribution history\n    \u2514\u2500 Language statistics\n    \u2193\n[Analysis Engine]\n    \u251c\u2500 Spark Score calculation\n    \u251c\u2500 Ranking algorithms\n    \u251c\u2500 AI Summarization (Claude API)\n    \u2514\u2500 Dependency analysis\n    \u2193\n[SVG Generation]\n    \u251c\u2500 Profile statistics (svgwrite)\n    \u251c\u2500 Heatmap visualization\n    \u251c\u2500 Language charts\n    \u2514\u2500 Streak visualizations\n    \u2193\n[Report Generation]\n    \u2514\u2500 GitHub-flavored markdown output\n```\n\n### Configuration Management\n- **YAML-based** configuration system (PyYAML",
       "attention_score": 6.6,
       "attention_metrics": {
         "score": 6.6,
@@ -981,7 +1220,7 @@
           "staleness": {
             "score": 0.0,
             "days_since_last_push": 0,
-            "recent_commits_90d": 11,
+            "recent_commits_90d": 12,
             "open_issues": 0
           },
           "dependencies": {
@@ -996,8 +1235,8 @@
           }
         }
       },
-      "rank": 2,
-      "composite_score": 43.36,
+      "rank": 3,
+      "composite_score": 43.72,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -1068,10 +1307,10 @@
           "availability": "available",
           "reason": "none",
           "recent_runs": 20,
-          "success_count": 11,
+          "success_count": 12,
           "failure_count": 8,
-          "last_run_status": "in_progress",
-          "last_run_conclusion": null,
+          "last_run_status": "completed",
+          "last_run_conclusion": "success",
           "last_run_age_days": 0
         },
         "sources": [
@@ -1080,19 +1319,45 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 14
+      "attention_rank": 14,
+      "screenshot": {
+        "path": "output/users/makeboldsolutions/screenshots/github-stats-spark.png",
+        "url": "http://github-stats.makeboldspark.com/",
+        "captured_at": "2026-09-29T00:45:02.671592+00:00",
+        "width": 1280,
+        "height": 720,
+        "file_size_kb": 234.43
+      },
+      "screenshot_audit": {
+        "status": "ok",
+        "website_url": "http://github-stats.makeboldspark.com/",
+        "screenshot_path": "output/users/makeboldsolutions/screenshots/github-stats-spark.png",
+        "flags": [],
+        "http": {
+          "status_code": 200,
+          "final_url": "http://github-stats.makeboldspark.com/",
+          "page_title": "GitHubSpark \u2014 Make Bold Solutions Repository Portfolio",
+          "flags": []
+        },
+        "image": {
+          "image_analysis_available": true,
+          "brightness": 196.42,
+          "variance": 77.51,
+          "flags": []
+        }
+      }
     },
     {
       "name": "TailwindSpark",
       "description": "A Demo of the Tailwind CSS Library",
       "summary": {
-        "text": "[![Version](https://img.shields.io/badge/version-1.0.18-blue.svg)](https://github.com/MakeBoldSolutions/TailwindSpark) [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![React](https://img.shields.io/badge/React-19.1.1-61dafb.svg)](https://reactjs.org/) [![TypeScript](https Built with TypeScript. Actively maintained with regular updates.",
-        "ai_generated": false,
-        "generation_method": "enhanced-template",
-        "generated_at": "2026-09-28T16:25:27.431521",
-        "model_used": null,
-        "tokens_used": 0,
-        "confidence_score": 60
+        "text": "# TailwindSpark - Technical Summary\n\n**TailwindSpark** is a production-ready React TypeScript monorepo that serves as a comprehensive showcase and learning resource for modern web development patterns, specifically emphasizing Tailwind CSS 4's semantic design system capabilities. The project demonstrates enterprise-grade architecture through a Turborepo-based structure featuring a main demo application (`apps/demo-app`) and shared packages for design tokens and reusable UI components, built with React 19.1.1, TypeScript 5.9, and Tailwind CSS 4.1.18. Key technical strengths include strict TypeScript implementation, formal code governance via a project constitution, minimum 40% test coverage requirements, WCAG AA accessibility compliance, and comprehensive CI/CD automation with Dependabot dependency management and security scanning. The architecture showcases scalable patterns through shared design tokens, semantic theming via Tailwind's `@theme` directive, and modular component architecture designed for both learning and production use. TailwindSpark is notable for its rigorous quality standards, extensive documentation (including development history metrics and architectural decision records), and active maintenance with 24 commits in the last 90 days, making it particularly valuable for developers seeking production-grade React patterns, design system implementation practices, and modern CSS-in-JS workflows. The project targets intermediate-to-advanced developers, technical architects, and organizations looking to understand scalable monorepo patterns, semantic design systems, and accessibility-first component development.",
+        "ai_generated": true,
+        "generation_method": "claude-haiku-4-5",
+        "generated_at": "2026-08-27T07:59:46.494905",
+        "model_used": "claude-haiku-4-5",
+        "tokens_used": 2052,
+        "confidence_score": 90
       },
       "url": "https://github.com/MakeBoldSolutions/TailwindSpark",
       "homepage": "http://tailwind.makeboldspark.com/",
@@ -1126,7 +1391,7 @@
         "commit_frequency": 4.33,
         "consistency_score": 0,
         "activity_rate": 0.144,
-        "days_since_last_commit": 42,
+        "days_since_last_commit": 43,
         "first_commit_date": "2025-07-29T16:30:33+00:00"
       },
       "commit_metrics": null,
@@ -1514,9 +1779,9 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 425,
+      "age_days": 426,
       "days_since_last_push": 0,
-      "ai_summary": null,
+      "ai_summary": "# TailwindSpark - Technical Summary\n\n**TailwindSpark** is a production-ready React TypeScript monorepo that serves as a comprehensive showcase and learning resource for modern web development patterns, specifically emphasizing Tailwind CSS 4's semantic design system capabilities. The project demonstrates enterprise-grade architecture through a Turborepo-based structure featuring a main demo application (`apps/demo-app`) and shared packages for design tokens and reusable UI components, built with React 19.1.1, TypeScript 5.9, and Tailwind CSS 4.1.18. Key technical strengths include strict TypeScript implementation, formal code governance via a project constitution, minimum 40% test coverage requirements, WCAG AA accessibility compliance, and comprehensive CI/CD automation with Dependabot dependency management and security scanning. The architecture showcases scalable patterns through shared design tokens, semantic theming via Tailwind's `@theme` directive, and modular component architecture designed for both learning and production use. TailwindSpark is notable for its rigorous quality standards, extensive documentation (including development history metrics and architectural decision records), and active maintenance with 24 commits in the last 90 days, making it particularly valuable for developers seeking production-grade React patterns, design system implementation practices, and modern CSS-in-JS workflows. The project targets intermediate-to-advanced developers, technical architects, and organizations looking to understand scalable monorepo patterns, semantic design systems, and accessibility-first component development.",
       "attention_score": 30.6,
       "attention_metrics": {
         "score": 30.6,
@@ -1566,8 +1831,8 @@
           }
         }
       },
-      "rank": 3,
-      "composite_score": 42.56,
+      "rank": 4,
+      "composite_score": 42.57,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -1650,219 +1915,45 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 1
-    },
-    {
-      "name": "ArrowSpark",
-      "description": "ArrowSpark a game of puzzle solving arrows",
-      "summary": {
-        "text": "For Godot 4.4 (4.2+ compatible) Built with GDScript. Key features: Main Menu, Options Menus, Pause Menu. Actively maintained with regular updates.",
-        "ai_generated": false,
-        "generation_method": "enhanced-template",
-        "generated_at": "2026-09-28T16:25:27.431683",
-        "model_used": null,
-        "tokens_used": 0,
-        "confidence_score": 60
+      "attention_rank": 5,
+      "screenshot": {
+        "path": "output/users/makeboldsolutions/screenshots/tailwindspark.png",
+        "url": "http://tailwind.makeboldspark.com/",
+        "captured_at": "2026-09-29T00:45:04.212572+00:00",
+        "width": 1280,
+        "height": 720,
+        "file_size_kb": 4.15
       },
-      "url": "https://github.com/MakeBoldSolutions/ArrowSpark",
-      "homepage": null,
-      "has_pages": false,
-      "pages_url": null,
-      "website_url": null,
-      "stars": 0,
-      "forks": 0,
-      "watchers": 0,
-      "language": "GDScript",
-      "language_stats": {},
-      "languages": {},
-      "created_at": "2026-09-28T15:25:46+00:00",
-      "updated_at": "2026-09-28T15:28:45+00:00",
-      "pushed_at": "2026-09-28T16:15:35+00:00",
-      "total_commits": 47,
-      "recent_commits_90d": 47,
-      "first_commit_date": "2026-09-28T15:25:46+00:00",
-      "last_commit_date": "2026-09-28T00:00:00+00:00",
-      "commit_history": {
-        "repository_name": "ArrowSpark",
-        "total_commits": 47,
-        "recent_90d": 47,
-        "recent_180d": 47,
-        "recent_365d": 47,
-        "last_commit_date": "2026-09-28T00:00:00+00:00",
-        "patterns": [
-          "highly_active",
-          "recently_updated",
-          "accelerating"
-        ],
-        "commit_frequency": 15.67,
-        "consistency_score": 0,
-        "activity_rate": 0.522,
-        "days_since_last_commit": 0,
-        "first_commit_date": "2026-09-28T15:25:46+00:00"
-      },
-      "commit_metrics": null,
-      "avg_commit_size": null,
-      "largest_commit": null,
-      "smallest_commit": null,
-      "commit_velocity": 15.67,
-      "tech_stack": null,
-      "has_readme": true,
-      "has_license": true,
-      "has_ci_cd": true,
-      "has_tests": true,
-      "has_docs": false,
-      "language_count": 4,
-      "size_kb": 0,
-      "is_fork": false,
-      "is_private": false,
-      "is_archived": false,
-      "age_days": 0,
-      "days_since_last_push": 0,
-      "ai_summary": null,
-      "attention_score": 3.5,
-      "attention_metrics": {
-        "score": 3.5,
-        "tier": "healthy",
-        "needs_attention": false,
-        "reasons": [],
-        "components": {
-          "pull_requests": {
-            "score": 0.0,
-            "availability": "available",
-            "reason": "none",
-            "total_open": 0,
-            "draft_count": 0,
-            "review_requested_count": 0,
-            "oldest_open_age_days": null
-          },
-          "security": {
-            "score": 10.0,
-            "availability": "partial",
-            "reason": "permission_denied",
-            "overall_state": "clear",
-            "active_alert_counts": {
-              "total_open": 0,
-              "critical": 0,
-              "high": 0,
-              "medium": 0,
-              "low": 0
-            }
-          },
-          "staleness": {
-            "score": 0.0,
-            "days_since_last_push": 0,
-            "recent_commits_90d": 47,
-            "open_issues": 0
-          },
-          "dependencies": {
-            "score": 0.0,
-            "total_dependencies": 0,
-            "outdated_count": 0,
-            "outdated_percentage": 0.0,
-            "currency_score": 100,
-            "version_coverage_percentage": 100.0,
-            "latest_version_coverage_percentage": 100.0,
-            "unknown_versions_count": 0
-          }
+      "screenshot_audit": {
+        "status": "ok",
+        "website_url": "http://tailwind.makeboldspark.com/",
+        "screenshot_path": "output/users/makeboldsolutions/screenshots/tailwindspark.png",
+        "flags": [],
+        "http": {
+          "status_code": 200,
+          "final_url": "http://tailwind.makeboldspark.com/",
+          "page_title": "TailwindSpark - Interactive Tailwind CSS Showcase | WebSpark Portfolio",
+          "flags": []
+        },
+        "image": {
+          "image_analysis_available": true,
+          "brightness": 255.0,
+          "variance": 0.0,
+          "flags": []
         }
-      },
-      "rank": 4,
-      "composite_score": 42.55,
-      "pull_request_summary": {
-        "availability": "available",
-        "reason": "none",
-        "has_open_pull_requests": false,
-        "total_open": 0,
-        "draft_count": 0,
-        "review_requested_count": 0,
-        "oldest_open_age_days": null,
-        "source": "rest.pulls.list"
-      },
-      "security_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
-        "overall_state": "clear",
-        "feature_status": {
-          "advanced_security": "unknown",
-          "secret_scanning": "unknown",
-          "secret_scanning_push_protection": "unknown",
-          "dependency_alerts": "unavailable",
-          "automated_security_fixes": "unavailable"
-        },
-        "active_alert_counts": {
-          "total_open": 0,
-          "critical": 0,
-          "high": 0,
-          "medium": 0,
-          "low": 0
-        },
-        "sources": [
-          "rest.repos.get"
-        ]
-      },
-      "diagnostics_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
-        "pull_requests": {
-          "availability": "available",
-          "reason": "none",
-          "total_open": 0,
-          "oldest_open_age_days": null
-        },
-        "issues": {
-          "availability": "available",
-          "reason": "none",
-          "total_open": 0,
-          "oldest_open_age_days": null,
-          "stale_over_30d": 0,
-          "stale_over_90d": 0
-        },
-        "security": {
-          "availability": "unavailable",
-          "reason": "permission_denied",
-          "dependabot": {
-            "total_open": 0,
-            "critical": 0,
-            "high": 0,
-            "medium": 0,
-            "low": 0
-          },
-          "code_scanning": {
-            "total_open": 0,
-            "error": 0,
-            "warning": 0,
-            "note": 0
-          }
-        },
-        "actions": {
-          "availability": "available",
-          "reason": "none",
-          "recent_runs": 0,
-          "success_count": 0,
-          "failure_count": 0,
-          "last_run_status": null,
-          "last_run_conclusion": null,
-          "last_run_age_days": null
-        },
-        "sources": [
-          "rest.pulls.list",
-          "rest.issues.list",
-          "rest.actions.runs"
-        ]
-      },
-      "attention_rank": 15
+      }
     },
     {
       "name": "RequestSpark",
       "description": "A small console application to run REST requests",
       "summary": {
-        "text": "[![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download/dotnet/10.0) [![License](https://img.shields.io/github/license/MakeBoldSolutions/RequestSpark)](https://github.com/MakeBoldSolutions/RequestSpark/blob/main/LICENSE) [![GitHub Issues](https://img.shields. Built with C#. Key features: **Postman Collection Integration**: Import and execute existing Postman collections, **Automated Regression Testing**: Run comprehensive API test suites automatically, **Performance Analysis**: Compare response times across multiple API instances. Maintained project with periodic updates.",
-        "ai_generated": false,
-        "generation_method": "enhanced-template",
-        "generated_at": "2026-09-28T16:25:27.431786",
-        "model_used": null,
-        "tokens_used": 0,
-        "confidence_score": 60
+        "text": "# RequestSpark - Technical Summary\n\n**RequestSpark** is a .NET 10 (LTS) web application and command-line tool designed for comprehensive REST API testing, performance benchmarking, and regression testing against Postman collections. The solution provides a dual-interface approach with a browser-based Razor Pages dashboard for interactive management and a console application for automated testing workflows, enabling developers and QA teams to validate API functionality, analyze performance metrics (including percentiles and success rates), and conduct load testing with configurable parameters.\n\nThe architecture follows a layered design pattern with distinct separation of concerns across five main projects: a domain layer (`RequestSpark.Domain`) encapsulating core business logic, a Postman collection import module (`RequestSpark.PostmanImport`) for deserializing and processing collection files, a web application (`RequestSpark.Web`) serving the interactive UI, a console entry point (`RequestSpark`), and comprehensive test suites (`RequestSpark.Domain.Tests`, `RequestSpark.Web.Tests`) achieving 100% pass rates. The technology stack leverages modern .NET 10 capabilities with MSTest v4 for testing and quality analysis, while supporting OpenAPI specifications and CSV export functionality for seamless integration with CI/CD pipelines and reporting tools.\n\nRequestSpark differentiates itself through tight Postman ecosystem integration, built-in sample CRUD APIs for demonstration purposes, and recent performance optimizations delivering 19% faster builds and 25% faster test execution compared to .NET 9. The project maintains security-first practices with 93% of packages at latest stable versions and zero known vulnerabilities, while the recently completed upgrade to .NET 10 LTS ensures three years of long-term support through November 2028. Though currently a niche project (2 stars, minimal community adoption), it serves as a valuable technical demonstration within the Make Bold Spark portfolio and targets development teams seeking lightweight, self-hosted API testing solutions without dependency on commercial platforms like Postman Cloud or specialized SaaS alternatives.",
+        "ai_generated": true,
+        "generation_method": "claude-haiku-4-5",
+        "generated_at": "2026-08-27T23:04:53.988963",
+        "model_used": "claude-haiku-4-5",
+        "tokens_used": 2784,
+        "confidence_score": 90
       },
       "url": "https://github.com/MakeBoldSolutions/RequestSpark",
       "homepage": null,
@@ -1896,7 +1987,7 @@
         "commit_frequency": 1.0,
         "consistency_score": 0,
         "activity_rate": 0.033,
-        "days_since_last_commit": 32,
+        "days_since_last_commit": 33,
         "first_commit_date": "2021-09-30T13:38:06+00:00"
       },
       "commit_metrics": null,
@@ -1917,7 +2008,7 @@
       "is_archived": false,
       "age_days": 1824,
       "days_since_last_push": 25,
-      "ai_summary": null,
+      "ai_summary": "# RequestSpark - Technical Summary\n\n**RequestSpark** is a .NET 10 (LTS) web application and command-line tool designed for comprehensive REST API testing, performance benchmarking, and regression testing against Postman collections. The solution provides a dual-interface approach with a browser-based Razor Pages dashboard for interactive management and a console application for automated testing workflows, enabling developers and QA teams to validate API functionality, analyze performance metrics (including percentiles and success rates), and conduct load testing with configurable parameters.\n\nThe architecture follows a layered design pattern with distinct separation of concerns across five main projects: a domain layer (`RequestSpark.Domain`) encapsulating core business logic, a Postman collection import module (`RequestSpark.PostmanImport`) for deserializing and processing collection files, a web application (`RequestSpark.Web`) serving the interactive UI, a console entry point (`RequestSpark`), and comprehensive test suites (`RequestSpark.Domain.Tests`, `RequestSpark.Web.Tests`) achieving 100% pass rates. The technology stack leverages modern .NET 10 capabilities with MSTest v4 for testing and quality analysis, while supporting OpenAPI specifications and CSV export functionality for seamless integration with CI/CD pipelines and reporting tools.\n\nRequestSpark differentiates itself through tight Postman ecosystem integration, built-in sample CRUD APIs for demonstration purposes, and recent performance optimizations delivering 19% faster builds and 25% faster test execution compared to .NET 9. The project maintains security-first practices with 93% of packages at latest stable versions and zero known vulnerabilities, while the recently completed upgrade to .NET 10 LTS ensures three years of long-term support through November 2028. Though currently a niche project (2 stars, minimal community adoption), it serves as a valuable technical demonstration within the Make Bold Spark portfolio and targets development teams seeking lightweight, self-hosted API testing solutions without dependency on commercial platforms like Postman Cloud or specialized SaaS alternatives.",
       "attention_score": 18.5,
       "attention_metrics": {
         "score": 18.5,
@@ -2051,19 +2142,27 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 8
+      "attention_rank": 8,
+      "screenshot_audit": {
+        "status": "ok",
+        "website_url": null,
+        "screenshot_path": null,
+        "flags": [],
+        "http": null,
+        "image": null
+      }
     },
     {
       "name": "MakeBoldSpark.com",
       "description": "MakeBoldSpark",
       "summary": {
-        "text": "**Live Site**: [makeboldspark.com](https://makeboldspark.com) Built with C#. Actively maintained with regular updates.",
-        "ai_generated": false,
-        "generation_method": "enhanced-template",
-        "generated_at": "2026-09-28T16:25:27.431845",
-        "model_used": null,
-        "tokens_used": 0,
-        "confidence_score": 60
+        "text": "# MakeBoldSpark Technical Summary\n\n**MakeBoldSpark** is a modular ASP.NET Core backend API platform designed to consolidate multiple low-volume APIs into a single, cost-effective Azure-hosted application, serving as the centralized API layer for static sites and single-page applications while keeping public web clients static-first. The platform leverages .NET 10 LTS with Entity Framework Core and SQLite as the primary relational backend, supplemented by Azure Cosmos DB for document-oriented scenarios, and is architected with segregated route areas (`/api/public/`, `/api/admin/`, `/api/publish/`, `/api/integrations/`) to enable granular access control and role-based authorization. Built on Azure App Service Linux with persistent SQLite storage and integrated with Azure Static Web Apps, the platform employs established architectural patterns documented through Architecture Decision Records (ADRs) and a constitution file, making it a production-ready reference implementation for hosting multiple small APIs efficiently without incurring proportional infrastructure costs. The codebase is predominantly C# (66.9%) with supporting TypeScript and HTML components, organized to support browser-based CMS/admin capabilities and static JSON generation for content distribution. This project is particularly noteworthy for its pragmatic approach to multi-tenant API consolidation\u2014demonstrating how to balance functionality, cost, and maintainability when hosting diverse, low-traffic services on a single infrastructure footprint. The repository serves both as a working platform for the MakeBoldSpark portfolio and as a technical reference implementation for developers seeking patterns and practices for building scalable, modular ASP.NET Core backends in Azure environments.",
+        "ai_generated": true,
+        "generation_method": "claude-haiku-4-5",
+        "generated_at": "2026-08-27T07:59:33.525605",
+        "model_used": "claude-haiku-4-5",
+        "tokens_used": 1214,
+        "confidence_score": 90
       },
       "url": "https://github.com/MakeBoldSolutions/MakeBoldSpark.com",
       "homepage": "https://makeboldspark.com",
@@ -2098,7 +2197,7 @@
         "commit_frequency": 7.0,
         "consistency_score": 0,
         "activity_rate": 0.233,
-        "days_since_last_commit": 16,
+        "days_since_last_commit": 17,
         "first_commit_date": "2026-05-07T02:16:07+00:00"
       },
       "commit_metrics": null,
@@ -2118,8 +2217,8 @@
       "is_private": false,
       "is_archived": false,
       "age_days": 144,
-      "days_since_last_push": 15,
-      "ai_summary": null,
+      "days_since_last_push": 16,
+      "ai_summary": "# MakeBoldSpark Technical Summary\n\n**MakeBoldSpark** is a modular ASP.NET Core backend API platform designed to consolidate multiple low-volume APIs into a single, cost-effective Azure-hosted application, serving as the centralized API layer for static sites and single-page applications while keeping public web clients static-first. The platform leverages .NET 10 LTS with Entity Framework Core and SQLite as the primary relational backend, supplemented by Azure Cosmos DB for document-oriented scenarios, and is architected with segregated route areas (`/api/public/`, `/api/admin/`, `/api/publish/`, `/api/integrations/`) to enable granular access control and role-based authorization. Built on Azure App Service Linux with persistent SQLite storage and integrated with Azure Static Web Apps, the platform employs established architectural patterns documented through Architecture Decision Records (ADRs) and a constitution file, making it a production-ready reference implementation for hosting multiple small APIs efficiently without incurring proportional infrastructure costs. The codebase is predominantly C# (66.9%) with supporting TypeScript and HTML components, organized to support browser-based CMS/admin capabilities and static JSON generation for content distribution. This project is particularly noteworthy for its pragmatic approach to multi-tenant API consolidation\u2014demonstrating how to balance functionality, cost, and maintainability when hosting diverse, low-traffic services on a single infrastructure footprint. The repository serves both as a working platform for the MakeBoldSpark portfolio and as a technical reference implementation for developers seeking patterns and practices for building scalable, modular ASP.NET Core backends in Azure environments.",
       "attention_score": 15.5,
       "attention_metrics": {
         "score": 15.5,
@@ -2153,7 +2252,7 @@
           },
           "staleness": {
             "score": 12.0,
-            "days_since_last_push": 15,
+            "days_since_last_push": 16,
             "recent_commits_90d": 21,
             "open_issues": 0
           },
@@ -2245,7 +2344,7 @@
           "failure_count": 1,
           "last_run_status": "completed",
           "last_run_conclusion": "success",
-          "last_run_age_days": 15
+          "last_run_age_days": 16
         },
         "sources": [
           "rest.pulls.list",
@@ -2253,19 +2352,45 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 11
+      "attention_rank": 10,
+      "screenshot": {
+        "path": "output/users/makeboldsolutions/screenshots/makeboldspark.com.png",
+        "url": "https://makeboldspark.com",
+        "captured_at": "2026-09-29T00:45:05.816013+00:00",
+        "width": 1280,
+        "height": 720,
+        "file_size_kb": 106.48
+      },
+      "screenshot_audit": {
+        "status": "ok",
+        "website_url": "https://makeboldspark.com",
+        "screenshot_path": "output/users/makeboldsolutions/screenshots/makeboldspark.com.png",
+        "flags": [],
+        "http": {
+          "status_code": 200,
+          "final_url": "https://makeboldspark.com/",
+          "page_title": "Make Bold Spark by Make Bold Solutions",
+          "flags": []
+        },
+        "image": {
+          "image_analysis_available": true,
+          "brightness": 211.83,
+          "variance": 70.63,
+          "flags": []
+        }
+      }
     },
     {
       "name": "SupportSpark",
       "description": null,
       "summary": {
-        "text": "> A compassionate support network platform helping people share updates with their trusted circle during life's challenging moments. Built with PowerShell. Key features: Create and manage journey conversations, Post updates with text and images, Invite trusted supporters via email. Maintained project with periodic updates.",
-        "ai_generated": false,
-        "generation_method": "enhanced-template",
-        "generated_at": "2026-09-28T16:25:27.432940",
-        "model_used": null,
-        "tokens_used": 0,
-        "confidence_score": 60
+        "text": "# Technical Summary: SupportSpark\n\n**SupportSpark** is a full-stack web application designed as a compassionate support network platform that enables members to share journey updates with their trusted circles during challenging life moments. The platform implements role-based access control where members post updates and supporters provide encouragement through organized, threaded conversations, creating a distraction-free, invitation-only environment with a calming UI specifically designed for sensitive contexts.\n\nThe application leverages a modern, type-safe technology stack built on **React 19 with TypeScript (strict mode)** for the frontend, **Express 5** for the REST API backend, and **Tailwind CSS 4** with **shadcn/ui + Radix** components for accessible, responsive UI design. State management is handled through **TanStack React Query** for server-state synchronization, with **Zod** providing runtime type validation across the full stack, ensuring consistency between frontend and backend. Authentication uses **Passport.js with session-based security**, and the application supports multiple deployment scenarios including a static GitHub Pages build with localStorage persistence and a production-ready IIS deployment via **iisnode** on Windows 11.\n\nThe architecture demonstrates sophisticated software engineering practices including end-to-end type safety, invitation-based network isolation, image upload handling, and a comprehensive documentation structure with governance principles. Notably, the project includes **automated PowerShell deployment scripts** for IIS environments, making it production-grade for enterprise Windows infrastructure, while also providing a demo mode with pre-seeded data for rapid exploration. With 98 dependencies carefully curated around accessibility (Radix primitives), validation, and modern React patterns, SupportSpark serves as both a functional platform for support networks and a technical reference implementation for building sensitive, role-based applications with TypeScript and Express.",
+        "ai_generated": true,
+        "generation_method": "claude-haiku-4-5",
+        "generated_at": "2026-08-27T23:05:00.276944",
+        "model_used": "claude-haiku-4-5",
+        "tokens_used": 2763,
+        "confidence_score": 90
       },
       "url": "https://github.com/MakeBoldSolutions/SupportSpark",
       "homepage": "http://support.makeboldspark.com/",
@@ -2294,12 +2419,12 @@
         "last_commit_date": "2026-09-21T00:00:00+00:00",
         "patterns": [
           "maintained",
-          "recently_updated"
+          "current"
         ],
         "commit_frequency": 2.33,
         "consistency_score": 0,
         "activity_rate": 0.078,
-        "days_since_last_commit": 7,
+        "days_since_last_commit": 8,
         "first_commit_date": "2026-02-01T15:22:40+00:00"
       },
       "commit_metrics": null,
@@ -3711,10 +3836,10 @@
       "is_archived": false,
       "age_days": 239,
       "days_since_last_push": 7,
-      "ai_summary": null,
-      "attention_score": 23.7,
+      "ai_summary": "# Technical Summary: SupportSpark\n\n**SupportSpark** is a full-stack web application designed as a compassionate support network platform that enables members to share journey updates with their trusted circles during challenging life moments. The platform implements role-based access control where members post updates and supporters provide encouragement through organized, threaded conversations, creating a distraction-free, invitation-only environment with a calming UI specifically designed for sensitive contexts.\n\nThe application leverages a modern, type-safe technology stack built on **React 19 with TypeScript (strict mode)** for the frontend, **Express 5** for the REST API backend, and **Tailwind CSS 4** with **shadcn/ui + Radix** components for accessible, responsive UI design. State management is handled through **TanStack React Query** for server-state synchronization, with **Zod** providing runtime type validation across the full stack, ensuring consistency between frontend and backend. Authentication uses **Passport.js with session-based security**, and the application supports multiple deployment scenarios including a static GitHub Pages build with localStorage persistence and a production-ready IIS deployment via **iisnode** on Windows 11.\n\nThe architecture demonstrates sophisticated software engineering practices including end-to-end type safety, invitation-based network isolation, image upload handling, and a comprehensive documentation structure with governance principles. Notably, the project includes **automated PowerShell deployment scripts** for IIS environments, making it production-grade for enterprise Windows infrastructure, while also providing a demo mode with pre-seeded data for rapid exploration. With 98 dependencies carefully curated around accessibility (Radix primitives), validation, and modern React patterns, SupportSpark serves as both a functional platform for support networks and a technical reference implementation for building sensitive, role-based applications with TypeScript and Express.",
+      "attention_score": 23.8,
       "attention_metrics": {
-        "score": 23.7,
+        "score": 23.8,
         "tier": "watch",
         "needs_attention": true,
         "reasons": [
@@ -3723,13 +3848,13 @@
         ],
         "components": {
           "pull_requests": {
-            "score": 61.4,
+            "score": 61.8,
             "availability": "available",
             "reason": "none",
             "total_open": 2,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": 107
+            "oldest_open_age_days": 108
           },
           "security": {
             "score": 10.0,
@@ -3771,7 +3896,7 @@
         "total_open": 2,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": 107,
+        "oldest_open_age_days": 108,
         "source": "rest.pulls.list"
       },
       "security_summary": {
@@ -3803,7 +3928,7 @@
           "availability": "available",
           "reason": "none",
           "total_open": 2,
-          "oldest_open_age_days": 107
+          "oldest_open_age_days": 108
         },
         "issues": {
           "availability": "available",
@@ -3846,19 +3971,45 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 6
+      "attention_rank": 7,
+      "screenshot": {
+        "path": "output/users/makeboldsolutions/screenshots/supportspark.png",
+        "url": "http://support.makeboldspark.com/",
+        "captured_at": "2026-09-29T00:45:07.447211+00:00",
+        "width": 1280,
+        "height": 720,
+        "file_size_kb": 139.76
+      },
+      "screenshot_audit": {
+        "status": "ok",
+        "website_url": "http://support.makeboldspark.com/",
+        "screenshot_path": "output/users/makeboldsolutions/screenshots/supportspark.png",
+        "flags": [],
+        "http": {
+          "status_code": 200,
+          "final_url": "http://support.makeboldspark.com/",
+          "page_title": null,
+          "flags": []
+        },
+        "image": {
+          "image_analysis_available": true,
+          "brightness": 237.42,
+          "variance": 24.8,
+          "flags": []
+        }
+      }
     },
     {
       "name": "ArtSpark",
       "description": "Art Institute Public API and WebSpark",
       "summary": {
-        "text": "**A comprehensive .NET solution for the Art Institute of Chicago's public API, featuring a complete client library, revolutionary AI chat system with multiple personas, and web applications showcasing modern .NET development practices.** Built with C#. Key features: \u2705 **Complete API Coverage**: All 33 endpoints across 6 categories, \u2705 **Strongly Typed Models**: Comprehensive C# models for all resource types, \u2705 **Async/Await Support**: Modern asynchronous programming patterns. Actively maintained with regular updates.",
-        "ai_generated": false,
-        "generation_method": "enhanced-template",
-        "generated_at": "2026-09-28T16:25:27.433124",
-        "model_used": null,
-        "tokens_used": 0,
-        "confidence_score": 60
+        "text": "# Technical Summary: WebSpark.ArtSpark\n\nWebSpark.ArtSpark is a comprehensive .NET solution that provides complete API integration with the Art Institute of Chicago's public REST API, featuring a full-featured client library covering all 33 endpoints across 6 categories, combined with an innovative AI chat system powered by OpenAI's Semantic Kernel and Vision capabilities. The solution demonstrates modern .NET 10.0 development practices through four interconnected projects: a strongly-typed client library with async/await support and IIIF image handling, an AI agent system with multiple personas (Artwork, Artist, Curator, Historian) that enables conversational interactions with artwork data, a full-featured ASP.NET Core web application with user authentication and personal collections, and a console application for developer usage. The architecture leverages `System.Text.Json` for efficient deserialization, implements externalized prompt management with hot-reload capabilities for AI persona customization, and includes built-in search with Elasticsearch integration and flexible querying patterns. While the project demonstrates excellent technical execution with minimal external dependencies and production-grade features like error handling and content filtering, it shows minimal recent activity (0 commits in 90 days, declining trajectory) and has seen no community adoption despite being well-documented and fully functional. The codebase serves primarily as a technical portfolio piece and educational reference for .NET ecosystem best practices, with the live demo site at Art.makeboldspark.com showcasing practical implementation of AI integration, responsive web design, and RESTful API consumption patterns.",
+        "ai_generated": true,
+        "generation_method": "claude-haiku-4-5",
+        "generated_at": "2026-08-27T07:59:13.520350",
+        "model_used": "claude-haiku-4-5",
+        "tokens_used": 2649,
+        "confidence_score": 90
       },
       "url": "https://github.com/MakeBoldSolutions/ArtSpark",
       "homepage": "https://art.makeboldspark.com",
@@ -3892,7 +4043,7 @@
         "commit_frequency": 3.67,
         "consistency_score": 0,
         "activity_rate": 0.122,
-        "days_since_last_commit": 29,
+        "days_since_last_commit": 30,
         "first_commit_date": "2023-01-30T15:23:30+00:00"
       },
       "commit_metrics": null,
@@ -3913,7 +4064,7 @@
       "is_archived": false,
       "age_days": 1337,
       "days_since_last_push": 28,
-      "ai_summary": null,
+      "ai_summary": "# Technical Summary: WebSpark.ArtSpark\n\nWebSpark.ArtSpark is a comprehensive .NET solution that provides complete API integration with the Art Institute of Chicago's public REST API, featuring a full-featured client library covering all 33 endpoints across 6 categories, combined with an innovative AI chat system powered by OpenAI's Semantic Kernel and Vision capabilities. The solution demonstrates modern .NET 10.0 development practices through four interconnected projects: a strongly-typed client library with async/await support and IIIF image handling, an AI agent system with multiple personas (Artwork, Artist, Curator, Historian) that enables conversational interactions with artwork data, a full-featured ASP.NET Core web application with user authentication and personal collections, and a console application for developer usage. The architecture leverages `System.Text.Json` for efficient deserialization, implements externalized prompt management with hot-reload capabilities for AI persona customization, and includes built-in search with Elasticsearch integration and flexible querying patterns. While the project demonstrates excellent technical execution with minimal external dependencies and production-grade features like error handling and content filtering, it shows minimal recent activity (0 commits in 90 days, declining trajectory) and has seen no community adoption despite being well-documented and fully functional. The codebase serves primarily as a technical portfolio piece and educational reference for .NET ecosystem best practices, with the live demo site at Art.makeboldspark.com showcasing practical implementation of AI integration, responsive web design, and RESTful API consumption patterns.",
       "attention_score": 15.5,
       "attention_metrics": {
         "score": 15.5,
@@ -4047,220 +4198,45 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 12
-    },
-    {
-      "name": "MuseumSpark",
-      "description": "A Museum Trip Planning Application",
-      "summary": {
-        "text": "> **The strategic travel planner for art lovers.** > Curate, prioritize, and optimize your museum visits across North America. Built with Python. Maintained project with periodic updates.",
-        "ai_generated": false,
-        "generation_method": "enhanced-template",
-        "generated_at": "2026-09-28T16:25:27.433213",
-        "model_used": null,
-        "tokens_used": 0,
-        "confidence_score": 60
+      "attention_rank": 11,
+      "screenshot": {
+        "path": "output/users/makeboldsolutions/screenshots/artspark.png",
+        "url": "https://art.makeboldspark.com",
+        "captured_at": "2026-09-29T00:45:09.512096+00:00",
+        "width": 1280,
+        "height": 720,
+        "file_size_kb": 477.99
       },
-      "url": "https://github.com/MakeBoldSolutions/MuseumSpark",
-      "homepage": "https://museum.makeboldspark.com/",
-      "has_pages": true,
-      "pages_url": "https://MakeBoldSolutions.github.io/MuseumSpark/",
-      "website_url": "https://museum.makeboldspark.com/",
-      "stars": 0,
-      "forks": 0,
-      "watchers": 0,
-      "language": "Python",
-      "language_stats": {},
-      "languages": {},
-      "created_at": "2026-01-15T13:24:02+00:00",
-      "updated_at": "2026-08-27T22:47:17+00:00",
-      "pushed_at": "2026-09-17T19:34:02+00:00",
-      "total_commits": 102,
-      "recent_commits_90d": 4,
-      "first_commit_date": "2026-01-15T13:24:02+00:00",
-      "last_commit_date": "2026-08-27T00:00:00+00:00",
-      "commit_history": {
-        "repository_name": "MuseumSpark",
-        "total_commits": 102,
-        "recent_90d": 4,
-        "recent_180d": 26,
-        "recent_365d": 102,
-        "last_commit_date": "2026-08-27T00:00:00+00:00",
-        "patterns": [
-          "maintained",
-          "declining"
-        ],
-        "commit_frequency": 1.33,
-        "consistency_score": 0,
-        "activity_rate": 0.044,
-        "days_since_last_commit": 32,
-        "first_commit_date": "2026-01-15T13:24:02+00:00"
-      },
-      "commit_metrics": null,
-      "avg_commit_size": null,
-      "largest_commit": null,
-      "smallest_commit": null,
-      "commit_velocity": 1.33,
-      "tech_stack": null,
-      "has_readme": true,
-      "has_license": true,
-      "has_ci_cd": true,
-      "has_tests": true,
-      "has_docs": true,
-      "language_count": 7,
-      "size_kb": 34619,
-      "is_fork": false,
-      "is_private": false,
-      "is_archived": false,
-      "age_days": 256,
-      "days_since_last_push": 10,
-      "ai_summary": null,
-      "attention_score": 18.2,
-      "attention_metrics": {
-        "score": 18.2,
-        "tier": "healthy",
-        "needs_attention": false,
-        "reasons": [
-          "pull_requests"
-        ],
-        "components": {
-          "pull_requests": {
-            "score": 58.9,
-            "availability": "available",
-            "reason": "none",
-            "total_open": 4,
-            "draft_count": 0,
-            "review_requested_count": 0,
-            "oldest_open_age_days": 31
-          },
-          "security": {
-            "score": 10.0,
-            "availability": "partial",
-            "reason": "permission_denied",
-            "overall_state": "clear",
-            "active_alert_counts": {
-              "total_open": 0,
-              "critical": 0,
-              "high": 0,
-              "medium": 0,
-              "low": 0
-            }
-          },
-          "staleness": {
-            "score": 0.0,
-            "days_since_last_push": 10,
-            "recent_commits_90d": 4,
-            "open_issues": 0
-          },
-          "dependencies": {
-            "score": 0.0,
-            "total_dependencies": 0,
-            "outdated_count": 0,
-            "outdated_percentage": 0.0,
-            "currency_score": 100,
-            "version_coverage_percentage": 100.0,
-            "latest_version_coverage_percentage": 100.0,
-            "unknown_versions_count": 0
-          }
+      "screenshot_audit": {
+        "status": "ok",
+        "website_url": "https://art.makeboldspark.com",
+        "screenshot_path": "output/users/makeboldsolutions/screenshots/artspark.png",
+        "flags": [],
+        "http": {
+          "status_code": 200,
+          "final_url": "https://art.makeboldspark.com/",
+          "page_title": "ArtSpark - Discover Collections - ArtSpark",
+          "flags": []
+        },
+        "image": {
+          "image_analysis_available": true,
+          "brightness": 197.52,
+          "variance": 82.93,
+          "flags": []
         }
-      },
-      "rank": 9,
-      "composite_score": 28.1,
-      "pull_request_summary": {
-        "availability": "available",
-        "reason": "none",
-        "has_open_pull_requests": true,
-        "total_open": 4,
-        "draft_count": 0,
-        "review_requested_count": 0,
-        "oldest_open_age_days": 31,
-        "source": "rest.pulls.list"
-      },
-      "security_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
-        "overall_state": "clear",
-        "feature_status": {
-          "advanced_security": "unknown",
-          "secret_scanning": "unknown",
-          "secret_scanning_push_protection": "unknown",
-          "dependency_alerts": "unavailable",
-          "automated_security_fixes": "unavailable"
-        },
-        "active_alert_counts": {
-          "total_open": 0,
-          "critical": 0,
-          "high": 0,
-          "medium": 0,
-          "low": 0
-        },
-        "sources": [
-          "rest.repos.get"
-        ]
-      },
-      "diagnostics_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
-        "pull_requests": {
-          "availability": "available",
-          "reason": "none",
-          "total_open": 4,
-          "oldest_open_age_days": 31
-        },
-        "issues": {
-          "availability": "available",
-          "reason": "none",
-          "total_open": 0,
-          "oldest_open_age_days": null,
-          "stale_over_30d": 0,
-          "stale_over_90d": 0
-        },
-        "security": {
-          "availability": "unavailable",
-          "reason": "permission_denied",
-          "dependabot": {
-            "total_open": 0,
-            "critical": 0,
-            "high": 0,
-            "medium": 0,
-            "low": 0
-          },
-          "code_scanning": {
-            "total_open": 0,
-            "error": 0,
-            "warning": 0,
-            "note": 0
-          }
-        },
-        "actions": {
-          "availability": "available",
-          "reason": "none",
-          "recent_runs": 20,
-          "success_count": 20,
-          "failure_count": 0,
-          "last_run_status": "completed",
-          "last_run_conclusion": "success",
-          "last_run_age_days": 3
-        },
-        "sources": [
-          "rest.pulls.list",
-          "rest.issues.list",
-          "rest.actions.runs"
-        ]
-      },
-      "attention_rank": 9
+      }
     },
     {
       "name": "BootstrapSpark",
       "description": "ReactSparkPortfolio is a production-ready, enterprise-grade developer portfolio built with React 19, TypeScript, and Vite. ",
       "summary": {
-        "text": "**BootstrapSpark** demonstrates enterprise-grade React development with React 19, TypeScript, and Vite \u2014 live at [Bootstrap.makeboldspark.com](https://Bootstrap.makeboldspark.com). Built with TypeScript. Maintained project with periodic updates.",
-        "ai_generated": false,
-        "generation_method": "enhanced-template",
-        "generated_at": "2026-09-28T16:25:27.433633",
-        "model_used": null,
-        "tokens_used": 0,
-        "confidence_score": 60
+        "text": "# BootstrapSpark: Technical Summary\n\n**BootstrapSpark** is a production-ready, enterprise-grade developer portfolio application built with React 19, TypeScript, and Vite that demonstrates modern frontend engineering best practices and cloud-native deployment patterns. The project serves as both a personal portfolio for Mark Hazleton and a comprehensive reference implementation for building scalable, maintainable web applications with real-time capabilities. It features a sophisticated tech stack including Bootstrap 5 for responsive UI, SignalR for real-time chat functionality, and integrations with external APIs (OpenWeather, JokeAPI, RSS feeds) through a serverless architecture powered by Azure Static Web Apps and Azure Functions.\n\nKey technical strengths include full TypeScript implementation with strict type safety, Vite's high-performance build system with code splitting and lazy loading, WCAG 2.1 AA accessibility compliance, and dual-theme support (dark/light mode) with persistent state management via React Context API. The architecture employs a frontend-first design pattern that proxies external content sources through a WebSpark backend, enabling flexible content management while maintaining security through intentionally-configured Content Security Policy headers that support multi-source integrations.\n\nThe project demonstrates enterprise-grade developer experience with automated CI/CD pipelines via GitHub Actions, comprehensive documentation, responsive mobile-first design, and interactive features including searchable project showcases, weather widgets with Leaflet-based maps, and XML-parsed RSS feed integration. This makes it particularly valuable for developers seeking reference implementations of modern React patterns, cloud deployment strategies, or building feature-rich portfolio applications, while its extensive documentation in the `/documentation` folder provides insights into security considerations, accessibility implementation, and production deployment practices.",
+        "ai_generated": true,
+        "generation_method": "claude-haiku-4-5",
+        "generated_at": "2026-08-27T07:59:14.574939",
+        "model_used": "claude-haiku-4-5",
+        "tokens_used": 2733,
+        "confidence_score": 90
       },
       "url": "https://github.com/MakeBoldSolutions/BootstrapSpark",
       "homepage": "https://bootstrap.makeboldspark.com/",
@@ -4276,32 +4252,32 @@
       "created_at": "2024-10-11T23:31:56+00:00",
       "updated_at": "2026-08-17T13:52:04+00:00",
       "pushed_at": "2026-08-17T13:52:01+00:00",
-      "total_commits": 86,
-      "recent_commits_90d": 5,
+      "total_commits": 95,
+      "recent_commits_90d": 11,
       "first_commit_date": "2024-10-11T23:31:56+00:00",
       "last_commit_date": "2026-08-17T00:00:00+00:00",
       "commit_history": {
         "repository_name": "BootstrapSpark",
-        "total_commits": 86,
-        "recent_90d": 5,
-        "recent_180d": 56,
-        "recent_365d": 86,
+        "total_commits": 95,
+        "recent_90d": 11,
+        "recent_180d": 74,
+        "recent_365d": 95,
         "last_commit_date": "2026-08-17T00:00:00+00:00",
         "patterns": [
-          "maintained",
+          "active",
           "declining"
         ],
-        "commit_frequency": 1.67,
+        "commit_frequency": 3.67,
         "consistency_score": 0,
-        "activity_rate": 0.056,
-        "days_since_last_commit": 42,
+        "activity_rate": 0.122,
+        "days_since_last_commit": 43,
         "first_commit_date": "2024-10-11T23:31:56+00:00"
       },
       "commit_metrics": null,
       "avg_commit_size": null,
       "largest_commit": null,
       "smallest_commit": null,
-      "commit_velocity": 1.67,
+      "commit_velocity": 3.67,
       "tech_stack": {
         "repository_name": "BootstrapSpark",
         "languages": {},
@@ -4976,12 +4952,12 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 716,
+      "age_days": 717,
       "days_since_last_push": 42,
-      "ai_summary": null,
-      "attention_score": 17.2,
+      "ai_summary": "# BootstrapSpark: Technical Summary\n\n**BootstrapSpark** is a production-ready, enterprise-grade developer portfolio application built with React 19, TypeScript, and Vite that demonstrates modern frontend engineering best practices and cloud-native deployment patterns. The project serves as both a personal portfolio for Mark Hazleton and a comprehensive reference implementation for building scalable, maintainable web applications with real-time capabilities. It features a sophisticated tech stack including Bootstrap 5 for responsive UI, SignalR for real-time chat functionality, and integrations with external APIs (OpenWeather, JokeAPI, RSS feeds) through a serverless architecture powered by Azure Static Web Apps and Azure Functions.\n\nKey technical strengths include full TypeScript implementation with strict type safety, Vite's high-performance build system with code splitting and lazy loading, WCAG 2.1 AA accessibility compliance, and dual-theme support (dark/light mode) with persistent state management via React Context API. The architecture employs a frontend-first design pattern that proxies external content sources through a WebSpark backend, enabling flexible content management while maintaining security through intentionally-configured Content Security Policy headers that support multi-source integrations.\n\nThe project demonstrates enterprise-grade developer experience with automated CI/CD pipelines via GitHub Actions, comprehensive documentation, responsive mobile-first design, and interactive features including searchable project showcases, weather widgets with Leaflet-based maps, and XML-parsed RSS feed integration. This makes it particularly valuable for developers seeking reference implementations of modern React patterns, cloud deployment strategies, or building feature-rich portfolio applications, while its extensive documentation in the `/documentation` folder provides insights into security considerations, accessibility implementation, and production deployment practices.",
+      "attention_score": 13.7,
       "attention_metrics": {
-        "score": 17.2,
+        "score": 13.7,
         "tier": "healthy",
         "needs_attention": false,
         "reasons": [
@@ -4999,9 +4975,9 @@
             "oldest_open_age_days": null
           },
           "security": {
-            "score": 10.0,
-            "availability": "partial",
-            "reason": "permission_denied",
+            "score": 0.0,
+            "availability": "available",
+            "reason": "none",
             "overall_state": "clear",
             "active_alert_counts": {
               "total_open": 0,
@@ -5014,7 +4990,7 @@
           "staleness": {
             "score": 35.0,
             "days_since_last_push": 42,
-            "recent_commits_90d": 5,
+            "recent_commits_90d": 11,
             "open_issues": 0
           },
           "dependencies": {
@@ -5029,8 +5005,8 @@
           }
         }
       },
-      "rank": 10,
-      "composite_score": 27.24,
+      "rank": 9,
+      "composite_score": 30.34,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -5042,15 +5018,15 @@
         "source": "rest.pulls.list"
       },
       "security_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
+        "availability": "available",
+        "reason": "none",
         "overall_state": "clear",
         "feature_status": {
           "advanced_security": "unknown",
-          "secret_scanning": "unknown",
-          "secret_scanning_push_protection": "unknown",
-          "dependency_alerts": "unavailable",
-          "automated_security_fixes": "unavailable"
+          "secret_scanning": "disabled",
+          "secret_scanning_push_protection": "disabled",
+          "dependency_alerts": "enabled",
+          "automated_security_fixes": "enabled"
         },
         "active_alert_counts": {
           "total_open": 0,
@@ -5060,12 +5036,15 @@
           "low": 0
         },
         "sources": [
-          "rest.repos.get"
+          "rest.repos.get",
+          "rest.repos.vulnerability-alerts",
+          "rest.repos.automated-security-fixes",
+          "rest.dependabot.alerts"
         ]
       },
       "diagnostics_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
+        "availability": "available",
+        "reason": "none",
         "pull_requests": {
           "availability": "available",
           "reason": "none",
@@ -5081,8 +5060,8 @@
           "stale_over_90d": 0
         },
         "security": {
-          "availability": "unavailable",
-          "reason": "permission_denied",
+          "availability": "partial",
+          "reason": "not_supported",
           "dependabot": {
             "total_open": 0,
             "critical": 0,
@@ -5101,8 +5080,8 @@
           "availability": "available",
           "reason": "none",
           "recent_runs": 20,
-          "success_count": 11,
-          "failure_count": 9,
+          "success_count": 16,
+          "failure_count": 4,
           "last_run_status": "completed",
           "last_run_conclusion": "failure",
           "last_run_age_days": 9
@@ -5110,95 +5089,121 @@
         "sources": [
           "rest.pulls.list",
           "rest.issues.list",
+          "rest.dependabot.alerts",
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 10
+      "attention_rank": 12,
+      "screenshot": {
+        "path": "output/users/makeboldsolutions/screenshots/bootstrapspark.png",
+        "url": "https://bootstrap.makeboldspark.com/",
+        "captured_at": "2026-09-29T00:45:11.478820+00:00",
+        "width": 1280,
+        "height": 720,
+        "file_size_kb": 111.02
+      },
+      "screenshot_audit": {
+        "status": "ok",
+        "website_url": "https://bootstrap.makeboldspark.com/",
+        "screenshot_path": "output/users/makeboldsolutions/screenshots/bootstrapspark.png",
+        "flags": [],
+        "http": {
+          "status_code": 200,
+          "final_url": "https://bootstrap.makeboldspark.com/",
+          "page_title": "BootstrapSpark - Portfolio and Bootstrap Showcase",
+          "flags": []
+        },
+        "image": {
+          "image_analysis_available": true,
+          "brightness": 199.21,
+          "variance": 63.33,
+          "flags": []
+        }
+      }
     },
     {
-      "name": "InquirySpark",
-      "description": "Spark Your Inquiry, Ignite Insights.",
+      "name": "MuseumSpark",
+      "description": "A Museum Trip Planning Application",
       "summary": {
-        "text": "Spark Your Inquiry, Ignite Insights. Built with C#. Maintained project with periodic updates.",
-        "ai_generated": false,
-        "generation_method": "enhanced-template",
-        "generated_at": "2026-09-28T16:25:27.433718",
-        "model_used": null,
-        "tokens_used": 0,
-        "confidence_score": 60
+        "text": "# MuseumSpark - Technical Summary\n\n**MuseumSpark** is an intelligent travel planning platform that transforms the Walker Art Center Reciprocal Program membership list (1,269 North American museums) into a searchable, data-enriched resource for art enthusiasts. The project combines a modern React 19 + Vite frontend with a sophisticated Python data enrichment pipeline that leverages multiple sources (Wikidata, Wikipedia, museum websites) to progressively enrich museum records with validated metadata, collection information, and priority scoring. The architecture follows a phased approach (currently in Phase 0\u20131 at 0.08% enrichment completion) implementing JSON Schema validation, multi-stage data scraping, and quality assurance workflows that enforce strict data integrity rules (e.g., \"Never Replace Known With Null\"). Built with Pydantic for schema validation and BeautifulSoup for web scraping, the pipeline is designed to scale from static GitHub Pages hosting to a full-featured FastAPI backend with user authentication and AI-assisted trip planning capabilities (planned Phase 4 by Q4 2026). This project is noteworthy for its systematic, transparent approach to museum discovery\u2014providing city tier classification, visit duration estimates, collection strength scoring, and iterative enrichment rather than relying on a static directory\u2014making it particularly valuable for art lovers planning multi-city museum tours or optimizing visits around time constraints.",
+        "ai_generated": true,
+        "generation_method": "claude-haiku-4-5",
+        "generated_at": "2026-08-27T23:04:47.647619",
+        "model_used": "claude-haiku-4-5",
+        "tokens_used": 2613,
+        "confidence_score": 90
       },
-      "url": "https://github.com/MakeBoldSolutions/InquirySpark",
-      "homepage": null,
-      "has_pages": false,
-      "pages_url": null,
-      "website_url": null,
+      "url": "https://github.com/MakeBoldSolutions/MuseumSpark",
+      "homepage": "https://museum.makeboldspark.com/",
+      "has_pages": true,
+      "pages_url": "https://MakeBoldSolutions.github.io/MuseumSpark/",
+      "website_url": "https://museum.makeboldspark.com/",
       "stars": 0,
       "forks": 0,
       "watchers": 0,
-      "language": "C#",
+      "language": "Python",
       "language_stats": {},
       "languages": {},
-      "created_at": "2023-10-24T13:14:08+00:00",
-      "updated_at": "2026-07-15T00:22:09+00:00",
-      "pushed_at": "2026-07-24T01:27:28+00:00",
-      "total_commits": 76,
-      "recent_commits_90d": 0,
-      "first_commit_date": "2023-10-24T13:14:08+00:00",
-      "last_commit_date": "2026-07-02T00:00:00+00:00",
+      "created_at": "2026-01-15T13:24:02+00:00",
+      "updated_at": "2026-08-27T22:47:17+00:00",
+      "pushed_at": "2026-09-17T19:34:02+00:00",
+      "total_commits": 102,
+      "recent_commits_90d": 4,
+      "first_commit_date": "2026-01-15T13:24:02+00:00",
+      "last_commit_date": "2026-08-27T00:00:00+00:00",
       "commit_history": {
-        "repository_name": "InquirySpark",
-        "total_commits": 76,
-        "recent_90d": 0,
-        "recent_180d": 51,
-        "recent_365d": 76,
-        "last_commit_date": "2026-07-02T00:00:00+00:00",
+        "repository_name": "MuseumSpark",
+        "total_commits": 102,
+        "recent_90d": 4,
+        "recent_180d": 26,
+        "recent_365d": 102,
+        "last_commit_date": "2026-08-27T00:00:00+00:00",
         "patterns": [
-          "minimal_activity",
+          "maintained",
           "declining"
         ],
-        "commit_frequency": 0.0,
+        "commit_frequency": 1.33,
         "consistency_score": 0,
-        "activity_rate": 0.0,
-        "days_since_last_commit": 88,
-        "first_commit_date": "2023-10-24T13:14:08+00:00"
+        "activity_rate": 0.044,
+        "days_since_last_commit": 33,
+        "first_commit_date": "2026-01-15T13:24:02+00:00"
       },
       "commit_metrics": null,
       "avg_commit_size": null,
       "largest_commit": null,
       "smallest_commit": null,
-      "commit_velocity": 0.0,
+      "commit_velocity": 1.33,
       "tech_stack": null,
       "has_readme": true,
       "has_license": true,
       "has_ci_cd": true,
-      "has_tests": false,
+      "has_tests": true,
       "has_docs": true,
-      "language_count": 9,
-      "size_kb": 13995,
+      "language_count": 7,
+      "size_kb": 34619,
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 1070,
-      "days_since_last_push": 66,
-      "ai_summary": null,
-      "attention_score": 27.0,
+      "age_days": 256,
+      "days_since_last_push": 11,
+      "ai_summary": "# MuseumSpark - Technical Summary\n\n**MuseumSpark** is an intelligent travel planning platform that transforms the Walker Art Center Reciprocal Program membership list (1,269 North American museums) into a searchable, data-enriched resource for art enthusiasts. The project combines a modern React 19 + Vite frontend with a sophisticated Python data enrichment pipeline that leverages multiple sources (Wikidata, Wikipedia, museum websites) to progressively enrich museum records with validated metadata, collection information, and priority scoring. The architecture follows a phased approach (currently in Phase 0\u20131 at 0.08% enrichment completion) implementing JSON Schema validation, multi-stage data scraping, and quality assurance workflows that enforce strict data integrity rules (e.g., \"Never Replace Known With Null\"). Built with Pydantic for schema validation and BeautifulSoup for web scraping, the pipeline is designed to scale from static GitHub Pages hosting to a full-featured FastAPI backend with user authentication and AI-assisted trip planning capabilities (planned Phase 4 by Q4 2026). This project is noteworthy for its systematic, transparent approach to museum discovery\u2014providing city tier classification, visit duration estimates, collection strength scoring, and iterative enrichment rather than relying on a static directory\u2014making it particularly valuable for art lovers planning multi-city museum tours or optimizing visits around time constraints.",
+      "attention_score": 18.3,
       "attention_metrics": {
-        "score": 27.0,
-        "tier": "watch",
-        "needs_attention": true,
+        "score": 18.3,
+        "tier": "healthy",
+        "needs_attention": false,
         "reasons": [
-          "pull_requests",
-          "staleness"
+          "pull_requests"
         ],
         "components": {
           "pull_requests": {
-            "score": 59.0,
+            "score": 59.2,
             "availability": "available",
             "reason": "none",
-            "total_open": 2,
+            "total_open": 4,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": 100
+            "oldest_open_age_days": 32
           },
           "security": {
             "score": 10.0,
@@ -5214,9 +5219,9 @@
             }
           },
           "staleness": {
-            "score": 35.0,
-            "days_since_last_push": 66,
-            "recent_commits_90d": 0,
+            "score": 0.0,
+            "days_since_last_push": 11,
+            "recent_commits_90d": 4,
             "open_issues": 0
           },
           "dependencies": {
@@ -5231,16 +5236,16 @@
           }
         }
       },
-      "rank": 11,
-      "composite_score": 24.05,
+      "rank": 10,
+      "composite_score": 28.1,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
         "has_open_pull_requests": true,
-        "total_open": 2,
+        "total_open": 4,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": 100,
+        "oldest_open_age_days": 32,
         "source": "rest.pulls.list"
       },
       "security_summary": {
@@ -5271,8 +5276,8 @@
         "pull_requests": {
           "availability": "available",
           "reason": "none",
-          "total_open": 2,
-          "oldest_open_age_days": 100
+          "total_open": 4,
+          "oldest_open_age_days": 32
         },
         "issues": {
           "availability": "available",
@@ -5303,11 +5308,11 @@
           "availability": "available",
           "reason": "none",
           "recent_runs": 20,
-          "success_count": 17,
-          "failure_count": 3,
+          "success_count": 20,
+          "failure_count": 0,
           "last_run_status": "completed",
           "last_run_conclusion": "success",
-          "last_run_age_days": 53
+          "last_run_age_days": 4
         },
         "sources": [
           "rest.pulls.list",
@@ -5315,19 +5320,45 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 4
+      "attention_rank": 9,
+      "screenshot": {
+        "path": "output/users/makeboldsolutions/screenshots/museumspark.png",
+        "url": "https://museum.makeboldspark.com/",
+        "captured_at": "2026-09-29T00:45:12.947309+00:00",
+        "width": 1280,
+        "height": 720,
+        "file_size_kb": 98.36
+      },
+      "screenshot_audit": {
+        "status": "ok",
+        "website_url": "https://museum.makeboldspark.com/",
+        "screenshot_path": "output/users/makeboldsolutions/screenshots/museumspark.png",
+        "flags": [],
+        "http": {
+          "status_code": 200,
+          "final_url": "https://museum.makeboldspark.com/",
+          "page_title": "MuseumSpark",
+          "flags": []
+        },
+        "image": {
+          "image_analysis_available": true,
+          "brightness": 136.09,
+          "variance": 107.86,
+          "flags": []
+        }
+      }
     },
     {
       "name": "MakeBoldSolutionsCom",
       "description": "The public site for MarkBoldSolutions.com ",
       "summary": {
-        "text": "The marketing website for Make Bold Solutions \u2014 a fractional CFO firm led by Lesley Hazleton, CPA, based in Wichita, Kansas. Built with HTML. Maintained project with periodic updates.",
-        "ai_generated": false,
-        "generation_method": "enhanced-template",
-        "generated_at": "2026-09-28T16:25:28.005780",
-        "model_used": null,
-        "tokens_used": 0,
-        "confidence_score": 60
+        "text": "# Technical Summary: MakeBoldSolutionsCom\n\nThis repository hosts the marketing website for Make Bold Solutions, a fractional CFO firm based in Wichita, Kansas, implemented as a lightweight Node.js static site generator that reads structured content from `content.json` and outputs flat HTML files to the `docs/` directory. The architecture eschews backend infrastructure, databases, and client-side frameworks entirely, instead bundling inline CSS and JavaScript directly into generated HTML files for optimal performance and deployment simplicity. The build pipeline (`build.js`) is the project's core, orchestrating content transformation, asset copying, and file generation, complemented by a local development server with hot-reload capabilities and a comprehensive smoke-test suite that validates page generation, asset integrity, and internal link resolution. The tech stack combines HTML (51.3%), PowerShell (16.9%), JavaScript (16.0%), and Shell scripting (15.0%), with minimal dependencies (qrcode, ESLint, globals) and a modular npm script interface (`dev`, `build`, `serve`, `test`, `lint`) for streamlined workflows. Notable features include automated deployment to Azure Static Web Apps via GitHub Actions, SEO optimization through dynamically generated sitemaps and robots.txt, accessibility through vCard-enabled digital business cards, and security hardening via staticwebapp.config.json for headers and routing. This design pattern is particularly suited for content-driven marketing websites requiring version control, reproducible builds, and hosting-agnostic deployment while maintaining rapid development iteration and minimal operational overhead.",
+        "ai_generated": true,
+        "generation_method": "claude-haiku-4-5",
+        "generated_at": "2026-08-27T07:59:29.069417",
+        "model_used": "claude-haiku-4-5",
+        "tokens_used": 1734,
+        "confidence_score": 90
       },
       "url": "https://github.com/MakeBoldSolutions/MakeBoldSolutionsCom",
       "homepage": "https://makeboldsolutions.com",
@@ -5344,31 +5375,31 @@
       "updated_at": "2026-07-14T03:37:03+00:00",
       "pushed_at": "2026-07-14T03:37:00+00:00",
       "total_commits": 34,
-      "recent_commits_90d": 6,
+      "recent_commits_90d": 26,
       "first_commit_date": "2025-12-10T17:14:44+00:00",
       "last_commit_date": "2026-07-13T00:00:00+00:00",
       "commit_history": {
         "repository_name": "MakeBoldSolutionsCom",
         "total_commits": 34,
-        "recent_90d": 6,
+        "recent_90d": 26,
         "recent_180d": 26,
         "recent_365d": 34,
         "last_commit_date": "2026-07-13T00:00:00+00:00",
         "patterns": [
-          "maintained",
-          "declining"
+          "active",
+          "accelerating"
         ],
-        "commit_frequency": 2.0,
+        "commit_frequency": 8.67,
         "consistency_score": 0,
-        "activity_rate": 0.067,
-        "days_since_last_commit": 77,
+        "activity_rate": 0.289,
+        "days_since_last_commit": 78,
         "first_commit_date": "2025-12-10T17:14:44+00:00"
       },
       "commit_metrics": null,
       "avg_commit_size": null,
       "largest_commit": null,
       "smallest_commit": null,
-      "commit_velocity": 2.0,
+      "commit_velocity": 8.67,
       "tech_stack": {
         "repository_name": "MakeBoldSolutionsCom",
         "languages": {},
@@ -5455,12 +5486,12 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 291,
+      "age_days": 292,
       "days_since_last_push": 76,
-      "ai_summary": null,
-      "attention_score": 13.7,
+      "ai_summary": "# Technical Summary: MakeBoldSolutionsCom\n\nThis repository hosts the marketing website for Make Bold Solutions, a fractional CFO firm based in Wichita, Kansas, implemented as a lightweight Node.js static site generator that reads structured content from `content.json` and outputs flat HTML files to the `docs/` directory. The architecture eschews backend infrastructure, databases, and client-side frameworks entirely, instead bundling inline CSS and JavaScript directly into generated HTML files for optimal performance and deployment simplicity. The build pipeline (`build.js`) is the project's core, orchestrating content transformation, asset copying, and file generation, complemented by a local development server with hot-reload capabilities and a comprehensive smoke-test suite that validates page generation, asset integrity, and internal link resolution. The tech stack combines HTML (51.3%), PowerShell (16.9%), JavaScript (16.0%), and Shell scripting (15.0%), with minimal dependencies (qrcode, ESLint, globals) and a modular npm script interface (`dev`, `build`, `serve`, `test`, `lint`) for streamlined workflows. Notable features include automated deployment to Azure Static Web Apps via GitHub Actions, SEO optimization through dynamically generated sitemaps and robots.txt, accessibility through vCard-enabled digital business cards, and security hardening via staticwebapp.config.json for headers and routing. This design pattern is particularly suited for content-driven marketing websites requiring version control, reproducible builds, and hosting-agnostic deployment while maintaining rapid development iteration and minimal operational overhead.",
+      "attention_score": 10.2,
       "attention_metrics": {
-        "score": 13.7,
+        "score": 10.2,
         "tier": "healthy",
         "needs_attention": false,
         "reasons": [
@@ -5477,9 +5508,9 @@
             "oldest_open_age_days": null
           },
           "security": {
-            "score": 10.0,
-            "availability": "partial",
-            "reason": "permission_denied",
+            "score": 0.0,
+            "availability": "available",
+            "reason": "none",
             "overall_state": "clear",
             "active_alert_counts": {
               "total_open": 0,
@@ -5492,7 +5523,7 @@
           "staleness": {
             "score": 35.0,
             "days_since_last_push": 76,
-            "recent_commits_90d": 6,
+            "recent_commits_90d": 26,
             "open_issues": 0
           },
           "dependencies": {
@@ -5507,8 +5538,8 @@
           }
         }
       },
-      "rank": 12,
-      "composite_score": 22.37,
+      "rank": 11,
+      "composite_score": 27.37,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -5520,15 +5551,15 @@
         "source": "rest.pulls.list"
       },
       "security_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
+        "availability": "available",
+        "reason": "none",
         "overall_state": "clear",
         "feature_status": {
           "advanced_security": "unknown",
-          "secret_scanning": "unknown",
-          "secret_scanning_push_protection": "unknown",
-          "dependency_alerts": "unavailable",
-          "automated_security_fixes": "unavailable"
+          "secret_scanning": "disabled",
+          "secret_scanning_push_protection": "disabled",
+          "dependency_alerts": "enabled",
+          "automated_security_fixes": "enabled"
         },
         "active_alert_counts": {
           "total_open": 0,
@@ -5538,12 +5569,15 @@
           "low": 0
         },
         "sources": [
-          "rest.repos.get"
+          "rest.repos.get",
+          "rest.repos.vulnerability-alerts",
+          "rest.repos.automated-security-fixes",
+          "rest.dependabot.alerts"
         ]
       },
       "diagnostics_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
+        "availability": "available",
+        "reason": "none",
         "pull_requests": {
           "availability": "available",
           "reason": "none",
@@ -5559,8 +5593,8 @@
           "stale_over_90d": 0
         },
         "security": {
-          "availability": "unavailable",
-          "reason": "permission_denied",
+          "availability": "partial",
+          "reason": "not_supported",
           "dependabot": {
             "total_open": 0,
             "critical": 0,
@@ -5583,27 +5617,269 @@
           "failure_count": 1,
           "last_run_status": "completed",
           "last_run_conclusion": "failure",
-          "last_run_age_days": 76
+          "last_run_age_days": 43
         },
         "sources": [
           "rest.pulls.list",
           "rest.issues.list",
+          "rest.dependabot.alerts",
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 13
+      "attention_rank": 13,
+      "screenshot": {
+        "path": "output/users/makeboldsolutions/screenshots/makeboldsolutionscom.png",
+        "url": "https://makeboldsolutions.com",
+        "captured_at": "2026-09-29T00:45:14.546604+00:00",
+        "width": 1280,
+        "height": 720,
+        "file_size_kb": 58.75
+      },
+      "screenshot_audit": {
+        "status": "ok",
+        "website_url": "https://makeboldsolutions.com",
+        "screenshot_path": "output/users/makeboldsolutions/screenshots/makeboldsolutionscom.png",
+        "flags": [],
+        "http": {
+          "status_code": 200,
+          "final_url": "https://makeboldsolutions.com/",
+          "page_title": "Fractional CFO Wichita, Kansas | Make Bold Solutions",
+          "flags": []
+        },
+        "image": {
+          "image_analysis_available": true,
+          "brightness": 58.85,
+          "variance": 71.8,
+          "flags": []
+        }
+      }
+    },
+    {
+      "name": "InquirySpark",
+      "description": "Spark Your Inquiry, Ignite Insights.",
+      "summary": {
+        "text": "# InquirySpark - Technical Summary\n\n**InquirySpark** is a modern ASP.NET Core MVC web application that serves as a unified survey, inquiry, and decision-management platform, designed to consolidate multiple legacy applications into a single, integrated operations workspace. Built on **.NET 10** with **Entity Framework Core 10** and **ASP.NET Core Identity**, the application uses read-only **SQLite databases** for persistence, eliminating the need for SQL Server and enabling lightweight, immutable data storage while maintaining a responsive web UI powered by **Bootstrap 5**, **DataTables 2.3.5**, and **Razor templating**.\n\nThe architecture emphasizes clean separation of concerns through distinct layers\u2014**InquirySpark.Web** (unified MVC frontend with organized Areas), **InquirySpark.Repository** (EF Core services and DbContext abstractions), and **InquirySpark.Common** (shared domain models and response wrappers)\u2014with comprehensive **MSTest unit and integration test coverage** and structured audit logging via a custom `IUnifiedAuditService`. Key capabilities include an operations dashboard, capability completion matrix, operational readiness assessments, and system health monitoring, all delivered through a single authenticated session with unified navigation, while enforcing nullable reference types, XML documentation, and zero compiler warnings.\n\nThis solution is noteworthy for its **consolidated legacy architecture**, where the functionality of deprecated `DecisionSpark` and `InquirySpark.Admin` applications has been fully merged into the unified web experience, and its use of **immutable SQLite** databases (read-only for inquiry data, read-write only for Identity operations) as a modern alternative to traditional relational databases. The project is production-deployed at [https://inquiry.makeboldspark.com](https://inquiry.makeboldspark.com) and serves as a technical demonstration portfolio piece showcasing enterprise ASP.NET Core patterns, targeting solutions architects, enterprise teams evaluating modern .NET stacks, and organizations seeking survey/decision-management systems with audit and compliance capabilities.",
+        "ai_generated": true,
+        "generation_method": "claude-haiku-4-5",
+        "generated_at": "2026-08-27T07:59:23.377489",
+        "model_used": "claude-haiku-4-5",
+        "tokens_used": 2242,
+        "confidence_score": 90
+      },
+      "url": "https://github.com/MakeBoldSolutions/InquirySpark",
+      "homepage": null,
+      "has_pages": false,
+      "pages_url": null,
+      "website_url": null,
+      "stars": 0,
+      "forks": 0,
+      "watchers": 0,
+      "language": "C#",
+      "language_stats": {},
+      "languages": {},
+      "created_at": "2023-10-24T13:14:08+00:00",
+      "updated_at": "2026-07-15T00:22:09+00:00",
+      "pushed_at": "2026-07-24T01:27:28+00:00",
+      "total_commits": 76,
+      "recent_commits_90d": 1,
+      "first_commit_date": "2023-10-24T13:14:08+00:00",
+      "last_commit_date": "2026-07-02T00:00:00+00:00",
+      "commit_history": {
+        "repository_name": "InquirySpark",
+        "total_commits": 76,
+        "recent_90d": 1,
+        "recent_180d": 58,
+        "recent_365d": 76,
+        "last_commit_date": "2026-07-02T00:00:00+00:00",
+        "patterns": [
+          "maintained",
+          "declining"
+        ],
+        "commit_frequency": 0.33,
+        "consistency_score": 0,
+        "activity_rate": 0.011,
+        "days_since_last_commit": 89,
+        "first_commit_date": "2023-10-24T13:14:08+00:00"
+      },
+      "commit_metrics": null,
+      "avg_commit_size": null,
+      "largest_commit": null,
+      "smallest_commit": null,
+      "commit_velocity": 0.33,
+      "tech_stack": null,
+      "has_readme": true,
+      "has_license": true,
+      "has_ci_cd": true,
+      "has_tests": false,
+      "has_docs": true,
+      "language_count": 9,
+      "size_kb": 13995,
+      "is_fork": false,
+      "is_private": false,
+      "is_archived": false,
+      "age_days": 1070,
+      "days_since_last_push": 66,
+      "ai_summary": "# InquirySpark - Technical Summary\n\n**InquirySpark** is a modern ASP.NET Core MVC web application that serves as a unified survey, inquiry, and decision-management platform, designed to consolidate multiple legacy applications into a single, integrated operations workspace. Built on **.NET 10** with **Entity Framework Core 10** and **ASP.NET Core Identity**, the application uses read-only **SQLite databases** for persistence, eliminating the need for SQL Server and enabling lightweight, immutable data storage while maintaining a responsive web UI powered by **Bootstrap 5**, **DataTables 2.3.5**, and **Razor templating**.\n\nThe architecture emphasizes clean separation of concerns through distinct layers\u2014**InquirySpark.Web** (unified MVC frontend with organized Areas), **InquirySpark.Repository** (EF Core services and DbContext abstractions), and **InquirySpark.Common** (shared domain models and response wrappers)\u2014with comprehensive **MSTest unit and integration test coverage** and structured audit logging via a custom `IUnifiedAuditService`. Key capabilities include an operations dashboard, capability completion matrix, operational readiness assessments, and system health monitoring, all delivered through a single authenticated session with unified navigation, while enforcing nullable reference types, XML documentation, and zero compiler warnings.\n\nThis solution is noteworthy for its **consolidated legacy architecture**, where the functionality of deprecated `DecisionSpark` and `InquirySpark.Admin` applications has been fully merged into the unified web experience, and its use of **immutable SQLite** databases (read-only for inquiry data, read-write only for Identity operations) as a modern alternative to traditional relational databases. The project is production-deployed at [https://inquiry.makeboldspark.com](https://inquiry.makeboldspark.com) and serves as a technical demonstration portfolio piece showcasing enterprise ASP.NET Core patterns, targeting solutions architects, enterprise teams evaluating modern .NET stacks, and organizations seeking survey/decision-management systems with audit and compliance capabilities.",
+      "attention_score": 55.6,
+      "attention_metrics": {
+        "score": 55.6,
+        "tier": "elevated",
+        "needs_attention": true,
+        "reasons": [
+          "security",
+          "pull_requests",
+          "staleness"
+        ],
+        "components": {
+          "pull_requests": {
+            "score": 47.5,
+            "availability": "available",
+            "reason": "none",
+            "total_open": 2,
+            "draft_count": 0,
+            "review_requested_count": 0,
+            "oldest_open_age_days": 67
+          },
+          "security": {
+            "score": 100.0,
+            "availability": "available",
+            "reason": "none",
+            "overall_state": "warning_present",
+            "active_alert_counts": {
+              "total_open": 19,
+              "critical": 0,
+              "high": 14,
+              "medium": 5,
+              "low": 0
+            }
+          },
+          "staleness": {
+            "score": 35.0,
+            "days_since_last_push": 66,
+            "recent_commits_90d": 1,
+            "open_issues": 0
+          },
+          "dependencies": {
+            "score": 0.0,
+            "total_dependencies": 0,
+            "outdated_count": 0,
+            "outdated_percentage": 0.0,
+            "currency_score": 100,
+            "version_coverage_percentage": 100.0,
+            "latest_version_coverage_percentage": 100.0,
+            "unknown_versions_count": 0
+          }
+        }
+      },
+      "rank": 12,
+      "composite_score": 27.33,
+      "pull_request_summary": {
+        "availability": "available",
+        "reason": "none",
+        "has_open_pull_requests": true,
+        "total_open": 2,
+        "draft_count": 0,
+        "review_requested_count": 0,
+        "oldest_open_age_days": 67,
+        "source": "rest.pulls.list"
+      },
+      "security_summary": {
+        "availability": "available",
+        "reason": "none",
+        "overall_state": "warning_present",
+        "feature_status": {
+          "advanced_security": "unknown",
+          "secret_scanning": "disabled",
+          "secret_scanning_push_protection": "disabled",
+          "dependency_alerts": "enabled",
+          "automated_security_fixes": "enabled"
+        },
+        "active_alert_counts": {
+          "total_open": 19,
+          "critical": 0,
+          "high": 14,
+          "medium": 5,
+          "low": 0
+        },
+        "sources": [
+          "rest.repos.get",
+          "rest.repos.vulnerability-alerts",
+          "rest.repos.automated-security-fixes",
+          "rest.dependabot.alerts"
+        ]
+      },
+      "diagnostics_summary": {
+        "availability": "available",
+        "reason": "none",
+        "pull_requests": {
+          "availability": "available",
+          "reason": "none",
+          "total_open": 2,
+          "oldest_open_age_days": 67
+        },
+        "issues": {
+          "availability": "available",
+          "reason": "none",
+          "total_open": 0,
+          "oldest_open_age_days": null,
+          "stale_over_30d": 0,
+          "stale_over_90d": 0
+        },
+        "security": {
+          "availability": "partial",
+          "reason": "not_supported",
+          "dependabot": {
+            "total_open": 19,
+            "critical": 0,
+            "high": 14,
+            "medium": 5,
+            "low": 0
+          },
+          "code_scanning": {
+            "total_open": 0,
+            "error": 0,
+            "warning": 0,
+            "note": 0
+          }
+        },
+        "actions": {
+          "availability": "available",
+          "reason": "none",
+          "recent_runs": 20,
+          "success_count": 17,
+          "failure_count": 3,
+          "last_run_status": "completed",
+          "last_run_conclusion": "success",
+          "last_run_age_days": 21
+        },
+        "sources": [
+          "rest.pulls.list",
+          "rest.issues.list",
+          "rest.dependabot.alerts",
+          "rest.actions.runs"
+        ]
+      },
+      "attention_rank": 2,
+      "screenshot_audit": {
+        "status": "ok",
+        "website_url": null,
+        "screenshot_path": null,
+        "flags": [],
+        "http": null,
+        "image": null
+      }
     },
     {
       "name": "DataSpark",
       "description": "A .NET 10 toolkit for working with SQLite databases: discover files, export tables to CSV, inspect schema, and generate C# DTOs. The solution includes a CLI, a web UI, a core library, tests, and benchmarks.",
       "summary": {
-        "text": "[![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download/dotnet/10.0) [![Build](https://img.shields.io/github/actions/workflow/status/markhazleton/DataSpark/ci.yml?branch=main)](https://github.com/markhazleton/DataSpark/actions) [![Coverage](https://img.shield Built with HTML. Key features: Discover SQLite database files in a directory., Export all tables or a filtered list to CSV., Generate schema reports (text, JSON, Markdown).. Maintained project with periodic updates.",
-        "ai_generated": false,
-        "generation_method": "enhanced-template",
-        "generated_at": "2026-09-28T16:25:28.005910",
-        "model_used": null,
-        "tokens_used": 0,
-        "confidence_score": 60
+        "text": "# DataSpark Technical Summary\n\n**DataSpark** is a comprehensive .NET 10 toolkit designed for SQLite database exploration, analysis, and code generation, providing both command-line and web-based interfaces for developers and database administrators. The project enables core capabilities including SQLite database discovery across directories, bulk table export to CSV format, multi-format schema reporting (text, JSON, Markdown), and automated C# Data Transfer Object (DTO) generation from database schemas, supporting efficient database-to-code workflows. The architecture follows a modular design pattern with a shared `DataSpark.Core` library providing domain logic consumed by three separate presentation layers: a CLI application (`DataSpark.Console`), an ASP.NET Core MVC web UI (`DataSpark.Web`), and a comprehensive test/benchmark suite, demonstrating clean separation of concerns and reusable abstractions. The tech stack leverages modern .NET 10, MSTest for testing, BenchmarkDotNet for performance profiling, and Node.js-based frontend tooling, indicating a production-oriented approach with performance monitoring and quality assurance built into the development workflow. The project is particularly valuable for database migration scenarios, reverse engineering legacy systems, and rapid prototyping where automatic schema-to-model generation accelerates development cycles while reducing manual coding effort. Hosted at https://data.makeboldspark.com as a live demonstration, DataSpark targets developers and architects who need scalable, repeatable solutions for working with SQLite databases at enterprise scale, though the declining activity (1 commit in 90 days, 29 in 365 days) suggests it may be in maintenance mode or evolved into a stable product release.",
+        "ai_generated": true,
+        "generation_method": "claude-haiku-4-5",
+        "generated_at": "2026-08-27T07:59:17.977350",
+        "model_used": "claude-haiku-4-5",
+        "tokens_used": 1722,
+        "confidence_score": 90
       },
       "url": "https://github.com/MakeBoldSolutions/DataSpark",
       "homepage": "",
@@ -5619,32 +5895,32 @@
       "created_at": "2017-11-06T16:04:58+00:00",
       "updated_at": "2026-07-15T00:20:27+00:00",
       "pushed_at": "2026-07-21T04:39:41+00:00",
-      "total_commits": 21,
-      "recent_commits_90d": 0,
+      "total_commits": 29,
+      "recent_commits_90d": 1,
       "first_commit_date": "2017-11-06T16:04:58+00:00",
       "last_commit_date": "2026-07-02T00:00:00+00:00",
       "commit_history": {
         "repository_name": "DataSpark",
-        "total_commits": 21,
-        "recent_90d": 0,
-        "recent_180d": 2,
-        "recent_365d": 21,
+        "total_commits": 29,
+        "recent_90d": 1,
+        "recent_180d": 15,
+        "recent_365d": 29,
         "last_commit_date": "2026-07-02T00:00:00+00:00",
         "patterns": [
-          "minimal_activity",
+          "maintained",
           "declining"
         ],
-        "commit_frequency": 0.0,
+        "commit_frequency": 0.33,
         "consistency_score": 0,
-        "activity_rate": 0.0,
-        "days_since_last_commit": 88,
+        "activity_rate": 0.011,
+        "days_since_last_commit": 89,
         "first_commit_date": "2017-11-06T16:04:58+00:00"
       },
       "commit_metrics": null,
       "avg_commit_size": null,
       "largest_commit": null,
       "smallest_commit": null,
-      "commit_velocity": 0.0,
+      "commit_velocity": 0.33,
       "tech_stack": null,
       "has_readme": true,
       "has_license": true,
@@ -5658,35 +5934,36 @@
       "is_archived": false,
       "age_days": 3248,
       "days_since_last_push": 69,
-      "ai_summary": null,
-      "attention_score": 21.3,
+      "ai_summary": "# DataSpark Technical Summary\n\n**DataSpark** is a comprehensive .NET 10 toolkit designed for SQLite database exploration, analysis, and code generation, providing both command-line and web-based interfaces for developers and database administrators. The project enables core capabilities including SQLite database discovery across directories, bulk table export to CSV format, multi-format schema reporting (text, JSON, Markdown), and automated C# Data Transfer Object (DTO) generation from database schemas, supporting efficient database-to-code workflows. The architecture follows a modular design pattern with a shared `DataSpark.Core` library providing domain logic consumed by three separate presentation layers: a CLI application (`DataSpark.Console`), an ASP.NET Core MVC web UI (`DataSpark.Web`), and a comprehensive test/benchmark suite, demonstrating clean separation of concerns and reusable abstractions. The tech stack leverages modern .NET 10, MSTest for testing, BenchmarkDotNet for performance profiling, and Node.js-based frontend tooling, indicating a production-oriented approach with performance monitoring and quality assurance built into the development workflow. The project is particularly valuable for database migration scenarios, reverse engineering legacy systems, and rapid prototyping where automatic schema-to-model generation accelerates development cycles while reducing manual coding effort. Hosted at https://data.makeboldspark.com as a live demonstration, DataSpark targets developers and architects who need scalable, repeatable solutions for working with SQLite databases at enterprise scale, though the declining activity (1 commit in 90 days, 29 in 365 days) suggests it may be in maintenance mode or evolved into a stable product release.",
+      "attention_score": 49.9,
       "attention_metrics": {
-        "score": 21.3,
-        "tier": "watch",
+        "score": 49.9,
+        "tier": "elevated",
         "needs_attention": true,
         "reasons": [
+          "security",
           "pull_requests",
           "staleness"
         ],
         "components": {
           "pull_requests": {
-            "score": 36.1,
+            "score": 24.6,
             "availability": "available",
             "reason": "none",
             "total_open": 1,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": 69
+            "oldest_open_age_days": 36
           },
           "security": {
-            "score": 10.0,
-            "availability": "partial",
-            "reason": "permission_denied",
-            "overall_state": "clear",
+            "score": 100.0,
+            "availability": "available",
+            "reason": "none",
+            "overall_state": "warning_present",
             "active_alert_counts": {
-              "total_open": 0,
+              "total_open": 5,
               "critical": 0,
-              "high": 0,
+              "high": 5,
               "medium": 0,
               "low": 0
             }
@@ -5694,7 +5971,7 @@
           "staleness": {
             "score": 35.0,
             "days_since_last_push": 69,
-            "recent_commits_90d": 0,
+            "recent_commits_90d": 1,
             "open_issues": 0
           },
           "dependencies": {
@@ -5710,7 +5987,7 @@
         }
       },
       "rank": 13,
-      "composite_score": 18.97,
+      "composite_score": 22.91,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -5718,39 +5995,42 @@
         "total_open": 1,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": 69,
+        "oldest_open_age_days": 36,
         "source": "rest.pulls.list"
       },
       "security_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
-        "overall_state": "clear",
+        "availability": "available",
+        "reason": "none",
+        "overall_state": "warning_present",
         "feature_status": {
           "advanced_security": "unknown",
-          "secret_scanning": "unknown",
-          "secret_scanning_push_protection": "unknown",
-          "dependency_alerts": "unavailable",
-          "automated_security_fixes": "unavailable"
+          "secret_scanning": "disabled",
+          "secret_scanning_push_protection": "disabled",
+          "dependency_alerts": "enabled",
+          "automated_security_fixes": "enabled"
         },
         "active_alert_counts": {
-          "total_open": 0,
+          "total_open": 5,
           "critical": 0,
-          "high": 0,
+          "high": 5,
           "medium": 0,
           "low": 0
         },
         "sources": [
-          "rest.repos.get"
+          "rest.repos.get",
+          "rest.repos.vulnerability-alerts",
+          "rest.repos.automated-security-fixes",
+          "rest.dependabot.alerts"
         ]
       },
       "diagnostics_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
+        "availability": "available",
+        "reason": "none",
         "pull_requests": {
           "availability": "available",
           "reason": "none",
           "total_open": 1,
-          "oldest_open_age_days": 69
+          "oldest_open_age_days": 36
         },
         "issues": {
           "availability": "available",
@@ -5761,12 +6041,12 @@
           "stale_over_90d": 0
         },
         "security": {
-          "availability": "unavailable",
-          "reason": "permission_denied",
+          "availability": "partial",
+          "reason": "not_supported",
           "dependabot": {
-            "total_open": 0,
+            "total_open": 5,
             "critical": 0,
-            "high": 0,
+            "high": 5,
             "medium": 0,
             "low": 0
           },
@@ -5785,27 +6065,36 @@
           "failure_count": 8,
           "last_run_status": "completed",
           "last_run_conclusion": "success",
-          "last_run_age_days": 67
+          "last_run_age_days": 34
         },
         "sources": [
           "rest.pulls.list",
           "rest.issues.list",
+          "rest.dependabot.alerts",
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 7
+      "attention_rank": 4,
+      "screenshot_audit": {
+        "status": "ok",
+        "website_url": null,
+        "screenshot_path": null,
+        "flags": [],
+        "http": null,
+        "image": null
+      }
     },
     {
       "name": "TeachSpark",
       "description": "LLM-Powered Educational Website",
       "summary": {
-        "text": "[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download) [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/) [![Bui Built with C#. Maintained project with periodic updates.",
-        "ai_generated": false,
-        "generation_method": "enhanced-template",
-        "generated_at": "2026-09-28T16:25:28.568628",
-        "model_used": null,
-        "tokens_used": 0,
-        "confidence_score": 60
+        "text": "# Technical Summary: TeachSpark\n\nTeachSpark is an LLM-powered educational platform built with .NET 10 MVC and a modern frontend stack, designed to deliver personalized, adaptive learning experiences through AI integration. The application combines C# backend services (40.4%) with a sophisticated frontend architecture spanning HTML (36.1%), PowerShell (18.8%), JavaScript (2.9%), and SCSS (1.8%), implementing clean architecture principles with Entity Framework Core for data persistence. Key technical features include an AI-driven content personalization engine, interactive curriculum delivery system, comprehensive learning analytics, and responsive design with a webpack-based build pipeline featuring Hot Module Replacement, code splitting, and automated bundle optimization. The project demonstrates modern development practices through automated code quality enforcement via ESLint, Prettier, and Stylelint, pre-commit hooks managed by Husky and lint-staged, and a robust build system supporting both development and production configurations. TeachSpark targets educational institutions and learners seeking intelligent tutoring capabilities, showcasing how Large Language Models can be operationalized within enterprise web applications to create adaptive educational pathways based on individual learning patterns. Despite strong technical currency (90/100) and a current live deployment at teach.makeboldspark.com, the repository shows minimal recent activity (0 commits in 90 days), suggesting it may be in a stable, maintenance-only phase or awaiting future development phases.",
+        "ai_generated": true,
+        "generation_method": "claude-haiku-4-5",
+        "generated_at": "2026-08-27T07:59:50.574078",
+        "model_used": "claude-haiku-4-5",
+        "tokens_used": 2709,
+        "confidence_score": 90
       },
       "url": "https://github.com/MakeBoldSolutions/TeachSpark",
       "homepage": "https://teach.makeboldspark.com",
@@ -5829,7 +6118,7 @@
         "repository_name": "TeachSpark",
         "total_commits": 26,
         "recent_90d": 0,
-        "recent_180d": 15,
+        "recent_180d": 24,
         "recent_365d": 26,
         "last_commit_date": "2026-05-23T00:00:00+00:00",
         "patterns": [
@@ -5839,7 +6128,7 @@
         "commit_frequency": 0.0,
         "consistency_score": 0,
         "activity_rate": 0.0,
-        "days_since_last_commit": 128,
+        "days_since_last_commit": 129,
         "first_commit_date": "2025-06-19T21:15:05+00:00"
       },
       "commit_metrics": null,
@@ -5919,39 +6208,40 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 465,
+      "age_days": 466,
       "days_since_last_push": 69,
-      "ai_summary": null,
-      "attention_score": 28.8,
+      "ai_summary": "# Technical Summary: TeachSpark\n\nTeachSpark is an LLM-powered educational platform built with .NET 10 MVC and a modern frontend stack, designed to deliver personalized, adaptive learning experiences through AI integration. The application combines C# backend services (40.4%) with a sophisticated frontend architecture spanning HTML (36.1%), PowerShell (18.8%), JavaScript (2.9%), and SCSS (1.8%), implementing clean architecture principles with Entity Framework Core for data persistence. Key technical features include an AI-driven content personalization engine, interactive curriculum delivery system, comprehensive learning analytics, and responsive design with a webpack-based build pipeline featuring Hot Module Replacement, code splitting, and automated bundle optimization. The project demonstrates modern development practices through automated code quality enforcement via ESLint, Prettier, and Stylelint, pre-commit hooks managed by Husky and lint-staged, and a robust build system supporting both development and production configurations. TeachSpark targets educational institutions and learners seeking intelligent tutoring capabilities, showcasing how Large Language Models can be operationalized within enterprise web applications to create adaptive educational pathways based on individual learning patterns. Despite strong technical currency (90/100) and a current live deployment at teach.makeboldspark.com, the repository shows minimal recent activity (0 commits in 90 days), suggesting it may be in a stable, maintenance-only phase or awaiting future development phases.",
+      "attention_score": 57.5,
       "attention_metrics": {
-        "score": 28.8,
-        "tier": "watch",
+        "score": 57.5,
+        "tier": "elevated",
         "needs_attention": true,
         "reasons": [
+          "security",
           "pull_requests",
           "staleness"
         ],
         "components": {
           "pull_requests": {
-            "score": 62.1,
+            "score": 51.0,
             "availability": "available",
             "reason": "none",
             "total_open": 2,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": 109
+            "oldest_open_age_days": 77
           },
           "security": {
-            "score": 10.0,
-            "availability": "partial",
-            "reason": "permission_denied",
-            "overall_state": "clear",
+            "score": 100.0,
+            "availability": "available",
+            "reason": "none",
+            "overall_state": "warning_present",
             "active_alert_counts": {
-              "total_open": 0,
-              "critical": 0,
-              "high": 0,
-              "medium": 0,
-              "low": 0
+              "total_open": 26,
+              "critical": 2,
+              "high": 15,
+              "medium": 8,
+              "low": 1
             }
           },
           "staleness": {
@@ -5973,7 +6263,7 @@
         }
       },
       "rank": 14,
-      "composite_score": 17.92,
+      "composite_score": 18.6,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -5981,39 +6271,42 @@
         "total_open": 2,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": 109,
+        "oldest_open_age_days": 77,
         "source": "rest.pulls.list"
       },
       "security_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
-        "overall_state": "clear",
+        "availability": "available",
+        "reason": "none",
+        "overall_state": "warning_present",
         "feature_status": {
           "advanced_security": "unknown",
-          "secret_scanning": "unknown",
-          "secret_scanning_push_protection": "unknown",
-          "dependency_alerts": "unavailable",
-          "automated_security_fixes": "unavailable"
+          "secret_scanning": "disabled",
+          "secret_scanning_push_protection": "disabled",
+          "dependency_alerts": "enabled",
+          "automated_security_fixes": "enabled"
         },
         "active_alert_counts": {
-          "total_open": 0,
-          "critical": 0,
-          "high": 0,
-          "medium": 0,
-          "low": 0
+          "total_open": 26,
+          "critical": 2,
+          "high": 15,
+          "medium": 8,
+          "low": 1
         },
         "sources": [
-          "rest.repos.get"
+          "rest.repos.get",
+          "rest.repos.vulnerability-alerts",
+          "rest.repos.automated-security-fixes",
+          "rest.dependabot.alerts"
         ]
       },
       "diagnostics_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
+        "availability": "available",
+        "reason": "none",
         "pull_requests": {
           "availability": "available",
           "reason": "none",
           "total_open": 2,
-          "oldest_open_age_days": 109
+          "oldest_open_age_days": 77
         },
         "issues": {
           "availability": "available",
@@ -6024,14 +6317,14 @@
           "stale_over_90d": 0
         },
         "security": {
-          "availability": "unavailable",
-          "reason": "permission_denied",
+          "availability": "partial",
+          "reason": "not_supported",
           "dependabot": {
-            "total_open": 0,
-            "critical": 0,
-            "high": 0,
-            "medium": 0,
-            "low": 0
+            "total_open": 26,
+            "critical": 2,
+            "high": 15,
+            "medium": 8,
+            "low": 1
           },
           "code_scanning": {
             "total_open": 0,
@@ -6048,24 +6341,51 @@
           "failure_count": 0,
           "last_run_status": "completed",
           "last_run_conclusion": "success",
-          "last_run_age_days": 21
+          "last_run_age_days": 14
         },
         "sources": [
           "rest.pulls.list",
           "rest.issues.list",
+          "rest.dependabot.alerts",
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 2
+      "attention_rank": 1,
+      "screenshot": {
+        "path": "output/users/makeboldsolutions/screenshots/teachspark.png",
+        "url": "https://teach.makeboldspark.com",
+        "captured_at": "2026-09-29T00:45:16.316050+00:00",
+        "width": 1280,
+        "height": 720,
+        "file_size_kb": 302.96
+      },
+      "screenshot_audit": {
+        "status": "ok",
+        "website_url": "https://teach.makeboldspark.com",
+        "screenshot_path": "output/users/makeboldsolutions/screenshots/teachspark.png",
+        "flags": [],
+        "http": {
+          "status_code": 200,
+          "final_url": "https://teach.makeboldspark.com/",
+          "page_title": "AI-Powered Worksheet Generator for Teachers | TeachSpark - TeachSpark",
+          "flags": []
+        },
+        "image": {
+          "image_analysis_available": true,
+          "brightness": 153.7,
+          "variance": 80.02,
+          "flags": []
+        }
+      }
     },
     {
       "name": "PHPDocSpark",
       "description": "An open-source PHP documentation & data exploration platform by Mark Hazleton (WebSpark suite) showcasing hybrid server-side + modern asset pipeline techniques.",
       "summary": {
-        "text": "An open-source PHP documentation & data exploration platform by Mark Hazleton (WebSpark suite) showcasing hybrid server-side + modern asset pipeline techniques. Written in PHP.",
+        "text": "An open-source PHP documentation & data exploration platform by Mark Hazleton (WebSpark suite) showcasing hybrid server-side + modern asset pipeline techniques. Written in PHP. 1 commits in the last 90 days.",
         "ai_generated": false,
         "generation_method": "basic-template",
-        "generated_at": "2026-09-28T16:25:28.569078",
+        "generated_at": "2026-09-28T19:44:55.965449",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 40
@@ -6085,31 +6405,31 @@
       "updated_at": "2026-07-15T12:31:40+00:00",
       "pushed_at": "2026-07-21T15:14:11+00:00",
       "total_commits": 8,
-      "recent_commits_90d": 0,
+      "recent_commits_90d": 1,
       "first_commit_date": "2023-09-08T16:08:13+00:00",
       "last_commit_date": "2026-07-02T00:00:00+00:00",
       "commit_history": {
         "repository_name": "PHPDocSpark",
         "total_commits": 8,
-        "recent_90d": 0,
-        "recent_180d": 4,
+        "recent_90d": 1,
+        "recent_180d": 8,
         "recent_365d": 8,
         "last_commit_date": "2026-07-02T00:00:00+00:00",
         "patterns": [
-          "minimal_activity",
+          "maintained",
           "declining"
         ],
-        "commit_frequency": 0.0,
+        "commit_frequency": 0.33,
         "consistency_score": 0,
-        "activity_rate": 0.0,
-        "days_since_last_commit": 88,
+        "activity_rate": 0.011,
+        "days_since_last_commit": 89,
         "first_commit_date": "2023-09-08T16:08:13+00:00"
       },
       "commit_metrics": null,
       "avg_commit_size": null,
       "largest_commit": null,
       "smallest_commit": null,
-      "commit_velocity": 0.0,
+      "commit_velocity": 0.33,
       "tech_stack": {
         "repository_name": "PHPDocSpark",
         "languages": {},
@@ -6521,43 +6841,44 @@
       "age_days": 1116,
       "days_since_last_push": 69,
       "ai_summary": null,
-      "attention_score": 26.1,
+      "attention_score": 54.8,
       "attention_metrics": {
-        "score": 26.1,
-        "tier": "watch",
+        "score": 54.8,
+        "tier": "elevated",
         "needs_attention": true,
         "reasons": [
+          "security",
           "pull_requests",
           "staleness",
           "dependencies"
         ],
         "components": {
           "pull_requests": {
-            "score": 36.1,
+            "score": 24.6,
             "availability": "available",
             "reason": "none",
             "total_open": 1,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": 69
+            "oldest_open_age_days": 36
           },
           "security": {
-            "score": 10.0,
-            "availability": "partial",
-            "reason": "permission_denied",
-            "overall_state": "clear",
+            "score": 100.0,
+            "availability": "available",
+            "reason": "none",
+            "overall_state": "warning_present",
             "active_alert_counts": {
-              "total_open": 0,
-              "critical": 0,
-              "high": 0,
-              "medium": 0,
+              "total_open": 19,
+              "critical": 1,
+              "high": 15,
+              "medium": 3,
               "low": 0
             }
           },
           "staleness": {
             "score": 35.0,
             "days_since_last_push": 69,
-            "recent_commits_90d": 0,
+            "recent_commits_90d": 1,
             "open_issues": 0
           },
           "dependencies": {
@@ -6573,7 +6894,7 @@
         }
       },
       "rank": 15,
-      "composite_score": 11.27,
+      "composite_score": 14.32,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -6581,39 +6902,42 @@
         "total_open": 1,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": 69,
+        "oldest_open_age_days": 36,
         "source": "rest.pulls.list"
       },
       "security_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
-        "overall_state": "clear",
+        "availability": "available",
+        "reason": "none",
+        "overall_state": "warning_present",
         "feature_status": {
           "advanced_security": "unknown",
-          "secret_scanning": "unknown",
-          "secret_scanning_push_protection": "unknown",
-          "dependency_alerts": "unavailable",
-          "automated_security_fixes": "unavailable"
+          "secret_scanning": "disabled",
+          "secret_scanning_push_protection": "disabled",
+          "dependency_alerts": "enabled",
+          "automated_security_fixes": "enabled"
         },
         "active_alert_counts": {
-          "total_open": 0,
-          "critical": 0,
-          "high": 0,
-          "medium": 0,
+          "total_open": 19,
+          "critical": 1,
+          "high": 15,
+          "medium": 3,
           "low": 0
         },
         "sources": [
-          "rest.repos.get"
+          "rest.repos.get",
+          "rest.repos.vulnerability-alerts",
+          "rest.repos.automated-security-fixes",
+          "rest.dependabot.alerts"
         ]
       },
       "diagnostics_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
+        "availability": "available",
+        "reason": "none",
         "pull_requests": {
           "availability": "available",
           "reason": "none",
           "total_open": 1,
-          "oldest_open_age_days": 69
+          "oldest_open_age_days": 36
         },
         "issues": {
           "availability": "available",
@@ -6624,13 +6948,13 @@
           "stale_over_90d": 0
         },
         "security": {
-          "availability": "unavailable",
-          "reason": "permission_denied",
+          "availability": "partial",
+          "reason": "not_supported",
           "dependabot": {
-            "total_open": 0,
-            "critical": 0,
-            "high": 0,
-            "medium": 0,
+            "total_open": 19,
+            "critical": 1,
+            "high": 15,
+            "medium": 3,
             "low": 0
           },
           "code_scanning": {
@@ -6644,23 +6968,43 @@
           "availability": "available",
           "reason": "none",
           "recent_runs": 20,
-          "success_count": 20,
-          "failure_count": 0,
+          "success_count": 19,
+          "failure_count": 1,
           "last_run_status": "completed",
           "last_run_conclusion": "success",
-          "last_run_age_days": 23
+          "last_run_age_days": 10
         },
         "sources": [
           "rest.pulls.list",
           "rest.issues.list",
+          "rest.dependabot.alerts",
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 5
+      "attention_rank": 3,
+      "screenshot_audit": {
+        "status": "error",
+        "website_url": "https://phpdocspark.azurewebsites.net",
+        "screenshot_path": null,
+        "flags": [
+          "website_unreachable",
+          "missing_screenshot"
+        ],
+        "http": {
+          "status_code": null,
+          "final_url": null,
+          "page_title": null,
+          "flags": [
+            "website_unreachable"
+          ],
+          "error": "ConnectionError"
+        },
+        "image": null
+      }
     }
   ],
   "metadata": {
-    "generated_at": "2026-09-28T16:25:28.569654+00:00",
+    "generated_at": "2026-09-29T00:44:55.966510+00:00",
     "schema_version": "2.3.0",
     "generator": "unified_data_generator",
     "schema_features": [
@@ -6668,6 +7012,254 @@
       "dependency_version_coverage",
       "activity_calendar"
     ],
-    "attention_formula_version": "1.0"
+    "attention_formula_version": "1.0",
+    "screenshot_audit": {
+      "generated_at": "2026-09-29T00:45:20.264450+00:00",
+      "repos_with_website": 11,
+      "repos_with_screenshot": 10,
+      "image_analysis_available": true,
+      "likely_404_pages": [],
+      "likely_black_or_blank": [],
+      "missing_screenshots": [
+        {
+          "repo": "PHPDocSpark",
+          "website_url": "https://phpdocspark.azurewebsites.net"
+        }
+      ],
+      "flagged_repository_count": 1,
+      "repositories": {
+        "ArrowSpark": {
+          "status": "ok",
+          "website_url": null,
+          "screenshot_path": null,
+          "flags": [],
+          "http": null,
+          "image": null
+        },
+        "UISampleSpark": {
+          "status": "ok",
+          "website_url": "https://ui.makeboldspark.com",
+          "screenshot_path": "output/users/makeboldsolutions/screenshots/uisamplespark.png",
+          "flags": [],
+          "http": {
+            "status_code": 200,
+            "final_url": "https://ui.makeboldspark.com/",
+            "page_title": "ASP.NET Core UI Patterns Tutorial | Modern UI Pattern Showcase - UISampleSpark",
+            "flags": []
+          },
+          "image": {
+            "image_analysis_available": true,
+            "brightness": 227.51,
+            "variance": 68.22,
+            "flags": []
+          }
+        },
+        "github-stats-spark": {
+          "status": "ok",
+          "website_url": "http://github-stats.makeboldspark.com/",
+          "screenshot_path": "output/users/makeboldsolutions/screenshots/github-stats-spark.png",
+          "flags": [],
+          "http": {
+            "status_code": 200,
+            "final_url": "http://github-stats.makeboldspark.com/",
+            "page_title": "GitHubSpark \u2014 Make Bold Solutions Repository Portfolio",
+            "flags": []
+          },
+          "image": {
+            "image_analysis_available": true,
+            "brightness": 196.42,
+            "variance": 77.51,
+            "flags": []
+          }
+        },
+        "TailwindSpark": {
+          "status": "ok",
+          "website_url": "http://tailwind.makeboldspark.com/",
+          "screenshot_path": "output/users/makeboldsolutions/screenshots/tailwindspark.png",
+          "flags": [],
+          "http": {
+            "status_code": 200,
+            "final_url": "http://tailwind.makeboldspark.com/",
+            "page_title": "TailwindSpark - Interactive Tailwind CSS Showcase | WebSpark Portfolio",
+            "flags": []
+          },
+          "image": {
+            "image_analysis_available": true,
+            "brightness": 255.0,
+            "variance": 0.0,
+            "flags": []
+          }
+        },
+        "RequestSpark": {
+          "status": "ok",
+          "website_url": null,
+          "screenshot_path": null,
+          "flags": [],
+          "http": null,
+          "image": null
+        },
+        "MakeBoldSpark.com": {
+          "status": "ok",
+          "website_url": "https://makeboldspark.com",
+          "screenshot_path": "output/users/makeboldsolutions/screenshots/makeboldspark.com.png",
+          "flags": [],
+          "http": {
+            "status_code": 200,
+            "final_url": "https://makeboldspark.com/",
+            "page_title": "Make Bold Spark by Make Bold Solutions",
+            "flags": []
+          },
+          "image": {
+            "image_analysis_available": true,
+            "brightness": 211.83,
+            "variance": 70.63,
+            "flags": []
+          }
+        },
+        "SupportSpark": {
+          "status": "ok",
+          "website_url": "http://support.makeboldspark.com/",
+          "screenshot_path": "output/users/makeboldsolutions/screenshots/supportspark.png",
+          "flags": [],
+          "http": {
+            "status_code": 200,
+            "final_url": "http://support.makeboldspark.com/",
+            "page_title": null,
+            "flags": []
+          },
+          "image": {
+            "image_analysis_available": true,
+            "brightness": 237.42,
+            "variance": 24.8,
+            "flags": []
+          }
+        },
+        "ArtSpark": {
+          "status": "ok",
+          "website_url": "https://art.makeboldspark.com",
+          "screenshot_path": "output/users/makeboldsolutions/screenshots/artspark.png",
+          "flags": [],
+          "http": {
+            "status_code": 200,
+            "final_url": "https://art.makeboldspark.com/",
+            "page_title": "ArtSpark - Discover Collections - ArtSpark",
+            "flags": []
+          },
+          "image": {
+            "image_analysis_available": true,
+            "brightness": 197.52,
+            "variance": 82.93,
+            "flags": []
+          }
+        },
+        "BootstrapSpark": {
+          "status": "ok",
+          "website_url": "https://bootstrap.makeboldspark.com/",
+          "screenshot_path": "output/users/makeboldsolutions/screenshots/bootstrapspark.png",
+          "flags": [],
+          "http": {
+            "status_code": 200,
+            "final_url": "https://bootstrap.makeboldspark.com/",
+            "page_title": "BootstrapSpark - Portfolio and Bootstrap Showcase",
+            "flags": []
+          },
+          "image": {
+            "image_analysis_available": true,
+            "brightness": 199.21,
+            "variance": 63.33,
+            "flags": []
+          }
+        },
+        "MuseumSpark": {
+          "status": "ok",
+          "website_url": "https://museum.makeboldspark.com/",
+          "screenshot_path": "output/users/makeboldsolutions/screenshots/museumspark.png",
+          "flags": [],
+          "http": {
+            "status_code": 200,
+            "final_url": "https://museum.makeboldspark.com/",
+            "page_title": "MuseumSpark",
+            "flags": []
+          },
+          "image": {
+            "image_analysis_available": true,
+            "brightness": 136.09,
+            "variance": 107.86,
+            "flags": []
+          }
+        },
+        "MakeBoldSolutionsCom": {
+          "status": "ok",
+          "website_url": "https://makeboldsolutions.com",
+          "screenshot_path": "output/users/makeboldsolutions/screenshots/makeboldsolutionscom.png",
+          "flags": [],
+          "http": {
+            "status_code": 200,
+            "final_url": "https://makeboldsolutions.com/",
+            "page_title": "Fractional CFO Wichita, Kansas | Make Bold Solutions",
+            "flags": []
+          },
+          "image": {
+            "image_analysis_available": true,
+            "brightness": 58.85,
+            "variance": 71.8,
+            "flags": []
+          }
+        },
+        "InquirySpark": {
+          "status": "ok",
+          "website_url": null,
+          "screenshot_path": null,
+          "flags": [],
+          "http": null,
+          "image": null
+        },
+        "DataSpark": {
+          "status": "ok",
+          "website_url": null,
+          "screenshot_path": null,
+          "flags": [],
+          "http": null,
+          "image": null
+        },
+        "TeachSpark": {
+          "status": "ok",
+          "website_url": "https://teach.makeboldspark.com",
+          "screenshot_path": "output/users/makeboldsolutions/screenshots/teachspark.png",
+          "flags": [],
+          "http": {
+            "status_code": 200,
+            "final_url": "https://teach.makeboldspark.com/",
+            "page_title": "AI-Powered Worksheet Generator for Teachers | TeachSpark - TeachSpark",
+            "flags": []
+          },
+          "image": {
+            "image_analysis_available": true,
+            "brightness": 153.7,
+            "variance": 80.02,
+            "flags": []
+          }
+        },
+        "PHPDocSpark": {
+          "status": "error",
+          "website_url": "https://phpdocspark.azurewebsites.net",
+          "screenshot_path": null,
+          "flags": [
+            "website_unreachable",
+            "missing_screenshot"
+          ],
+          "http": {
+            "status_code": null,
+            "final_url": null,
+            "page_title": null,
+            "flags": [
+              "website_unreachable"
+            ],
+            "error": "ConnectionError"
+          },
+          "image": null
+        }
+      }
+    }
   }
 }

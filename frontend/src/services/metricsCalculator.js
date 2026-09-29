@@ -4,6 +4,13 @@
  * Provides formatting and calculation utilities for dashboard metrics.
  * Used across components for consistent data display.
  *
+ * SIZE JUSTIFICATION (Constitution I — >500 LOC as of 2026-09-28): this
+ * module is a flat collection of small, independent, pure formatting and
+ * transform helpers (dates, numbers, chart-data shaping, heatmap/timeline
+ * computation) shared across many visualization components. Splitting it
+ * would multiply import boilerplate without improving testability, since
+ * each function is already independently unit-tested.
+ *
  * @module metricsCalculator
  */
 
@@ -439,48 +446,47 @@ export default {
 };
 
 /**
- * Compute heatmap cell data from activity_calendar for trailing 365 days.
+ * Approved fixed intensity thresholds (README "Contribution heatmap"):
+ * 0 -> level 0, 1-3 -> level 1, 4-10 -> level 2, 11-20 -> level 3, 21+ -> level 4.
+ */
+function getHeatmapIntensity(count) {
+  if (!count || count <= 0) return 0;
+  if (count <= 3) return 1;
+  if (count <= 10) return 2;
+  if (count <= 20) return 3;
+  return 4;
+}
+
+/**
+ * Compute heatmap cell data from activity_calendar for the trailing 365-day
+ * window ending at `endDate` (defaults to today when omitted, e.g. in
+ * environments without a `metadata.generated_at` value).
  *
  * @param {Object} activityCalendar - Map of "YYYY-MM-DD" → commit count
+ * @param {string|Date} [endDate] - Window end date (inclusive); defaults to today
  * @returns {Array<{date: string, count: number, intensity: number}>}
- *   intensity 0–4 based on quartile distribution of non-zero days
+ *   intensity 0–4 based on the approved fixed thresholds
  */
-export function computeHeatmapData(activityCalendar) {
+export function computeHeatmapData(activityCalendar, endDate) {
   if (!activityCalendar || typeof activityCalendar !== "object") return [];
 
-  const today = new Date();
-  const start = new Date(today);
+  const end = endDate ? new Date(endDate) : new Date();
+  const resolvedEnd = Number.isNaN(end.getTime()) ? new Date() : end;
+
+  const start = new Date(resolvedEnd);
   start.setFullYear(start.getFullYear() - 1);
   start.setDate(start.getDate() + 1); // trailing 365 days (not 366)
 
-  // Collect all counts for non-zero days to compute quartiles
-  const nonZeroCounts = Object.values(activityCalendar).filter((c) => c > 0);
-  nonZeroCounts.sort((a, b) => a - b);
-
-  const q1 = nonZeroCounts.length
-    ? nonZeroCounts[Math.floor(nonZeroCounts.length * 0.25)]
-    : 1;
-  const q2 = nonZeroCounts.length
-    ? nonZeroCounts[Math.floor(nonZeroCounts.length * 0.5)]
-    : 2;
-  const q3 = nonZeroCounts.length
-    ? nonZeroCounts[Math.floor(nonZeroCounts.length * 0.75)]
-    : 3;
-
-  const getIntensity = (count) => {
-    if (!count || count === 0) return 0;
-    if (count <= q1) return 1;
-    if (count <= q2) return 2;
-    if (count <= q3) return 3;
-    return 4;
-  };
-
   const result = [];
   const cursor = new Date(start);
-  while (cursor <= today) {
+  while (cursor <= resolvedEnd) {
     const dateStr = cursor.toISOString().slice(0, 10);
     const count = activityCalendar[dateStr] ?? 0;
-    result.push({ date: dateStr, count, intensity: getIntensity(count) });
+    result.push({
+      date: dateStr,
+      count,
+      intensity: getHeatmapIntensity(count),
+    });
     cursor.setDate(cursor.getDate() + 1);
   }
   return result;

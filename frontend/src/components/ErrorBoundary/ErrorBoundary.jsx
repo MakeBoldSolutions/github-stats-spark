@@ -101,13 +101,17 @@ class ErrorBoundary extends React.Component {
       return (
         <div className="error-boundary">
           <div className="error-boundary__container">
-            <div className="error-boundary__icon" role="img" aria-label="Error">
-              ⚠️
-            </div>
+            <img
+              src="/logo-mark.svg"
+              alt=""
+              width={40}
+              height={40}
+              className="error-boundary__mark"
+            />
 
-            <h1 className="error-boundary__title">
-              Oops! Something went wrong
-            </h1>
+            <p className="error-boundary__eyebrow">Unexpected error</p>
+
+            <h1 className="error-boundary__title">Something went wrong.</h1>
 
             <p className="error-boundary__message">
               We&apos;re sorry for the inconvenience. The application
@@ -120,7 +124,7 @@ class ErrorBoundary extends React.Component {
                 onClick={this.handleRetry}
                 type="button"
               >
-                Try Again
+                Try again
               </button>
 
               <button
@@ -128,7 +132,7 @@ class ErrorBoundary extends React.Component {
                 onClick={() => window.location.reload()}
                 type="button"
               >
-                Reload Page
+                Reload page
               </button>
             </div>
 

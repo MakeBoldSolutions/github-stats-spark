@@ -14,7 +14,7 @@ function WebsiteSection({
   return (
     <CollapsibleSection
       section="website"
-      title="🌐 Website Preview"
+      title="Website Preview"
       expanded={expanded}
       onToggle={onToggle}
     >

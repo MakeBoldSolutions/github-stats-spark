@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
+import { Download } from "lucide-react";
+import styles from "./ExportButton.module.css";
 
 /**
  * ExportButton Component
  *
- * Provides export functionality for repository data in CSV or JSON format.
- * Uses client-side generation with FileSaver.js pattern.
+ * Accessible, dismissible export menu for the current Overview filtered
+ * list or Health ranked list. Exports CSV or JSON client-side and reports
+ * outcomes through the supplied toast callback instead of alert().
  *
  * @component
  * @param {Object} props
@@ -13,25 +16,43 @@ import PropTypes from "prop-types";
  * @param {string} [props.filename='repositories'] - Base filename for export
  * @param {string} [props.label='Export'] - Button label
  * @param {boolean} [props.disabled=false] - Whether button is disabled
+ * @param {Function} [props.onToast] - (message, variant) => void, for export outcomes
  */
 function ExportButton({
   data,
   filename = "repositories",
   label = "Export",
   disabled = false,
+  onToast,
 }) {
-  const [isExporting, setIsExporting] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const rootRef = useRef(null);
 
-  /**
-   * Convert repositories to CSV format
-   */
+  useEffect(() => {
+    if (!showMenu) return;
+    const handleClickOutside = (e) => {
+      if (rootRef.current && !rootRef.current.contains(e.target)) {
+        setShowMenu(false);
+      }
+    };
+    const handleKeydown = (e) => {
+      if (e.key === "Escape") setShowMenu(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeydown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeydown);
+    };
+  }, [showMenu]);
+
+  const notify = (message, variant = "info") => {
+    if (onToast) onToast(message, variant);
+  };
+
   const convertToCSV = (repositories) => {
-    if (!Array.isArray(repositories) || repositories.length === 0) {
-      return "";
-    }
+    if (!Array.isArray(repositories) || repositories.length === 0) return "";
 
-    // Define CSV columns
     const columns = [
       { key: "name", label: "Repository Name" },
       { key: "language", label: "Language" },
@@ -107,199 +128,123 @@ function ExportButton({
       { key: "screenshot_audit.flags", label: "Screenshot Audit Flags" },
     ];
 
-    // Helper to get nested value
-    const getNestedValue = (obj, path) => {
-      return path.split(".").reduce((acc, part) => acc?.[part], obj);
-    };
+    const getNestedValue = (obj, path) =>
+      path.split(".").reduce((acc, part) => acc?.[part], obj);
 
-    // Create CSV header
     const header = columns.map((col) => `"${col.label}"`).join(",");
 
-    // Create CSV rows
-    const rows = repositories.map((repo) => {
-      return columns
+    const rows = repositories.map((repo) =>
+      columns
         .map((col) => {
           const value = getNestedValue(repo, col.key);
-
-          // Handle null/undefined
           if (value === null || value === undefined) return '""';
-
-          // Handle booleans
           if (typeof value === "boolean") return value ? "Yes" : "No";
-
-          // Handle numbers
           if (typeof value === "number") return value;
-
-          // Handle strings (escape quotes)
           return `"${String(value).replace(/"/g, '""')}"`;
         })
-        .join(",");
-    });
+        .join(","),
+    );
 
     return [header, ...rows].join("\n");
   };
 
-  /**
-   * Download file with given content
-   */
-  const downloadFile = (content, filename, mimeType) => {
+  const downloadFile = (content, downloadFilename, mimeType) => {
     const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = filename;
+    link.download = downloadFilename;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
 
-  /**
-   * Export as CSV
-   */
-  const handleExportCSV = async () => {
-    setIsExporting(true);
+  const handleExportCSV = () => {
     setShowMenu(false);
-
+    if (!data || data.length === 0) {
+      notify("No data to export", "warning");
+      return;
+    }
     try {
       const csv = convertToCSV(data);
-
-      if (!csv) {
-        alert("No data to export");
-        return;
-      }
-
       const timestamp = new Date().toISOString().split("T")[0];
-      const fullFilename = `${filename}-${timestamp}.csv`;
-
-      downloadFile(csv, fullFilename, "text/csv;charset=utf-8;");
+      downloadFile(
+        csv,
+        `${filename}-${timestamp}.csv`,
+        "text/csv;charset=utf-8;",
+      );
+      notify(`Exported ${data.length} repositories as CSV`, "success");
     } catch (error) {
       console.error("CSV export failed:", error);
-      alert("Export failed. Please try again.");
-    } finally {
-      setIsExporting(false);
+      notify("Export failed. Check the console for details.", "error");
     }
   };
 
-  /**
-   * Export as JSON
-   */
-  const handleExportJSON = async () => {
-    setIsExporting(true);
+  const handleExportJSON = () => {
     setShowMenu(false);
-
+    if (!data || data.length === 0) {
+      notify("No data to export", "warning");
+      return;
+    }
     try {
-      if (!data || data.length === 0) {
-        alert("No data to export");
-        return;
-      }
-
       const json = JSON.stringify(data, null, 2);
       const timestamp = new Date().toISOString().split("T")[0];
-      const fullFilename = `${filename}-${timestamp}.json`;
-
-      downloadFile(json, fullFilename, "application/json;charset=utf-8;");
+      downloadFile(
+        json,
+        `${filename}-${timestamp}.json`,
+        "application/json;charset=utf-8;",
+      );
+      notify(`Exported ${data.length} repositories as JSON`, "success");
     } catch (error) {
       console.error("JSON export failed:", error);
-      alert("Export failed. Please try again.");
-    } finally {
-      setIsExporting(false);
+      notify("Export failed. Check the console for details.", "error");
     }
   };
 
+  const count = data?.length ?? 0;
+
   return (
-    <div
-      className="export-button-wrapper"
-      style={{ position: "relative", display: "inline-block" }}
-    >
+    <div className={styles.wrapper} ref={rootRef}>
       <button
-        className="btn btn-secondary"
-        onClick={() => setShowMenu(!showMenu)}
-        disabled={disabled || isExporting || !data || data.length === 0}
+        type="button"
+        className={styles.trigger}
+        onClick={() => setShowMenu((open) => !open)}
+        disabled={disabled}
         aria-label="Export data"
         aria-expanded={showMenu}
         aria-haspopup="true"
       >
-        {isExporting ? "Exporting..." : label}
-        <span style={{ marginLeft: "0.5rem" }}>▼</span>
+        <Download size={16} aria-hidden="true" />
+        {label}
       </button>
 
       {showMenu && (
-        <div
-          className="export-menu"
-          style={{
-            position: "absolute",
-            top: "100%",
-            right: 0,
-            marginTop: "0.5rem",
-            backgroundColor: "var(--color-bg-primary)",
-            border: "1px solid var(--color-border)",
-            borderRadius: "var(--border-radius)",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            zIndex: 1000,
-            minWidth: "150px",
-          }}
-        >
+        <div className={styles.menu} role="menu">
+          <p className={styles.menuCount}>
+            {count} repositories in current view
+          </p>
           <button
-            className="export-menu-item"
+            type="button"
+            role="menuitem"
+            className={styles.menuItem}
             onClick={handleExportCSV}
-            style={{
-              display: "block",
-              width: "100%",
-              padding: "var(--spacing-sm) var(--spacing-md)",
-              textAlign: "left",
-              border: "none",
-              background: "none",
-              cursor: "pointer",
-              fontSize: "var(--font-size-base)",
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = "var(--color-bg-secondary)";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = "transparent";
-            }}
           >
-            Export as CSV
+            <span className={styles.menuItemLabel}>Export as CSV</span>
+            <span className={styles.menuItemDesc}>
+              Spreadsheet-ready summary columns
+            </span>
           </button>
           <button
-            className="export-menu-item"
+            type="button"
+            role="menuitem"
+            className={styles.menuItem}
             onClick={handleExportJSON}
-            style={{
-              display: "block",
-              width: "100%",
-              padding: "var(--spacing-sm) var(--spacing-md)",
-              textAlign: "left",
-              border: "none",
-              background: "none",
-              cursor: "pointer",
-              fontSize: "var(--font-size-base)",
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = "var(--color-bg-secondary)";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = "transparent";
-            }}
           >
-            Export as JSON
+            <span className={styles.menuItemLabel}>Export as JSON</span>
+            <span className={styles.menuItemDesc}>Full repository records</span>
           </button>
         </div>
-      )}
-
-      {/* Clickout handler */}
-      {showMenu && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 999,
-          }}
-          onClick={() => setShowMenu(false)}
-        />
       )}
     </div>
   );
@@ -310,6 +255,7 @@ ExportButton.propTypes = {
   filename: PropTypes.string,
   label: PropTypes.string,
   disabled: PropTypes.bool,
+  onToast: PropTypes.func,
 };
 
 export default ExportButton;

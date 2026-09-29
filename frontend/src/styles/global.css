@@ -9,96 +9,87 @@
    CSS Custom Properties (Theme Variables)
    ========================================= */
 :root {
-  /* Color Palette - Primary */
-  --color-primary: #0366d6;
-  --color-primary-dark: #0256c2;
-  --color-primary-light: #2b7de9;
+  /* Make Bold Solutions token remap — one approved light theme, no GitHub blue. */
 
-  /* Color Palette - Accent */
-  --color-accent: #28a745;
-  --color-accent-dark: #22863a;
-  --color-accent-light: #34d058;
+  /* Color Palette - Primary (rust) */
+  --color-primary: var(--brand);
+  --color-primary-dark: var(--brand-strong);
+  --color-primary-light: var(--ember-300);
+
+  /* Color Palette - Accent (ember) */
+  --color-accent: var(--accent);
+  --color-accent-dark: var(--accent-strong);
+  --color-accent-light: var(--ember-300);
 
   /* Color Palette - Neutrals */
-  --color-background: #ffffff;
-  --color-surface: #f6f8fa;
-  --color-surface-alt: #e1e4e8;
-  --color-border: #d1d5da;
-  --color-text: #24292e;
-  --color-text-secondary: #586069;
-  --color-text-muted: #6a737d;
+  --color-background: var(--surface-page);
+  --color-surface: var(--surface-card);
+  --color-surface-alt: var(--surface-sunken);
+  --color-border: var(--border-default);
+  --color-text: var(--text-strong);
+  --color-text-secondary: var(--text-body);
+  --color-text-muted: var(--text-muted);
 
   /* Color Palette - Semantic Colors */
-  --color-success: #28a745;
-  --color-warning: #ffd33d;
-  --color-error: #d73a49;
-  --color-info: #0366d6;
+  --color-success: var(--positive);
+  --color-warning: var(--caution);
+  --color-error: var(--critical);
+  --color-info: var(--info);
 
   /* Chart Colors */
-  --chart-color-1: #0366d6;
-  --chart-color-2: #28a745;
-  --chart-color-3: #6f42c1;
-  --chart-color-4: #fd8c73;
-  --chart-color-5: #ffd33d;
-  --chart-color-6: #ea4a5a;
-  --chart-color-7: #1b7cd3;
-  --chart-color-8: #79589f;
-  --chart-color-9: #f97583;
-  --chart-color-10: #ffdf5d;
+  --chart-color-1: var(--rust-500);
+  --chart-color-2: var(--ember-500);
+  --chart-color-3: var(--info);
+  --chart-color-4: var(--positive);
+  --chart-color-5: var(--caution);
+  --chart-color-6: var(--critical);
+  --chart-color-7: var(--rust-300);
+  --chart-color-8: var(--ember-300);
+  --chart-color-9: var(--ink-500);
+  --chart-color-10: var(--rust-700);
 
   /* Typography */
-  --font-family-base:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-  --font-family-mono:
-    "SFMono-Regular", "Consolas", "Liberation Mono", "Menlo", "Courier",
-    monospace;
+  --font-family-base: var(--font-body);
+  --font-family-mono: var(--font-mono);
 
-  --font-size-xs: 0.75rem; /* 12px */
-  --font-size-sm: 0.875rem; /* 14px */
-  --font-size-base: 1rem; /* 16px */
-  --font-size-lg: 1.125rem; /* 18px */
-  --font-size-xl: 1.25rem; /* 20px */
-  --font-size-2xl: 1.5rem; /* 24px */
-  --font-size-3xl: 1.875rem; /* 30px */
+  --font-size-xs: var(--fs-xs);
+  --font-size-sm: var(--fs-sm);
+  --font-size-base: var(--fs-base);
+  --font-size-lg: var(--fs-lg);
+  --font-size-xl: var(--fs-xl);
+  --font-size-2xl: var(--fs-2xl);
+  --font-size-3xl: var(--fs-h3);
 
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
+  --font-weight-normal: var(--fw-regular);
+  --font-weight-medium: var(--fw-medium);
+  --font-weight-semibold: var(--fw-semibold);
+  --font-weight-bold: var(--fw-bold);
 
-  --line-height-tight: 1.25;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.75;
+  --line-height-tight: var(--lh-snug);
+  --line-height-normal: var(--lh-normal);
+  --line-height-relaxed: var(--lh-relaxed);
 
   /* Spacing Scale */
-  --spacing-xs: 0.25rem; /* 4px */
-  --spacing-sm: 0.5rem; /* 8px */
-  --spacing-md: 1rem; /* 16px */
-  --spacing-lg: 1.5rem; /* 24px */
-  --spacing-xl: 2rem; /* 32px */
-  --spacing-2xl: 3rem; /* 48px */
-  --spacing-3xl: 4rem; /* 64px */
+  --spacing-xs: var(--space-1);
+  --spacing-sm: var(--space-2);
+  --spacing-md: var(--space-4);
+  --spacing-lg: var(--space-6);
+  --spacing-xl: var(--space-8);
+  --spacing-2xl: var(--space-12);
+  --spacing-3xl: var(--space-16);
 
-  /* Border Radius */
-  --radius-sm: 3px;
-  --radius-md: 6px;
-  --radius-lg: 12px;
-  --radius-full: 9999px;
+  /* Border Radius (--radius-sm/md/lg inherited from brand/effects.css) */
+  --radius-full: var(--radius-pill);
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  /* Shadows (--shadow-sm/md/lg/xl inherited from brand/effects.css) */
 
   /* Transitions */
-  --transition-fast: 150ms ease-in-out;
-  --transition-base: 250ms ease-in-out;
-  --transition-slow: 350ms ease-in-out;
+  --transition-fast: var(--dur-fast) var(--ease-standard);
+  --transition-base: var(--dur-base) var(--ease-standard);
+  --transition-slow: var(--dur-slow) var(--ease-standard);
 
   /* Layout */
-  --container-max-width: 1280px;
+  --container-max-width: var(--container-max);
   --header-height: 64px;
   --sidebar-width: 280px;
 
@@ -109,40 +100,6 @@
   --z-index-modal-backdrop: 400;
   --z-index-modal: 500;
   --z-index-tooltip: 600;
-}
-
-/* Dark Mode Theme — triggered by data-theme="dark" attribute on <html> (ThemeContext) */
-/* System-preference fallback also keeps @media rule so default "system" mode works before JS */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --color-background: #0d1117;
-    --color-surface: #161b22;
-    --color-surface-alt: #21262d;
-    --color-border: #30363d;
-    --color-text: #c9d1d9;
-    --color-text-secondary: #8b949e;
-    --color-text-muted: #919ba6;
-  }
-}
-
-[data-theme="dark"] {
-  --color-background: #0d1117;
-  --color-surface: #161b22;
-  --color-surface-alt: #21262d;
-  --color-border: #30363d;
-  --color-text: #c9d1d9;
-  --color-text-secondary: #8b949e;
-  --color-text-muted: #919ba6;
-}
-
-[data-theme="light"] {
-  --color-background: #ffffff;
-  --color-surface: #f6f8fa;
-  --color-surface-alt: #e1e4e8;
-  --color-border: #d1d5da;
-  --color-text: #24292e;
-  --color-text-secondary: #586069;
-  --color-text-muted: #6a737d;
 }
 
 /* =========================================
@@ -474,6 +431,35 @@ pre {
   }
 }
 
+.loading-state--page {
+  padding: 120px 24px;
+}
+
+.loading-state__mark {
+  animation: markPulse 1.6s ease-in-out infinite;
+}
+
+.loading-state--page p {
+  font-size: 15px;
+  margin-top: var(--spacing-md);
+}
+
+@keyframes markPulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-state__mark {
+    animation: none;
+  }
+}
+
 /* =========================================
    Component Patterns
    ========================================= */
@@ -654,10 +640,10 @@ pre {
   transition: opacity var(--transition-base) ease-in-out;
 }
 
-/* T041: Mobile main content padding for fixed bottom TabBar */
+/* Mobile main content padding for fixed bottom TabBar */
 @media (max-width: 767px) {
   .main {
-    padding-bottom: 80px; /* TabBar height (64px) + extra spacing */
+    padding-bottom: 72px; /* TabBar height (64px) + safe-area allowance */
   }
 }
 
@@ -726,38 +712,10 @@ pre {
   border-bottom-color: var(--color-primary-dark);
 }
 
-/* Mobile navigation menu */
+/* Below 768px the fixed mobile TabBar replaces header navigation (FR-010). */
 @media (max-width: 767px) {
   .nav-menu {
-    width: 100%;
-    background-color: var(--color-surface-alt);
-    border-radius: var(--radius-md);
-    padding: 4px;
-    border: 1px solid var(--color-border);
-  }
-
-  .nav-menu-item {
-    flex: 1;
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: var(--font-size-sm);
-    border-bottom: none;
-    border-radius: var(--radius-sm);
-  }
-
-  .nav-menu-item--active {
-    background-color: var(--color-primary);
-    color: #ffffff;
-    border-bottom-color: transparent;
-  }
-
-  .nav-menu-item--active:hover {
-    background-color: var(--color-primary-dark);
-  }
-
-  .nav-menu-item:hover {
-    color: var(--color-text);
-    background-color: var(--color-surface);
-    border-bottom-color: transparent;
+    display: none;
   }
 }
 
@@ -884,7 +842,7 @@ pre {
 .stat-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-lg, 8px);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   text-align: center;
 }
@@ -918,7 +876,7 @@ pre {
 .dashboard-panel {
   background: var(--color-background);
   border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-lg, 8px);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   min-height: 350px;
 }
@@ -952,7 +910,7 @@ pre {
   padding: var(--spacing-xl);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-lg, 8px);
+  border-radius: var(--radius-lg);
 }
 
 .spark-score-explainer h3 {
@@ -980,7 +938,7 @@ pre {
 .score-factor {
   background: var(--color-background);
   border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-lg, 8px);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-md);
 }
 
@@ -1190,9 +1148,22 @@ pre {
 }
 
 .footer-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.8125rem;
   padding: var(--spacing-xs) var(--spacing-md);
   min-height: 36px;
+}
+
+.footer-refresh-btn .spin {
+  animation: spin 1s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-refresh-btn .spin {
+    animation: none;
+  }
 }
 
 @media (max-width: 767px) {
@@ -1246,13 +1217,4 @@ pre {
 /* Reserve the initial viewport so loading data does not push a visible footer. */
 #main-content {
   min-height: 100vh;
-}
-
-[data-theme="dark"] {
-  --color-primary: #58a6ff;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --color-primary: #58a6ff;
-  }
 }

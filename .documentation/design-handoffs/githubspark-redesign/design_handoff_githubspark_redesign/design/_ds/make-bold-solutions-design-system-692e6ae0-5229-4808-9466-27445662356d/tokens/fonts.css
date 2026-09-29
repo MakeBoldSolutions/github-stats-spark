@@ -1,0 +1,65 @@
+/* ==========================================================================
+   Make Bold Solutions — Webfonts
+   Be Vietnam Pro  → display / headlines / brand moments
+   Inter Tight     → body copy, UI, long-form
+   ========================================================================== */
+
+/* ---- Be Vietnam Pro (static instances) ---- */
+@font-face {
+  font-family: "Be Vietnam Pro";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../assets/fonts/BeVietnamPro-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Be Vietnam Pro";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../assets/fonts/BeVietnamPro-Medium.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Be Vietnam Pro";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../assets/fonts/BeVietnamPro-SemiBold.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Be Vietnam Pro";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../assets/fonts/BeVietnamPro-Bold.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Be Vietnam Pro";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("../assets/fonts/BeVietnamPro-ExtraBold.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Be Vietnam Pro";
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("../assets/fonts/BeVietnamPro-Black.ttf") format("truetype");
+}
+
+/* ---- Inter Tight (variable) ---- */
+@font-face {
+  font-family: "Inter Tight";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../assets/fonts/InterTight-VariableFont_wght.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Inter Tight";
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../assets/fonts/InterTight-Italic-VariableFont_wght.ttf") format("truetype");
+}

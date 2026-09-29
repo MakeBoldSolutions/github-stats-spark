@@ -1,0 +1,56 @@
+.panels {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.panelTitle {
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  font-size: 17px;
+  color: var(--text-strong);
+  margin: 0 0 12px;
+}
+
+.legendList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-600);
+}
+
+.legendSwatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.legendCount {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}

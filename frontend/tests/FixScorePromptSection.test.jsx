@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
-import {
+import { describe, expect, it, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import FixScorePromptSection, {
   buildPrompt,
   getFixScoreBlockers,
 } from "../src/components/DrillDown/RepositoryDetail/sections/FixScorePromptSection";
@@ -160,5 +161,64 @@ describe("FixScorePromptSection prompt helpers", () => {
     );
     expect(prompt).toContain("Missing flags: License, CI/CD, Tests, Docs");
     expect(prompt).toContain("action failures 1/5");
+  });
+});
+
+describe("<FixScorePromptSection /> collapsible presentation", () => {
+  Object.assign(navigator, {
+    clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+  });
+
+  it("shows a signals-count badge when collapsed and blockers exist", () => {
+    render(
+      <FixScorePromptSection
+        repository={repository}
+        expanded={false}
+        onToggle={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("Fix score prompt")).toBeInTheDocument();
+    expect(screen.getByText("/devspark.fix-score")).toBeInTheDocument();
+    expect(screen.getByText(/signals/)).toBeInTheDocument();
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+  });
+
+  it("expands to show blockers and the read-only prompt on toggle", () => {
+    const onToggle = vi.fn();
+    render(
+      <FixScorePromptSection
+        repository={repository}
+        expanded={false}
+        onToggle={onToggle}
+      />,
+    );
+    fireEvent.click(screen.getByText("Fix score prompt"));
+    expect(onToggle).toHaveBeenCalledWith("remediation");
+  });
+
+  it("copies the prompt and shows temporary copied feedback", async () => {
+    render(
+      <FixScorePromptSection
+        repository={repository}
+        expanded={true}
+        onToggle={vi.fn()}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Copy prompt" }));
+    expect(navigator.clipboard.writeText).toHaveBeenCalled();
+    expect(
+      await screen.findByRole("button", { name: "Copied" }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows a ready badge when there are no blockers", () => {
+    render(
+      <FixScorePromptSection
+        repository={{ name: "clean-repo" }}
+        expanded={false}
+        onToggle={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("Ready")).toBeInTheDocument();
   });
 });

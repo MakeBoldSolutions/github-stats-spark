@@ -1,9 +1,12 @@
 /**
- * T036 – Vitest coverage for contribution heatmap logic.
- * Tests computeHeatmapData from metricsCalculator.js.
+ * Vitest coverage for contribution heatmap logic.
+ * Tests computeHeatmapData from metricsCalculator.js against the approved
+ * generated-at window boundary and the five fixed intensity thresholds.
  */
 import { describe, it, expect } from "vitest";
+import { render, screen } from "@testing-library/react";
 import { computeHeatmapData } from "../src/services/metricsCalculator";
+import ContributionHeatmap from "../src/components/Visualizations/ContributionHeatmap";
 
 describe("computeHeatmapData", () => {
   it("returns empty array for null input", () => {
@@ -15,62 +18,95 @@ describe("computeHeatmapData", () => {
     expect(computeHeatmapData(42)).toEqual([]);
   });
 
-  it("returns 365 cells for a full-year calendar", () => {
+  it("returns 365 cells for a full-year calendar ending at generatedAt", () => {
+    const generatedAt = "2026-09-28T16:25:21.777778";
     const calendar = {};
-    const today = new Date();
+    const end = new Date(generatedAt);
     for (let i = 0; i < 365; i++) {
-      const d = new Date(today);
+      const d = new Date(end);
       d.setDate(d.getDate() - i);
       calendar[d.toISOString().slice(0, 10)] = i % 5;
     }
-    const cells = computeHeatmapData(calendar);
+    const cells = computeHeatmapData(calendar, generatedAt);
     expect(cells.length).toBe(365);
+    expect(cells[cells.length - 1].date).toBe("2026-09-28");
   });
 
-  it("assigns intensity 0 to days with 0 commits", () => {
+  it("falls back to today when generatedAt is omitted or invalid", () => {
     const today = new Date().toISOString().slice(0, 10);
-    const calendar = { [today]: 0 };
-    const cells = computeHeatmapData(calendar);
-    const todayCell = cells.find((c) => c.date === today);
-    expect(todayCell).toBeDefined();
-    expect(todayCell.intensity).toBe(0);
+    const calendar = { [today]: 3 };
+    expect(computeHeatmapData(calendar)[364].date).toBe(today);
+    expect(computeHeatmapData(calendar, "not-a-date")[364].date).toBe(today);
   });
 
-  it("assigns intensity 4 to the highest day", () => {
-    const today = new Date();
-    // 5 data points so the max (50) is strictly above Q3 (40) → intensity 4
-    const calendar = {};
-    const counts = [10, 20, 30, 40, 50];
-    for (let i = 0; i < counts.length; i++) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      calendar[d.toISOString().slice(0, 10)] = counts[i]; // today = 10
-    }
-    // 5 days ago from today has count 50 (highest)
-    const highestDate = new Date(today);
-    highestDate.setDate(highestDate.getDate() - 4); // counts[4] = 50
-    const cells = computeHeatmapData(calendar);
-    const highCell = cells.find((c) => c.date === highestDate.toISOString().slice(0, 10));
-    expect(highCell).toBeDefined();
-    expect(highCell.count).toBe(50);
-    // With sorted [10,20,30,40,50]: q3 index = Math.floor(5*0.75)=3 → value 40; 50>40 → intensity 4
-    expect(highCell.intensity).toBe(4);
+  it("excludes days after the generatedAt window end", () => {
+    const generatedAt = "2026-09-28";
+    const future = "2026-10-05";
+    const calendar = { [generatedAt]: 5, [future]: 99 };
+    const cells = computeHeatmapData(calendar, generatedAt);
+    expect(cells.find((c) => c.date === future)).toBeUndefined();
+    expect(cells.find((c) => c.date === generatedAt).count).toBe(5);
   });
 
-  it("includes correct count for a known date", () => {
-    const today = new Date().toISOString().slice(0, 10);
-    const calendar = { [today]: 7 };
-    const cells = computeHeatmapData(calendar);
-    const todayCell = cells.find((c) => c.date === today);
-    expect(todayCell).toBeDefined();
-    expect(todayCell.count).toBe(7);
+  it("assigns the five approved fixed intensity thresholds", () => {
+    const generatedAt = "2026-09-28";
+    const calendar = {
+      [generatedAt]: 0,
+      "2026-09-27": 3,
+      "2026-09-26": 10,
+      "2026-09-25": 20,
+      "2026-09-24": 21,
+    };
+    const cells = computeHeatmapData(calendar, generatedAt);
+    const byDate = Object.fromEntries(cells.map((c) => [c.date, c.intensity]));
+    expect(byDate[generatedAt]).toBe(0);
+    expect(byDate["2026-09-27"]).toBe(1);
+    expect(byDate["2026-09-26"]).toBe(2);
+    expect(byDate["2026-09-25"]).toBe(3);
+    expect(byDate["2026-09-24"]).toBe(4);
   });
 
   it("returns empty array for empty object calendar", () => {
-    // An empty object means no data, but the function still builds 365 slots
-    const cells = computeHeatmapData({});
+    const cells = computeHeatmapData({}, "2026-09-28");
     expect(Array.isArray(cells)).toBe(true);
-    // All cells should have intensity 0
+    expect(cells.length).toBe(365);
     cells.forEach((c) => expect(c.intensity).toBe(0));
+  });
+});
+
+describe("<ContributionHeatmap />", () => {
+  it("shows the contribution total, active-day count, legend, and footnote", () => {
+    const generatedAt = "2026-09-28";
+    render(
+      <ContributionHeatmap
+        activityCalendar={{ "2026-09-28": 5, "2026-09-27": 2 }}
+        generatedAt={generatedAt}
+      />,
+    );
+    expect(screen.getByText("Contribution activity")).toBeInTheDocument();
+    expect(
+      screen.getByText(/7 contributions across 2 active days/),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Trailing 365 days")).toBeInTheDocument();
+    expect(screen.getByText("Less")).toBeInTheDocument();
+    expect(screen.getByText("More")).toBeInTheDocument();
+  });
+
+  it("gives every day cell a keyboard-accessible, focusable description", () => {
+    render(
+      <ContributionHeatmap
+        activityCalendar={{ "2026-09-28": 5 }}
+        generatedAt="2026-09-28"
+      />,
+    );
+    const cell = screen.getByRole("img", {
+      name: "5 contributions on 2026-09-28",
+    });
+    expect(cell).toHaveAttribute("tabIndex", "0");
+  });
+
+  it("shows an empty state when no activity data is available", () => {
+    render(<ContributionHeatmap activityCalendar={{}} />);
+    expect(screen.getByText("No activity data available.")).toBeInTheDocument();
   });
 });

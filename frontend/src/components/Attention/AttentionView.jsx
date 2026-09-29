@@ -109,13 +109,6 @@ function AttentionView({ repositories, onRepoClick, onToast }) {
     );
   }
 
-  function handleKeyboardAction(event, action) {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      action();
-    }
-  }
-
   const displayRows = useMemo(() => {
     return [...rankedRepositories].sort((a, b) => {
       const av = getSortValue(a, sort.key);
@@ -206,9 +199,6 @@ function AttentionView({ repositories, onRepoClick, onToast }) {
                         type="button"
                         className={styles.sortButton}
                         onClick={() => handleSort(col.key)}
-                        onKeyDown={(event) =>
-                          handleKeyboardAction(event, () => handleSort(col.key))
-                        }
                         aria-label={`Sort by ${col.label}`}
                       >
                         {col.label}
@@ -234,11 +224,6 @@ function AttentionView({ repositories, onRepoClick, onToast }) {
                             type="button"
                             className={styles.repoButton}
                             onClick={() => onRepoClick?.(repo, displayRows)}
-                            onKeyDown={(event) =>
-                              handleKeyboardAction(event, () =>
-                                onRepoClick?.(repo, displayRows),
-                              )
-                            }
                             aria-label={`Open details for ${repo.name}`}
                           >
                             {repo.name}

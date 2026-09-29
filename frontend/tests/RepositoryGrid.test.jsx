@@ -157,4 +157,16 @@ describe("RepositoryGrid", () => {
     fireEvent.keyDown(card, { key: " " });
     expect(onRepoClick).toHaveBeenCalledTimes(2);
   });
+
+  it("includes the visible repository metadata in an interactive card name", () => {
+    render(
+      <RepositoryGrid repositories={repositories} onRepoClick={vi.fn()} />,
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: /Open details for alpha-api, TypeScript, Critical, Active this week/i,
+      }),
+    ).toBeInTheDocument();
+  });
 });

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import AttentionView from "../src/components/Attention/AttentionView";
 
 function makeRepo(overrides = {}) {
@@ -72,7 +73,8 @@ describe("<AttentionView />", () => {
     expect(names[0]).toBe("critical-repo");
   });
 
-  it("toggles sort direction with a keyboard-operable header button and exposes aria-sort", () => {
+  it("toggles sort direction with native keyboard activation and exposes aria-sort", async () => {
+    const user = userEvent.setup();
     render(<AttentionView repositories={repositories} onRepoClick={vi.fn()} />);
     const repositoryHeader = screen.getByRole("columnheader", {
       name: /Repository/i,
@@ -82,14 +84,15 @@ describe("<AttentionView />", () => {
     });
 
     expect(repositoryHeader).toHaveAttribute("aria-sort", "none");
-    fireEvent.keyDown(repositorySortButton, { key: "Enter" });
+  repositorySortButton.focus();
+  await user.keyboard("{Enter}");
     let names = screen
       .getAllByText(/critical-repo|healthy-repo/)
       .map((n) => n.textContent);
     expect(names[0]).toBe("healthy-repo"); // name sort defaults to desc
     expect(repositoryHeader).toHaveAttribute("aria-sort", "descending");
 
-    fireEvent.keyDown(repositorySortButton, { key: " " });
+    await user.keyboard(" ");
     names = screen
       .getAllByText(/critical-repo|healthy-repo/)
       .map((n) => n.textContent);
@@ -97,7 +100,8 @@ describe("<AttentionView />", () => {
     expect(repositoryHeader).toHaveAttribute("aria-sort", "ascending");
   });
 
-  it("opens the drawer with a keyboard-focusable repository detail button", () => {
+  it("opens the drawer once with native keyboard activation", async () => {
+    const user = userEvent.setup();
     const onRepoClick = vi.fn();
     render(
       <AttentionView repositories={repositories} onRepoClick={onRepoClick} />,
@@ -107,7 +111,8 @@ describe("<AttentionView />", () => {
     });
     detailButton.focus();
     expect(detailButton).toHaveFocus();
-    fireEvent.keyDown(detailButton, { key: "Enter" });
+    await user.keyboard("{Enter}");
+    expect(onRepoClick).toHaveBeenCalledTimes(1);
     expect(onRepoClick).toHaveBeenCalledWith(
       expect.objectContaining({ name: "critical-repo" }),
       expect.arrayContaining([

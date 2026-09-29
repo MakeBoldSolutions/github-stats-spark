@@ -1,4 +1,4 @@
-import { useState, useMemo, useId } from "react";
+import { useState, useMemo } from "react";
 import {
   Search,
   X,
@@ -31,7 +31,6 @@ function QualityChip({ label, active }) {
 }
 
 function RepoCard({ repo, onClick }) {
-  const titleId = useId();
   const language = repo.language || "Unknown";
   const langColor = getLanguageColor(language);
   const excerpt = getRepositorySummaryExcerpt(repo);
@@ -39,6 +38,26 @@ function RepoCard({ repo, onClick }) {
   const daysSincePush = repo.days_since_last_push;
   const activityLabel = getRelativePushLabel(daysSincePush);
   const isRecent = typeof daysSincePush === "number" && daysSincePush <= 3;
+  const qualitySummary = [
+    `${repo.has_readme ? "README" : "No README"}`,
+    `${repo.has_license ? "License" : "No License"}`,
+    `${repo.has_ci_cd ? "CI/CD" : "No CI/CD"}`,
+    `${repo.has_tests ? "Tests" : "No Tests"}`,
+  ].join(", ");
+  const accessibleName = [
+    `Open details for ${repo.name}`,
+    language,
+    health.label,
+    isRecent ? "Active this week" : null,
+    excerpt,
+    qualitySummary,
+    `${repo.stars ?? 0} stars`,
+    `${repo.forks ?? 0} forks`,
+    `${(repo.total_commits || 0).toLocaleString()} commits`,
+    activityLabel,
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   const handleClick = (e) => {
     if (e.target.closest("a")) return;
@@ -54,7 +73,7 @@ function RepoCard({ repo, onClick }) {
       onClick={handleClick}
       role="button"
       tabIndex={0}
-      aria-labelledby={titleId}
+      aria-label={accessibleName}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
@@ -64,11 +83,7 @@ function RepoCard({ repo, onClick }) {
     >
       <div className={styles.cardBody}>
         <div className={styles.cardTop}>
-          <span
-            id={titleId}
-            className={styles.cardTitle}
-            data-testid="repo-name"
-          >
+          <span className={styles.cardTitle} data-testid="repo-name">
             {repo.name}
           </span>
           {repo.homepage && (

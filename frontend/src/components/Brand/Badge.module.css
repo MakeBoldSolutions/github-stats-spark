@@ -33,7 +33,7 @@
 
 .caution {
   background: var(--caution-soft);
-  color: var(--caution);
+  color: var(--ember-800);
 }
 
 .critical {

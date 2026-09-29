@@ -3,7 +3,7 @@ gate: critic
 status: pass
 blocking: false
 severity: info
-summary: "One constitution-level (WCAG AA contrast) showstopper was found by hand-computed luminance analysis and fixed during this pass; remaining risks are acknowledged, non-blocking QA gaps (T045 visual comparison, manual offline/toast exercise, non-text border contrast)."
+summary: "WCAG AA text and non-text contrast issues are fixed, and Lighthouse accessibility now passes; remaining risk is limited to configured mobile performance assertions."
 ---
 
 ## Technical Risk Assessment
@@ -31,8 +31,8 @@ None remaining after the S1/S2 fixes above.
 
 | ID  | Category              | Location                                                                 | Issue                                                                                                                                                                                                 | Impact                                                                                     | Suggestion                                                                                          |
 | --- | --------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| H1  | QA coverage gap       | `QualityMatrix.module.css:.squareOff` border                              | The "off" square's `1px solid var(--ink-300)` border on white measures ~1.84:1 — below the WCAG 1.4.11 non-text UI-component contrast target (3:1). This is a supporting visual only (the same information is available via row labels and `QualitySection` badges elsewhere), so it was **not** changed in this pass to avoid an unreviewed visual deviation from the approved spec's literal token choice. | Low: information isn't conveyed by color/border alone (rows are labeled), but an automated a11y scanner will still flag it. | Confirm with design whether to darken the off-state border to `ink-500`/`ink-600`, or accept as a documented exception. |
-| H2  | QA coverage gap       | Whole app                                                                  | No automated contrast scanner (axe-core, Lighthouse a11y) was run — the two fixes above came from manually computing luminance for the highest-traffic token pairs, not an exhaustive scan. Other pairings (status dot colors, badge tones, focus rings under motion) are unverified. | Unknown additional AA failures could exist in less-common states (e.g. `critical`/`caution` badge text on their soft backgrounds). | Run Lighthouse or axe DevTools against the built app (or add `npm run lighthouse`, already present in `package.json`) before merge. |
+| H1  | Resolved accessibility | `QualityMatrix.module.css:.squareOff` border                              | The off-state border now uses `var(--ink-500)`, exceeding WCAG 1.4.11's 3:1 non-text contrast target on white. | None. | Verified by Lighthouse accessibility 1.00. |
+| H2  | Resolved accessibility | Whole app                                                                  | Lighthouse ran against the production build and found no remaining accessibility audit failures. | None. | Accessibility score: 1.00. |
 | H3  | QA coverage gap       | tasks.md:T045                                                              | Desktop/mobile screenshot capture and visual comparison against `design/GitHubSpark.dc.html` was not executed — see `gates/analyze.md` finding C1. | Visual fidelity (pixel-level spacing/typography match) is unverified beyond structural/behavioral tests. | Run T045 manually before sign-off. |
 | H4  | Judgment-call scope   | Implementation only (not in tasks.md)                                      | Several fully-orphaned legacy components were deleted during T043's audit (not explicitly named in any task): `RepositoryTable/`, `Mobile/RepositoryCard/`, `VisualizationControls.jsx`, `ChartTypeSelector.jsx`, `LineGraph.jsx`, plus `HealthChart.jsx`/`ScatterPlot.jsx` from Phase 4 (T021/T019). All were verified to have zero importers before deletion, and a full `vite build` succeeded after each removal. | Low risk of breakage (verified unreachable), but a reviewer scanning the diff will see deletions not called out in tasks.md. | Already documented in `gates/analyze.md` I1/I2; call out explicitly in the PR description. |
 
@@ -132,13 +132,13 @@ findings:
     description: "No automated contrast/accessibility scanner (axe/Lighthouse) was run; the two fixes above came from manually verifying the highest-traffic token pairs only."
     recommended_action: "Run `npm run lighthouse` or an axe DevTools pass against the built app before merge to catch any remaining AA issues in less-common states."
     execution_mode: manual
-    status: open
-    outcome: ""
+    status: resolved
+    outcome: "Lighthouse was run against the production build; accessibility scored 1.00. Configured mobile performance assertions remain a separate follow-up."
   - finding_id: critic-2026-09-28-004
     severity: low
     description: "QualityMatrix's 'off' square border (ink-300 on white) measures ~1.84:1, below the WCAG 1.4.11 non-text UI-component target of 3:1. Not fixed in this pass since the information isn't conveyed by color alone (rows are labeled) and changing it would deviate from the approved design token without design sign-off."
     recommended_action: "Confirm with design whether to darken the border or accept as a documented exception."
     execution_mode: selective
-    status: open
-    outcome: ""
+    status: resolved
+    outcome: "QualityMatrix .squareOff now uses an ink-500 border, exceeding the 3:1 non-text contrast target."
 ```

@@ -1,9 +1,9 @@
 ---
 gate: pr-review
-status: pass
+status: warn
 blocking: false
-severity: info
-summary: "All critical lifecycle and keyboard-accessibility findings are resolved; two non-blocking quality follow-ups remain."
+severity: warning
+summary: "Keyboard and contrast findings are resolved; Lighthouse accessibility passes, while configured mobile performance assertions remain unresolved."
 ---
 
 # Pull Request Review: Redesign GitHubSpark dashboard with Make Bold Solutions system
@@ -15,7 +15,7 @@ summary: "All critical lifecycle and keyboard-accessibility findings are resolve
 - **Target Branch**: `main`
 - **Review Date**: 2026-09-28 UTC
 - **Last Updated**: 2026-09-28 UTC
-- **Reviewed Commit**: `65cc7116019741d2809b5ff93b9f787d059deda0`
+- **Reviewed Commit**: `ccd2e56633e8b069cad9a82155ba83b0bf045ee9`
 - **Reviewer**: `devspark.pr-review`
 - **Constitution Version**: 1.1.1
 
@@ -25,6 +25,8 @@ summary: "All critical lifecycle and keyboard-accessibility findings are resolve
 | --- | --------- | ---------- | -------- | ---- | ------ | --- | --- | ---------------------------------- | -------------------------- |
 | 1   | `65cc711` | 2026-09-28 | 3        | 0    | 2      | 0   | 0   | `cd frontend && npm test -- --run` | pass: 105 tests / 16 files |
 | 2   | local    | 2026-09-28 | 0        | 0    | 2      | 0   | 0   | `npm test -- --run`, lint, format, build, smoke | pass: 105 tests / 16 files |
+| 3   | `ccd2e56` | 2026-09-28 | 1        | 0    | 2      | 0   | 0   | `cd frontend && npm test -- --run AttentionView.test.jsx` | pass: 7 tests / 1 file |
+| 4   | local | 2026-09-28 | 0        | 0    | 1      | 0   | 0   | `npm test -- --run`, lint, format, build, Lighthouse | pass: 106 tests; Lighthouse accessibility 1.00, performance gate fails |
 
 ## PR Summary
 
@@ -32,18 +34,18 @@ summary: "All critical lifecycle and keyboard-accessibility findings are resolve
 - **Created**: 2026-09-29 UTC
 - **Status**: OPEN
 - **Files Changed**: 100
-- **Commits**: 4
-- **Lines**: +20,309 -8,667
+- **Commits**: 6
+- **Lines**: +20,646 -8,670
 
 ## Stats
 
 | Metric          |     Value |
 | --------------- | --------: |
 | Files changed   |       100 |
-| Lines added     |   +20,309 |
-| Lines removed   |    -8,667 |
-| Net lines       |   +11,642 |
-| Commit snapshot | `65cc711` |
+| Lines added     |   +20,646 |
+| Lines removed   |    -8,670 |
+| Net lines       |   +11,976 |
+| Commit snapshot | `ccd2e56` |
 
 ## Executive Summary
 
@@ -52,11 +54,11 @@ summary: "All critical lifecycle and keyboard-accessibility findings are resolve
 - 📝 **Task Completion**: 47/47 tasks complete
 - 🔒 **Security**: 0 issues found in maintained frontend sources
 - 📊 **Code Quality**: 2 recommendations
-- 🧪 **Testing**: PASS (105 tests / 16 files)
+- 🧪 **Testing**: PASS (106 tests / 16 files)
 - 📝 **Documentation**: ADEQUATE
 - 🏛️ **Constitution Improvements**: 0 findings
 
-**Overall Assessment**: The redesign has broad automated coverage, keeps the public-data contract intact, and passes its current test suite. Visual comparison evidence is recorded and the Health table exposes semantic, keyboard-operable controls.
+**Overall Assessment**: The lifecycle and visual-comparison blockers are resolved. Health actions rely on native button activation, repository cards have complete accessible names, and Lighthouse accessibility passes. The configured mobile performance assertions remain a non-blocking follow-up.
 
 **Approval Recommendation**: ✅ APPROVE
 
@@ -67,11 +69,12 @@ summary: "All critical lifecycle and keyboard-accessibility findings are resolve
 - [x] **C-01** `.documentation/specs/001-make-bold-solutions-redesign/spec.md` - The feature spec is `Complete`.
 - [x] **C-02** `.documentation/specs/001-make-bold-solutions-redesign/tasks.md:T045` - Visual evidence is recorded in `evidence/visual-comparison/comparison.md`.
 - [x] **C-03** `frontend/src/components/Attention/AttentionView.jsx` - Sort and repository-detail actions are semantic controls with `aria-sort` and Enter/Space coverage.
+- [x] **C-04** `frontend/src/components/Attention/AttentionView.jsx` - Native button actions now rely on default Enter and Space activation; `user-event` coverage asserts one detail callback.
 
 ### Recommended Improvements
 
-- [ ] **M-01** `frontend/package.json:18` - The existing Lighthouse script was not run, leaving contrast and keyboard coverage outside the exercised test suite unverified.
-- [ ] **M-02** `frontend/src/components/Visualizations/QualityMatrix.module.css` - The inactive Quality Matrix border is documented in the Critic gate as below WCAG 1.4.11 non-text contrast; resolve it or obtain an explicit design exception.
+- [x] **M-01** `frontend/package.json:18` - Lighthouse ran with accessibility `1.00`; its mobile performance assertions remain a separate follow-up.
+- [x] **M-02** `frontend/src/components/Visualizations/QualityMatrix.module.css` - The inactive Quality Matrix border now uses `--ink-500`, exceeding the 3:1 non-text contrast target.
 
 ## What's Good
 
@@ -90,6 +93,7 @@ summary: "All critical lifecycle and keyboard-accessibility findings are resolve
 | C-01 | ✅ Resolved | Spec Lifecycle      | `.documentation/specs/001-make-bold-solutions-redesign/spec.md`    | The spec status is `Complete`. | Verified after T045 evidence completion. |
 | C-02 | ✅ Resolved | Spec Lifecycle      | `.documentation/specs/001-make-bold-solutions-redesign/tasks.md:T045` | Visual comparison evidence covers desktop, mobile, drawer, offline, and error states. | Evidence is retained under the feature spec. |
 | C-03 | ✅ Resolved | Accessibility First | `frontend/src/components/Attention/AttentionView.jsx` | Sort and detail actions are semantic controls with exposed sort state and Enter/Space coverage. | Verified by the full frontend test suite. |
+| C-04 | ✅ Resolved | Accessibility First | `frontend/src/components/Attention/AttentionView.jsx` | Manual keyboard callbacks were removed from native buttons. `userEvent.keyboard` verifies native Enter and Space activation, and the detail callback runs once. | Verified by 106 frontend tests. |
 
 ### High Priority Issues
 
@@ -99,8 +103,8 @@ None found.
 
 | ID   | Status  | Principle           | File:Line                                                         | Issue                                                                                                | Recommendation                                                                             |
 | ---- | ------- | ------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| M-01 | 🔴 Open | Accessibility First | `frontend/package.json:18`                                        | The Lighthouse accessibility runner exists but was not included in the recorded validation evidence. | Run `npm run lighthouse` against the production build and address any actionable findings. |
-| M-02 | 🔴 Open | Accessibility First | `frontend/src/components/Visualizations/QualityMatrix.module.css` | The Critic gate records an inactive-grid border contrast ratio below WCAG 1.4.11.                    | Darken the border or document an approved exception.                                       |
+| M-01 | ✅ Resolved | Accessibility First | `frontend/package.json:18`                                        | Lighthouse ran against the production build and reported accessibility `1.00`; its mobile performance assertions did not pass. | Track performance separately without weakening the accessibility result. |
+| M-02 | ✅ Resolved | Accessibility First | `frontend/src/components/Visualizations/QualityMatrix.module.css` | The inactive-grid border now uses `--ink-500`, which exceeds WCAG 1.4.11's 3:1 non-text target. | Verified by the Lighthouse accessibility pass. |
 
 ### Low Priority Improvements
 
@@ -118,7 +122,7 @@ None found.
 | Data Privacy                | ✅ Pass | No fetcher/data-schema changes                      | Public-only filtering and static data contract remain intact.                                            |
 | Fail Fast, Fail Loud        | ✅ Pass | Loading, error, retry, toast paths                  | Recovery paths remain present and covered by tests.                                                      |
 | Change-Driven Caching       | ✅ Pass | `dataService` remains unchanged                     | Refresh uses the existing cache-clear/refetch flow.                                                      |
-| Accessibility First         | ✅ Pass | `AttentionView.jsx`, `AttentionView.test.jsx`        | Sort and detail controls are keyboard-operable and communicate sort state.                              |
+| Accessibility First         | ✅ Pass | `AttentionView.jsx`, `RepositoryGrid.jsx`, `Badge.module.css` | Native buttons activate once, interactive cards expose complete names, and Lighthouse accessibility is 1.00. |
 | Generated Artifact Boundary | ✅ Pass | Build output redirected to `.validation/site`       | No generated artifact boundary changes are introduced.                                                   |
 
 ## Security Checklist
@@ -134,9 +138,9 @@ No backend, credential, or persistence surface was added. The new `lucide-react`
 
 ## Testing Coverage
 
-**Status**: ADEQUATE. Keyboard sorting, `aria-sort`, and keyboard repository activation are covered by `AttentionView.test.jsx`; all 105 frontend tests pass.
+**Status**: ADEQUATE. `userEvent.keyboard` exercises native Enter and Space activation, including a single-callback assertion for repository detail; the full suite has 106 passing tests.
 
-Executed `cd frontend && npm test -- --run`, lint, formatting, production build, and browser smoke: all passed. `AttentionView.test.jsx` exercises keyboard sorting, `aria-sort`, and keyboard repository activation.
+Executed full tests, lint, formatting, and a production build. `npm run lighthouse` reports accessibility `1.00`, best practices `1.00`, and no layout shift or blocking time; it remains nonzero only for configured mobile performance assertions.
 
 ## Test Inventory
 
@@ -157,10 +161,10 @@ The feature spec, plan, tasks, quickstart, Analyze gate, Critic gate, and retain
 
 | File group                                            | Tier | Changes                             | Type           | Findings          |
 | ----------------------------------------------------- | ---- | ----------------------------------- | -------------- | ----------------- |
-| `frontend/src/components/Attention/AttentionView.jsx` | P1   | Health data and interaction rewrite | Modified       | Resolved C-03     |
+| `frontend/src/components/Attention/AttentionView.jsx` | P1   | Health data and interaction rewrite | Modified       | Resolved C-03; C-04 |
 | `frontend/src/hooks/useDashboardShell.js`             | P1   | Shell-state extraction              | Added          | None              |
 | `frontend/src/utils/repositoryPresentation.js`        | P1   | Pure presentation helpers           | Added          | None              |
-| `frontend/tests/*.test.jsx`                           | P2   | 105-test frontend suite             | Added/Modified | Keyboard coverage |
+| `frontend/tests/*.test.jsx`                           | P2   | 105-test frontend suite             | Added/Modified | C-04 masked by synthetic keydown |
 | `frontend/package.json`                               | P2   | Icon and test dependencies/scripts  | Modified       | M-01              |
 | `.documentation/**`                                   | P3   | Handoff and lifecycle artifacts     | Added/Modified | Resolved C-01, C-02 |
 
@@ -171,12 +175,13 @@ The feature spec, plan, tasks, quickstart, Analyze gate, Critic gate, and retain
 | Health scoring    | Browser-derived composite score | Source `attention_score` and `attention_metrics` | Yes          | Reduces source/display divergence.                                   |
 | Theme selection   | User-facing theme toggle        | Permanent light theme                            | Yes          | Smoke coverage was updated.                                          |
 | Drawer navigation | App-level default list          | Initiating view's active list                    | Yes          | Overview and Health behavior verified.                               |
+| Health keyboard activation | One semantic control action | `onKeyDown` action plus native button click | No | Enter sorts twice and may call detail navigation twice. |
 
 ## Approval Decision
 
 **Recommendation**: ✅ APPROVE
 
-**Reasoning**: The required visual comparison is complete, the spec lifecycle is closed, and Health table interactions are keyboard-operable and tested. M-01 and M-02 remain non-blocking quality follow-ups.
+**Reasoning**: The required visual comparison is complete, the feature lifecycle is closed, and all accessibility findings are resolved. The Lighthouse performance thresholds need separate performance work but do not alter the accessibility disposition.
 
 **Estimated Rework Time**: 1-3 hours, excluding the manual visual comparison.
 
@@ -210,15 +215,22 @@ findings:
     description: "No automated Lighthouse accessibility evidence accompanies the completed implementation."
     recommended_action: "Run the existing Lighthouse script against the production build and address actionable findings."
     execution_mode: manual
-    status: open
-    outcome: ""
+    status: resolved
+    outcome: "Lighthouse accessibility scored 1.00; only configured mobile performance assertions remain nonzero."
   - finding_id: pr-3-m-02
     severity: medium
     description: "The inactive Quality Matrix border is documented as below WCAG non-text contrast guidance."
     recommended_action: "Darken the border or obtain an explicit design exception."
     execution_mode: selective
-    status: open
-    outcome: ""
+    status: resolved
+    outcome: "The inactive square border now uses --ink-500, exceeding 3:1 non-text contrast."
+  - finding_id: pr-3-c-04
+    severity: critical
+    description: "Native Health-table buttons invoke actions from both onKeyDown and their default click behavior."
+    recommended_action: "Remove manual keyboard action handlers from native buttons and test a real keyboard activation path."
+    execution_mode: auto
+    status: resolved
+    outcome: "Removed manual onKeyDown actions from native buttons and added user-event keyboard coverage."
 ```
 
 ---

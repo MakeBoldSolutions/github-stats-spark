@@ -4,7 +4,7 @@
     "total_repositories": 15,
     "total_stars": 10,
     "total_forks": 5,
-    "total_commits": 1331,
+    "total_commits": 1320,
     "activity_calendar": {
       "2026-09-26": 32,
       "2026-09-27": 13,
@@ -26,7 +26,7 @@
       "2026-08-28": 9,
       "2026-08-30": 2,
       "2025-10-05": 2,
-      "2025-10-13": 12,
+      "2025-10-13": 1,
       "2025-10-20": 1,
       "2025-10-24": 1,
       "2025-12-02": 7,
@@ -105,6 +105,7 @@
       "2026-07-12": 3,
       "2026-08-16": 6,
       "2026-08-27": 10,
+      "2026-10-04": 1,
       "2025-12-03": 1,
       "2025-12-04": 5,
       "2025-12-06": 2,
@@ -158,7 +159,6 @@
       "2026-03-21": 1,
       "2026-05-23": 2,
       "2026-09-21": 2,
-      "2025-10-12": 1,
       "2025-11-03": 11,
       "2026-02-09": 4,
       "2026-03-02": 11,
@@ -177,21 +177,15 @@
     },
     "weekly_activity": [
       {
-        "week": "2025-W40",
-        "label": "Sep 29",
-        "commits": 2,
-        "active_repos": 1
-      },
-      {
         "week": "2025-W41",
         "label": "Oct 6",
-        "commits": 1,
-        "active_repos": 1
+        "commits": 0,
+        "active_repos": 0
       },
       {
         "week": "2025-W42",
         "label": "Oct 13",
-        "commits": 12,
+        "commits": 1,
         "active_repos": 1
       },
       {
@@ -491,8 +485,14 @@
       {
         "week": "2026-W40",
         "label": "Sep 28",
-        "commits": 91,
-        "active_repos": 6
+        "commits": 92,
+        "active_repos": 7
+      },
+      {
+        "week": "2026-W41",
+        "label": "Oct 5",
+        "commits": 0,
+        "active_repos": 0
       }
     ]
   },
@@ -504,7 +504,7 @@
         "text": "*A Make Bold Spark Game* \u2014 created by [Make Bold Solutions](https://makeboldspark.com) Built with GDScript. Actively maintained with regular updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-04T04:03:41.567414",
+        "generated_at": "2026-10-11T03:41:16.756821",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -522,7 +522,7 @@
       "languages": {},
       "created_at": "2026-09-28T15:25:46+00:00",
       "updated_at": "2026-10-03T20:17:02+00:00",
-      "pushed_at": "2026-10-03T20:16:55+00:00",
+      "pushed_at": "2026-10-10T20:01:48+00:00",
       "total_commits": 123,
       "recent_commits_90d": 123,
       "first_commit_date": "2026-09-28T15:25:46+00:00",
@@ -536,13 +536,13 @@
         "last_commit_date": "2026-10-03T00:00:00+00:00",
         "patterns": [
           "highly_active",
-          "recently_updated",
+          "current",
           "accelerating"
         ],
         "commit_frequency": 41.0,
         "consistency_score": 0,
         "activity_rate": 1.367,
-        "days_since_last_commit": 1,
+        "days_since_last_commit": 8,
         "first_commit_date": "2026-09-28T15:25:46+00:00"
       },
       "commit_metrics": null,
@@ -557,28 +557,28 @@
       "has_tests": true,
       "has_docs": false,
       "language_count": 9,
-      "size_kb": 10687,
+      "size_kb": 10739,
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 5,
+      "age_days": 12,
       "days_since_last_push": 0,
       "ai_summary": null,
-      "attention_score": 3.5,
+      "attention_score": 6.5,
       "attention_metrics": {
-        "score": 3.5,
+        "score": 6.5,
         "tier": "healthy",
         "needs_attention": false,
         "reasons": [],
         "components": {
           "pull_requests": {
-            "score": 0.0,
+            "score": 12.0,
             "availability": "available",
             "reason": "none",
-            "total_open": 0,
+            "total_open": 1,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": null
+            "oldest_open_age_days": 0
           },
           "security": {
             "score": 10.0,
@@ -612,15 +612,15 @@
         }
       },
       "rank": 1,
-      "composite_score": 87.82,
+      "composite_score": 87.85,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
-        "has_open_pull_requests": false,
-        "total_open": 0,
+        "has_open_pull_requests": true,
+        "total_open": 1,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": null,
+        "oldest_open_age_days": 0,
         "source": "rest.pulls.list"
       },
       "security_summary": {
@@ -651,8 +651,8 @@
         "pull_requests": {
           "availability": "available",
           "reason": "none",
-          "total_open": 0,
-          "oldest_open_age_days": null
+          "total_open": 1,
+          "oldest_open_age_days": 0
         },
         "issues": {
           "availability": "available",
@@ -683,8 +683,8 @@
           "availability": "available",
           "reason": "none",
           "recent_runs": 20,
-          "success_count": 19,
-          "failure_count": 1,
+          "success_count": 13,
+          "failure_count": 0,
           "last_run_status": "completed",
           "last_run_conclusion": "success",
           "last_run_age_days": 0
@@ -704,7 +704,7 @@
         "text": "> Automated GitHub profile statistics generator with beautiful SVG visualizations and AI-powered repository analysis Built with Python. Actively maintained with regular updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-04T04:03:41.690952",
+        "generated_at": "2026-10-11T03:41:16.970801",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -721,28 +721,27 @@
       "language_stats": {},
       "languages": {},
       "created_at": "2025-12-28T17:01:51+00:00",
-      "updated_at": "2026-09-29T02:50:14+00:00",
-      "pushed_at": "2026-09-29T02:50:06+00:00",
-      "total_commits": 301,
+      "updated_at": "2026-10-04T04:04:07+00:00",
+      "pushed_at": "2026-10-04T04:04:02+00:00",
+      "total_commits": 302,
       "recent_commits_90d": 20,
       "first_commit_date": "2025-12-28T17:01:51+00:00",
-      "last_commit_date": "2026-09-28T00:00:00+00:00",
+      "last_commit_date": "2026-10-04T00:00:00+00:00",
       "commit_history": {
         "repository_name": "github-stats-spark",
-        "total_commits": 301,
+        "total_commits": 302,
         "recent_90d": 20,
-        "recent_180d": 85,
-        "recent_365d": 301,
-        "last_commit_date": "2026-09-28T00:00:00+00:00",
+        "recent_180d": 79,
+        "recent_365d": 302,
+        "last_commit_date": "2026-10-04T00:00:00+00:00",
         "patterns": [
           "active",
-          "recently_updated",
-          "declining"
+          "recently_updated"
         ],
         "commit_frequency": 6.67,
         "consistency_score": 0,
         "activity_rate": 0.222,
-        "days_since_last_commit": 6,
+        "days_since_last_commit": 7,
         "first_commit_date": "2025-12-28T17:01:51+00:00"
       },
       "commit_metrics": null,
@@ -842,7 +841,7 @@
           {
             "name": "anthropic",
             "current_version": "0.101.0",
-            "latest_version": "1.11.0",
+            "latest_version": "1.13.0",
             "ecosystem": "pypi",
             "versions_behind": 1,
             "is_outdated": true,
@@ -856,11 +855,11 @@
           {
             "name": "tenacity",
             "current_version": "9.1.4",
-            "latest_version": "9.1.4",
+            "latest_version": "9.2.1",
             "ecosystem": "pypi",
             "versions_behind": 0,
-            "is_outdated": false,
-            "status": "current",
+            "is_outdated": true,
+            "status": "minor_outdated",
             "version_requirement": "9.1.4,<10.0.0",
             "current_version_known": true,
             "latest_version_status": "resolved",
@@ -884,7 +883,7 @@
           {
             "name": "tomli",
             "current_version": "2.0.0",
-            "latest_version": "2.4.1",
+            "latest_version": "2.5.0",
             "ecosystem": "pypi",
             "versions_behind": 0,
             "is_outdated": true,
@@ -926,15 +925,15 @@
         ],
         "version_info": {},
         "dependency_file_type": "requirements.txt",
-        "currency_score": 68,
-        "outdated_count": 10,
+        "currency_score": 65,
+        "outdated_count": 11,
         "total_dependencies": 12,
         "known_versions_count": 12,
         "resolved_latest_versions_count": 12,
         "unknown_versions_count": 0,
         "primary_language": null,
         "language_diversity": 0,
-        "outdated_percentage": 83.3,
+        "outdated_percentage": 91.7,
         "version_coverage_percentage": 100.0,
         "latest_version_coverage_percentage": 100.0
       },
@@ -944,16 +943,16 @@
       "has_tests": true,
       "has_docs": true,
       "language_count": 5,
-      "size_kb": 34470,
+      "size_kb": 34480,
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 279,
-      "days_since_last_push": 5,
+      "age_days": 286,
+      "days_since_last_push": 6,
       "ai_summary": null,
-      "attention_score": 6.6,
+      "attention_score": 6.9,
       "attention_metrics": {
-        "score": 6.6,
+        "score": 6.9,
         "tier": "healthy",
         "needs_attention": false,
         "reasons": [
@@ -984,16 +983,16 @@
           },
           "staleness": {
             "score": 0.0,
-            "days_since_last_push": 5,
+            "days_since_last_push": 6,
             "recent_commits_90d": 20,
             "open_issues": 0
           },
           "dependencies": {
-            "score": 20.8,
+            "score": 22.8,
             "total_dependencies": 12,
-            "outdated_count": 10,
-            "outdated_percentage": 83.3,
-            "currency_score": 68,
+            "outdated_count": 11,
+            "outdated_percentage": 91.7,
+            "currency_score": 65,
             "version_coverage_percentage": 100.0,
             "latest_version_coverage_percentage": 100.0,
             "unknown_versions_count": 0
@@ -1001,7 +1000,7 @@
         }
       },
       "rank": 2,
-      "composite_score": 68.04,
+      "composite_score": 67.35,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -1072,8 +1071,8 @@
           "availability": "available",
           "reason": "none",
           "recent_runs": 20,
-          "success_count": 13,
-          "failure_count": 6,
+          "success_count": 15,
+          "failure_count": 4,
           "last_run_status": "in_progress",
           "last_run_conclusion": null,
           "last_run_age_days": 0
@@ -1090,10 +1089,10 @@
       "name": "UISampleSpark",
       "description": "An application to demonstrate multiple ways of implementing simple maintenance (CRUD) and user interface in ASP.Net using latest public versions. ",
       "summary": {
-        "text": "**Live Site**: [ui.makeboldspark.com](https://ui.makeboldspark.com) Built with HTML. Actively maintained with regular updates.",
+        "text": "**Live Site**: [ui.makeboldspark.com](https://ui.makeboldspark.com) Built with HTML. Maintained project with periodic updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-04T04:03:41.691160",
+        "generated_at": "2026-10-11T03:41:16.970966",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -1111,33 +1110,33 @@
       "languages": {},
       "created_at": "2019-04-25T18:45:29+00:00",
       "updated_at": "2026-07-13T16:11:36+00:00",
-      "pushed_at": "2026-09-30T13:04:38+00:00",
+      "pushed_at": "2026-10-07T13:05:20+00:00",
       "total_commits": 141,
-      "recent_commits_90d": 11,
+      "recent_commits_90d": 0,
       "first_commit_date": "2019-04-25T18:45:29+00:00",
       "last_commit_date": "2026-07-13T00:00:00+00:00",
       "commit_history": {
         "repository_name": "UISampleSpark",
         "total_commits": 141,
-        "recent_90d": 11,
+        "recent_90d": 0,
         "recent_180d": 53,
         "recent_365d": 141,
         "last_commit_date": "2026-07-13T00:00:00+00:00",
         "patterns": [
-          "active",
+          "minimal_activity",
           "declining"
         ],
-        "commit_frequency": 3.67,
+        "commit_frequency": 0.0,
         "consistency_score": 0,
-        "activity_rate": 0.122,
-        "days_since_last_commit": 83,
+        "activity_rate": 0.0,
+        "days_since_last_commit": 90,
         "first_commit_date": "2019-04-25T18:45:29+00:00"
       },
       "commit_metrics": null,
       "avg_commit_size": null,
       "largest_commit": null,
       "smallest_commit": null,
-      "commit_velocity": 3.67,
+      "commit_velocity": 0.0,
       "tech_stack": null,
       "has_readme": true,
       "has_license": true,
@@ -1149,7 +1148,7 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 2718,
+      "age_days": 2725,
       "days_since_last_push": 3,
       "ai_summary": null,
       "attention_score": 28.5,
@@ -1168,7 +1167,7 @@
             "total_open": 28,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": 75
+            "oldest_open_age_days": 82
           },
           "security": {
             "score": 10.0,
@@ -1186,7 +1185,7 @@
           "staleness": {
             "score": 0.0,
             "days_since_last_push": 3,
-            "recent_commits_90d": 11,
+            "recent_commits_90d": 0,
             "open_issues": 0
           },
           "dependencies": {
@@ -1202,7 +1201,7 @@
         }
       },
       "rank": 3,
-      "composite_score": 54.87,
+      "composite_score": 49.62,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -1210,7 +1209,7 @@
         "total_open": 28,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": 75,
+        "oldest_open_age_days": 82,
         "source": "rest.pulls.list"
       },
       "security_summary": {
@@ -1242,7 +1241,7 @@
           "availability": "available",
           "reason": "none",
           "total_open": 28,
-          "oldest_open_age_days": 75
+          "oldest_open_age_days": 82
         },
         "issues": {
           "availability": "available",
@@ -1273,8 +1272,8 @@
           "availability": "available",
           "reason": "none",
           "recent_runs": 20,
-          "success_count": 11,
-          "failure_count": 9,
+          "success_count": 13,
+          "failure_count": 7,
           "last_run_status": "completed",
           "last_run_conclusion": "success",
           "last_run_age_days": 2
@@ -1294,7 +1293,7 @@
         "text": "[![Version](https://img.shields.io/badge/version-1.0.18-blue.svg)](https://github.com/MakeBoldSolutions/TailwindSpark) [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![React](https://img.shields.io/badge/React-19.1.1-61dafb.svg)](https://reactjs.org/) [![TypeScript](https Built with TypeScript. Maintained project with periodic updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-04T04:03:43.408348",
+        "generated_at": "2026-10-11T03:41:18.574717",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -1312,17 +1311,17 @@
       "languages": {},
       "created_at": "2025-07-29T16:30:33+00:00",
       "updated_at": "2026-08-17T14:56:40+00:00",
-      "pushed_at": "2026-10-01T10:56:48+00:00",
-      "total_commits": 165,
+      "pushed_at": "2026-10-05T13:06:03+00:00",
+      "total_commits": 153,
       "recent_commits_90d": 7,
       "first_commit_date": "2025-07-29T16:30:33+00:00",
       "last_commit_date": "2026-08-17T00:00:00+00:00",
       "commit_history": {
         "repository_name": "TailwindSpark",
-        "total_commits": 165,
+        "total_commits": 153,
         "recent_90d": 7,
-        "recent_180d": 63,
-        "recent_365d": 165,
+        "recent_180d": 47,
+        "recent_365d": 153,
         "last_commit_date": "2026-08-17T00:00:00+00:00",
         "patterns": [
           "maintained",
@@ -1331,7 +1330,7 @@
         "commit_frequency": 2.33,
         "consistency_score": 0,
         "activity_rate": 0.078,
-        "days_since_last_commit": 48,
+        "days_since_last_commit": 55,
         "first_commit_date": "2025-07-29T16:30:33+00:00"
       },
       "commit_metrics": null,
@@ -1361,7 +1360,7 @@
           {
             "name": "web-vitals",
             "current_version": "6.1.1",
-            "latest_version": "6.2.2",
+            "latest_version": "6.2.3",
             "ecosystem": "npm",
             "versions_behind": 0,
             "is_outdated": true,
@@ -1389,7 +1388,7 @@
           {
             "name": "@playwright/test",
             "current_version": "1.62.1",
-            "latest_version": "1.63.0",
+            "latest_version": "1.64.0",
             "ecosystem": "npm",
             "versions_behind": 0,
             "is_outdated": true,
@@ -1543,7 +1542,7 @@
           {
             "name": "jsdom",
             "current_version": "30.0.1",
-            "latest_version": "30.1.1",
+            "latest_version": "30.1.2",
             "ecosystem": "npm",
             "versions_behind": 0,
             "is_outdated": true,
@@ -1557,7 +1556,7 @@
           {
             "name": "oxlint",
             "current_version": "1.78.0",
-            "latest_version": "1.86.0",
+            "latest_version": "1.87.0",
             "ecosystem": "npm",
             "versions_behind": 0,
             "is_outdated": true,
@@ -1571,7 +1570,7 @@
           {
             "name": "oxlint-tsgolint",
             "current_version": "7.0.2001",
-            "latest_version": "7.0.2003",
+            "latest_version": "7.0.2004",
             "ecosystem": "npm",
             "versions_behind": 0,
             "is_outdated": true,
@@ -1585,7 +1584,7 @@
           {
             "name": "prettier",
             "current_version": "3.9.6",
-            "latest_version": "3.9.9",
+            "latest_version": "3.9.10",
             "ecosystem": "npm",
             "versions_behind": 0,
             "is_outdated": true,
@@ -1715,12 +1714,12 @@
       "has_tests": false,
       "has_docs": true,
       "language_count": 6,
-      "size_kb": 4495,
+      "size_kb": 4483,
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 431,
-      "days_since_last_push": 2,
+      "age_days": 438,
+      "days_since_last_push": 5,
       "ai_summary": null,
       "attention_score": 30.6,
       "attention_metrics": {
@@ -1735,10 +1734,10 @@
             "score": 100.0,
             "availability": "available",
             "reason": "none",
-            "total_open": 11,
+            "total_open": 10,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": 32
+            "oldest_open_age_days": 39
           },
           "security": {
             "score": 10.0,
@@ -1755,7 +1754,7 @@
           },
           "staleness": {
             "score": 0.0,
-            "days_since_last_push": 2,
+            "days_since_last_push": 5,
             "recent_commits_90d": 7,
             "open_issues": 0
           },
@@ -1772,15 +1771,15 @@
         }
       },
       "rank": 4,
-      "composite_score": 38.43,
+      "composite_score": 36.93,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
         "has_open_pull_requests": true,
-        "total_open": 11,
+        "total_open": 10,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": 32,
+        "oldest_open_age_days": 39,
         "source": "rest.pulls.list"
       },
       "security_summary": {
@@ -1811,8 +1810,8 @@
         "pull_requests": {
           "availability": "available",
           "reason": "none",
-          "total_open": 11,
-          "oldest_open_age_days": 32
+          "total_open": 10,
+          "oldest_open_age_days": 39
         },
         "issues": {
           "availability": "available",
@@ -1843,8 +1842,8 @@
           "availability": "available",
           "reason": "none",
           "recent_runs": 20,
-          "success_count": 18,
-          "failure_count": 2,
+          "success_count": 19,
+          "failure_count": 1,
           "last_run_status": "completed",
           "last_run_conclusion": "success",
           "last_run_age_days": 0
@@ -1858,214 +1857,13 @@
       "attention_rank": 1
     },
     {
-      "name": "RequestSpark",
-      "description": "A small console application to run REST requests",
-      "summary": {
-        "text": "[![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download/dotnet/10.0) [![License](https://img.shields.io/github/license/MakeBoldSolutions/RequestSpark)](https://github.com/MakeBoldSolutions/RequestSpark/blob/main/LICENSE) [![GitHub Issues](https://img.shields. Built with C#. Key features: **Postman Collection Integration**: Import and execute existing Postman collections, **Automated Regression Testing**: Run comprehensive API test suites automatically, **Performance Analysis**: Compare response times across multiple API instances. Maintained project with periodic updates.",
-        "ai_generated": false,
-        "generation_method": "enhanced-template",
-        "generated_at": "2026-10-04T04:03:43.408568",
-        "model_used": null,
-        "tokens_used": 0,
-        "confidence_score": 60
-      },
-      "url": "https://github.com/MakeBoldSolutions/RequestSpark",
-      "homepage": null,
-      "has_pages": false,
-      "pages_url": null,
-      "website_url": null,
-      "stars": 2,
-      "forks": 1,
-      "watchers": 2,
-      "language": "C#",
-      "language_stats": {},
-      "languages": {},
-      "created_at": "2021-09-30T13:38:06+00:00",
-      "updated_at": "2026-08-28T04:58:48+00:00",
-      "pushed_at": "2026-09-03T12:10:45+00:00",
-      "total_commits": 57,
-      "recent_commits_90d": 3,
-      "first_commit_date": "2021-09-30T13:38:06+00:00",
-      "last_commit_date": "2026-08-27T00:00:00+00:00",
-      "commit_history": {
-        "repository_name": "RequestSpark",
-        "total_commits": 57,
-        "recent_90d": 3,
-        "recent_180d": 6,
-        "recent_365d": 57,
-        "last_commit_date": "2026-08-27T00:00:00+00:00",
-        "patterns": [
-          "maintained",
-          "consistent"
-        ],
-        "commit_frequency": 1.0,
-        "consistency_score": 0,
-        "activity_rate": 0.033,
-        "days_since_last_commit": 38,
-        "first_commit_date": "2021-09-30T13:38:06+00:00"
-      },
-      "commit_metrics": null,
-      "avg_commit_size": null,
-      "largest_commit": null,
-      "smallest_commit": null,
-      "commit_velocity": 1.0,
-      "tech_stack": null,
-      "has_readme": true,
-      "has_license": true,
-      "has_ci_cd": true,
-      "has_tests": false,
-      "has_docs": true,
-      "language_count": 5,
-      "size_kb": 1388,
-      "is_fork": false,
-      "is_private": false,
-      "is_archived": false,
-      "age_days": 1829,
-      "days_since_last_push": 30,
-      "ai_summary": null,
-      "attention_score": 18.5,
-      "attention_metrics": {
-        "score": 18.5,
-        "tier": "healthy",
-        "needs_attention": false,
-        "reasons": [
-          "pull_requests"
-        ],
-        "components": {
-          "pull_requests": {
-            "score": 48.1,
-            "availability": "available",
-            "reason": "none",
-            "total_open": 2,
-            "draft_count": 0,
-            "review_requested_count": 0,
-            "oldest_open_age_days": 69
-          },
-          "security": {
-            "score": 10.0,
-            "availability": "partial",
-            "reason": "permission_denied",
-            "overall_state": "clear",
-            "active_alert_counts": {
-              "total_open": 0,
-              "critical": 0,
-              "high": 0,
-              "medium": 0,
-              "low": 0
-            }
-          },
-          "staleness": {
-            "score": 12.0,
-            "days_since_last_push": 30,
-            "recent_commits_90d": 3,
-            "open_issues": 0
-          },
-          "dependencies": {
-            "score": 0.0,
-            "total_dependencies": 0,
-            "outdated_count": 0,
-            "outdated_percentage": 0.0,
-            "currency_score": 100,
-            "version_coverage_percentage": 100.0,
-            "latest_version_coverage_percentage": 100.0,
-            "unknown_versions_count": 0
-          }
-        }
-      },
-      "rank": 5,
-      "composite_score": 37.63,
-      "pull_request_summary": {
-        "availability": "available",
-        "reason": "none",
-        "has_open_pull_requests": true,
-        "total_open": 2,
-        "draft_count": 0,
-        "review_requested_count": 0,
-        "oldest_open_age_days": 69,
-        "source": "rest.pulls.list"
-      },
-      "security_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
-        "overall_state": "clear",
-        "feature_status": {
-          "advanced_security": "unknown",
-          "secret_scanning": "unknown",
-          "secret_scanning_push_protection": "unknown",
-          "dependency_alerts": "unavailable",
-          "automated_security_fixes": "unavailable"
-        },
-        "active_alert_counts": {
-          "total_open": 0,
-          "critical": 0,
-          "high": 0,
-          "medium": 0,
-          "low": 0
-        },
-        "sources": [
-          "rest.repos.get"
-        ]
-      },
-      "diagnostics_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
-        "pull_requests": {
-          "availability": "available",
-          "reason": "none",
-          "total_open": 2,
-          "oldest_open_age_days": 69
-        },
-        "issues": {
-          "availability": "available",
-          "reason": "none",
-          "total_open": 0,
-          "oldest_open_age_days": null,
-          "stale_over_30d": 0,
-          "stale_over_90d": 0
-        },
-        "security": {
-          "availability": "unavailable",
-          "reason": "permission_denied",
-          "dependabot": {
-            "total_open": 0,
-            "critical": 0,
-            "high": 0,
-            "medium": 0,
-            "low": 0
-          },
-          "code_scanning": {
-            "total_open": 0,
-            "error": 0,
-            "warning": 0,
-            "note": 0
-          }
-        },
-        "actions": {
-          "availability": "available",
-          "reason": "none",
-          "recent_runs": 20,
-          "success_count": 14,
-          "failure_count": 6,
-          "last_run_status": "completed",
-          "last_run_conclusion": "failure",
-          "last_run_age_days": 25
-        },
-        "sources": [
-          "rest.pulls.list",
-          "rest.issues.list",
-          "rest.actions.runs"
-        ]
-      },
-      "attention_rank": 10
-    },
-    {
       "name": "MakeBoldSpark.com",
       "description": "MakeBoldSpark",
       "summary": {
         "text": "**Live Site**: [makeboldspark.com](https://makeboldspark.com) Built with C#. Actively maintained with regular updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-04T04:03:43.408674",
+        "generated_at": "2026-10-11T03:41:18.574857",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -2103,7 +1901,7 @@
         "commit_frequency": 7.0,
         "consistency_score": 0,
         "activity_rate": 0.233,
-        "days_since_last_commit": 22,
+        "days_since_last_commit": 29,
         "first_commit_date": "2026-05-07T02:16:07+00:00"
       },
       "commit_metrics": null,
@@ -2122,8 +1920,8 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 150,
-      "days_since_last_push": 21,
+      "age_days": 157,
+      "days_since_last_push": 28,
       "ai_summary": null,
       "attention_score": 15.5,
       "attention_metrics": {
@@ -2158,7 +1956,7 @@
           },
           "staleness": {
             "score": 12.0,
-            "days_since_last_push": 21,
+            "days_since_last_push": 28,
             "recent_commits_90d": 21,
             "open_issues": 0
           },
@@ -2174,8 +1972,8 @@
           }
         }
       },
-      "rank": 6,
-      "composite_score": 36.56,
+      "rank": 5,
+      "composite_score": 36.58,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -2261,13 +2059,215 @@
       "attention_rank": 12
     },
     {
+      "name": "RequestSpark",
+      "description": "A small console application to run REST requests",
+      "summary": {
+        "text": "[![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download/dotnet/10.0) [![License](https://img.shields.io/github/license/MakeBoldSolutions/RequestSpark)](https://github.com/MakeBoldSolutions/RequestSpark/blob/main/LICENSE) [![GitHub Issues](https://img.shields. Built with C#. Key features: **Postman Collection Integration**: Import and execute existing Postman collections, **Automated Regression Testing**: Run comprehensive API test suites automatically, **Performance Analysis**: Compare response times across multiple API instances. Maintained project with periodic updates.",
+        "ai_generated": false,
+        "generation_method": "enhanced-template",
+        "generated_at": "2026-10-11T03:41:18.574972",
+        "model_used": null,
+        "tokens_used": 0,
+        "confidence_score": 60
+      },
+      "url": "https://github.com/MakeBoldSolutions/RequestSpark",
+      "homepage": null,
+      "has_pages": false,
+      "pages_url": null,
+      "website_url": null,
+      "stars": 2,
+      "forks": 1,
+      "watchers": 2,
+      "language": "C#",
+      "language_stats": {},
+      "languages": {},
+      "created_at": "2021-09-30T13:38:06+00:00",
+      "updated_at": "2026-08-28T04:58:48+00:00",
+      "pushed_at": "2026-09-03T12:10:45+00:00",
+      "total_commits": 57,
+      "recent_commits_90d": 3,
+      "first_commit_date": "2021-09-30T13:38:06+00:00",
+      "last_commit_date": "2026-08-27T00:00:00+00:00",
+      "commit_history": {
+        "repository_name": "RequestSpark",
+        "total_commits": 57,
+        "recent_90d": 3,
+        "recent_180d": 6,
+        "recent_365d": 57,
+        "last_commit_date": "2026-08-27T00:00:00+00:00",
+        "patterns": [
+          "maintained",
+          "consistent"
+        ],
+        "commit_frequency": 1.0,
+        "consistency_score": 0,
+        "activity_rate": 0.033,
+        "days_since_last_commit": 45,
+        "first_commit_date": "2021-09-30T13:38:06+00:00"
+      },
+      "commit_metrics": null,
+      "avg_commit_size": null,
+      "largest_commit": null,
+      "smallest_commit": null,
+      "commit_velocity": 1.0,
+      "tech_stack": null,
+      "has_readme": true,
+      "has_license": true,
+      "has_ci_cd": true,
+      "has_tests": false,
+      "has_docs": true,
+      "language_count": 5,
+      "size_kb": 1388,
+      "is_fork": false,
+      "is_private": false,
+      "is_archived": false,
+      "age_days": 1836,
+      "days_since_last_push": 37,
+      "ai_summary": null,
+      "attention_score": 24.3,
+      "attention_metrics": {
+        "score": 24.3,
+        "tier": "watch",
+        "needs_attention": true,
+        "reasons": [
+          "pull_requests",
+          "staleness"
+        ],
+        "components": {
+          "pull_requests": {
+            "score": 48.1,
+            "availability": "available",
+            "reason": "none",
+            "total_open": 2,
+            "draft_count": 0,
+            "review_requested_count": 0,
+            "oldest_open_age_days": 69
+          },
+          "security": {
+            "score": 10.0,
+            "availability": "partial",
+            "reason": "permission_denied",
+            "overall_state": "clear",
+            "active_alert_counts": {
+              "total_open": 0,
+              "critical": 0,
+              "high": 0,
+              "medium": 0,
+              "low": 0
+            }
+          },
+          "staleness": {
+            "score": 35.0,
+            "days_since_last_push": 37,
+            "recent_commits_90d": 3,
+            "open_issues": 0
+          },
+          "dependencies": {
+            "score": 0.0,
+            "total_dependencies": 0,
+            "outdated_count": 0,
+            "outdated_percentage": 0.0,
+            "currency_score": 100,
+            "version_coverage_percentage": 100.0,
+            "latest_version_coverage_percentage": 100.0,
+            "unknown_versions_count": 0
+          }
+        }
+      },
+      "rank": 6,
+      "composite_score": 33.13,
+      "pull_request_summary": {
+        "availability": "available",
+        "reason": "none",
+        "has_open_pull_requests": true,
+        "total_open": 2,
+        "draft_count": 0,
+        "review_requested_count": 0,
+        "oldest_open_age_days": 69,
+        "source": "rest.pulls.list"
+      },
+      "security_summary": {
+        "availability": "partial",
+        "reason": "permission_denied",
+        "overall_state": "clear",
+        "feature_status": {
+          "advanced_security": "unknown",
+          "secret_scanning": "unknown",
+          "secret_scanning_push_protection": "unknown",
+          "dependency_alerts": "unavailable",
+          "automated_security_fixes": "unavailable"
+        },
+        "active_alert_counts": {
+          "total_open": 0,
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "sources": [
+          "rest.repos.get"
+        ]
+      },
+      "diagnostics_summary": {
+        "availability": "partial",
+        "reason": "permission_denied",
+        "pull_requests": {
+          "availability": "available",
+          "reason": "none",
+          "total_open": 2,
+          "oldest_open_age_days": 69
+        },
+        "issues": {
+          "availability": "available",
+          "reason": "none",
+          "total_open": 0,
+          "oldest_open_age_days": null,
+          "stale_over_30d": 0,
+          "stale_over_90d": 0
+        },
+        "security": {
+          "availability": "unavailable",
+          "reason": "permission_denied",
+          "dependabot": {
+            "total_open": 0,
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0
+          },
+          "code_scanning": {
+            "total_open": 0,
+            "error": 0,
+            "warning": 0,
+            "note": 0
+          }
+        },
+        "actions": {
+          "availability": "available",
+          "reason": "none",
+          "recent_runs": 20,
+          "success_count": 14,
+          "failure_count": 6,
+          "last_run_status": "completed",
+          "last_run_conclusion": "failure",
+          "last_run_age_days": 25
+        },
+        "sources": [
+          "rest.pulls.list",
+          "rest.issues.list",
+          "rest.actions.runs"
+        ]
+      },
+      "attention_rank": 7
+    },
+    {
       "name": "MuseumSpark",
       "description": "A Museum Trip Planning Application",
       "summary": {
         "text": "> **The strategic travel planner for art lovers.** > Curate, prioritize, and optimize your museum visits across North America. Built with Python. Maintained project with periodic updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-04T04:03:43.408820",
+        "generated_at": "2026-10-11T03:41:18.575086",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -2304,7 +2304,7 @@
         "commit_frequency": 1.33,
         "consistency_score": 0,
         "activity_rate": 0.044,
-        "days_since_last_commit": 38,
+        "days_since_last_commit": 45,
         "first_commit_date": "2026-01-15T13:24:02+00:00"
       },
       "commit_metrics": null,
@@ -2323,8 +2323,8 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 261,
-      "days_since_last_push": 16,
+      "age_days": 268,
+      "days_since_last_push": 23,
       "ai_summary": null,
       "attention_score": 21.2,
       "attention_metrics": {
@@ -2359,7 +2359,7 @@
           },
           "staleness": {
             "score": 12.0,
-            "days_since_last_push": 16,
+            "days_since_last_push": 23,
             "recent_commits_90d": 4,
             "open_issues": 0
           },
@@ -2376,7 +2376,7 @@
         }
       },
       "rank": 7,
-      "composite_score": 28.11,
+      "composite_score": 28.14,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -2459,7 +2459,7 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 9
+      "attention_rank": 10
     },
     {
       "name": "BootstrapSpark",
@@ -2468,7 +2468,7 @@
         "text": "**BootstrapSpark** demonstrates enterprise-grade React development with React 19, TypeScript, and Vite \u2014 live at [Bootstrap.makeboldspark.com](https://Bootstrap.makeboldspark.com). Built with TypeScript. Maintained project with periodic updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-04T04:03:43.409551",
+        "generated_at": "2026-10-11T03:41:18.575656",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -2505,7 +2505,7 @@
         "commit_frequency": 1.67,
         "consistency_score": 0,
         "activity_rate": 0.056,
-        "days_since_last_commit": 48,
+        "days_since_last_commit": 55,
         "first_commit_date": "2024-10-11T23:31:56+00:00"
       },
       "commit_metrics": null,
@@ -3187,8 +3187,8 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 722,
-      "days_since_last_push": 47,
+      "age_days": 729,
+      "days_since_last_push": 54,
       "ai_summary": null,
       "attention_score": 17.2,
       "attention_metrics": {
@@ -3224,7 +3224,7 @@
           },
           "staleness": {
             "score": 35.0,
-            "days_since_last_push": 47,
+            "days_since_last_push": 54,
             "recent_commits_90d": 5,
             "open_issues": 0
           },
@@ -3241,7 +3241,7 @@
         }
       },
       "rank": 8,
-      "composite_score": 27.26,
+      "composite_score": 27.28,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -3333,7 +3333,7 @@
         "text": "> A compassionate support network platform helping people share updates with their trusted circle during life's challenging moments. Built with PowerShell. Key features: Create and manage journey conversations, Post updates with text and images, Invite trusted supporters via email. Maintained project with periodic updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-04T04:03:43.410770",
+        "generated_at": "2026-10-11T03:41:18.576562",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -3370,7 +3370,7 @@
         "commit_frequency": 2.33,
         "consistency_score": 0,
         "activity_rate": 0.078,
-        "days_since_last_commit": 13,
+        "days_since_last_commit": 20,
         "first_commit_date": "2026-02-01T15:22:40+00:00"
       },
       "commit_metrics": null,
@@ -4780,12 +4780,12 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 244,
-      "days_since_last_push": 12,
+      "age_days": 251,
+      "days_since_last_push": 19,
       "ai_summary": null,
-      "attention_score": 23.7,
+      "attention_score": 26.7,
       "attention_metrics": {
-        "score": 23.7,
+        "score": 26.7,
         "tier": "watch",
         "needs_attention": true,
         "reasons": [
@@ -4816,8 +4816,8 @@
             }
           },
           "staleness": {
-            "score": 0.0,
-            "days_since_last_push": 12,
+            "score": 12.0,
+            "days_since_last_push": 19,
             "recent_commits_90d": 7,
             "open_issues": 0
           },
@@ -4834,7 +4834,7 @@
         }
       },
       "rank": 9,
-      "composite_score": 26.95,
+      "composite_score": 26.97,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -4917,7 +4917,7 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 6
+      "attention_rank": 5
     },
     {
       "name": "ArtSpark",
@@ -4926,7 +4926,7 @@
         "text": "**A comprehensive .NET solution for the Art Institute of Chicago's public API, featuring a complete client library, revolutionary AI chat system with multiple personas, and web applications showcasing modern .NET development practices.** Built with C#. Key features: \u2705 **Complete API Coverage**: All 33 endpoints across 6 categories, \u2705 **Strongly Typed Models**: Comprehensive C# models for all resource types, \u2705 **Async/Await Support**: Modern asynchronous programming patterns. Actively maintained with regular updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-04T04:03:43.411020",
+        "generated_at": "2026-10-11T03:41:18.576761",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -4962,7 +4962,7 @@
         "commit_frequency": 3.67,
         "consistency_score": 0,
         "activity_rate": 0.122,
-        "days_since_last_commit": 35,
+        "days_since_last_commit": 42,
         "first_commit_date": "2023-01-30T15:23:30+00:00"
       },
       "commit_metrics": null,
@@ -4981,8 +4981,8 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 1342,
-      "days_since_last_push": 34,
+      "age_days": 1349,
+      "days_since_last_push": 41,
       "ai_summary": null,
       "attention_score": 21.3,
       "attention_metrics": {
@@ -5018,7 +5018,7 @@
           },
           "staleness": {
             "score": 35.0,
-            "days_since_last_push": 34,
+            "days_since_last_push": 41,
             "recent_commits_90d": 11,
             "open_issues": 0
           },
@@ -5118,7 +5118,7 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 7
+      "attention_rank": 8
     },
     {
       "name": "InquirySpark",
@@ -5127,7 +5127,7 @@
         "text": "Spark Your Inquiry, Ignite Insights. Built with C#. Maintained project with periodic updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-04T04:03:43.411145",
+        "generated_at": "2026-10-11T03:41:18.576832",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -5164,7 +5164,7 @@
         "commit_frequency": 0.0,
         "consistency_score": 0,
         "activity_rate": 0.0,
-        "days_since_last_commit": 94,
+        "days_since_last_commit": 101,
         "first_commit_date": "2023-10-24T13:14:08+00:00"
       },
       "commit_metrics": null,
@@ -5183,8 +5183,8 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 1075,
-      "days_since_last_push": 72,
+      "age_days": 1082,
+      "days_since_last_push": 79,
       "ai_summary": null,
       "attention_score": 27.0,
       "attention_metrics": {
@@ -5220,7 +5220,7 @@
           },
           "staleness": {
             "score": 35.0,
-            "days_since_last_push": 72,
+            "days_since_last_push": 79,
             "recent_commits_90d": 0,
             "open_issues": 0
           },
@@ -5237,7 +5237,7 @@
         }
       },
       "rank": 11,
-      "composite_score": 24.07,
+      "composite_score": 24.09,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -5329,7 +5329,7 @@
         "text": "The marketing website for Make Bold Solutions \u2014 a fractional CFO firm led by Lesley Hazleton, CPA, based in Wichita, Kansas. Built with HTML. Maintained project with periodic updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-04T04:03:43.579299",
+        "generated_at": "2026-10-11T03:41:18.750673",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -5366,7 +5366,7 @@
         "commit_frequency": 2.0,
         "consistency_score": 0,
         "activity_rate": 0.067,
-        "days_since_last_commit": 83,
+        "days_since_last_commit": 90,
         "first_commit_date": "2025-12-10T17:14:44+00:00"
       },
       "commit_metrics": null,
@@ -5460,8 +5460,8 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 297,
-      "days_since_last_push": 82,
+      "age_days": 304,
+      "days_since_last_push": 89,
       "ai_summary": null,
       "attention_score": 13.7,
       "attention_metrics": {
@@ -5496,7 +5496,7 @@
           },
           "staleness": {
             "score": 35.0,
-            "days_since_last_push": 82,
+            "days_since_last_push": 89,
             "recent_commits_90d": 6,
             "open_issues": 0
           },
@@ -5513,7 +5513,7 @@
         }
       },
       "rank": 12,
-      "composite_score": 22.39,
+      "composite_score": 22.41,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -5605,7 +5605,7 @@
         "text": "[![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download/dotnet/10.0) [![Build](https://img.shields.io/github/actions/workflow/status/markhazleton/DataSpark/ci.yml?branch=main)](https://github.com/markhazleton/DataSpark/actions) [![Coverage](https://img.shield Built with HTML. Key features: Discover SQLite database files in a directory., Export all tables or a filtered list to CSV., Generate schema reports (text, JSON, Markdown).. Maintained project with periodic updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-04T04:03:43.579463",
+        "generated_at": "2026-10-11T03:41:18.750812",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -5642,7 +5642,7 @@
         "commit_frequency": 0.0,
         "consistency_score": 0,
         "activity_rate": 0.0,
-        "days_since_last_commit": 94,
+        "days_since_last_commit": 101,
         "first_commit_date": "2017-11-06T16:04:58+00:00"
       },
       "commit_metrics": null,
@@ -5661,8 +5661,8 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 3253,
-      "days_since_last_push": 74,
+      "age_days": 3260,
+      "days_since_last_push": 81,
       "ai_summary": null,
       "attention_score": 21.3,
       "attention_metrics": {
@@ -5698,7 +5698,7 @@
           },
           "staleness": {
             "score": 35.0,
-            "days_since_last_push": 74,
+            "days_since_last_push": 81,
             "recent_commits_90d": 0,
             "open_issues": 0
           },
@@ -5798,7 +5798,7 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 8
+      "attention_rank": 9
     },
     {
       "name": "TeachSpark",
@@ -5807,7 +5807,7 @@
         "text": "[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download) [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/) [![Bui Built with C#. Maintained project with periodic updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-04T04:03:43.621950",
+        "generated_at": "2026-10-11T03:41:18.793784",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -5844,7 +5844,7 @@
         "commit_frequency": 0.0,
         "consistency_score": 0,
         "activity_rate": 0.0,
-        "days_since_last_commit": 134,
+        "days_since_last_commit": 141,
         "first_commit_date": "2025-06-19T21:15:05+00:00"
       },
       "commit_metrics": null,
@@ -5924,8 +5924,8 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 471,
-      "days_since_last_push": 75,
+      "age_days": 478,
+      "days_since_last_push": 81,
       "ai_summary": null,
       "attention_score": 28.8,
       "attention_metrics": {
@@ -5961,7 +5961,7 @@
           },
           "staleness": {
             "score": 35.0,
-            "days_since_last_push": 75,
+            "days_since_last_push": 81,
             "recent_commits_90d": 0,
             "open_issues": 0
           },
@@ -5978,7 +5978,7 @@
         }
       },
       "rank": 14,
-      "composite_score": 17.94,
+      "composite_score": 17.97,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -6070,7 +6070,7 @@
         "text": "An open-source PHP documentation & data exploration platform by Mark Hazleton (WebSpark suite) showcasing hybrid server-side + modern asset pipeline techniques. Written in PHP.",
         "ai_generated": false,
         "generation_method": "basic-template",
-        "generated_at": "2026-10-04T04:03:43.622641",
+        "generated_at": "2026-10-11T03:41:18.794327",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 40
@@ -6107,7 +6107,7 @@
         "commit_frequency": 0.0,
         "consistency_score": 0,
         "activity_rate": 0.0,
-        "days_since_last_commit": 94,
+        "days_since_last_commit": 101,
         "first_commit_date": "2023-09-08T16:08:13+00:00"
       },
       "commit_metrics": null,
@@ -6523,8 +6523,8 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 1121,
-      "days_since_last_push": 74,
+      "age_days": 1128,
+      "days_since_last_push": 81,
       "ai_summary": null,
       "attention_score": 26.1,
       "attention_metrics": {
@@ -6561,7 +6561,7 @@
           },
           "staleness": {
             "score": 35.0,
-            "days_since_last_push": 74,
+            "days_since_last_push": 81,
             "recent_commits_90d": 0,
             "open_issues": 0
           },
@@ -6661,11 +6661,11 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 5
+      "attention_rank": 6
     }
   ],
   "metadata": {
-    "generated_at": "2026-10-04T04:03:43.623863+00:00",
+    "generated_at": "2026-10-11T03:41:18.795011+00:00",
     "schema_version": "2.3.0",
     "generator": "unified_data_generator",
     "schema_features": [

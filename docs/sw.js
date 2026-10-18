@@ -6,8 +6,8 @@
 // Base path for custom domain
 const BASE_PATH = '/';
 
-// Service Worker Version - replaced by Vite at build time with v1791690090380
-const CACHE_VERSION = 'v1791690090380';
+// Service Worker Version - replaced by Vite at build time with v1792291753642
+const CACHE_VERSION = 'v1792291753642';
 const CACHE_NAME = `github-stats-spark-${CACHE_VERSION}`;
 
 // Assets to precache on install

@@ -4,7 +4,7 @@
     "total_repositories": 15,
     "total_stars": 10,
     "total_forks": 5,
-    "total_commits": 1404,
+    "total_commits": 1405,
     "activity_calendar": {
       "2026-09-26": 32,
       "2026-09-27": 13,
@@ -23,6 +23,8 @@
       "2026-10-17": 7,
       "2026-10-18": 2,
       "2026-10-19": 2,
+      "2026-10-23": 7,
+      "2026-10-31": 4,
       "2025-11-16": 28,
       "2025-11-17": 10,
       "2025-12-27": 4,
@@ -112,6 +114,7 @@
       "2026-08-16": 6,
       "2026-08-27": 10,
       "2026-10-04": 1,
+      "2026-10-25": 1,
       "2025-12-03": 1,
       "2025-12-04": 5,
       "2025-12-06": 2,
@@ -165,7 +168,6 @@
       "2026-03-21": 1,
       "2026-05-23": 2,
       "2026-09-21": 2,
-      "2025-11-03": 11,
       "2026-02-09": 4,
       "2026-03-02": 11,
       "2026-05-28": 4,
@@ -184,12 +186,6 @@
     },
     "weekly_activity": [
       {
-        "week": "2025-W43",
-        "label": "Oct 20",
-        "commits": 0,
-        "active_repos": 0
-      },
-      {
         "week": "2025-W44",
         "label": "Oct 27",
         "commits": 0,
@@ -198,8 +194,8 @@
       {
         "week": "2025-W45",
         "label": "Nov 3",
-        "commits": 11,
-        "active_repos": 1
+        "commits": 0,
+        "active_repos": 0
       },
       {
         "week": "2025-W46",
@@ -498,8 +494,14 @@
       {
         "week": "2026-W43",
         "label": "Oct 19",
+        "commits": 12,
+        "active_repos": 4
+      },
+      {
+        "week": "2026-W44",
+        "label": "Oct 26",
         "commits": 4,
-        "active_repos": 2
+        "active_repos": 1
       }
     ]
   },
@@ -511,7 +513,7 @@
         "text": "*A Make Bold Spark Game* \u2014 created by [Make Bold Solutions](https://makeboldspark.com) Built with GDScript. Actively maintained with regular updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-25T02:59:30.144411",
+        "generated_at": "2026-11-01T04:02:16.739394",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -528,35 +530,35 @@
       "language_stats": {},
       "languages": {},
       "created_at": "2026-09-28T15:25:46+00:00",
-      "updated_at": "2026-10-19T13:34:07+00:00",
-      "pushed_at": "2026-10-23T17:39:51+00:00",
-      "total_commits": 179,
-      "recent_commits_90d": 179,
+      "updated_at": "2026-11-01T03:46:51+00:00",
+      "pushed_at": "2026-11-01T03:47:01+00:00",
+      "total_commits": 190,
+      "recent_commits_90d": 190,
       "first_commit_date": "2026-09-28T15:25:46+00:00",
-      "last_commit_date": "2026-10-19T00:00:00+00:00",
+      "last_commit_date": "2026-10-31T00:00:00+00:00",
       "commit_history": {
         "repository_name": "ArrowSpark",
-        "total_commits": 179,
-        "recent_90d": 179,
-        "recent_180d": 179,
-        "recent_365d": 179,
-        "last_commit_date": "2026-10-19T00:00:00+00:00",
+        "total_commits": 190,
+        "recent_90d": 190,
+        "recent_180d": 190,
+        "recent_365d": 190,
+        "last_commit_date": "2026-10-31T00:00:00+00:00",
         "patterns": [
           "highly_active",
           "recently_updated",
           "accelerating"
         ],
-        "commit_frequency": 59.67,
+        "commit_frequency": 63.33,
         "consistency_score": 0,
-        "activity_rate": 1.989,
-        "days_since_last_commit": 6,
+        "activity_rate": 2.111,
+        "days_since_last_commit": 1,
         "first_commit_date": "2026-09-28T15:25:46+00:00"
       },
       "commit_metrics": null,
       "avg_commit_size": null,
       "largest_commit": null,
       "smallest_commit": null,
-      "commit_velocity": 59.67,
+      "commit_velocity": 63.33,
       "tech_stack": null,
       "has_readme": true,
       "has_license": true,
@@ -564,28 +566,28 @@
       "has_tests": true,
       "has_docs": false,
       "language_count": 9,
-      "size_kb": 18085,
+      "size_kb": 17522,
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 26,
-      "days_since_last_push": 1,
+      "age_days": 33,
+      "days_since_last_push": 0,
       "ai_summary": null,
-      "attention_score": 6.6,
+      "attention_score": 3.5,
       "attention_metrics": {
-        "score": 6.6,
+        "score": 3.5,
         "tier": "healthy",
         "needs_attention": false,
         "reasons": [],
         "components": {
           "pull_requests": {
-            "score": 12.3,
+            "score": 0.0,
             "availability": "available",
             "reason": "none",
-            "total_open": 1,
+            "total_open": 0,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": 1
+            "oldest_open_age_days": null
           },
           "security": {
             "score": 10.0,
@@ -602,8 +604,8 @@
           },
           "staleness": {
             "score": 0.0,
-            "days_since_last_push": 1,
-            "recent_commits_90d": 179,
+            "days_since_last_push": 0,
+            "recent_commits_90d": 190,
             "open_issues": 0
           },
           "dependencies": {
@@ -619,15 +621,15 @@
         }
       },
       "rank": 1,
-      "composite_score": 88.04,
+      "composite_score": 88.09,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
-        "has_open_pull_requests": true,
-        "total_open": 1,
+        "has_open_pull_requests": false,
+        "total_open": 0,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": 1,
+        "oldest_open_age_days": null,
         "source": "rest.pulls.list"
       },
       "security_summary": {
@@ -658,8 +660,8 @@
         "pull_requests": {
           "availability": "available",
           "reason": "none",
-          "total_open": 1,
-          "oldest_open_age_days": 1
+          "total_open": 0,
+          "oldest_open_age_days": null
         },
         "issues": {
           "availability": "available",
@@ -690,10 +692,10 @@
           "availability": "available",
           "reason": "none",
           "recent_runs": 20,
-          "success_count": 9,
+          "success_count": 6,
           "failure_count": 5,
           "last_run_status": "completed",
-          "last_run_conclusion": "skipped",
+          "last_run_conclusion": "success",
           "last_run_age_days": 0
         },
         "sources": [
@@ -702,7 +704,7 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 14
+      "attention_rank": 15
     },
     {
       "name": "github-stats-spark",
@@ -711,7 +713,7 @@
         "text": "> Automated GitHub profile statistics generator with beautiful SVG visualizations and AI-powered repository analysis Built with Python. Actively maintained with regular updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-25T02:59:31.028411",
+        "generated_at": "2026-11-01T04:02:17.089751",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -728,26 +730,26 @@
       "language_stats": {},
       "languages": {},
       "created_at": "2025-12-28T17:01:51+00:00",
-      "updated_at": "2026-10-18T02:49:22+00:00",
-      "pushed_at": "2026-10-21T01:02:44+00:00",
-      "total_commits": 304,
-      "recent_commits_90d": 22,
+      "updated_at": "2026-10-25T02:59:57+00:00",
+      "pushed_at": "2026-10-25T02:59:52+00:00",
+      "total_commits": 305,
+      "recent_commits_90d": 23,
       "first_commit_date": "2025-12-28T17:01:51+00:00",
-      "last_commit_date": "2026-10-18T00:00:00+00:00",
+      "last_commit_date": "2026-10-25T00:00:00+00:00",
       "commit_history": {
         "repository_name": "github-stats-spark",
-        "total_commits": 304,
-        "recent_90d": 22,
-        "recent_180d": 76,
-        "recent_365d": 304,
-        "last_commit_date": "2026-10-18T00:00:00+00:00",
+        "total_commits": 305,
+        "recent_90d": 23,
+        "recent_180d": 72,
+        "recent_365d": 305,
+        "last_commit_date": "2026-10-25T00:00:00+00:00",
         "patterns": [
           "active",
           "recently_updated"
         ],
-        "commit_frequency": 7.33,
+        "commit_frequency": 7.67,
         "consistency_score": 0,
-        "activity_rate": 0.244,
+        "activity_rate": 0.256,
         "days_since_last_commit": 7,
         "first_commit_date": "2025-12-28T17:01:51+00:00"
       },
@@ -755,7 +757,7 @@
       "avg_commit_size": null,
       "largest_commit": null,
       "smallest_commit": null,
-      "commit_velocity": 7.33,
+      "commit_velocity": 7.67,
       "tech_stack": {
         "repository_name": "github-stats-spark",
         "languages": {},
@@ -950,16 +952,16 @@
       "has_tests": true,
       "has_docs": true,
       "language_count": 5,
-      "size_kb": 34564,
+      "size_kb": 34570,
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 300,
-      "days_since_last_push": 4,
+      "age_days": 307,
+      "days_since_last_push": 7,
       "ai_summary": null,
-      "attention_score": 10.9,
+      "attention_score": 11.5,
       "attention_metrics": {
-        "score": 10.9,
+        "score": 11.5,
         "tier": "healthy",
         "needs_attention": false,
         "reasons": [
@@ -967,13 +969,13 @@
         ],
         "components": {
           "pull_requests": {
-            "score": 13.4,
+            "score": 15.8,
             "availability": "available",
             "reason": "none",
             "total_open": 1,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": 4
+            "oldest_open_age_days": 11
           },
           "security": {
             "score": 10.0,
@@ -990,8 +992,8 @@
           },
           "staleness": {
             "score": 0.0,
-            "days_since_last_push": 4,
-            "recent_commits_90d": 22,
+            "days_since_last_push": 7,
+            "recent_commits_90d": 23,
             "open_issues": 0
           },
           "dependencies": {
@@ -1007,7 +1009,7 @@
         }
       },
       "rank": 2,
-      "composite_score": 67.95,
+      "composite_score": 67.93,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -1015,7 +1017,7 @@
         "total_open": 1,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": 4,
+        "oldest_open_age_days": 11,
         "source": "rest.pulls.list"
       },
       "security_summary": {
@@ -1047,7 +1049,7 @@
           "availability": "available",
           "reason": "none",
           "total_open": 1,
-          "oldest_open_age_days": 4
+          "oldest_open_age_days": 11
         },
         "issues": {
           "availability": "available",
@@ -1078,8 +1080,8 @@
           "availability": "available",
           "reason": "none",
           "recent_runs": 20,
-          "success_count": 18,
-          "failure_count": 1,
+          "success_count": 19,
+          "failure_count": 0,
           "last_run_status": "in_progress",
           "last_run_conclusion": null,
           "last_run_age_days": 0
@@ -1090,7 +1092,7 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 9
+      "attention_rank": 11
     },
     {
       "name": "UISampleSpark",
@@ -1099,7 +1101,7 @@
         "text": "**Live Site**: [ui.makeboldspark.com](https://ui.makeboldspark.com) Built with HTML. Actively maintained with regular updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-25T02:59:31.028621",
+        "generated_at": "2026-11-01T04:02:17.089965",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -1117,7 +1119,7 @@
       "languages": {},
       "created_at": "2019-04-25T18:45:29+00:00",
       "updated_at": "2026-10-23T03:54:42+00:00",
-      "pushed_at": "2026-10-23T03:54:40+00:00",
+      "pushed_at": "2026-10-28T13:05:10+00:00",
       "total_commits": 159,
       "recent_commits_90d": 18,
       "first_commit_date": "2019-04-25T18:45:29+00:00",
@@ -1126,17 +1128,17 @@
         "repository_name": "UISampleSpark",
         "total_commits": 159,
         "recent_90d": 18,
-        "recent_180d": 71,
+        "recent_180d": 59,
         "recent_365d": 159,
         "last_commit_date": "2026-10-22T00:00:00+00:00",
         "patterns": [
           "active",
-          "recently_updated"
+          "current"
         ],
         "commit_frequency": 6.0,
         "consistency_score": 0,
         "activity_rate": 0.2,
-        "days_since_last_commit": 3,
+        "days_since_last_commit": 10,
         "first_commit_date": "2019-04-25T18:45:29+00:00"
       },
       "commit_metrics": null,
@@ -1151,28 +1153,30 @@
       "has_tests": false,
       "has_docs": true,
       "language_count": 8,
-      "size_kb": 51197,
+      "size_kb": 51258,
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 2739,
-      "days_since_last_push": 1,
+      "age_days": 2746,
+      "days_since_last_push": 3,
       "ai_summary": null,
-      "attention_score": 3.5,
+      "attention_score": 28.5,
       "attention_metrics": {
-        "score": 3.5,
-        "tier": "healthy",
-        "needs_attention": false,
-        "reasons": [],
+        "score": 28.5,
+        "tier": "watch",
+        "needs_attention": true,
+        "reasons": [
+          "pull_requests"
+        ],
         "components": {
           "pull_requests": {
-            "score": 0.0,
+            "score": 100.0,
             "availability": "available",
             "reason": "none",
-            "total_open": 0,
+            "total_open": 14,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": null
+            "oldest_open_age_days": 5
           },
           "security": {
             "score": 10.0,
@@ -1189,7 +1193,7 @@
           },
           "staleness": {
             "score": 0.0,
-            "days_since_last_push": 1,
+            "days_since_last_push": 3,
             "recent_commits_90d": 18,
             "open_issues": 0
           },
@@ -1206,217 +1210,15 @@
         }
       },
       "rank": 3,
-      "composite_score": 58.46,
-      "pull_request_summary": {
-        "availability": "available",
-        "reason": "none",
-        "has_open_pull_requests": false,
-        "total_open": 0,
-        "draft_count": 0,
-        "review_requested_count": 0,
-        "oldest_open_age_days": null,
-        "source": "rest.pulls.list"
-      },
-      "security_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
-        "overall_state": "clear",
-        "feature_status": {
-          "advanced_security": "unknown",
-          "secret_scanning": "unknown",
-          "secret_scanning_push_protection": "unknown",
-          "dependency_alerts": "unavailable",
-          "automated_security_fixes": "unavailable"
-        },
-        "active_alert_counts": {
-          "total_open": 0,
-          "critical": 0,
-          "high": 0,
-          "medium": 0,
-          "low": 0
-        },
-        "sources": [
-          "rest.repos.get"
-        ]
-      },
-      "diagnostics_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
-        "pull_requests": {
-          "availability": "available",
-          "reason": "none",
-          "total_open": 0,
-          "oldest_open_age_days": null
-        },
-        "issues": {
-          "availability": "available",
-          "reason": "none",
-          "total_open": 0,
-          "oldest_open_age_days": null,
-          "stale_over_30d": 0,
-          "stale_over_90d": 0
-        },
-        "security": {
-          "availability": "unavailable",
-          "reason": "permission_denied",
-          "dependabot": {
-            "total_open": 0,
-            "critical": 0,
-            "high": 0,
-            "medium": 0,
-            "low": 0
-          },
-          "code_scanning": {
-            "total_open": 0,
-            "error": 0,
-            "warning": 0,
-            "note": 0
-          }
-        },
-        "actions": {
-          "availability": "available",
-          "reason": "none",
-          "recent_runs": 20,
-          "success_count": 20,
-          "failure_count": 0,
-          "last_run_status": "completed",
-          "last_run_conclusion": "success",
-          "last_run_age_days": 1
-        },
-        "sources": [
-          "rest.pulls.list",
-          "rest.issues.list",
-          "rest.actions.runs"
-        ]
-      },
-      "attention_rank": 15
-    },
-    {
-      "name": "MakeBoldSpark.com",
-      "description": "MakeBoldSpark",
-      "summary": {
-        "text": "**Live Site**: [makeboldspark.com](https://makeboldspark.com) Built with C#. Actively maintained with regular updates.",
-        "ai_generated": false,
-        "generation_method": "enhanced-template",
-        "generated_at": "2026-10-25T02:59:31.028720",
-        "model_used": null,
-        "tokens_used": 0,
-        "confidence_score": 60
-      },
-      "url": "https://github.com/MakeBoldSolutions/MakeBoldSpark.com",
-      "homepage": "https://makeboldspark.com",
-      "has_pages": false,
-      "pages_url": null,
-      "website_url": "https://makeboldspark.com",
-      "stars": 0,
-      "forks": 0,
-      "watchers": 0,
-      "language": "C#",
-      "language_stats": {},
-      "languages": {},
-      "created_at": "2026-05-07T02:16:07+00:00",
-      "updated_at": "2026-10-11T18:46:10+00:00",
-      "pushed_at": "2026-10-19T01:52:55+00:00",
-      "total_commits": 97,
-      "recent_commits_90d": 20,
-      "first_commit_date": "2026-05-07T02:16:07+00:00",
-      "last_commit_date": "2026-10-11T00:00:00+00:00",
-      "commit_history": {
-        "repository_name": "MakeBoldSpark.com",
-        "total_commits": 97,
-        "recent_90d": 20,
-        "recent_180d": 97,
-        "recent_365d": 97,
-        "last_commit_date": "2026-10-11T00:00:00+00:00",
-        "patterns": [
-          "active",
-          "current",
-          "declining"
-        ],
-        "commit_frequency": 6.67,
-        "consistency_score": 0,
-        "activity_rate": 0.222,
-        "days_since_last_commit": 14,
-        "first_commit_date": "2026-05-07T02:16:07+00:00"
-      },
-      "commit_metrics": null,
-      "avg_commit_size": null,
-      "largest_commit": null,
-      "smallest_commit": null,
-      "commit_velocity": 6.67,
-      "tech_stack": null,
-      "has_readme": true,
-      "has_license": true,
-      "has_ci_cd": true,
-      "has_tests": true,
-      "has_docs": true,
-      "language_count": 8,
-      "size_kb": 23290,
-      "is_fork": false,
-      "is_private": false,
-      "is_archived": false,
-      "age_days": 171,
-      "days_since_last_push": 6,
-      "ai_summary": null,
-      "attention_score": 10.7,
-      "attention_metrics": {
-        "score": 10.7,
-        "tier": "healthy",
-        "needs_attention": false,
-        "reasons": [
-          "pull_requests"
-        ],
-        "components": {
-          "pull_requests": {
-            "score": 28.6,
-            "availability": "available",
-            "reason": "none",
-            "total_open": 2,
-            "draft_count": 0,
-            "review_requested_count": 0,
-            "oldest_open_age_days": 13
-          },
-          "security": {
-            "score": 10.0,
-            "availability": "partial",
-            "reason": "permission_denied",
-            "overall_state": "clear",
-            "active_alert_counts": {
-              "total_open": 0,
-              "critical": 0,
-              "high": 0,
-              "medium": 0,
-              "low": 0
-            }
-          },
-          "staleness": {
-            "score": 0.0,
-            "days_since_last_push": 6,
-            "recent_commits_90d": 20,
-            "open_issues": 0
-          },
-          "dependencies": {
-            "score": 0.0,
-            "total_dependencies": 0,
-            "outdated_count": 0,
-            "outdated_percentage": 0.0,
-            "currency_score": 100,
-            "version_coverage_percentage": 100.0,
-            "latest_version_coverage_percentage": 100.0,
-            "unknown_versions_count": 0
-          }
-        }
-      },
-      "rank": 4,
-      "composite_score": 41.49,
+      "composite_score": 57.56,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
         "has_open_pull_requests": true,
-        "total_open": 2,
+        "total_open": 14,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": 13,
+        "oldest_open_age_days": 5,
         "source": "rest.pulls.list"
       },
       "security_summary": {
@@ -1447,8 +1249,8 @@
         "pull_requests": {
           "availability": "available",
           "reason": "none",
-          "total_open": 2,
-          "oldest_open_age_days": 13
+          "total_open": 14,
+          "oldest_open_age_days": 5
         },
         "issues": {
           "availability": "available",
@@ -1479,11 +1281,11 @@
           "availability": "available",
           "reason": "none",
           "recent_runs": 20,
-          "success_count": 12,
-          "failure_count": 8,
+          "success_count": 16,
+          "failure_count": 4,
           "last_run_status": "completed",
           "last_run_conclusion": "success",
-          "last_run_age_days": 1
+          "last_run_age_days": 2
         },
         "sources": [
           "rest.pulls.list",
@@ -1491,7 +1293,7 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 10
+      "attention_rank": 6
     },
     {
       "name": "TailwindSpark",
@@ -1500,7 +1302,7 @@
         "text": "[![Version](https://img.shields.io/badge/version-1.0.18-blue.svg)](https://github.com/MakeBoldSolutions/TailwindSpark) [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![React](https://img.shields.io/badge/React-19.1.1-61dafb.svg)](https://reactjs.org/) [![TypeScript](https Built with TypeScript. Maintained project with periodic updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-25T02:59:31.029152",
+        "generated_at": "2026-11-01T04:02:17.090420",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -1518,17 +1320,17 @@
       "languages": {},
       "created_at": "2025-07-29T16:30:33+00:00",
       "updated_at": "2026-10-12T02:51:23+00:00",
-      "pushed_at": "2026-10-19T13:07:08+00:00",
-      "total_commits": 156,
+      "pushed_at": "2026-10-30T10:21:07+00:00",
+      "total_commits": 145,
       "recent_commits_90d": 10,
       "first_commit_date": "2025-07-29T16:30:33+00:00",
       "last_commit_date": "2026-10-11T00:00:00+00:00",
       "commit_history": {
         "repository_name": "TailwindSpark",
-        "total_commits": 156,
+        "total_commits": 145,
         "recent_90d": 10,
         "recent_180d": 50,
-        "recent_365d": 156,
+        "recent_365d": 145,
         "last_commit_date": "2026-10-11T00:00:00+00:00",
         "patterns": [
           "active",
@@ -1538,7 +1340,7 @@
         "commit_frequency": 3.33,
         "consistency_score": 0,
         "activity_rate": 0.111,
-        "days_since_last_commit": 14,
+        "days_since_last_commit": 21,
         "first_commit_date": "2025-07-29T16:30:33+00:00"
       },
       "commit_metrics": null,
@@ -1936,16 +1738,16 @@
       "has_tests": false,
       "has_docs": true,
       "language_count": 6,
-      "size_kb": 4780,
+      "size_kb": 5067,
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 452,
-      "days_since_last_push": 5,
+      "age_days": 459,
+      "days_since_last_push": 1,
       "ai_summary": null,
-      "attention_score": 23.8,
+      "attention_score": 33.4,
       "attention_metrics": {
-        "score": 23.8,
+        "score": 33.4,
         "tier": "watch",
         "needs_attention": true,
         "reasons": [
@@ -1954,13 +1756,13 @@
         ],
         "components": {
           "pull_requests": {
-            "score": 61.8,
+            "score": 100.0,
             "availability": "available",
             "reason": "none",
-            "total_open": 5,
+            "total_open": 9,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": 5
+            "oldest_open_age_days": 12
           },
           "security": {
             "score": 10.0,
@@ -1977,7 +1779,7 @@
           },
           "staleness": {
             "score": 0.0,
-            "days_since_last_push": 5,
+            "days_since_last_push": 1,
             "recent_commits_90d": 10,
             "open_issues": 0
           },
@@ -1993,16 +1795,16 @@
           }
         }
       },
-      "rank": 5,
-      "composite_score": 38.03,
+      "rank": 4,
+      "composite_score": 37.76,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
         "has_open_pull_requests": true,
-        "total_open": 5,
+        "total_open": 9,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": 5,
+        "oldest_open_age_days": 12,
         "source": "rest.pulls.list"
       },
       "security_summary": {
@@ -2033,8 +1835,8 @@
         "pull_requests": {
           "availability": "available",
           "reason": "none",
-          "total_open": 5,
-          "oldest_open_age_days": 5
+          "total_open": 9,
+          "oldest_open_age_days": 12
         },
         "issues": {
           "availability": "available",
@@ -2065,8 +1867,8 @@
           "availability": "available",
           "reason": "none",
           "recent_runs": 20,
-          "success_count": 17,
-          "failure_count": 3,
+          "success_count": 14,
+          "failure_count": 6,
           "last_run_status": "completed",
           "last_run_conclusion": "success",
           "last_run_age_days": 0
@@ -2077,76 +1879,77 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 7
+      "attention_rank": 4
     },
     {
-      "name": "ArtSpark",
-      "description": "Art Institute Public API and WebSpark",
+      "name": "MakeBoldSpark.com",
+      "description": "MakeBoldSpark",
       "summary": {
-        "text": "**A comprehensive .NET solution for the Art Institute of Chicago's public API, featuring a complete client library, revolutionary AI chat system with multiple personas, and web applications showcasing modern .NET development practices.** Built with C#. Key features: \u2705 **Complete API Coverage**: All 33 endpoints across 6 categories, \u2705 **Strongly Typed Models**: Comprehensive C# models for all resource types, \u2705 **Async/Await Support**: Modern asynchronous programming patterns. Actively maintained with regular updates.",
+        "text": "**Live Site**: [makeboldspark.com](https://makeboldspark.com) Built with C#. Actively maintained with regular updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-25T02:59:31.029367",
+        "generated_at": "2026-11-01T04:02:17.090547",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
       },
-      "url": "https://github.com/MakeBoldSolutions/ArtSpark",
-      "homepage": "https://art.makeboldspark.com",
+      "url": "https://github.com/MakeBoldSolutions/MakeBoldSpark.com",
+      "homepage": "https://makeboldspark.com",
       "has_pages": false,
       "pages_url": null,
-      "website_url": "https://art.makeboldspark.com",
+      "website_url": "https://makeboldspark.com",
       "stars": 0,
       "forks": 0,
       "watchers": 0,
       "language": "C#",
       "language_stats": {},
       "languages": {},
-      "created_at": "2023-01-30T15:23:30+00:00",
-      "updated_at": "2026-08-31T02:50:08+00:00",
-      "pushed_at": "2026-10-19T02:24:08+00:00",
-      "total_commits": 47,
-      "recent_commits_90d": 11,
-      "first_commit_date": "2023-01-30T15:23:30+00:00",
-      "last_commit_date": "2026-08-30T00:00:00+00:00",
+      "created_at": "2026-05-07T02:16:07+00:00",
+      "updated_at": "2026-10-11T18:46:10+00:00",
+      "pushed_at": "2026-10-19T01:52:55+00:00",
+      "total_commits": 97,
+      "recent_commits_90d": 20,
+      "first_commit_date": "2026-05-07T02:16:07+00:00",
+      "last_commit_date": "2026-10-11T00:00:00+00:00",
       "commit_history": {
-        "repository_name": "ArtSpark",
-        "total_commits": 47,
-        "recent_90d": 11,
-        "recent_180d": 17,
-        "recent_365d": 47,
-        "last_commit_date": "2026-08-30T00:00:00+00:00",
+        "repository_name": "MakeBoldSpark.com",
+        "total_commits": 97,
+        "recent_90d": 20,
+        "recent_180d": 79,
+        "recent_365d": 97,
+        "last_commit_date": "2026-10-11T00:00:00+00:00",
         "patterns": [
-          "active"
+          "active",
+          "current"
         ],
-        "commit_frequency": 3.67,
+        "commit_frequency": 6.67,
         "consistency_score": 0,
-        "activity_rate": 0.122,
-        "days_since_last_commit": 56,
-        "first_commit_date": "2023-01-30T15:23:30+00:00"
+        "activity_rate": 0.222,
+        "days_since_last_commit": 21,
+        "first_commit_date": "2026-05-07T02:16:07+00:00"
       },
       "commit_metrics": null,
       "avg_commit_size": null,
       "largest_commit": null,
       "smallest_commit": null,
-      "commit_velocity": 3.67,
+      "commit_velocity": 6.67,
       "tech_stack": null,
       "has_readme": true,
       "has_license": true,
-      "has_ci_cd": false,
-      "has_tests": false,
+      "has_ci_cd": true,
+      "has_tests": true,
       "has_docs": true,
-      "language_count": 7,
-      "size_kb": 5007,
+      "language_count": 8,
+      "size_kb": 23290,
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 1363,
-      "days_since_last_push": 6,
+      "age_days": 178,
+      "days_since_last_push": 13,
       "ai_summary": null,
-      "attention_score": 10.3,
+      "attention_score": 11.2,
       "attention_metrics": {
-        "score": 10.3,
+        "score": 11.2,
         "tier": "healthy",
         "needs_attention": false,
         "reasons": [
@@ -2154,13 +1957,13 @@
         ],
         "components": {
           "pull_requests": {
-            "score": 27.1,
+            "score": 31.0,
             "availability": "available",
             "reason": "none",
             "total_open": 2,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": 9
+            "oldest_open_age_days": 20
           },
           "security": {
             "score": 10.0,
@@ -2177,8 +1980,8 @@
           },
           "staleness": {
             "score": 0.0,
-            "days_since_last_push": 6,
-            "recent_commits_90d": 11,
+            "days_since_last_push": 13,
+            "recent_commits_90d": 20,
             "open_issues": 0
           },
           "dependencies": {
@@ -2193,8 +1996,8 @@
           }
         }
       },
-      "rank": 6,
-      "composite_score": 35.05,
+      "rank": 5,
+      "composite_score": 35.67,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -2202,7 +2005,7 @@
         "total_open": 2,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": 9,
+        "oldest_open_age_days": 20,
         "source": "rest.pulls.list"
       },
       "security_summary": {
@@ -2234,7 +2037,7 @@
           "availability": "available",
           "reason": "none",
           "total_open": 2,
-          "oldest_open_age_days": 9
+          "oldest_open_age_days": 20
         },
         "issues": {
           "availability": "available",
@@ -2264,12 +2067,12 @@
         "actions": {
           "availability": "available",
           "reason": "none",
-          "recent_runs": 14,
-          "success_count": 14,
-          "failure_count": 0,
+          "recent_runs": 20,
+          "success_count": 16,
+          "failure_count": 4,
           "last_run_status": "completed",
           "last_run_conclusion": "success",
-          "last_run_age_days": 5
+          "last_run_age_days": 1
         },
         "sources": [
           "rest.pulls.list",
@@ -2277,7 +2080,7 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 11
+      "attention_rank": 13
     },
     {
       "name": "RequestSpark",
@@ -2286,7 +2089,7 @@
         "text": "[![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download/dotnet/10.0) [![License](https://img.shields.io/github/license/MakeBoldSolutions/RequestSpark)](https://github.com/MakeBoldSolutions/RequestSpark/blob/main/LICENSE) [![GitHub Issues](https://img.shields. Built with C#. Key features: **Postman Collection Integration**: Import and execute existing Postman collections, **Automated Regression Testing**: Run comprehensive API test suites automatically, **Performance Analysis**: Compare response times across multiple API instances. Maintained project with periodic updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-25T02:59:31.029534",
+        "generated_at": "2026-11-01T04:02:17.090691",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -2323,7 +2126,7 @@
         "commit_frequency": 1.0,
         "consistency_score": 0,
         "activity_rate": 0.033,
-        "days_since_last_commit": 59,
+        "days_since_last_commit": 66,
         "first_commit_date": "2021-09-30T13:38:06+00:00"
       },
       "commit_metrics": null,
@@ -2342,12 +2145,12 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 1850,
-      "days_since_last_push": 51,
+      "age_days": 1857,
+      "days_since_last_push": 58,
       "ai_summary": null,
-      "attention_score": 26.6,
+      "attention_score": 27.2,
       "attention_metrics": {
-        "score": 26.6,
+        "score": 27.2,
         "tier": "watch",
         "needs_attention": true,
         "reasons": [
@@ -2356,13 +2159,13 @@
         ],
         "components": {
           "pull_requests": {
-            "score": 57.2,
+            "score": 60.0,
             "availability": "available",
             "reason": "none",
             "total_open": 2,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": 95
+            "oldest_open_age_days": 103
           },
           "security": {
             "score": 10.0,
@@ -2379,7 +2182,7 @@
           },
           "staleness": {
             "score": 35.0,
-            "days_since_last_push": 51,
+            "days_since_last_push": 58,
             "recent_commits_90d": 3,
             "open_issues": 0
           },
@@ -2395,7 +2198,7 @@
           }
         }
       },
-      "rank": 7,
+      "rank": 6,
       "composite_score": 33.13,
       "pull_request_summary": {
         "availability": "available",
@@ -2404,7 +2207,7 @@
         "total_open": 2,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": 95,
+        "oldest_open_age_days": 103,
         "source": "rest.pulls.list"
       },
       "security_summary": {
@@ -2436,7 +2239,7 @@
           "availability": "available",
           "reason": "none",
           "total_open": 2,
-          "oldest_open_age_days": 95
+          "oldest_open_age_days": 103
         },
         "issues": {
           "availability": "available",
@@ -2471,7 +2274,7 @@
           "failure_count": 5,
           "last_run_status": "completed",
           "last_run_conclusion": "success",
-          "last_run_age_days": 6
+          "last_run_age_days": 13
         },
         "sources": [
           "rest.pulls.list",
@@ -2479,1072 +2282,7 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 5
-    },
-    {
-      "name": "MuseumSpark",
-      "description": "A Museum Trip Planning Application",
-      "summary": {
-        "text": "> **The strategic travel planner for art lovers.** > Curate, prioritize, and optimize your museum visits across North America. Built with Python. Maintained project with periodic updates.",
-        "ai_generated": false,
-        "generation_method": "enhanced-template",
-        "generated_at": "2026-10-25T02:59:31.029686",
-        "model_used": null,
-        "tokens_used": 0,
-        "confidence_score": 60
-      },
-      "url": "https://github.com/MakeBoldSolutions/MuseumSpark",
-      "homepage": "https://museum.makeboldspark.com/",
-      "has_pages": true,
-      "pages_url": "https://MakeBoldSolutions.github.io/MuseumSpark/",
-      "website_url": "https://museum.makeboldspark.com/",
-      "stars": 0,
-      "forks": 0,
-      "watchers": 0,
-      "language": "Python",
-      "language_stats": {},
-      "languages": {},
-      "created_at": "2026-01-15T13:24:02+00:00",
-      "updated_at": "2026-08-27T22:47:17+00:00",
-      "pushed_at": "2026-10-21T13:04:46+00:00",
-      "total_commits": 102,
-      "recent_commits_90d": 4,
-      "first_commit_date": "2026-01-15T13:24:02+00:00",
-      "last_commit_date": "2026-08-27T00:00:00+00:00",
-      "commit_history": {
-        "repository_name": "MuseumSpark",
-        "total_commits": 102,
-        "recent_90d": 4,
-        "recent_180d": 16,
-        "recent_365d": 102,
-        "last_commit_date": "2026-08-27T00:00:00+00:00",
-        "patterns": [
-          "maintained"
-        ],
-        "commit_frequency": 1.33,
-        "consistency_score": 0,
-        "activity_rate": 0.044,
-        "days_since_last_commit": 59,
-        "first_commit_date": "2026-01-15T13:24:02+00:00"
-      },
-      "commit_metrics": null,
-      "avg_commit_size": null,
-      "largest_commit": null,
-      "smallest_commit": null,
-      "commit_velocity": 1.33,
-      "tech_stack": null,
-      "has_readme": true,
-      "has_license": true,
-      "has_ci_cd": true,
-      "has_tests": true,
-      "has_docs": true,
-      "language_count": 7,
-      "size_kb": 34680,
-      "is_fork": false,
-      "is_private": false,
-      "is_archived": false,
-      "age_days": 282,
-      "days_since_last_push": 3,
-      "ai_summary": null,
-      "attention_score": 26.6,
-      "attention_metrics": {
-        "score": 26.6,
-        "tier": "watch",
-        "needs_attention": true,
-        "reasons": [
-          "pull_requests"
-        ],
-        "components": {
-          "pull_requests": {
-            "score": 92.3,
-            "availability": "available",
-            "reason": "none",
-            "total_open": 6,
-            "draft_count": 0,
-            "review_requested_count": 0,
-            "oldest_open_age_days": 58
-          },
-          "security": {
-            "score": 10.0,
-            "availability": "partial",
-            "reason": "permission_denied",
-            "overall_state": "clear",
-            "active_alert_counts": {
-              "total_open": 0,
-              "critical": 0,
-              "high": 0,
-              "medium": 0,
-              "low": 0
-            }
-          },
-          "staleness": {
-            "score": 0.0,
-            "days_since_last_push": 3,
-            "recent_commits_90d": 4,
-            "open_issues": 0
-          },
-          "dependencies": {
-            "score": 0.0,
-            "total_dependencies": 0,
-            "outdated_count": 0,
-            "outdated_percentage": 0.0,
-            "currency_score": 100,
-            "version_coverage_percentage": 100.0,
-            "latest_version_coverage_percentage": 100.0,
-            "unknown_versions_count": 0
-          }
-        }
-      },
-      "rank": 8,
-      "composite_score": 31.94,
-      "pull_request_summary": {
-        "availability": "available",
-        "reason": "none",
-        "has_open_pull_requests": true,
-        "total_open": 6,
-        "draft_count": 0,
-        "review_requested_count": 0,
-        "oldest_open_age_days": 58,
-        "source": "rest.pulls.list"
-      },
-      "security_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
-        "overall_state": "clear",
-        "feature_status": {
-          "advanced_security": "unknown",
-          "secret_scanning": "unknown",
-          "secret_scanning_push_protection": "unknown",
-          "dependency_alerts": "unavailable",
-          "automated_security_fixes": "unavailable"
-        },
-        "active_alert_counts": {
-          "total_open": 0,
-          "critical": 0,
-          "high": 0,
-          "medium": 0,
-          "low": 0
-        },
-        "sources": [
-          "rest.repos.get"
-        ]
-      },
-      "diagnostics_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
-        "pull_requests": {
-          "availability": "available",
-          "reason": "none",
-          "total_open": 6,
-          "oldest_open_age_days": 58
-        },
-        "issues": {
-          "availability": "available",
-          "reason": "none",
-          "total_open": 0,
-          "oldest_open_age_days": null,
-          "stale_over_30d": 0,
-          "stale_over_90d": 0
-        },
-        "security": {
-          "availability": "unavailable",
-          "reason": "permission_denied",
-          "dependabot": {
-            "total_open": 0,
-            "critical": 0,
-            "high": 0,
-            "medium": 0,
-            "low": 0
-          },
-          "code_scanning": {
-            "total_open": 0,
-            "error": 0,
-            "warning": 0,
-            "note": 0
-          }
-        },
-        "actions": {
-          "availability": "available",
-          "reason": "none",
-          "recent_runs": 20,
-          "success_count": 20,
-          "failure_count": 0,
-          "last_run_status": "completed",
-          "last_run_conclusion": "success",
-          "last_run_age_days": 0
-        },
-        "sources": [
-          "rest.pulls.list",
-          "rest.issues.list",
-          "rest.actions.runs"
-        ]
-      },
-      "attention_rank": 6
-    },
-    {
-      "name": "BootstrapSpark",
-      "description": "ReactSparkPortfolio is a production-ready, enterprise-grade developer portfolio built with React 19, TypeScript, and Vite. ",
-      "summary": {
-        "text": "**BootstrapSpark** demonstrates enterprise-grade React development with React 19, TypeScript, and Vite \u2014 live at [Bootstrap.makeboldspark.com](https://Bootstrap.makeboldspark.com). Built with TypeScript. Maintained project with periodic updates.",
-        "ai_generated": false,
-        "generation_method": "enhanced-template",
-        "generated_at": "2026-10-25T02:59:31.030321",
-        "model_used": null,
-        "tokens_used": 0,
-        "confidence_score": 60
-      },
-      "url": "https://github.com/MakeBoldSolutions/BootstrapSpark",
-      "homepage": "https://bootstrap.makeboldspark.com/",
-      "has_pages": true,
-      "pages_url": "https://MakeBoldSolutions.github.io/BootstrapSpark/",
-      "website_url": "https://bootstrap.makeboldspark.com/",
-      "stars": 0,
-      "forks": 0,
-      "watchers": 0,
-      "language": "TypeScript",
-      "language_stats": {},
-      "languages": {},
-      "created_at": "2024-10-11T23:31:56+00:00",
-      "updated_at": "2026-10-12T12:22:12+00:00",
-      "pushed_at": "2026-10-12T12:22:08+00:00",
-      "total_commits": 83,
-      "recent_commits_90d": 6,
-      "first_commit_date": "2024-10-11T23:31:56+00:00",
-      "last_commit_date": "2026-10-12T00:00:00+00:00",
-      "commit_history": {
-        "repository_name": "BootstrapSpark",
-        "total_commits": 83,
-        "recent_90d": 6,
-        "recent_180d": 36,
-        "recent_365d": 83,
-        "last_commit_date": "2026-10-12T00:00:00+00:00",
-        "patterns": [
-          "maintained",
-          "current",
-          "declining"
-        ],
-        "commit_frequency": 2.0,
-        "consistency_score": 0,
-        "activity_rate": 0.067,
-        "days_since_last_commit": 13,
-        "first_commit_date": "2024-10-11T23:31:56+00:00"
-      },
-      "commit_metrics": null,
-      "avg_commit_size": null,
-      "largest_commit": null,
-      "smallest_commit": null,
-      "commit_velocity": 2.0,
-      "tech_stack": {
-        "repository_name": "BootstrapSpark",
-        "languages": {},
-        "frameworks": [],
-        "dependencies": [
-          {
-            "name": "@microsoft/signalr",
-            "current_version": "10.0.11",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "10.0.11",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "bootstrap",
-            "current_version": "5.3.8",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "5.3.8",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "bootstrap-icons",
-            "current_version": "1.13.2",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "1.13.2",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "bootswatch",
-            "current_version": "5.3.8",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "5.3.8",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "date-fns",
-            "current_version": "4.4.0",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "4.4.0",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "leaflet",
-            "current_version": "1.9.4",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "1.9.4",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "react",
-            "current_version": "19.3.0",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "19.3.0",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "react-bootstrap",
-            "current_version": "2.10.10",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "2.10.10",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "react-bootstrap-icons",
-            "current_version": "1.11.6",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "1.11.6",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "react-dom",
-            "current_version": "19.3.0",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "19.3.0",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "react-leaflet",
-            "current_version": "5.0.0",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "5.0.0",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "react-markdown",
-            "current_version": "10.1.0",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "10.1.0",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "react-router-dom",
-            "current_version": "7.18.4",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "7.18.4",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "zod",
-            "current_version": "4.6.6",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "4.6.6",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "@azure/static-web-apps-cli",
-            "current_version": "2.0.10",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "2.0.10",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "@eslint/js",
-            "current_version": "10.0.1",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "10.0.1",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "@rollup/plugin-strip",
-            "current_version": "3.0.4",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "3.0.4",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "@testing-library/jest-dom",
-            "current_version": "7.0.1",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "7.0.1",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "@testing-library/react",
-            "current_version": "16.3.3",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "16.3.3",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "@testing-library/user-event",
-            "current_version": "14.6.7",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "14.6.7",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "@types/leaflet",
-            "current_version": "1.9.22",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "1.9.22",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "@types/node",
-            "current_version": "26.6.5",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "26.6.5",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "@types/react",
-            "current_version": "19.3.0",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "19.3.0",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "@types/react-dom",
-            "current_version": "19.3.0",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "19.3.0",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "@vitejs/plugin-react",
-            "current_version": "6.1.2",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "6.1.2",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "@vitest/coverage-v8",
-            "current_version": "5.0.4",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "5.0.4",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "@vitest/ui",
-            "current_version": "5.0.4",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "5.0.4",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "concurrently",
-            "current_version": "10.0.6",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "10.0.6",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "eslint",
-            "current_version": "10.12.0",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "10.12.0",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "eslint-plugin-react-hooks",
-            "current_version": "7.1.1",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "7.1.1",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "eslint-plugin-react-refresh",
-            "current_version": "0.5.7",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "0.5.7",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "fontawesome-free",
-            "current_version": "1.0.4",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "1.0.4",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "globals",
-            "current_version": "17.13.0",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "17.13.0",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "husky",
-            "current_version": "9.1.7",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "9.1.7",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "jsdom",
-            "current_version": "30.1.2",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "30.1.2",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "lint-staged",
-            "current_version": "17.6.0",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "17.6.0",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "npm-check-updates",
-            "current_version": "23.1.1",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "23.1.1",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "prettier",
-            "current_version": "3.9.10",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "3.9.10",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "rimraf",
-            "current_version": "6.1.3",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "6.1.3",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "sass",
-            "current_version": "1.105.1",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "1.105.1",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "tsx",
-            "current_version": "4.23.15",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "4.23.15",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "typescript",
-            "current_version": "6.0.3",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "6.0.3",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "typescript-eslint",
-            "current_version": "8.71.1",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "8.71.1",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "vite",
-            "current_version": "8.3.4",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "8.3.4",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "vite-plugin-static-copy",
-            "current_version": "4.1.1",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "4.1.1",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          },
-          {
-            "name": "vitest",
-            "current_version": "5.0.4",
-            "latest_version": null,
-            "ecosystem": "npm",
-            "versions_behind": 0,
-            "is_outdated": false,
-            "status": "unknown",
-            "version_requirement": "5.0.4",
-            "current_version_known": true,
-            "latest_version_status": "skipped_limit",
-            "latest_version_source": null,
-            "source_file": "package.json"
-          }
-        ],
-        "version_info": {},
-        "dependency_file_type": "package.json",
-        "currency_score": 50,
-        "outdated_count": 0,
-        "total_dependencies": 46,
-        "known_versions_count": 46,
-        "resolved_latest_versions_count": 0,
-        "unknown_versions_count": 0,
-        "primary_language": null,
-        "language_diversity": 0,
-        "outdated_percentage": 0.0,
-        "version_coverage_percentage": 100.0,
-        "latest_version_coverage_percentage": 0.0
-      },
-      "has_readme": true,
-      "has_license": true,
-      "has_ci_cd": true,
-      "has_tests": true,
-      "has_docs": true,
-      "language_count": 7,
-      "size_kb": 39196,
-      "is_fork": false,
-      "is_private": false,
-      "is_archived": false,
-      "age_days": 743,
-      "days_since_last_push": 12,
-      "ai_summary": null,
-      "attention_score": 8.4,
-      "attention_metrics": {
-        "score": 8.4,
-        "tier": "healthy",
-        "needs_attention": false,
-        "reasons": [
-          "dependencies"
-        ],
-        "components": {
-          "pull_requests": {
-            "score": 0.0,
-            "availability": "available",
-            "reason": "none",
-            "total_open": 0,
-            "draft_count": 0,
-            "review_requested_count": 0,
-            "oldest_open_age_days": null
-          },
-          "security": {
-            "score": 10.0,
-            "availability": "partial",
-            "reason": "permission_denied",
-            "overall_state": "clear",
-            "active_alert_counts": {
-              "total_open": 0,
-              "critical": 0,
-              "high": 0,
-              "medium": 0,
-              "low": 0
-            }
-          },
-          "staleness": {
-            "score": 0.0,
-            "days_since_last_push": 12,
-            "recent_commits_90d": 6,
-            "open_issues": 0
-          },
-          "dependencies": {
-            "score": 32.5,
-            "total_dependencies": 46,
-            "outdated_count": 0,
-            "outdated_percentage": 0.0,
-            "currency_score": 50,
-            "version_coverage_percentage": 100.0,
-            "latest_version_coverage_percentage": 0.0,
-            "unknown_versions_count": 0
-          }
-        }
-      },
-      "rank": 9,
-      "composite_score": 30.5,
-      "pull_request_summary": {
-        "availability": "available",
-        "reason": "none",
-        "has_open_pull_requests": false,
-        "total_open": 0,
-        "draft_count": 0,
-        "review_requested_count": 0,
-        "oldest_open_age_days": null,
-        "source": "rest.pulls.list"
-      },
-      "security_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
-        "overall_state": "clear",
-        "feature_status": {
-          "advanced_security": "unknown",
-          "secret_scanning": "unknown",
-          "secret_scanning_push_protection": "unknown",
-          "dependency_alerts": "unavailable",
-          "automated_security_fixes": "unavailable"
-        },
-        "active_alert_counts": {
-          "total_open": 0,
-          "critical": 0,
-          "high": 0,
-          "medium": 0,
-          "low": 0
-        },
-        "sources": [
-          "rest.repos.get"
-        ]
-      },
-      "diagnostics_summary": {
-        "availability": "partial",
-        "reason": "permission_denied",
-        "pull_requests": {
-          "availability": "available",
-          "reason": "none",
-          "total_open": 0,
-          "oldest_open_age_days": null
-        },
-        "issues": {
-          "availability": "available",
-          "reason": "none",
-          "total_open": 0,
-          "oldest_open_age_days": null,
-          "stale_over_30d": 0,
-          "stale_over_90d": 0
-        },
-        "security": {
-          "availability": "unavailable",
-          "reason": "permission_denied",
-          "dependabot": {
-            "total_open": 0,
-            "critical": 0,
-            "high": 0,
-            "medium": 0,
-            "low": 0
-          },
-          "code_scanning": {
-            "total_open": 0,
-            "error": 0,
-            "warning": 0,
-            "note": 0
-          }
-        },
-        "actions": {
-          "availability": "available",
-          "reason": "none",
-          "recent_runs": 20,
-          "success_count": 9,
-          "failure_count": 11,
-          "last_run_status": "completed",
-          "last_run_conclusion": "failure",
-          "last_run_age_days": 12
-        },
-        "sources": [
-          "rest.pulls.list",
-          "rest.issues.list",
-          "rest.actions.runs"
-        ]
-      },
-      "attention_rank": 12
+      "attention_rank": 7
     },
     {
       "name": "SupportSpark",
@@ -3553,7 +2291,7 @@
         "text": "> A compassionate support network platform helping people share updates with their trusted circle during life's challenging moments. Built with PowerShell. Key features: Create and manage journey conversations, Post updates with text and images, Invite trusted supporters via email. Maintained project with periodic updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-25T02:59:31.031505",
+        "generated_at": "2026-11-01T04:02:17.091782",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -3571,7 +2309,7 @@
       "languages": {},
       "created_at": "2026-02-01T15:22:40+00:00",
       "updated_at": "2026-10-12T02:31:52+00:00",
-      "pushed_at": "2026-10-12T02:34:02+00:00",
+      "pushed_at": "2026-10-29T14:44:39+00:00",
       "total_commits": 55,
       "recent_commits_90d": 9,
       "first_commit_date": "2026-02-01T15:22:40+00:00",
@@ -3590,7 +2328,7 @@
         "commit_frequency": 3.0,
         "consistency_score": 0,
         "activity_rate": 0.1,
-        "days_since_last_commit": 14,
+        "days_since_last_commit": 21,
         "first_commit_date": "2026-02-01T15:22:40+00:00"
       },
       "commit_metrics": null,
@@ -4996,16 +3734,1081 @@
       "has_tests": true,
       "has_docs": true,
       "language_count": 7,
-      "size_kb": 2837,
+      "size_kb": 2931,
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 265,
+      "age_days": 272,
+      "days_since_last_push": 2,
+      "ai_summary": null,
+      "attention_score": 11.6,
+      "attention_metrics": {
+        "score": 11.6,
+        "tier": "healthy",
+        "needs_attention": false,
+        "reasons": [
+          "dependencies"
+        ],
+        "components": {
+          "pull_requests": {
+            "score": 12.7,
+            "availability": "available",
+            "reason": "none",
+            "total_open": 1,
+            "draft_count": 0,
+            "review_requested_count": 0,
+            "oldest_open_age_days": 2
+          },
+          "security": {
+            "score": 10.0,
+            "availability": "partial",
+            "reason": "permission_denied",
+            "overall_state": "clear",
+            "active_alert_counts": {
+              "total_open": 0,
+              "critical": 0,
+              "high": 0,
+              "medium": 0,
+              "low": 0
+            }
+          },
+          "staleness": {
+            "score": 0.0,
+            "days_since_last_push": 2,
+            "recent_commits_90d": 9,
+            "open_issues": 0
+          },
+          "dependencies": {
+            "score": 32.5,
+            "total_dependencies": 98,
+            "outdated_count": 0,
+            "outdated_percentage": 0.0,
+            "currency_score": 50,
+            "version_coverage_percentage": 100.0,
+            "latest_version_coverage_percentage": 0.0,
+            "unknown_versions_count": 0
+          }
+        }
+      },
+      "rank": 7,
+      "composite_score": 31.65,
+      "pull_request_summary": {
+        "availability": "available",
+        "reason": "none",
+        "has_open_pull_requests": true,
+        "total_open": 1,
+        "draft_count": 0,
+        "review_requested_count": 0,
+        "oldest_open_age_days": 2,
+        "source": "rest.pulls.list"
+      },
+      "security_summary": {
+        "availability": "partial",
+        "reason": "permission_denied",
+        "overall_state": "clear",
+        "feature_status": {
+          "advanced_security": "unknown",
+          "secret_scanning": "unknown",
+          "secret_scanning_push_protection": "unknown",
+          "dependency_alerts": "unavailable",
+          "automated_security_fixes": "unavailable"
+        },
+        "active_alert_counts": {
+          "total_open": 0,
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "sources": [
+          "rest.repos.get"
+        ]
+      },
+      "diagnostics_summary": {
+        "availability": "partial",
+        "reason": "permission_denied",
+        "pull_requests": {
+          "availability": "available",
+          "reason": "none",
+          "total_open": 1,
+          "oldest_open_age_days": 2
+        },
+        "issues": {
+          "availability": "available",
+          "reason": "none",
+          "total_open": 0,
+          "oldest_open_age_days": null,
+          "stale_over_30d": 0,
+          "stale_over_90d": 0
+        },
+        "security": {
+          "availability": "unavailable",
+          "reason": "permission_denied",
+          "dependabot": {
+            "total_open": 0,
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0
+          },
+          "code_scanning": {
+            "total_open": 0,
+            "error": 0,
+            "warning": 0,
+            "note": 0
+          }
+        },
+        "actions": {
+          "availability": "available",
+          "reason": "none",
+          "recent_runs": 20,
+          "success_count": 20,
+          "failure_count": 0,
+          "last_run_status": "completed",
+          "last_run_conclusion": "success",
+          "last_run_age_days": 1
+        },
+        "sources": [
+          "rest.pulls.list",
+          "rest.issues.list",
+          "rest.actions.runs"
+        ]
+      },
+      "attention_rank": 10
+    },
+    {
+      "name": "ArtSpark",
+      "description": "Art Institute Public API and WebSpark",
+      "summary": {
+        "text": "**A comprehensive .NET solution for the Art Institute of Chicago's public API, featuring a complete client library, revolutionary AI chat system with multiple personas, and web applications showcasing modern .NET development practices.** Built with C#. Key features: \u2705 **Complete API Coverage**: All 33 endpoints across 6 categories, \u2705 **Strongly Typed Models**: Comprehensive C# models for all resource types, \u2705 **Async/Await Support**: Modern asynchronous programming patterns. Actively maintained with regular updates.",
+        "ai_generated": false,
+        "generation_method": "enhanced-template",
+        "generated_at": "2026-11-01T04:02:17.092039",
+        "model_used": null,
+        "tokens_used": 0,
+        "confidence_score": 60
+      },
+      "url": "https://github.com/MakeBoldSolutions/ArtSpark",
+      "homepage": "https://art.makeboldspark.com",
+      "has_pages": false,
+      "pages_url": null,
+      "website_url": "https://art.makeboldspark.com",
+      "stars": 0,
+      "forks": 0,
+      "watchers": 0,
+      "language": "C#",
+      "language_stats": {},
+      "languages": {},
+      "created_at": "2023-01-30T15:23:30+00:00",
+      "updated_at": "2026-08-31T02:50:08+00:00",
+      "pushed_at": "2026-10-19T02:24:08+00:00",
+      "total_commits": 47,
+      "recent_commits_90d": 11,
+      "first_commit_date": "2023-01-30T15:23:30+00:00",
+      "last_commit_date": "2026-08-30T00:00:00+00:00",
+      "commit_history": {
+        "repository_name": "ArtSpark",
+        "total_commits": 47,
+        "recent_90d": 11,
+        "recent_180d": 17,
+        "recent_365d": 47,
+        "last_commit_date": "2026-08-30T00:00:00+00:00",
+        "patterns": [
+          "active"
+        ],
+        "commit_frequency": 3.67,
+        "consistency_score": 0,
+        "activity_rate": 0.122,
+        "days_since_last_commit": 63,
+        "first_commit_date": "2023-01-30T15:23:30+00:00"
+      },
+      "commit_metrics": null,
+      "avg_commit_size": null,
+      "largest_commit": null,
+      "smallest_commit": null,
+      "commit_velocity": 3.67,
+      "tech_stack": null,
+      "has_readme": true,
+      "has_license": true,
+      "has_ci_cd": false,
+      "has_tests": false,
+      "has_docs": true,
+      "language_count": 7,
+      "size_kb": 5007,
+      "is_fork": false,
+      "is_private": false,
+      "is_archived": false,
+      "age_days": 1370,
       "days_since_last_push": 13,
       "ai_summary": null,
-      "attention_score": 8.4,
+      "attention_score": 11.0,
       "attention_metrics": {
-        "score": 8.4,
+        "score": 11.0,
+        "tier": "healthy",
+        "needs_attention": false,
+        "reasons": [
+          "pull_requests"
+        ],
+        "components": {
+          "pull_requests": {
+            "score": 29.9,
+            "availability": "available",
+            "reason": "none",
+            "total_open": 2,
+            "draft_count": 0,
+            "review_requested_count": 0,
+            "oldest_open_age_days": 17
+          },
+          "security": {
+            "score": 10.0,
+            "availability": "partial",
+            "reason": "permission_denied",
+            "overall_state": "clear",
+            "active_alert_counts": {
+              "total_open": 0,
+              "critical": 0,
+              "high": 0,
+              "medium": 0,
+              "low": 0
+            }
+          },
+          "staleness": {
+            "score": 0.0,
+            "days_since_last_push": 13,
+            "recent_commits_90d": 11,
+            "open_issues": 0
+          },
+          "dependencies": {
+            "score": 0.0,
+            "total_dependencies": 0,
+            "outdated_count": 0,
+            "outdated_percentage": 0.0,
+            "currency_score": 100,
+            "version_coverage_percentage": 100.0,
+            "latest_version_coverage_percentage": 100.0,
+            "unknown_versions_count": 0
+          }
+        }
+      },
+      "rank": 8,
+      "composite_score": 30.55,
+      "pull_request_summary": {
+        "availability": "available",
+        "reason": "none",
+        "has_open_pull_requests": true,
+        "total_open": 2,
+        "draft_count": 0,
+        "review_requested_count": 0,
+        "oldest_open_age_days": 17,
+        "source": "rest.pulls.list"
+      },
+      "security_summary": {
+        "availability": "partial",
+        "reason": "permission_denied",
+        "overall_state": "clear",
+        "feature_status": {
+          "advanced_security": "unknown",
+          "secret_scanning": "unknown",
+          "secret_scanning_push_protection": "unknown",
+          "dependency_alerts": "unavailable",
+          "automated_security_fixes": "unavailable"
+        },
+        "active_alert_counts": {
+          "total_open": 0,
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "sources": [
+          "rest.repos.get"
+        ]
+      },
+      "diagnostics_summary": {
+        "availability": "partial",
+        "reason": "permission_denied",
+        "pull_requests": {
+          "availability": "available",
+          "reason": "none",
+          "total_open": 2,
+          "oldest_open_age_days": 17
+        },
+        "issues": {
+          "availability": "available",
+          "reason": "none",
+          "total_open": 0,
+          "oldest_open_age_days": null,
+          "stale_over_30d": 0,
+          "stale_over_90d": 0
+        },
+        "security": {
+          "availability": "unavailable",
+          "reason": "permission_denied",
+          "dependabot": {
+            "total_open": 0,
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0
+          },
+          "code_scanning": {
+            "total_open": 0,
+            "error": 0,
+            "warning": 0,
+            "note": 0
+          }
+        },
+        "actions": {
+          "availability": "available",
+          "reason": "none",
+          "recent_runs": 14,
+          "success_count": 14,
+          "failure_count": 0,
+          "last_run_status": "completed",
+          "last_run_conclusion": "success",
+          "last_run_age_days": 13
+        },
+        "sources": [
+          "rest.pulls.list",
+          "rest.issues.list",
+          "rest.actions.runs"
+        ]
+      },
+      "attention_rank": 14
+    },
+    {
+      "name": "BootstrapSpark",
+      "description": "ReactSparkPortfolio is a production-ready, enterprise-grade developer portfolio built with React 19, TypeScript, and Vite. ",
+      "summary": {
+        "text": "**BootstrapSpark** demonstrates enterprise-grade React development with React 19, TypeScript, and Vite \u2014 live at [Bootstrap.makeboldspark.com](https://Bootstrap.makeboldspark.com). Built with TypeScript. Maintained project with periodic updates.",
+        "ai_generated": false,
+        "generation_method": "enhanced-template",
+        "generated_at": "2026-11-01T04:02:17.092685",
+        "model_used": null,
+        "tokens_used": 0,
+        "confidence_score": 60
+      },
+      "url": "https://github.com/MakeBoldSolutions/BootstrapSpark",
+      "homepage": "https://bootstrap.makeboldspark.com/",
+      "has_pages": true,
+      "pages_url": "https://MakeBoldSolutions.github.io/BootstrapSpark/",
+      "website_url": "https://bootstrap.makeboldspark.com/",
+      "stars": 0,
+      "forks": 0,
+      "watchers": 0,
+      "language": "TypeScript",
+      "language_stats": {},
+      "languages": {},
+      "created_at": "2024-10-11T23:31:56+00:00",
+      "updated_at": "2026-10-12T12:22:12+00:00",
+      "pushed_at": "2026-10-12T12:22:08+00:00",
+      "total_commits": 83,
+      "recent_commits_90d": 6,
+      "first_commit_date": "2024-10-11T23:31:56+00:00",
+      "last_commit_date": "2026-10-12T00:00:00+00:00",
+      "commit_history": {
+        "repository_name": "BootstrapSpark",
+        "total_commits": 83,
+        "recent_90d": 6,
+        "recent_180d": 36,
+        "recent_365d": 83,
+        "last_commit_date": "2026-10-12T00:00:00+00:00",
+        "patterns": [
+          "maintained",
+          "current",
+          "declining"
+        ],
+        "commit_frequency": 2.0,
+        "consistency_score": 0,
+        "activity_rate": 0.067,
+        "days_since_last_commit": 20,
+        "first_commit_date": "2024-10-11T23:31:56+00:00"
+      },
+      "commit_metrics": null,
+      "avg_commit_size": null,
+      "largest_commit": null,
+      "smallest_commit": null,
+      "commit_velocity": 2.0,
+      "tech_stack": {
+        "repository_name": "BootstrapSpark",
+        "languages": {},
+        "frameworks": [],
+        "dependencies": [
+          {
+            "name": "@microsoft/signalr",
+            "current_version": "10.0.11",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "10.0.11",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "bootstrap",
+            "current_version": "5.3.8",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "5.3.8",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "bootstrap-icons",
+            "current_version": "1.13.2",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "1.13.2",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "bootswatch",
+            "current_version": "5.3.8",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "5.3.8",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "date-fns",
+            "current_version": "4.4.0",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "4.4.0",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "leaflet",
+            "current_version": "1.9.4",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "1.9.4",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "react",
+            "current_version": "19.3.0",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "19.3.0",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "react-bootstrap",
+            "current_version": "2.10.10",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "2.10.10",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "react-bootstrap-icons",
+            "current_version": "1.11.6",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "1.11.6",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "react-dom",
+            "current_version": "19.3.0",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "19.3.0",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "react-leaflet",
+            "current_version": "5.0.0",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "5.0.0",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "react-markdown",
+            "current_version": "10.1.0",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "10.1.0",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "react-router-dom",
+            "current_version": "7.18.4",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "7.18.4",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "zod",
+            "current_version": "4.6.6",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "4.6.6",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "@azure/static-web-apps-cli",
+            "current_version": "2.0.10",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "2.0.10",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "@eslint/js",
+            "current_version": "10.0.1",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "10.0.1",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "@rollup/plugin-strip",
+            "current_version": "3.0.4",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "3.0.4",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "@testing-library/jest-dom",
+            "current_version": "7.0.1",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "7.0.1",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "@testing-library/react",
+            "current_version": "16.3.3",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "16.3.3",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "@testing-library/user-event",
+            "current_version": "14.6.7",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "14.6.7",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "@types/leaflet",
+            "current_version": "1.9.22",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "1.9.22",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "@types/node",
+            "current_version": "26.6.5",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "26.6.5",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "@types/react",
+            "current_version": "19.3.0",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "19.3.0",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "@types/react-dom",
+            "current_version": "19.3.0",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "19.3.0",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "@vitejs/plugin-react",
+            "current_version": "6.1.2",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "6.1.2",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "@vitest/coverage-v8",
+            "current_version": "5.0.4",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "5.0.4",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "@vitest/ui",
+            "current_version": "5.0.4",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "5.0.4",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "concurrently",
+            "current_version": "10.0.6",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "10.0.6",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "eslint",
+            "current_version": "10.12.0",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "10.12.0",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "eslint-plugin-react-hooks",
+            "current_version": "7.1.1",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "7.1.1",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "eslint-plugin-react-refresh",
+            "current_version": "0.5.7",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "0.5.7",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "fontawesome-free",
+            "current_version": "1.0.4",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "1.0.4",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "globals",
+            "current_version": "17.13.0",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "17.13.0",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "husky",
+            "current_version": "9.1.7",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "9.1.7",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "jsdom",
+            "current_version": "30.1.2",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "30.1.2",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "lint-staged",
+            "current_version": "17.6.0",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "17.6.0",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "npm-check-updates",
+            "current_version": "23.1.1",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "23.1.1",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "prettier",
+            "current_version": "3.9.10",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "3.9.10",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "rimraf",
+            "current_version": "6.1.3",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "6.1.3",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "sass",
+            "current_version": "1.105.1",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "1.105.1",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "tsx",
+            "current_version": "4.23.15",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "4.23.15",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "typescript",
+            "current_version": "6.0.3",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "6.0.3",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "typescript-eslint",
+            "current_version": "8.71.1",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "8.71.1",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "vite",
+            "current_version": "8.3.4",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "8.3.4",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "vite-plugin-static-copy",
+            "current_version": "4.1.1",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "4.1.1",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          },
+          {
+            "name": "vitest",
+            "current_version": "5.0.4",
+            "latest_version": null,
+            "ecosystem": "npm",
+            "versions_behind": 0,
+            "is_outdated": false,
+            "status": "unknown",
+            "version_requirement": "5.0.4",
+            "current_version_known": true,
+            "latest_version_status": "skipped_limit",
+            "latest_version_source": null,
+            "source_file": "package.json"
+          }
+        ],
+        "version_info": {},
+        "dependency_file_type": "package.json",
+        "currency_score": 50,
+        "outdated_count": 0,
+        "total_dependencies": 46,
+        "known_versions_count": 46,
+        "resolved_latest_versions_count": 0,
+        "unknown_versions_count": 0,
+        "primary_language": null,
+        "language_diversity": 0,
+        "outdated_percentage": 0.0,
+        "version_coverage_percentage": 100.0,
+        "latest_version_coverage_percentage": 0.0
+      },
+      "has_readme": true,
+      "has_license": true,
+      "has_ci_cd": true,
+      "has_tests": true,
+      "has_docs": true,
+      "language_count": 7,
+      "size_kb": 39196,
+      "is_fork": false,
+      "is_private": false,
+      "is_archived": false,
+      "age_days": 750,
+      "days_since_last_push": 19,
+      "ai_summary": null,
+      "attention_score": 11.4,
+      "attention_metrics": {
+        "score": 11.4,
         "tier": "healthy",
         "needs_attention": false,
         "reasons": [
@@ -5035,14 +4838,14 @@
             }
           },
           "staleness": {
-            "score": 0.0,
-            "days_since_last_push": 13,
-            "recent_commits_90d": 9,
+            "score": 12.0,
+            "days_since_last_push": 19,
+            "recent_commits_90d": 6,
             "open_issues": 0
           },
           "dependencies": {
             "score": 32.5,
-            "total_dependencies": 98,
+            "total_dependencies": 46,
             "outdated_count": 0,
             "outdated_percentage": 0.0,
             "currency_score": 50,
@@ -5052,8 +4855,8 @@
           }
         }
       },
-      "rank": 10,
-      "composite_score": 27.13,
+      "rank": 9,
+      "composite_score": 30.52,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -5124,11 +4927,11 @@
           "availability": "available",
           "reason": "none",
           "recent_runs": 20,
-          "success_count": 20,
-          "failure_count": 0,
+          "success_count": 9,
+          "failure_count": 11,
           "last_run_status": "completed",
-          "last_run_conclusion": "success",
-          "last_run_age_days": 13
+          "last_run_conclusion": "failure",
+          "last_run_age_days": 19
         },
         "sources": [
           "rest.pulls.list",
@@ -5136,7 +4939,207 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 13
+      "attention_rank": 12
+    },
+    {
+      "name": "MuseumSpark",
+      "description": "A Museum Trip Planning Application",
+      "summary": {
+        "text": "> **The strategic travel planner for art lovers.** > Curate, prioritize, and optimize your museum visits across North America. Built with Python. Maintained project with periodic updates.",
+        "ai_generated": false,
+        "generation_method": "enhanced-template",
+        "generated_at": "2026-11-01T04:02:17.092882",
+        "model_used": null,
+        "tokens_used": 0,
+        "confidence_score": 60
+      },
+      "url": "https://github.com/MakeBoldSolutions/MuseumSpark",
+      "homepage": "https://museum.makeboldspark.com/",
+      "has_pages": true,
+      "pages_url": "https://MakeBoldSolutions.github.io/MuseumSpark/",
+      "website_url": "https://museum.makeboldspark.com/",
+      "stars": 0,
+      "forks": 0,
+      "watchers": 0,
+      "language": "Python",
+      "language_stats": {},
+      "languages": {},
+      "created_at": "2026-01-15T13:24:02+00:00",
+      "updated_at": "2026-08-27T22:47:17+00:00",
+      "pushed_at": "2026-10-21T13:04:46+00:00",
+      "total_commits": 102,
+      "recent_commits_90d": 4,
+      "first_commit_date": "2026-01-15T13:24:02+00:00",
+      "last_commit_date": "2026-08-27T00:00:00+00:00",
+      "commit_history": {
+        "repository_name": "MuseumSpark",
+        "total_commits": 102,
+        "recent_90d": 4,
+        "recent_180d": 16,
+        "recent_365d": 102,
+        "last_commit_date": "2026-08-27T00:00:00+00:00",
+        "patterns": [
+          "maintained"
+        ],
+        "commit_frequency": 1.33,
+        "consistency_score": 0,
+        "activity_rate": 0.044,
+        "days_since_last_commit": 66,
+        "first_commit_date": "2026-01-15T13:24:02+00:00"
+      },
+      "commit_metrics": null,
+      "avg_commit_size": null,
+      "largest_commit": null,
+      "smallest_commit": null,
+      "commit_velocity": 1.33,
+      "tech_stack": null,
+      "has_readme": true,
+      "has_license": true,
+      "has_ci_cd": true,
+      "has_tests": true,
+      "has_docs": true,
+      "language_count": 7,
+      "size_kb": 34680,
+      "is_fork": false,
+      "is_private": false,
+      "is_archived": false,
+      "age_days": 289,
+      "days_since_last_push": 10,
+      "ai_summary": null,
+      "attention_score": 27.2,
+      "attention_metrics": {
+        "score": 27.2,
+        "tier": "watch",
+        "needs_attention": true,
+        "reasons": [
+          "pull_requests"
+        ],
+        "components": {
+          "pull_requests": {
+            "score": 94.8,
+            "availability": "available",
+            "reason": "none",
+            "total_open": 6,
+            "draft_count": 0,
+            "review_requested_count": 0,
+            "oldest_open_age_days": 65
+          },
+          "security": {
+            "score": 10.0,
+            "availability": "partial",
+            "reason": "permission_denied",
+            "overall_state": "clear",
+            "active_alert_counts": {
+              "total_open": 0,
+              "critical": 0,
+              "high": 0,
+              "medium": 0,
+              "low": 0
+            }
+          },
+          "staleness": {
+            "score": 0.0,
+            "days_since_last_push": 10,
+            "recent_commits_90d": 4,
+            "open_issues": 0
+          },
+          "dependencies": {
+            "score": 0.0,
+            "total_dependencies": 0,
+            "outdated_count": 0,
+            "outdated_percentage": 0.0,
+            "currency_score": 100,
+            "version_coverage_percentage": 100.0,
+            "latest_version_coverage_percentage": 100.0,
+            "unknown_versions_count": 0
+          }
+        }
+      },
+      "rank": 10,
+      "composite_score": 27.46,
+      "pull_request_summary": {
+        "availability": "available",
+        "reason": "none",
+        "has_open_pull_requests": true,
+        "total_open": 6,
+        "draft_count": 0,
+        "review_requested_count": 0,
+        "oldest_open_age_days": 65,
+        "source": "rest.pulls.list"
+      },
+      "security_summary": {
+        "availability": "partial",
+        "reason": "permission_denied",
+        "overall_state": "clear",
+        "feature_status": {
+          "advanced_security": "unknown",
+          "secret_scanning": "unknown",
+          "secret_scanning_push_protection": "unknown",
+          "dependency_alerts": "unavailable",
+          "automated_security_fixes": "unavailable"
+        },
+        "active_alert_counts": {
+          "total_open": 0,
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "sources": [
+          "rest.repos.get"
+        ]
+      },
+      "diagnostics_summary": {
+        "availability": "partial",
+        "reason": "permission_denied",
+        "pull_requests": {
+          "availability": "available",
+          "reason": "none",
+          "total_open": 6,
+          "oldest_open_age_days": 65
+        },
+        "issues": {
+          "availability": "available",
+          "reason": "none",
+          "total_open": 0,
+          "oldest_open_age_days": null,
+          "stale_over_30d": 0,
+          "stale_over_90d": 0
+        },
+        "security": {
+          "availability": "unavailable",
+          "reason": "permission_denied",
+          "dependabot": {
+            "total_open": 0,
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0
+          },
+          "code_scanning": {
+            "total_open": 0,
+            "error": 0,
+            "warning": 0,
+            "note": 0
+          }
+        },
+        "actions": {
+          "availability": "available",
+          "reason": "none",
+          "recent_runs": 20,
+          "success_count": 20,
+          "failure_count": 0,
+          "last_run_status": "completed",
+          "last_run_conclusion": "success",
+          "last_run_age_days": 2
+        },
+        "sources": [
+          "rest.pulls.list",
+          "rest.issues.list",
+          "rest.actions.runs"
+        ]
+      },
+      "attention_rank": 8
     },
     {
       "name": "InquirySpark",
@@ -5145,7 +5148,7 @@
         "text": "Spark Your Inquiry, Ignite Insights. Built with C#. Maintained project with periodic updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-25T02:59:31.031668",
+        "generated_at": "2026-11-01T04:02:17.092983",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -5172,7 +5175,7 @@
         "repository_name": "InquirySpark",
         "total_commits": 76,
         "recent_90d": 0,
-        "recent_180d": 3,
+        "recent_180d": 2,
         "recent_365d": 76,
         "last_commit_date": "2026-07-02T00:00:00+00:00",
         "patterns": [
@@ -5182,7 +5185,7 @@
         "commit_frequency": 0.0,
         "consistency_score": 0,
         "activity_rate": 0.0,
-        "days_since_last_commit": 115,
+        "days_since_last_commit": 122,
         "first_commit_date": "2023-10-24T13:14:08+00:00"
       },
       "commit_metrics": null,
@@ -5201,12 +5204,12 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 1096,
-      "days_since_last_push": 93,
+      "age_days": 1103,
+      "days_since_last_push": 100,
       "ai_summary": null,
-      "attention_score": 36.8,
+      "attention_score": 37.4,
       "attention_metrics": {
-        "score": 36.8,
+        "score": 37.4,
         "tier": "watch",
         "needs_attention": true,
         "reasons": [
@@ -5215,13 +5218,13 @@
         ],
         "components": {
           "pull_requests": {
-            "score": 68.1,
+            "score": 70.5,
             "availability": "available",
             "reason": "none",
             "total_open": 2,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": 126
+            "oldest_open_age_days": 133
           },
           "security": {
             "score": 10.0,
@@ -5238,7 +5241,7 @@
           },
           "staleness": {
             "score": 65.0,
-            "days_since_last_push": 93,
+            "days_since_last_push": 100,
             "recent_commits_90d": 0,
             "open_issues": 0
           },
@@ -5255,7 +5258,7 @@
         }
       },
       "rank": 11,
-      "composite_score": 16.04,
+      "composite_score": 15.96,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -5263,7 +5266,7 @@
         "total_open": 2,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": 126,
+        "oldest_open_age_days": 133,
         "source": "rest.pulls.list"
       },
       "security_summary": {
@@ -5295,7 +5298,7 @@
           "availability": "available",
           "reason": "none",
           "total_open": 2,
-          "oldest_open_age_days": 126
+          "oldest_open_age_days": 133
         },
         "issues": {
           "availability": "available",
@@ -5330,7 +5333,7 @@
           "failure_count": 3,
           "last_run_status": "completed",
           "last_run_conclusion": "success",
-          "last_run_age_days": 80
+          "last_run_age_days": 87
         },
         "sources": [
           "rest.pulls.list",
@@ -5347,7 +5350,7 @@
         "text": "[![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download/dotnet/10.0) [![Build](https://img.shields.io/github/actions/workflow/status/markhazleton/DataSpark/ci.yml?branch=main)](https://github.com/markhazleton/DataSpark/actions) [![Coverage](https://img.shield Built with HTML. Key features: Discover SQLite database files in a directory., Export all tables or a filtered list to CSV., Generate schema reports (text, JSON, Markdown).. Maintained project with periodic updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-25T02:59:31.031791",
+        "generated_at": "2026-11-01T04:02:17.093090",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -5384,7 +5387,7 @@
         "commit_frequency": 0.0,
         "consistency_score": 0,
         "activity_rate": 0.0,
-        "days_since_last_commit": 115,
+        "days_since_last_commit": 122,
         "first_commit_date": "2017-11-06T16:04:58+00:00"
       },
       "commit_metrics": null,
@@ -5403,12 +5406,12 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 3274,
-      "days_since_last_push": 95,
+      "age_days": 3281,
+      "days_since_last_push": 102,
       "ai_summary": null,
-      "attention_score": 31.1,
+      "attention_score": 31.7,
       "attention_metrics": {
-        "score": 31.1,
+        "score": 31.7,
         "tier": "watch",
         "needs_attention": true,
         "reasons": [
@@ -5417,13 +5420,13 @@
         ],
         "components": {
           "pull_requests": {
-            "score": 45.2,
+            "score": 47.7,
             "availability": "available",
             "reason": "none",
             "total_open": 1,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": 95
+            "oldest_open_age_days": 102
           },
           "security": {
             "score": 10.0,
@@ -5440,7 +5443,7 @@
           },
           "staleness": {
             "score": 65.0,
-            "days_since_last_push": 95,
+            "days_since_last_push": 102,
             "recent_commits_90d": 0,
             "open_issues": 0
           },
@@ -5465,7 +5468,7 @@
         "total_open": 1,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": 95,
+        "oldest_open_age_days": 102,
         "source": "rest.pulls.list"
       },
       "security_summary": {
@@ -5497,7 +5500,7 @@
           "availability": "available",
           "reason": "none",
           "total_open": 1,
-          "oldest_open_age_days": 95
+          "oldest_open_age_days": 102
         },
         "issues": {
           "availability": "available",
@@ -5532,7 +5535,7 @@
           "failure_count": 8,
           "last_run_status": "completed",
           "last_run_conclusion": "success",
-          "last_run_age_days": 93
+          "last_run_age_days": 100
         },
         "sources": [
           "rest.pulls.list",
@@ -5540,7 +5543,7 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 4
+      "attention_rank": 5
     },
     {
       "name": "MakeBoldSolutionsCom",
@@ -5549,7 +5552,7 @@
         "text": "The marketing website for Make Bold Solutions \u2014 a fractional CFO firm led by Lesley Hazleton, CPA, based in Wichita, Kansas. Built with HTML. Maintained project with periodic updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-25T02:59:31.174012",
+        "generated_at": "2026-11-01T04:02:17.296643",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -5586,7 +5589,7 @@
         "commit_frequency": 0.0,
         "consistency_score": 0,
         "activity_rate": 0.0,
-        "days_since_last_commit": 104,
+        "days_since_last_commit": 111,
         "first_commit_date": "2025-12-10T17:14:44+00:00"
       },
       "commit_metrics": null,
@@ -5630,7 +5633,7 @@
           {
             "name": "eslint",
             "current_version": "10.7.0",
-            "latest_version": "10.13.0",
+            "latest_version": "10.14.0",
             "ecosystem": "npm",
             "versions_behind": 0,
             "is_outdated": true,
@@ -5680,8 +5683,8 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 318,
-      "days_since_last_push": 102,
+      "age_days": 325,
+      "days_since_last_push": 110,
       "ai_summary": null,
       "attention_score": 21.2,
       "attention_metrics": {
@@ -5716,7 +5719,7 @@
           },
           "staleness": {
             "score": 65.0,
-            "days_since_last_push": 102,
+            "days_since_last_push": 110,
             "recent_commits_90d": 0,
             "open_issues": 0
           },
@@ -5733,7 +5736,7 @@
         }
       },
       "rank": 13,
-      "composite_score": 13.96,
+      "composite_score": 13.99,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -5808,7 +5811,7 @@
           "failure_count": 1,
           "last_run_status": "completed",
           "last_run_conclusion": "failure",
-          "last_run_age_days": 102
+          "last_run_age_days": 110
         },
         "sources": [
           "rest.pulls.list",
@@ -5816,7 +5819,7 @@
           "rest.actions.runs"
         ]
       },
-      "attention_rank": 8
+      "attention_rank": 9
     },
     {
       "name": "TeachSpark",
@@ -5825,7 +5828,7 @@
         "text": "[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download) [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/) [![Bui Built with C#. Maintained project with periodic updates.",
         "ai_generated": false,
         "generation_method": "enhanced-template",
-        "generated_at": "2026-10-25T02:59:31.213342",
+        "generated_at": "2026-11-01T04:02:17.351691",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 60
@@ -5862,7 +5865,7 @@
         "commit_frequency": 0.0,
         "consistency_score": 0,
         "activity_rate": 0.0,
-        "days_since_last_commit": 155,
+        "days_since_last_commit": 162,
         "first_commit_date": "2025-06-19T21:15:05+00:00"
       },
       "commit_metrics": null,
@@ -5942,12 +5945,12 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 492,
-      "days_since_last_push": 95,
+      "age_days": 499,
+      "days_since_last_push": 103,
       "ai_summary": null,
-      "attention_score": 38.6,
+      "attention_score": 39.2,
       "attention_metrics": {
-        "score": 38.6,
+        "score": 39.2,
         "tier": "watch",
         "needs_attention": true,
         "reasons": [
@@ -5956,13 +5959,13 @@
         ],
         "components": {
           "pull_requests": {
-            "score": 71.6,
+            "score": 74.0,
             "availability": "available",
             "reason": "none",
             "total_open": 2,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": 136
+            "oldest_open_age_days": 143
           },
           "security": {
             "score": 10.0,
@@ -5979,7 +5982,7 @@
           },
           "staleness": {
             "score": 65.0,
-            "days_since_last_push": 95,
+            "days_since_last_push": 103,
             "recent_commits_90d": 0,
             "open_issues": 0
           },
@@ -5996,7 +5999,7 @@
         }
       },
       "rank": 14,
-      "composite_score": 13.52,
+      "composite_score": 13.54,
       "pull_request_summary": {
         "availability": "available",
         "reason": "none",
@@ -6004,7 +6007,7 @@
         "total_open": 2,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": 136,
+        "oldest_open_age_days": 143,
         "source": "rest.pulls.list"
       },
       "security_summary": {
@@ -6036,7 +6039,7 @@
           "availability": "available",
           "reason": "none",
           "total_open": 2,
-          "oldest_open_age_days": 136
+          "oldest_open_age_days": 143
         },
         "issues": {
           "availability": "available",
@@ -6071,7 +6074,7 @@
           "failure_count": 0,
           "last_run_status": "completed",
           "last_run_conclusion": "success",
-          "last_run_age_days": 47
+          "last_run_age_days": 54
         },
         "sources": [
           "rest.pulls.list",
@@ -6088,7 +6091,7 @@
         "text": "An open-source PHP documentation & data exploration platform by Mark Hazleton (WebSpark suite) showcasing hybrid server-side + modern asset pipeline techniques. Written in PHP.",
         "ai_generated": false,
         "generation_method": "basic-template",
-        "generated_at": "2026-10-25T02:59:31.214052",
+        "generated_at": "2026-11-01T04:02:17.352481",
         "model_used": null,
         "tokens_used": 0,
         "confidence_score": 40
@@ -6125,7 +6128,7 @@
         "commit_frequency": 0.0,
         "consistency_score": 0,
         "activity_rate": 0.0,
-        "days_since_last_commit": 115,
+        "days_since_last_commit": 122,
         "first_commit_date": "2023-09-08T16:08:13+00:00"
       },
       "commit_metrics": null,
@@ -6541,12 +6544,12 @@
       "is_fork": false,
       "is_private": false,
       "is_archived": false,
-      "age_days": 1142,
-      "days_since_last_push": 95,
+      "age_days": 1149,
+      "days_since_last_push": 102,
       "ai_summary": null,
-      "attention_score": 35.9,
+      "attention_score": 36.5,
       "attention_metrics": {
-        "score": 35.9,
+        "score": 36.5,
         "tier": "watch",
         "needs_attention": true,
         "reasons": [
@@ -6556,13 +6559,13 @@
         ],
         "components": {
           "pull_requests": {
-            "score": 45.2,
+            "score": 47.7,
             "availability": "available",
             "reason": "none",
             "total_open": 1,
             "draft_count": 0,
             "review_requested_count": 0,
-            "oldest_open_age_days": 95
+            "oldest_open_age_days": 102
           },
           "security": {
             "score": 10.0,
@@ -6579,7 +6582,7 @@
           },
           "staleness": {
             "score": 65.0,
-            "days_since_last_push": 95,
+            "days_since_last_push": 102,
             "recent_commits_90d": 0,
             "open_issues": 0
           },
@@ -6604,7 +6607,7 @@
         "total_open": 1,
         "draft_count": 0,
         "review_requested_count": 0,
-        "oldest_open_age_days": 95,
+        "oldest_open_age_days": 102,
         "source": "rest.pulls.list"
       },
       "security_summary": {
@@ -6636,7 +6639,7 @@
           "availability": "available",
           "reason": "none",
           "total_open": 1,
-          "oldest_open_age_days": 95
+          "oldest_open_age_days": 102
         },
         "issues": {
           "availability": "available",
@@ -6671,7 +6674,7 @@
           "failure_count": 0,
           "last_run_status": "completed",
           "last_run_conclusion": "success",
-          "last_run_age_days": 49
+          "last_run_age_days": 56
         },
         "sources": [
           "rest.pulls.list",
@@ -6683,7 +6686,7 @@
     }
   ],
   "metadata": {
-    "generated_at": "2026-10-25T02:59:31.214934+00:00",
+    "generated_at": "2026-11-01T04:02:17.353377+00:00",
     "schema_version": "2.3.0",
     "generator": "unified_data_generator",
     "schema_features": [

@@ -10,7 +10,12 @@ import time
 from datetime import datetime, timedelta
 from typing import Callable, Optional
 
+from github import Auth, Github
+
 from spark.cli_output_layout import slugify_username
+from spark.registry import Registry, collection_users, seed_users
+from spark.registry.discovery import run_discovery
+from spark.registry.export import write_portfolio
 from spark.worker import publish
 from spark.worker.rate_limit import fetch_rate_limit
 from spark.worker.runner import RunResult, build_command, run_collection
@@ -29,12 +34,16 @@ class CollectionWorker:
         runner: Callable[..., RunResult] = run_collection,
         rate_limit_fn: Callable[[str], Optional[dict]] = fetch_rate_limit,
         now_fn: Callable[[], datetime] = utcnow,
+        github_factory: Callable[[str], object] = lambda token: (
+            Github(auth=Auth.Token(token), timeout=30) if token else Github(timeout=30)
+        ),
         log: Callable[[str], None] = lambda msg: print(msg, flush=True),
     ):
         self.settings = settings
         self.runner = runner
         self.rate_limit_fn = rate_limit_fn
         self.now = now_fn
+        self.github_factory = github_factory
         self.log = log
         self.stop_event = threading.Event()
         self.status = StatusStore(
@@ -96,8 +105,9 @@ class CollectionWorker:
 
             env = dict(os.environ)
             env["SPARK_CACHE_DIR"] = str(s.cache_dir)
+            users, problems, portfolio_count = self._refresh_registry(token, stage)
             ok_users, failed_users = [], []
-            for user in s.users:
+            for user in users:
                 self.log(f"Collecting {user}")
                 result = self.runner(
                     build_command(user, s.config_path, s.extra_args),
@@ -115,15 +125,19 @@ class CollectionWorker:
                     failed_users.append(user)
                     reason = self._failure_reason(result, user) or reason
 
-            if ok_users:
+            if ok_users or (not users and portfolio_count):
                 release_id = started.strftime("%Y%m%dT%H%M%SZ")
                 publish.publish_tree(stage / "data", s.data_dir, release_id)
                 publish.publish_tree(stage / "output", s.output_dir, release_id)
-                outcome = "partial" if (failed_users or errors) else "success"
+                outcome = (
+                    "partial" if (failed_users or errors or problems) else "success"
+                )
                 if failed_users:
                     reason = f"{len(failed_users)} user(s) failed: " + reason
                 elif errors:
                     reason = f"completed with {errors} logged error(s)"
+                elif problems:
+                    reason = "; ".join(problems)
             else:
                 reason = reason or "no data was collected"
         except Exception as error:  # noqa: BLE001 - the loop must survive anything
@@ -147,6 +161,31 @@ class CollectionWorker:
         )
         self.log(f"Collection {outcome}: {reason or 'ok'}")
         return outcome
+
+    def _refresh_registry(self, token: str, stage):
+        """Discover sources and write portfolio.json into the stage.
+
+        Returns (users to collect, source problems, portfolio repository count).
+        A failing source is recorded on that source and reported; it never
+        blocks the others.
+        """
+        registry = Registry.open(self.settings.db_path)
+        try:
+            seed_users(registry, self.settings.users)
+            results = run_discovery(registry, self.github_factory(token))
+            payload = write_portfolio(registry, stage / "data" / "portfolio.json")
+            sources = {src["id"]: src for src in registry.list_sources()}
+            problems = [
+                f"{sources[r['source_id']]['type']} "
+                f"{sources[r['source_id']]['identifier']}: {r['code']}"
+                for r in results
+                if r["state"] == "error"
+            ]
+            users = collection_users(registry)
+            self.status.state["users"] = users
+            return users, problems, payload["repository_count"]
+        finally:
+            registry.close()
 
     @staticmethod
     def _has_valid_data(stage, user: str) -> bool:

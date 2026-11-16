@@ -1,11 +1,11 @@
 ---
 id: ps-003
 title: Source registry and portfolio model
-status: proposed
+status: complete
 order: 30
 depends_on: [ps-002]
 blockers: []
-delivery: []
+delivery: ["branch 005-work-ps-003-source-registry", "commit 801a9b7", "commit 6d2dc18"]
 ---
 
 # ps-003: Source registry and portfolio model

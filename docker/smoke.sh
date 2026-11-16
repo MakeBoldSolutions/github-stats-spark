@@ -16,4 +16,10 @@ check "/data/users/$SLUG/repositories.json" '"repositories"'
 check /data/status.json '"schema_version"'
 code="$(curl -s -o /dev/null -w '%{http_code}' "$BASE/data/.releases/")"
 [ "$code" = 404 ] && echo "ok   /data/.releases hidden" || { echo "FAIL /data/.releases served ($code)"; exit 1; }
+check /api/health '"ok"'
+# The API must refuse unauthenticated reads and writes.
+for path in /api/sources /api/connections /api/repositories; do
+    code="$(curl -s -o /dev/null -w '%{http_code}' "$BASE$path")"
+    [ "$code" = 401 ] && echo "ok   $path requires sign-in" || { echo "FAIL $path answered $code without sign-in"; exit 1; }
+done
 echo "smoke passed"

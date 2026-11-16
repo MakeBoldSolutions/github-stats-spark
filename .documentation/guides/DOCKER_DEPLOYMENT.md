@@ -94,3 +94,39 @@ docker compose exec worker python -m spark.registry disable 3
 - Full per-repository analytics (`data/users/<name>/...`, the dashboard) still run for `user` sources.
   Organization and explicit-repository sources currently appear in `portfolio.json` only.
 - Back up `registry.db` (stop the worker, or use `sqlite3 registry.db ".backup out.db"`).
+
+## Admin UI (sign-in, sources, tokens)
+
+A third service, `api`, serves the admin API. It has no host port; the web container proxies `/api`
+to it, so it is exactly as reachable as the dashboard (keep `BIND_ADDRESS` on the LAN). The
+dashboard shows a **Sources** page only when the API answers; on GitHub Pages it never appears.
+
+**First start**
+1. Generate an encryption key once and keep it outside the database:
+   `docker compose run --rm api python -m spark.api generate-key` -> set it as `SPARK_SECRET_KEY`
+   (or point `SPARK_SECRET_KEY_FILE` at a secret file). Set it on the stack so both `api` and
+   `worker` see it. Losing or changing it makes saved tokens unreadable (re-enter them).
+2. Set `SPARK_ADMIN_USER` and `SPARK_ADMIN_PASSWORD` (12+ characters). The administrator is created
+   on first start and the variables are ignored afterwards; **remove the password from the stack
+   once you can sign in**. Alternatively run `docker compose exec api python -m spark.api create-admin`.
+3. Open the dashboard, choose **Sources**, and sign in.
+
+**What it does**
+- **Sources:** add an organization, user or repository. Access is validated against GitHub first;
+  a source that cannot be read is not saved and the error says what to fix. Disable, re-enable or
+  remove sources; removing never deletes collected repositories.
+- **Repositories:** include/exclude and assign to a client, project and application.
+- **Tokens:** save fine-grained personal access tokens (read-only; one per user or organization),
+  encrypted at rest. A token's expiry is tracked: the page warns when one is within 14 days, and a
+  source whose token has expired reports `connection_unusable` instead of silently using another.
+  Sources without a token use the stack's `GITHUB_TOKEN`.
+- **Refresh now:** asks the worker to collect; it starts within seconds.
+
+**Security notes**
+- Passwords are stored as Argon2id hashes; session cookies are `HttpOnly`, `SameSite=Strict`, and only
+  a hash of the session token is stored. Writes require a CSRF token and a matching `Origin`.
+  Five failed sign-ins lock that username for 15 minutes. Changing the password signs everyone out.
+- The API is plain HTTP on the LAN. Set `SPARK_COOKIE_SECURE=true` only behind HTTPS.
+- Tokens are never returned by the API or written to logs. Back up `registry.db` and the key
+  separately: the database alone cannot be used to recover saved tokens.
+- `docker/smoke.sh` now also checks that the API refuses unauthenticated reads.

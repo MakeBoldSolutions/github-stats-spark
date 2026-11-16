@@ -53,6 +53,9 @@ services:
       GITHUB_TOKEN_FILE: ${GITHUB_TOKEN_FILE:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       SPARK_CACHE_DIR: /app/.cache
+      SPARK_DB_PATH: /app/config/registry.db
+      SPARK_SECRET_KEY: ${SPARK_SECRET_KEY:-}
+      SPARK_SECRET_KEY_FILE: ${SPARK_SECRET_KEY_FILE:-}
     volumes:
       - spark-data:/app/data
       - spark-output:/app/output
@@ -63,6 +66,40 @@ services:
       interval: 60s
       timeout: 10s
       start_period: 30s
+      retries: 3
+    security_opt:
+      - no-new-privileges:true
+
+  # Admin API: sign-in, source management, refresh requests. Not published on
+  # a host port; the web container proxies /api to it, so it is exactly as
+  # reachable as the dashboard (LAN only).
+  api:
+    build:
+      context: .
+      dockerfile: docker/worker.Dockerfile
+    image: github-stats-spark-worker:local
+    restart: unless-stopped
+    entrypoint: []
+    command: ["python", "-m", "spark.api", "serve", "--port", "8000"]
+    environment:
+      SPARK_DB_PATH: /app/config/registry.db
+      # Creates the first administrator if none exists; ignored afterwards.
+      SPARK_ADMIN_USER: ${SPARK_ADMIN_USER:-}
+      SPARK_ADMIN_PASSWORD: ${SPARK_ADMIN_PASSWORD:-}
+      SPARK_ADMIN_PASSWORD_FILE: ${SPARK_ADMIN_PASSWORD_FILE:-}
+      # Fernet key that encrypts stored tokens. Keep it outside the database.
+      SPARK_SECRET_KEY: ${SPARK_SECRET_KEY:-}
+      SPARK_SECRET_KEY_FILE: ${SPARK_SECRET_KEY_FILE:-}
+      SPARK_COOKIE_SECURE: ${SPARK_COOKIE_SECURE:-false}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      GITHUB_TOKEN_FILE: ${GITHUB_TOKEN_FILE:-}
+    volumes:
+      - spark-config:/app/config
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
       retries: 3
     security_opt:
       - no-new-privileges:true

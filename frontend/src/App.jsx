@@ -13,6 +13,8 @@ import RepositoryGrid from "@/components/RepositoryGrid/RepositoryGrid";
 import TabBar from "@/components/Mobile/TabBar/TabBar";
 import { OfflineIndicator } from "@/components/Mobile/OfflineIndicator/OfflineIndicator";
 import CollectionStatus from "@/components/Common/CollectionStatus";
+import UserPicker from "@/components/Common/UserPicker";
+import useUserOptions from "@/hooks/useUserOptions";
 import useAdminAvailable from "@/hooks/useAdminAvailable";
 import { ToastContainer } from "@/components/Mobile/Toast/Toast";
 
@@ -48,6 +50,8 @@ function App() {
     refetch,
   } = useRepositoryData();
   const adminAvailable = useAdminAvailable();
+  const userOptions = useUserOptions();
+  const showUserPicker = userOptions.length >= 2;
 
   const {
     toasts,
@@ -86,21 +90,34 @@ function App() {
                 className="flex items-center justify-between"
                 style={{ height: "var(--header-height)" }}
               >
-                <a
-                  href="/"
-                  className="header-brand"
-                  aria-label="GitHubSpark — home"
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    minWidth: 0,
+                  }}
                 >
-                  <div className="header-logo" aria-hidden="true">
-                    <img src="/logo-mark.svg" alt="" width="28" height="28" />
-                  </div>
-                  <div className="header-title-group">
-                    <span className="header-title-main">GitHubSpark</span>
-                    <span className="header-title-sub">
-                      {data?.profile?.username || "MakeBoldSolutions"}
-                    </span>
-                  </div>
-                </a>
+                  <a
+                    href="/"
+                    className="header-brand"
+                    aria-label="GitHubSpark — home"
+                  >
+                    <div className="header-logo" aria-hidden="true">
+                      <img src="/logo-mark.svg" alt="" width="28" height="28" />
+                    </div>
+                    <div className="header-title-group">
+                      <span className="header-title-main">GitHubSpark</span>
+                      {!showUserPicker && (
+                        <span className="header-title-sub">
+                          {data?.profile?.username || "MakeBoldSolutions"}
+                        </span>
+                      )}
+                    </div>
+                  </a>
+                  {/* Outside the link: a control inside an anchor is invalid and would navigate home. */}
+                  <UserPicker users={userOptions} />
+                </div>
 
                 {/* Navigation Menu */}
                 <nav

@@ -42,6 +42,12 @@ vi.mock("@/services/dataService", () => ({
   ],
   setupBackgroundSync: () => () => {},
   clearCache: vi.fn(),
+  getSelectedUser: () => "makeboldsolutions",
+}));
+
+// The header picker only appears when the self-hosted portfolio.json lists 2+ users.
+vi.mock("@/hooks/useUserOptions", () => ({
+  default: () => [],
 }));
 
 vi.mock("@/components/RepositoryGrid/RepositoryGrid", () => ({

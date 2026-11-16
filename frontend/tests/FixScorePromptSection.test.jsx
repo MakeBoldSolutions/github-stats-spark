@@ -148,6 +148,7 @@ describe("FixScorePromptSection prompt helpers", () => {
     expect(prompt).not.toMatch(/devspark|copilot|\/fix-score/i);
     expect(prompt).toContain("How to improve each signal:");
     expect(prompt).toContain("Pull request pressure: Review and merge");
+    expect(prompt).toContain("Needs a change in the repository:");
     expect(prompt).toContain("Do not hide a problem.");
     expect(prompt).toContain("Attention score inputs");
     expect(prompt).toContain("Pull requests: score 18/100");
@@ -224,5 +225,58 @@ describe("<FixScorePromptSection /> collapsible presentation", () => {
       />,
     );
     expect(screen.getByText("Ready")).toBeInTheDocument();
+  });
+
+  it("separates GitHub settings from file changes", () => {
+    const blockers = getFixScoreBlockers(repository);
+    const files = blockers.find((b) => b.label === "Quality indicators");
+    const settings = blockers.find((b) => b.label === "Repository settings");
+
+    expect(files.detail).not.toContain("Discussions");
+    expect(settings.detail).toContain("Discussions");
+
+    const prompt = buildPrompt(repository, blockers);
+    expect(prompt).toContain("Needs a GitHub setting or housekeeping");
+    expect(prompt).toContain("Do not try to commit them");
+  });
+
+  it("does not treat unreadable security data as a repository defect", () => {
+    const unreadable = {
+      ...repository,
+      attention_metrics: {
+        ...repository.attention_metrics,
+        components: {
+          ...repository.attention_metrics.components,
+          security: {
+            score: 30,
+            availability: "unavailable",
+            reason: "permission_denied",
+          },
+        },
+      },
+    };
+    const blockers = getFixScoreBlockers(unreadable);
+
+    expect(blockers.map((b) => b.label)).not.toContain("Security pressure");
+    const blocker = blockers.find(
+      (b) => b.label === "Security data unavailable",
+    );
+    expect(blocker.severity).toBe("external");
+    expect(blocker.detail).toContain("permission_denied");
+    expect(buildPrompt(unreadable, blockers)).toContain(
+      "Cannot be fixed from the repository",
+    );
+  });
+
+  it("states the real goal and how to verify without a test suite", () => {
+    const prompt = buildPrompt(repository, getFixScoreBlockers(repository));
+
+    expect(prompt).toContain("the score is not the goal");
+    expect(prompt).toContain("If the repository has no test suite");
+    expect(prompt).toContain("Do major-version dependency upgrades separately");
+    expect(prompt).toContain("Do not generate boilerplate");
+    expect(prompt).toContain(
+      "Do not push, open a pull request, or change repository settings",
+    );
   });
 });

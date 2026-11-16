@@ -7,7 +7,7 @@ The repository detail view has a "Fix score prompt" section. Its text is generic
 (`buildPrompt`) and does not depend on DevSpark or any slash command, so it can be pasted into
 Claude Code, Copilot, or any other coding assistant working in the target repository. It contains the
 repository's current score blockers, a short "how to improve" note for each blocker present
-(`REMEDIATION_GUIDANCE`), the scoring inputs, and rules against hiding problems. Extend
+(`REMEDIATION_GUIDANCE`, each tagged as a repository change, a GitHub setting, or not fixable from the repository), the scoring inputs, verification guidance for repositories with no test suite, and rules against hiding problems. Extend
 `REMEDIATION_GUIDANCE` when a new signal is added.
 
 The rest of this page documents the Stats Spark repository's own Copilot prompt file.

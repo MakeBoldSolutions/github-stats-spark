@@ -49,6 +49,11 @@ class WorkerSettings:
         default_factory=lambda: Path(tempfile.gettempdir()) / "spark-stage"
     )
     extra_args: List[str] = field(default_factory=list)
+    db_path: Optional[Path] = None
+
+    def __post_init__(self) -> None:
+        if self.db_path is None:
+            self.db_path = self.config_path.parent / "registry.db"
 
     @property
     def heartbeat_path(self) -> Path:
@@ -87,6 +92,7 @@ class WorkerSettings:
             config_path=Path(env.get("SPARK_CONFIG_PATH", "/app/config/spark.yml")),
             cache_dir=Path(env.get("SPARK_CACHE_DIR", "/app/.cache")),
             extra_args=shlex.split(env.get("SPARK_EXTRA_ARGS", "")),
+            db_path=Path(env["SPARK_DB_PATH"]) if env.get("SPARK_DB_PATH") else None,
         )
         if env.get("SPARK_STAGE_DIR"):
             settings.stage_dir = Path(env["SPARK_STAGE_DIR"])

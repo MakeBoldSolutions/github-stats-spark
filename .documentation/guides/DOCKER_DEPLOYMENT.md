@@ -17,7 +17,7 @@ Open <http://127.0.0.1:8086>. The page shows data once the first collection fini
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `SPARK_USER` | required | GitHub user(s), comma separated |
+| `SPARK_USER` | required | GitHub user(s), comma separated. **Seeds the source registry on first start only**; after that the registry is authoritative. |
 | `SPARK_REFRESH_INTERVAL` | `6h` | time between runs (minimum `60s`) |
 | `SPARK_RUN_ON_START` | `true` | collect immediately when the worker starts |
 | `SPARK_RUN_TIMEOUT` | `2h` | a run longer than this is stopped and reported failed |
@@ -70,3 +70,27 @@ not forward the port. Do not enable private repositories until the private-data 
 - `no GitHub token` error: set `GITHUB_TOKEN` or `GITHUB_TOKEN_FILE`.
 - Reset collected data only: `docker compose down` then `docker volume rm github-stats-spark_spark-data
   github-stats-spark_spark-output github-stats-spark_spark-cache`. Keep `spark-config`.
+
+
+## Managing sources (organizations, repositories, users)
+
+Sources live in a SQLite registry (`/app/config/registry.db`, in the `spark-config` volume, so it
+survives container recreation). Manage them from the worker container (uses its `GITHUB_TOKEN`):
+
+```sh
+docker compose exec worker python -m spark.registry add org MyOrg --client "Acme"
+docker compose exec worker python -m spark.registry add repo owner/name
+docker compose exec worker python -m spark.registry list
+docker compose exec worker python -m spark.registry exclude owner/name
+docker compose exec worker python -m spark.registry disable 3
+```
+
+- Each cycle the worker re-discovers every enabled source (all pages), de-duplicates repositories by
+  case-insensitive full name, and publishes `data/portfolio.json` with per-source status. A source
+  that fails (`not_found`, `no_access`, `sso_required`, `rate_limited`) is reported there and makes the
+  run `partial`; other sources are unaffected.
+- Removing a source never deletes repositories (or collected data). Delete orphans explicitly with
+  `python -m spark.registry prune`.
+- Full per-repository analytics (`data/users/<name>/...`, the dashboard) still run for `user` sources.
+  Organization and explicit-repository sources currently appear in `portfolio.json` only.
+- Back up `registry.db` (stop the worker, or use `sqlite3 registry.db ".backup out.db"`).

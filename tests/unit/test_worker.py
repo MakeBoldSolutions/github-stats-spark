@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 
 from spark.worker import publish
+from tests.unit.registry_fakes import FakeGithub
 from spark.worker.loop import CollectionWorker
 from spark.worker.runner import RunResult, run_collection
 from spark.worker.settings import SettingsError, WorkerSettings, parse_duration
@@ -72,6 +73,7 @@ def _make(settings, runner, rate=None, clock=None):
         runner=runner,
         rate_limit_fn=lambda token: rate,
         now_fn=clock or (lambda: NOW),
+        github_factory=lambda token: FakeGithub(users={"Octo": []}),
         log=lambda msg: None,
     )
 
@@ -316,3 +318,86 @@ def test_healthcheck_depends_on_heartbeat_age(settings):
     assert healthcheck(settings) == 0
     settings.heartbeat_path.write_text("1")
     assert healthcheck(settings) == 1
+
+
+# -- source registry integration (ps-003) ---------------------------------
+def _make_with_github(settings, runner, github):
+    return CollectionWorker(
+        settings,
+        runner=runner,
+        rate_limit_fn=lambda token: None,
+        now_fn=lambda: NOW,
+        github_factory=lambda token: github,
+        log=lambda msg: None,
+    )
+
+
+def test_run_publishes_a_deduplicated_portfolio(settings):
+    from tests.unit.registry_fakes import make_repo
+    from spark.registry import Registry
+
+    registry = Registry.open(settings.db_path)
+    registry.add_source("user", "Octo")
+    registry.add_source("org", "Acme")
+    registry.add_source("repo", "acme/A")
+    registry.close()
+    github = FakeGithub(
+        users={"Octo": [make_repo("Octo/x")]},
+        orgs={"Acme": [make_repo("Acme/a"), make_repo("Acme/b")]},
+        repos={"acme/A": make_repo("Acme/a")},
+    )
+    outcome = _make_with_github(settings, _good_runner(), github).run_once()
+
+    assert outcome == "success"
+    portfolio = json.loads((settings.data_dir / "portfolio.json").read_text())
+    assert [r["full_name"] for r in portfolio["repositories"]] == [
+        "Acme/a",
+        "Acme/b",
+        "Octo/x",
+    ]
+
+
+def test_bad_source_makes_the_run_partial_with_the_reason(settings):
+    from spark.registry import Registry
+
+    registry = Registry.open(settings.db_path)
+    registry.add_source("user", "Octo")
+    registry.add_source("org", "Typo")
+    registry.close()
+    worker = _make_with_github(settings, _good_runner(), FakeGithub(users={"Octo": []}))
+
+    assert worker.run_once() == "partial"
+    assert "org Typo: not_found" in worker.status.state["last_attempt"]["reason"]
+    assert _published(settings)["repositories"] == ["a"]  # others still published
+
+
+def test_org_only_registry_publishes_the_portfolio_without_user_collection(settings):
+    from tests.unit.registry_fakes import make_repo
+    from spark.registry import Registry
+
+    registry = Registry.open(settings.db_path)
+    registry.add_source("org", "Acme")
+    registry.set_source_enabled(registry.find_source("org", "Acme")["id"], True)
+    registry.close()
+    # Settings still seed "Octo" only when the registry is empty; it is not.
+    calls = []
+
+    def runner(*args, **kwargs):
+        calls.append(args)
+        return RunResult(exit_code=0)
+
+    github = FakeGithub(orgs={"Acme": [make_repo("Acme/a")]})
+    outcome = _make_with_github(settings, runner, github).run_once()
+
+    assert outcome == "success"
+    assert calls == []
+    assert (settings.data_dir / "portfolio.json").exists()
+
+
+def test_registry_is_seeded_from_spark_user_once(settings):
+    from spark.registry import Registry
+
+    _make(settings, _good_runner()).run_once()
+    registry = Registry.open(settings.db_path)
+    assert [s["identifier"] for s in registry.list_sources()] == ["Octo"]
+    registry.close()

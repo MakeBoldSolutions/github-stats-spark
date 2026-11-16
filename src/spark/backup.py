@@ -49,7 +49,8 @@ def verify_backup(path: Union[str, Path]) -> BackupInfo:
     path = Path(path)
     if not path.is_file():
         raise BackupError(f"backup not found: {path}")
-    uri = path.resolve().as_uri() + "?mode=ro"
+    # immutable: read the file as-is, without creating -wal/-shm companions.
+    uri = path.resolve().as_uri() + "?mode=ro&immutable=1"
     try:
         conn = sqlite3.connect(uri, uri=True, timeout=10)
     except sqlite3.Error as error:
@@ -159,7 +160,8 @@ def create_backup(
 
 def _rotate(backup_dir: Path, keep: int) -> None:
     for path, _ in list_backups(backup_dir)[keep:]:
-        path.unlink(missing_ok=True)
+        for suffix in ("", "-wal", "-shm"):
+            Path(str(path) + suffix).unlink(missing_ok=True)
         stamp = _NAME.match(path.name).group(1)
         (backup_dir / f"spark-{stamp}.yml").unlink(missing_ok=True)
 

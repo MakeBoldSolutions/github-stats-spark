@@ -48,6 +48,14 @@ def test_backup_is_verified_and_describes_its_contents(db, tmp_path):
     assert verify_backup(info.path).sources == 1
 
 
+def test_a_backup_is_one_self_contained_file(db, tmp_path):
+    info = create_backup(db, tmp_path / "b", now=NOW)
+    verify_backup(info.path)  # verifying must not create companions either
+    assert sorted(p.name for p in (tmp_path / "b").iterdir()) == [info.path.name]
+    header = info.path.read_bytes()[:20]
+    assert header[18] == header[19] == 1  # rollback-journal format, not WAL
+
+
 def test_backup_includes_a_copy_of_the_config_file(db, tmp_path):
     config = tmp_path / "spark.yml"
     config.write_text("users: [a]\n")

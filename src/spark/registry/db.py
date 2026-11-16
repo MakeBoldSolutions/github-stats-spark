@@ -142,6 +142,9 @@ def copy_database(source: Union[str, Path], target: Union[str, Path]) -> None:
     dst = sqlite3.connect(str(partial))
     try:
         src.backup(dst)
+        # A copy is a single self-contained file: no -wal/-shm companions to
+        # lose, rotate, or leave behind. connect() restores WAL on the live DB.
+        dst.execute("PRAGMA journal_mode = DELETE")
     finally:
         dst.close()
         src.close()

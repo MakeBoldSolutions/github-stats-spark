@@ -20,7 +20,7 @@ const CACHE_KEY_REPOSITORIES = "repositories-data";
 // Must match the 'user' key in config/spark.yml.
 const DEFAULT_USER = "makeboldsolutions";
 
-const getSelectedUser = (explicitUser) => {
+export const getSelectedUser = (explicitUser) => {
   if (explicitUser) {
     return explicitUser.trim().toLowerCase();
   }

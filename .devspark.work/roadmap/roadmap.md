@@ -138,7 +138,7 @@ without a schema rewrite. No tenants, billing, or multi-admin in this roadmap.
    [ps-002 Scheduled collection and status](specs/complete/ps-002-scheduled-collection-and-status.md)
 2. **Portfolio and source management:**
    [ps-003 Source registry and portfolio model](specs/complete/ps-003-source-registry-and-portfolio-collection.md),
-   [ps-004 Admin API and management UI](specs/ps-004-admin-api-and-source-management-ui.md),
+   [ps-004 Admin API and management UI](specs/complete/ps-004-admin-api-and-source-management-ui.md),
    [ps-005 Private and client data boundary](specs/ps-005-private-data-boundary.md),
    [ps-020 Portfolio classification and signal scoring](specs/ps-020-portfolio-classification-and-signal-scoring.md)
 3. **GitHub and security intelligence:**

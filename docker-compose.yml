@@ -1,0 +1,58 @@
+# GitHub Stats Spark - self-hosted stack (ps-001: Docker foundation).
+#
+#   docker compose up -d --build     # start the dashboard on port 8086
+#   docker compose up worker         # (re)run one data collection
+#
+# Collected data lives in named volumes, separate from configuration:
+#   spark-data / spark-output  - generated JSON and reports (rebuildable)
+#   spark-cache                - GitHub API cache
+#   spark-config               - config/spark.yml (seeded from the image on first start)
+
+name: github-stats-spark
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+    image: github-stats-spark-web:local
+    ports:
+      # Defaults to this machine only. On the home server set BIND_ADDRESS=192.168.1.197.
+      - "${BIND_ADDRESS:-127.0.0.1}:${WEB_PORT:-8086}:8080"
+    volumes:
+      - spark-data:/usr/share/nginx/html/data:ro
+      - spark-output:/usr/share/nginx/html/output:ro
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/worker.Dockerfile
+    image: github-stats-spark-worker:local
+    # One-shot collection. Restart the container (Portainer) or run
+    # `docker compose up worker` to refresh. Scheduling arrives in a later item.
+    restart: "no"
+    command: ["spark", "unified", "--user", "${SPARK_USER:?Set SPARK_USER to the GitHub user to analyze}"]
+    environment:
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      GITHUB_TOKEN_FILE: ${GITHUB_TOKEN_FILE:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      SPARK_CACHE_DIR: /app/.cache
+    volumes:
+      - spark-data:/app/data
+      - spark-output:/app/output
+      - spark-cache:/app/.cache
+      - spark-config:/app/config
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  spark-data:
+  spark-output:
+  spark-cache:
+  spark-config:

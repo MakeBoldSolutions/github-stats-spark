@@ -27,5 +27,6 @@ RUN useradd --uid 10001 --create-home app \
 USER app
 
 ENTRYPOINT ["worker-entrypoint.sh"]
-# One-shot run; the user is supplied by the compose file.
-CMD ["spark", "--help"]
+# Scheduled collection worker; configured through SPARK_* environment variables.
+# `docker run ... spark unified --user <name>` still works for a manual one-off.
+CMD ["python", "-m", "spark.worker"]

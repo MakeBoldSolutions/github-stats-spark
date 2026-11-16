@@ -30,29 +30,34 @@ manageable by one person; add dependencies and services only when demonstrated n
 
 ## Current Baseline
 
-Evidence from the repository (branch `001-make-bold-solutions-redesign`, dd322de).
+Evidence from the repository on `main` (after ps-021, commit 159620c). Rows marked Missing or Partial are
+the remaining roadmap.
 
 | Area | Status | Evidence |
 | --- | --- | --- |
 | Pipeline: `spark unified/generate/analyze/cache/config` CLI, JSON per user | Implemented | `src/spark/cli*.py`, `unified_data_generator.py`, `data/users/<slug>/repositories.json` |
-| Multi-user collection | Implemented (config-file only) | `users:` in `config/spark.yml` |
+| Collection for users, organizations, and single repositories | Implemented (ps-021) | worker runs `spark unified` per enabled source; `--slug` scopes output; an org collects all public repos regardless of author; repos use `owner--name` |
 | Repository metadata, activity, PRs, issues, Actions summary, dependency parsing | Implemented | `fetcher.py`, `dependencies/`, `models/repository.py` |
 | Change-driven cache (`pushed_at`), `SPARK_CACHE_DIR`, force refresh | Implemented | `fetcher.py`, `cache*.py`; constitution Principle IV |
-| Rate-limit handling and retries | Partial | `handle_rate_limit` blocks until reset; naive-datetime comparison unverified |
-| Dependabot summary (severity counts, availability/reason) | Partial | open state only, first page of 100, no detail/age/advisory/fix/URL (`fetcher.py` ~L1036, ~L1249) |
+| Rate-limit handling and retries | Partial | worker skips a cycle when remaining quota is low; `fetcher.handle_rate_limit` is unused and its naive-datetime comparison unverified |
+| Dependabot summary (severity counts, availability/reason) | Partial | open state only, first page of 100, no detail/age/advisory/fix/URL (`fetcher.py`); ps-006 |
 | Code-scanning summary, repo security feature flags | Partial | same functions |
 | Attention scoring (security/PR/dependency/staleness) | Implemented | `unified_data_generator.py`, `ranker.py` |
 | React dashboard: attention view, drill-down, filters, export, offline cache | Implemented | `frontend/src/components/*`, `services/dataService.js` |
+| Header source switcher (users, orgs, repositories, grouped) | Implemented | `UserPicker.jsx`, `useUserOptions.js`; listed from `data/portfolio.json`; hidden on Pages |
+| Repository "fix score" prompt | Implemented, generic | `FixScorePromptSection.jsx`; no DevSpark dependency; per-signal guidance |
 | GitHub Pages publication (public only) and CI | Implemented | `.github/workflows/generate-stats.yml`, `validate.yml` |
-| Tests (pytest, vitest, Lighthouse CI config, a11y audit) | Implemented | `tests/`, `frontend/tests`, `frontend/scripts` |
-| Docker/Compose, scheduler, long-running process | Missing | no Dockerfile or compose file |
-| Backend API, admin authentication, credential store | Missing | frontend is static and anonymous |
-| Source registration, org/repo discovery, dedupe, per-source status | Missing | discovery is `get_user().get_repos()` only |
-| Clients/projects/applications/environments model | Missing | — |
-| Persistent history, observations, alert lifecycle | Missing | only caches and latest JSON |
-| Releases/tags, CI run history, deployments, Dependabot PRs | Missing | Actions *summary* only |
+| Tests (pytest 515, vitest 137, Lighthouse CI config, a11y audit) | Implemented | `tests/`, `frontend/tests`, `frontend/scripts` |
+| Docker/Compose, scheduler, long-running worker, status, healthcheck | Implemented (ps-001, 002) | `docker-compose.yml`, `docker/`, `src/spark/worker/`; stack runs under Portainer on 192.168.1.197:8086 |
+| SQLite registry, sources, connections, dedupe, discovery, `portfolio.json` | Implemented (ps-003) | `src/spark/registry/` |
+| Backend API, admin authentication, encrypted token store, admin UI | Implemented (ps-004) | `src/spark/api/`, `frontend/src/components/Admin/`; Argon2id, server-side sessions, CSRF, Fernet |
+| Backup, restore, rotation, resource limits, log rotation, secrets override | Implemented (ps-009) | `src/spark/backup.py`, `docker-compose*.yml`; backups sit on the same host disk |
+| Clients/projects/applications model | Partial | tables and API exist (ps-003/004); environments and websites are not modelled until ps-011 |
+| Persistent history, observations, alert lifecycle | Missing | the `observation` table exists but nothing writes history yet (ps-006/007) |
+| Releases/tags, CI run history, deployments, Dependabot PRs | Missing | Actions *summary* only (ps-010) |
 | Website availability, TLS, Lighthouse, synthetic checks | Missing | `screenshot.py` / `web_scraper.py` capture screenshots and page signals for repo sites only |
 | Search/analytics integrations, reports (client/PDF), notifications | Missing | markdown/SVG reports for a GitHub user exist |
+| Tiering and signal scoring of the portfolio | Missing | recoverable from tag `archive/004-portfolio-intelligence` (ps-020) |
 | DevSpark roadmap consumption | Unverified | format is inspectable: `roadmap.md` plus `specs/ps-NNN-*.md` with YAML front matter (`id`, `status`, `depends_on`, `blockers`, `delivery`); read-only parse appears feasible |
 | Provider API capabilities (Clarity, GA4 quotas, CrUX coverage, Search Console access) | Unverified | to verify at the start of each item that depends on them |
 
@@ -119,9 +124,9 @@ without a schema rewrite. No tenants, billing, or multi-admin in this roadmap.
 
 ## Capability Map
 
-- **Foundation:** container deployment, scheduling, status, persistence, backup (ps-001, 002, 003, 009).
-- **Portfolio and sources:** registry, domain model, admin API/UI, GitHub connections, discovery, tiering (ps-003, 004, 020).
-- **Access and privacy:** admin authentication, private/client data boundary (ps-004, 005).
+- **Foundation:** container deployment, scheduling, status, persistence, backup (ps-001, 002, 003, 009), delivered.
+- **Portfolio and sources:** registry, domain model, admin API/UI, GitHub connections, discovery, per-source dashboards and switching (ps-003, 004, 021 delivered), tiering (ps-020, open).
+- **Access and privacy:** admin authentication (ps-004, delivered), private/client data boundary (ps-005, blocked on the constitution amendment).
 - **GitHub intelligence:** Dependabot detail and lifecycle, CI/PR/release evidence (ps-006, 007, 010).
 - **Website health:** availability/TLS, Lighthouse lab audits (ps-011, 012).
 - **Delivery intelligence:** DevSpark roadmap visibility, synthetic smoke checks, release/verification timeline (ps-013, 014, 015).
@@ -172,19 +177,21 @@ ps-001 → ps-002 → ps-003 ─┬→ ps-004 → ps-005
                           ├→ ps-013  ├→ ps-015 ←─ ps-014 (needs ps-011)
                           └→ ps-016 → ps-017           │
 ps-003 → ps-009 (backup/restore is pulled forward once history exists)
-ps-004 → ps-021 (org/repo dashboards and switching; extends ps-003/004 collection)
+ps-004 → ps-021 (delivered: org/repo dashboards and switching; extends ps-003/004 collection)
 ps-003 → ps-020 (tiering; recovered from archive tag archive/004-portfolio-intelligence; feeds ps-018)
 ```
 
-Recommended order: 001, 002, 003, 004, 006, 009, 011, 007, 010, 005 (before any private or client-owned
-data is stored, which is required before client reporting), 012, 013, 014, 015, 008, 016, 017, 018, 019.
+Done so far: 001, 002, 003, 004, 009, 021 (021 was added after the original sequence, at the
+developer's request). Recommended order for the rest: 006, 011, 007, 010, 005 (before any private or client-owned
+data is stored, which is required before client reporting), 012, 013, 020, 014, 015, 008, 016, 017, 018, 019.
 `order` values in the items reflect this. History starts accumulating at ps-006, because its value
 compounds; note GitHub rate limits cannot be banked, so value comes from retained observations and
 incremental requests, not from collecting faster.
 
-**Smallest useful first increment: ps-001** (existing dashboard in Docker on port 8086). The smallest
-increment that *monitors real things* is ps-001 → 003 → 006, with ps-011 giving an early website view.
-The first release does not need the rest.
+**Smallest useful first increment (done): ps-001** (existing dashboard in Docker on port 8086). The smallest
+increment that *monitors real things* is ps-001 → 003 → 006, with ps-011 giving an early website view. Of
+that path ps-001 and ps-003 are delivered; ps-006 is blocked on the constitution amendment, so ps-011
+(website availability) is the next item that adds monitoring without waiting on a decision.
 
 ## Decisions
 
@@ -206,11 +213,16 @@ The first release does not need the rest.
   The App comes forward if a client wants to grant access themselves, owners multiply, or an org blocks tokens.
   No known organization forbids personal tokens.
 
+**Adopted in delivered work, no further decision needed:**
+
+- **FastAPI** for the API (ps-004), served by the same Python image as the worker.
+- **Single administrator** signing in against the SQLite-stored credential with a server-side session;
+  per-client scoping deferred (ps-004).
+- **Organization dashboards** (ps-021): an organization shows all of its public repositories with activity
+  from anyone, not one author's commits; a repository source is its own dashboard.
+
 **Recommendations still awaiting developer decision:**
 
-- **FastAPI** for the API.
-- **Single administrator** signing in against the SQLite-stored credential with a server-side session;
-  per-client scoping deferred.
 - **DevSpark integration:** parse existing roadmap artifacts read-only; no export contract unless parsing
   proves unreliable. A milestone is "complete" only if the roadmap says so; PR merges are shown as
   linked evidence, never as inferred completion.
@@ -225,4 +237,28 @@ Decisions.
 
 ## Delivered
 
-None.
+All on `main` and running on the home server (stack `github-stats-spark`, Portainer).
+
+| Item | Result |
+| --- | --- |
+| [ps-001 Docker foundation](specs/complete/ps-001-docker-foundation.md) | Dashboard served from Docker/Compose on port 8086 |
+| [ps-002 Scheduled collection and status](specs/complete/ps-002-scheduled-collection-and-status.md) | Worker collects every 6 hours; status banner shows freshness |
+| [ps-003 Source registry and portfolio](specs/complete/ps-003-source-registry-and-portfolio-collection.md) | SQLite registry, discovery, de-duplicated `portfolio.json` |
+| [ps-004 Admin API and management UI](specs/complete/ps-004-admin-api-and-source-management-ui.md) | Sign-in, add/edit/disable sources, GitHub tokens, refresh now |
+| [ps-009 Operational hardening and backup](specs/complete/ps-009-operational-hardening.md) | Verified backups, restore, limits; rollback drill passed |
+| [ps-021 Organization and repository dashboards](specs/complete/ps-021-source-dashboards-and-switching.md) | Each enabled user, org, and repo source has a dashboard and appears in the header switcher |
+
+Smaller changes made outside the roadmap items: a header user picker (later extended by ps-021), a
+follow-up fix so a restarted worker keeps reporting the existing backup, and a generic "fix score"
+prompt that no longer refers to a DevSpark command.
+
+Known gaps and notes:
+
+- ps-021: a "collect now" for a single source is not built (the existing Refresh now collects
+  everything), and a single-repository source is covered by tests but has not been tried on the server.
+- ps-009: backups are on the same disk as the data; an off-host copy is the administrator's step
+  (a cron example is in the Docker deployment guide).
+- Credentials still to tidy: the initial admin password sits in the stack environment and should be
+  changed and removed; the Portainer and GitHub token files should be rotated.
+- ps-005 and ps-006 remain blocked on the constitution amendment (`/devspark-constitution`).
+- 45 Dependabot alerts are open on this repository; ps-006 is the planned home for handling them.

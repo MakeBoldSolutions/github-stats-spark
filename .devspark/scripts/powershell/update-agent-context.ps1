@@ -1,4 +1,6 @@
 #!/usr/bin/env pwsh
+# DevSpark - (c) 2026 Make Bold Solutions. Source: https://dev.makeboldspark.com
+#requires -Version 7.0
 <#!
 .SYNOPSIS
 Update agent context files with information from plan.md (PowerShell version)
@@ -9,7 +11,7 @@ Mirrors the behavior of scripts/bash/update-agent-context.sh:
  2. Plan Data Extraction
  3. Agent File Management (create from template or update existing)
  4. Content Generation (technology stack, recent changes, timestamp)
- 5. Multi-Agent Support (claude, gemini, copilot, cursor-agent, qwen, opencode, codex, windsurf, kilocode, auggie, roo, codebuddy, amp, shai, q, bob, qodercli)
+ 5. Multi-Agent Support (claude, gemini, copilot, cursor-agent, qwen, opencode, codex, windsurf, kilocode, auggie, roo, codebuddy, amp, shai, q, bob, qodercli, antigravity)
 
 .PARAMETER AgentType
 Optional agent key to update a single agent. If omitted, updates all existing agent files (creating a default Claude file if none exist).
@@ -25,7 +27,7 @@ Relies on common helper functions in common.ps1
 #>
 param(
     [Parameter(Position=0)]
-    [ValidateSet('claude','gemini','copilot','cursor-agent','qwen','opencode','codex','windsurf','kilocode','auggie','roo','codebuddy','amp','shai','q','bob','qodercli')]
+    [ValidateSet('claude','gemini','copilot','cursor-agent','qwen','opencode','codex','windsurf','kilocode','auggie','roo','codebuddy','amp','shai','q','bob','qodercli','antigravity')]
     [string]$AgentType
 )
 
@@ -48,11 +50,11 @@ $HAS_GIT       = $envData.HAS_GIT
 $IMPL_PLAN     = $envData.IMPL_PLAN
 $NEW_PLAN = $IMPL_PLAN
 $AGENT_REGISTRY_FILE = Join-Path $REPO_ROOT 'agents-registry.json'
-$SHARED_AGENT_CONTEXT_FILE = Join-Path $REPO_ROOT '.documentation/AGENTS.md'
+$SHARED_AGENT_CONTEXT_FILE = Join-Path $REPO_ROOT 'AGENTS.md'
 $SHARED_CONTEXT_START = '<!-- DEVSPARK SHARED CONTEXT:START -->'
 $SHARED_CONTEXT_END = '<!-- DEVSPARK SHARED CONTEXT:END -->'
 
-$TEMPLATE_FILE = Join-Path $REPO_ROOT '.documentation/templates/agent-file-template.md'
+$TEMPLATE_FILE = Join-Path $REPO_ROOT '.devspark.work/templates/agent-file-template.md'
 $LEGACY_TEMPLATE_FILE = Join-Path $REPO_ROOT 'templates/agent-file-template.md'
 
 # Parsed plan data placeholders
@@ -168,7 +170,7 @@ function Validate-Environment {
         } else {
             Write-Err "Template file not found at $TEMPLATE_FILE"
             Write-Info "Legacy fallback also not found at $LEGACY_TEMPLATE_FILE"
-            Write-Info 'Run devspark init to scaffold .documentation/templates, or add agent-file-template.md there.'
+            Write-Info 'Run the quickstart guide for your agent to scaffold .devspark.work/templates, or add agent-file-template.md there.'
             exit 1
         }
     }
@@ -185,14 +187,23 @@ function Extract-PlanField {
         [string]$PlanFile
     )
     if (-not (Test-Path $PlanFile)) { return '' }
-    # Lines like **Language/Version**: Python 3.12
+    # Lines like **Language/Version**: Python 3.12. The value may be hard-wrapped
+    # onto following lines, so continuation lines are joined back onto one line.
     $regex = "^\*\*$([Regex]::Escape($FieldPattern))\*\*: (.+)$"
-    Get-Content -LiteralPath $PlanFile -Encoding utf8 | ForEach-Object {
-        if ($_ -match $regex) { 
-            $val = $Matches[1].Trim()
-            if ($val -notin @('NEEDS CLARIFICATION','N/A')) { return $val }
+    $lines = @(Get-Content -LiteralPath $PlanFile -Encoding utf8)
+    for ($i = 0; $i -lt $lines.Count; $i++) {
+        if ($lines[$i] -notmatch $regex) { continue }
+        $val = $Matches[1].Trim()
+        for ($j = $i + 1; $j -lt $lines.Count; $j++) {
+            $next = $lines[$j]
+            if ([string]::IsNullOrWhiteSpace($next)) { break }
+            if ($next -match '^\s*(\*\*|#{1,6}\s|[-*+]\s|\d+\.\s|\||>)') { break }
+            $val = "$val $($next.Trim())"
         }
-    } | Select-Object -First 1
+        if ($val -in @('NEEDS CLARIFICATION','N/A')) { continue }
+        return $val
+    }
+    return ''
 }
 
 function Parse-PlanData {
@@ -257,6 +268,17 @@ function Get-LanguageConventions {
     if ($Lang) { "${Lang}: Follow standard conventions" } else { 'General: Follow standard conventions' } 
 }
 
+function Get-SafeReplacement {
+    param(
+        [Parameter(Mandatory=$false)]
+        [string]$Value
+    )
+    # On the replacement side of -replace, '$' is special ($1, $&, $$, ${name}).
+    # Double literal '$' to '$$' so dynamic values can't corrupt the output.
+    if ($null -eq $Value) { return '' }
+    return $Value.Replace('$','$$')
+}
+
 function New-AgentFile {
     param(
         [Parameter(Mandatory=$true)]
@@ -279,7 +301,7 @@ function New-AgentFile {
     $escaped_branch = $CURRENT_BRANCH
 
     $content = Get-Content -LiteralPath $temp -Raw -Encoding utf8
-    $content = $content -replace '\[PROJECT NAME\]',$ProjectName
+    $content = $content -replace '\[PROJECT NAME\]',(Get-SafeReplacement $ProjectName)
     $content = $content -replace '\[DATE\]',$Date.ToString('yyyy-MM-dd')
     
     # Build the technology stack string safely
@@ -292,13 +314,17 @@ function New-AgentFile {
         $techStackForTemplate = "- $escaped_framework ($escaped_branch)"
     }
     
-    $content = $content -replace '\[EXTRACTED FROM ALL PLAN.MD FILES\]',$techStackForTemplate
-    # For project structure we manually embed (keep newlines)
-    $escapedStructure = [Regex]::Escape($projectStructure)
+    $content = $content -replace '\[EXTRACTED FROM ALL PLAN.MD FILES\]',(Get-SafeReplacement $techStackForTemplate)
+    # For project structure we manually embed (keep newlines). [Regex]::Escape is a
+    # *pattern*-side escaper (backslash-prefixes ".", "(", "$", spaces, etc.), so using
+    # it here leaked stray backslashes into the rendered output. Instead: double '$'
+    # for -replace safety, then turn real newlines into a literal "\n" marker that the
+    # later '\\n' -> newline pass converts back — no other characters are touched.
+    $escapedStructure = (Get-SafeReplacement $projectStructure) -replace "`n", '\n'
     $content = $content -replace '\[ACTUAL STRUCTURE FROM PLANS\]',$escapedStructure
     # Replace escaped newlines placeholder after all replacements
-    $content = $content -replace '\[ONLY COMMANDS FOR ACTIVE TECHNOLOGIES\]',$commands
-    $content = $content -replace '\[LANGUAGE-SPECIFIC, ONLY FOR LANGUAGES IN USE\]',$languageConventions
+    $content = $content -replace '\[ONLY COMMANDS FOR ACTIVE TECHNOLOGIES\]',(Get-SafeReplacement $commands)
+    $content = $content -replace '\[LANGUAGE-SPECIFIC, ONLY FOR LANGUAGES IN USE\]',(Get-SafeReplacement $languageConventions)
     
     # Build the recent changes string safely
     $recentChangesForTemplate = ""
@@ -310,7 +336,7 @@ function New-AgentFile {
         $recentChangesForTemplate = "- ${escaped_branch}: Added ${escaped_framework}"
     }
     
-    $content = $content -replace '\[LAST 3 FEATURES AND WHAT THEY ADDED\]',$recentChangesForTemplate
+    $content = $content -replace '\[LAST 3 FEATURES AND WHAT THEY ADDED\]',(Get-SafeReplacement $recentChangesForTemplate)
     # Convert literal \n sequences introduced by Escape to real newlines
     $content = $content -replace '\\n',[Environment]::NewLine
 
@@ -350,7 +376,13 @@ function Update-ExistingAgentFile {
 
     $lines = Get-Content -LiteralPath $TargetFile -Encoding utf8
     $output = New-Object System.Collections.Generic.List[string]
-    $inTech = $false; $inChanges = $false; $techAdded = $false; $changeAdded = $false; $existingChanges = 0
+    $inTech = $false; $inChanges = $false; $techAdded = $false; $existingChanges = 0
+
+    # Appends a blank line unless the buffer already ends with one, so generated
+    # headings and lists always stay surrounded by blanks (MD022/MD032/MD012).
+    $addSeparator = {
+        if ($output.Count -gt 0 -and -not [string]::IsNullOrWhiteSpace($output[$output.Count - 1])) { $output.Add('') }
+    }
 
     for ($i=0; $i -lt $lines.Count; $i++) {
         $line = $lines[$i]
@@ -360,23 +392,53 @@ function Update-ExistingAgentFile {
             continue
         }
         if ($inTech -and $line -match '^##\s') {
-            if (-not $techAdded -and $newTechEntries.Count -gt 0) { $newTechEntries | ForEach-Object { $output.Add($_) }; $techAdded = $true }
+            if (-not $techAdded -and $newTechEntries.Count -gt 0) {
+                & $addSeparator
+                $newTechEntries | ForEach-Object { $output.Add($_) }
+                $techAdded = $true
+            }
+            & $addSeparator
             $output.Add($line); $inTech = $false; continue
         }
         if ($inTech -and [string]::IsNullOrWhiteSpace($line)) {
-            if (-not $techAdded -and $newTechEntries.Count -gt 0) { $newTechEntries | ForEach-Object { $output.Add($_) }; $techAdded = $true }
-            $output.Add($line); continue
+            if (-not $techAdded -and $newTechEntries.Count -gt 0) {
+                & $addSeparator
+                $newTechEntries | ForEach-Object { $output.Add($_) }
+                $techAdded = $true
+                continue
+            }
+            & $addSeparator
+            continue
+        }
+        if ($inTech -and $line -notmatch '^- ') {
+            if (-not $techAdded -and $newTechEntries.Count -gt 0) {
+                & $addSeparator
+                $newTechEntries | ForEach-Object { $output.Add($_) }
+                $techAdded = $true
+            }
+            & $addSeparator
+            $output.Add($line); $inTech = $false; continue
         }
         if ($line -eq '## Recent Changes') {
             $output.Add($line)
-            if ($newChangeEntry) { $output.Add($newChangeEntry); $changeAdded = $true }
+            if ($newChangeEntry) {
+                $output.Add('')
+                $output.Add($newChangeEntry)
+            }
             $inChanges = $true
             continue
         }
-        if ($inChanges -and $line -match '^##\s') { $output.Add($line); $inChanges = $false; continue }
+        if ($inChanges -and [string]::IsNullOrWhiteSpace($line)) { continue }
         if ($inChanges -and $line -match '^- ') {
-            if ($existingChanges -lt 2) { $output.Add($line); $existingChanges++ }
+            if ($existingChanges -lt 2) {
+                & $addSeparator
+                $output.Add($line); $existingChanges++
+            }
             continue
+        }
+        if ($inChanges) {
+            & $addSeparator
+            $output.Add($line); $inChanges = $false; continue
         }
         if ($line -match '\*\*Last updated\*\*: .*\d{4}-\d{2}-\d{2}') {
             $output.Add(($line -replace '\d{4}-\d{2}-\d{2}',$Date.ToString('yyyy-MM-dd')))
@@ -387,6 +449,7 @@ function Update-ExistingAgentFile {
 
     # Post-loop check: if we're still in the Active Technologies section and haven't added new entries
     if ($inTech -and -not $techAdded -and $newTechEntries.Count -gt 0) {
+        & $addSeparator
         $newTechEntries | ForEach-Object { $output.Add($_) }
     }
 

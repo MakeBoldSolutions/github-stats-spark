@@ -1,14 +1,26 @@
 ---
-description: Perform adversarial risk analysis identifying technical flaws, implementation hazards, and failure modes across spec.md, plan.md, and tasks.md.
+source: "DevSpark — © 2026 Make Bold Solutions. Source: https://dev.makeboldspark.com"
+description: On demand for one specific material concern — challenge whether the work is wrong about the real system it will run in, such as unimplementable conditions, absent operational controls, and unexamined assumptions about code, dependencies, and failure. Never a default gate.
 handoffs:
-  - label: Fix Critical Issues
-    agent: devspark.plan
-    prompt: Revise plan to address critical architectural risks
-    send: true
-  - label: Update Tasks
-    agent: devspark.tasks
-    prompt: Regenerate tasks with missing operational items
-    send: true
+  - label: Return to Implementation
+    agent: devspark-implement
+    prompt: Continue implementation, applying the critic disposition
+    send: false
+  - label: Resolve Spec Showstoppers (existing specification)
+    agent: devspark-clarify
+    prompt: Resolve vague requirements, missing edge cases, or undefined trust boundaries in the existing spec
+    send: false
+  - label: Revise Existing Plan
+    agent: devspark-plan
+    prompt: Revise the existing plan to address the critical architectural risk
+    send: false
+  - label: Update Existing Tasks
+    agent: devspark-tasks
+    prompt: Update the existing task list with the missing operational items
+    send: false
+scripts:
+  sh: .devspark/scripts/bash/check-prerequisites.sh --json --include-tasks
+  ps: .devspark/scripts/powershell/check-prerequisites.ps1 -Json -IncludeTasks
 ---
 
 ## User Input
@@ -21,491 +33,544 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Overview
 
-Act as a skeptical technical expert identifying risks, architectural flaws, implementation hazards, and failure scenarios that will prevent successful delivery. This command assumes `/devspark.tasks` has completed and focuses on **what will go wrong** rather than consistency checking.
+Load and obey the shared preamble contract core at `/.devspark/templates/command-preamble-contract.md` (installed repos) or `templates/command-preamble-contract.md` (source repos) before step 1. Preamble modules: `finding-fix`, `convergence`, `provenance`.
 
-**Key Distinction from `/devspark.analyze`:**
+Load and obey the shared assurance contract at `/.devspark/templates/assurance-contract.md` (installed repos) or `templates/assurance-contract.md` (source repos). It is the canonical source for lane ownership, deduplication, finding quality, verdict derivation, bounded passes, and applicability. This command implements that contract; it does not restate it.
 
-- `/devspark.analyze` = Consistency & completeness checking (are artifacts aligned?)
-- `/devspark.critic` = Adversarial risk analysis (what will fail in production?)
+> **Critic exists to find the places where a coherent plan is wrong about the system it will run in — unimplementable conditions, absent operational controls, and unexamined assumptions about code, dependencies, and failure — early enough that the plan can still change cheaply.**
+
+Critic is the **open-world** half of planning assurance. `/devspark-analyze` establishes that the artifacts are internally sound; Critic challenges that internally sound plan against repository and operating reality. The two are complementary, not two names for reviewing the work.
+
+Critic **owns**: requirements resting on false assumptions about existing code; **a new mechanism where a closer existing implementation would satisfy the requirement (search the repository; do not trust the plan's claim that none exists)**; conditions the baseline can never produce; behavior removed as "redundant" that is a sole required path; hidden coupling to existing consumers; missing rollback/disable/kill-switch posture; missing observability needed to operate the proposed behavior; unexamined external-dependency behavior; persistent-data limits; state-machine failure modes; compatibility assumptions; concurrency and async hazards visible from the design; NFR achievability; `context_resolved` **sufficiency**; architectural assumptions unsupported by current source.
+
+Critic does **NOT** own, and MUST NOT emit normal findings for (assurance-contract.md §4.1):
+
+| Not Critic's | Owner |
+| ------------ | ----- |
+| Artifact consistency, duplication, terminology drift | `/devspark-analyze` |
+| Requirement ↔ task coverage, traceability, task bookkeeping and completion state | `/devspark-analyze` |
+| Missing task anchors; tasks citing requirement ids that do not exist | `/devspark-analyze` |
+| Requirement *wording* precision (vague adjectives, placeholders) | `/devspark-analyze` |
+| Rationale Summary completeness, spec↔plan Core-Problem drift | `/devspark-analyze` |
+| Documentation drift | `/devspark-analyze` |
+| `context_resolved` entries that simply fail to resolve (**validity**) | `/devspark-analyze` |
+| Implementation correctness, runtime proof | `/devspark-verify` |
+| Diff review, post-implementation code quality | `/devspark-pr-review` |
+
+Noticing one of these anyway is normal. Route it under `routed_findings:` per assurance-contract.md §4.2 — never as a Critic risk finding.
+
+### What this command is NOT
+
+Critic findings are **hypotheses**, not proven defects. This command does **not** replace SAST, DAST, profiling, dependency scanning, code review, integration testing, or formal verification. A clean critic report means "no obvious traps in the artifacts," not "the system is safe." Teams must still run real testing.
+
+Critic is **planning-time** assurance. It is not post-implementation code review, and it never reviews the work performed to resolve its own earlier findings (assurance-contract.md §3.2, §8).
 
 ## Operating Constraints
 
-The risk review itself is non-destructive. Do **not** edit `spec.md`, `plan.md`, `tasks.md`, or source files. The only file write allowed is refreshing the persisted gate artifact at `FEATURE_DIR/gates/critic.md` with the final report from this command.
+Non-destructive. Do **not** edit `spec.md`, `plan.md`, `tasks.md`, or source files. The only allowed write is refreshing the gate artifact at `FEATURE_DIR/gates/critic.md` — and on a work branch, not even that (assurance-contract.md §13).
 
-Read the YAML frontmatter in `spec.md` before evaluating risk. Treat `classification`, `risk_level`, and `required_gates` as authoritative metadata.
+Read YAML frontmatter from `spec.md` (or the quickfix record when `FEATURE_SPEC` resolves to `.devspark.work/quickfixes/<branch>.md`). Treat `classification`, `risk_level`, `risk_profile`, `change_type`, `archetype`, and `required_gates` as authoritative when present. On a work branch none of this applies: a `spec.md` in its directory is incidental, and the stated concern alone sets the scope (assurance-contract.md §13).
 
-**Critical Mindset**: Assume the team has **limited experience** with the proposed stack, **optimistic estimates**, and **incomplete understanding** of edge cases. Your job is to identify where the plan will fail in production.
+**Mindset**: Default — assume **limited team experience** with the stack, **optimistic estimates**, and **incomplete edge-case understanding**. If `/.knowledge/governance/constitution.md` declares `**Team Experience**: expert` in its Governance section, calibrate instead to: assume deep stack familiarity — de-emphasize beginner-trap findings (basic setup mistakes, well-known footguns already covered by linting/tests) and weight findings toward the sophisticated, cross-cutting risks a seasoned team is more likely to miss (subtle race conditions, cross-service contract drift, adversarial edge cases). `mixed` blends both: neither suppress nor over-index on beginner traps. Absence of the field, or any other value, means the default pessimistic mindset applies unchanged.
 
-**Constitution Authority**: The project constitution (`/.documentation/memory/constitution.md`) is **non-negotiable**. Constitution violations are automatically SHOWSTOPPER severity.
+**Constitution Authority**: `/.knowledge/governance/constitution.md` is **non-negotiable**. Constitution violations are automatically SHOWSTOPPER.
 
 ## Outline
 
-**Multi-app support**: If this repository uses multi-app mode (`.documentation/devspark.json` exists with `mode: "multi-app"`), check for `--app <id>` in the user input to scope this workflow to a specific application. When app context is provided, resolve artifacts from `{app.path}/.documentation/` instead of the repository root `.documentation/`. Print the resolved scope (app name, doc root) at the start of output.
+Multi-app scope and script resolution are defined by the shared preamble contract.
 
 ### 1. Initialize Analysis Context
 
-> **Script Resolution**: Before running `.devspark/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
+**Planning Review hand-off.** When invoked by `/devspark-planning-review`, the invocation carries an already-resolved `FEATURE_DIR`, a `DEVSPARK_FEATURE` value, and a `PLANNING_REVIEW_RUN_ID`. Use them: do not re-resolve the feature from the branch name, run any script with `DEVSPARK_FEATURE` set to the handed-off value, and stamp the run id into the gate header as `planning_review.run_id`. Run the script below only when no hand-off was given.
 
-Run `.devspark/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks` once from repo root and parse JSON for FEATURE_DIR and AVAILABLE_DOCS. Derive absolute paths:
+Run `{SCRIPT}` once from repo root, parse JSON for FEATURE_DIR and AVAILABLE_DOCS. Derive:
 
 - SPEC = FEATURE_DIR/spec.md
-- PLAN = FEATURE_DIR/plan.md
-- TASKS = FEATURE_DIR/tasks.md
-- CONSTITUTION = /.documentation/memory/constitution.md
+- PLAN = FEATURE_DIR/plan.md (optional)
+- TASKS = FEATURE_DIR/tasks.md (optional)
+- CONSTITUTION = /.knowledge/governance/constitution.md
 
-Abort with an error message if any required file is missing (instruct the user to run the appropriate prerequisite command).
+**Tiered artifact requirements** — do NOT abort on missing plan/tasks; degrade gracefully:
 
-For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+| Artifacts present   | Critique scope                                                                   | Degradation label |
+| ------------------- | -------------------------------------------------------------------------------- | ----------------- |
+| quickfix record only (no `spec.md` for this branch) | Record-level: WHAT/WHY/HOW soundness, Affected Components blast radius, rollback risk, unresolved `## Gate Acknowledgements` | `QUICKFIX-ONLY`    |
+| spec only           | Spec-level: rationale, requirement completeness, scope hazards, trust boundaries | `SPEC-ONLY`       |
+| spec + plan         | Above + architecture, stack, data model, deployment risks                        | `SPEC+PLAN`       |
+| spec + plan + tasks | Full critique including task sequencing & operational gaps                       | `FULL`            |
+| work branch (`NNN-work-*`, whatever its directory holds) | One stated concern challenged against the current code, tests, declared contracts, `.knowledge/` and the constitution | `WORK`            |
 
-### 2. Detect Technology Stack
+Abort only if `spec.md` is missing AND no quickfix record exists for this branch under `.devspark.work/quickfixes/` AND the branch is not a `NNN-work-*` branch (FEATURE_SPEC resolves there automatically — see the shared preamble's script resolution). Print the degradation label in the Executive Summary so partial reviews aren't mistaken for full ones.
 
-Before applying risk heuristics, extract the technology stack from plan.md:
+**Work branch (`WORK`).** Follow assurance-contract.md §13. Ask for the concern if the developer did not state one; with no concern there is nothing to critique. Challenge only that concern, with inspected evidence (§3.1) from the real system — the change under way, its consumers, contracts and failure modes — and use the optional `work.md` and `plan.md` as stated intent. Report the §13 result block instead of the full report. Write no gate artifact (skip §11) and return to `/devspark-implement`. Never run `/devspark-analyze` or Planning Review as a follow-on; recommend one only when the outcome shows that concern needs it.
 
-- **Language**: Python, TypeScript, Go, Rust, Java, C#, etc.
-- **Framework**: FastAPI, Django, Express, Next.js, Spring Boot, ASP.NET, etc.
-- **Database**: PostgreSQL, MySQL, MongoDB, Redis, etc.
-- **Infrastructure**: Docker, Kubernetes, AWS, Azure, GCP, etc.
-- **Async Model**: Sync-only, async/await, event-driven, etc.
+For single quotes in args (e.g. "I'm Groot"), use `'I'\''m Groot'` or double-quote.
 
-This informs which framework-specific risks to prioritize.
+### 2. Determine Applicability
 
-### 3. Load Artifacts with Risk Lens
+Critic applies on the basis of **observable change shape**, per assurance-contract.md §11. Authored `risk_level` is NOT the run/skip switch — it may modulate depth once applicability is established, and nothing else.
 
-Extract failure-prone elements from each artifact:
+Read the spec/plan/tasks and the touched surface, then test for these five shapes:
 
-**From spec.md:**
+| Signal | Applies when the change… |
+| ------ | ------------------------ |
+| `persistent-data-shape` | changes the shape, meaning, or controlled vocabulary of persisted data |
+| `cross-boundary-interaction` | adds or alters interaction with an external service or another subsystem |
+| `state-lifecycle` | changes state-machine transitions, lifecycle stages, or terminal-path behavior |
+| `nondeterministic-behavior` | depends on model, heuristic, or other nondeterministic output |
+| `new-entry-point` | introduces a new publicly reachable entry point or write path |
 
-- Performance/scale requirements (look for unrealistic targets)
-- Security requirements (look for vague or incomplete coverage)
-- Third-party integrations (look for vendor lock-in, API limits)
-- Edge cases (look for missing critical scenarios)
-- Data consistency requirements (look for distributed system naivety)
+At least one signal → `applicable: true`. None → `applicable: false`; typical negative controls are a pure symbol rename, a local mechanical refactor with no behavioral surface, a documentation-only change, or formatting.
 
-**From plan.md:**
+`applicable: false` does **not** mean Critic refuses to run. When the developer invoked `/devspark-critic` explicitly, record `invoked: explicit`, state in one line that no change-shape signal was detected, and continue with a correspondingly narrow review rather than a full adversarial sweep.
 
-- Technology stack (look for bleeding-edge/unproven choices)
-- Architecture patterns (look for over-engineering or under-engineering)
-- Data models (look for normalization issues, missing indexes, scale bottlenecks)
-- Deployment strategy (look for missing observability, rollback plans)
-- Testing strategy (look for inadequate coverage of failure modes)
+Record the decision in the gate header exactly as assurance-contract.md §11.3 specifies — `applicable`, `signals`, `invoked`, and `reason` when not applicable. One line of reason; applicability is a routing decision, not another risk essay.
 
-**From tasks.md:**
+### 3. Detect Repository Archetype
 
-- Task sequencing (look for missing dependencies, circular deps)
-- Effort estimates (look for optimistic scheduling)
-- Parallelization assumptions (look for hidden bottlenecks)
-- Missing operational tasks (monitoring, alerting, backups, disaster recovery)
+Determine the repo archetype (drives which risk categories apply). Read in priority order:
 
-### 4. Risk Detection Framework
+1. `archetype` field in spec.md frontmatter (if present)
+2. `archetype` or `platforms` declared in constitution
+3. File-system signals (heuristics below)
 
-Analyze across these critical dimensions, applying stack-specific knowledge:
+Archetype values:
+`web-service | library | cli | mobile-app | desktop-app | data-pipeline | ml-training | llm-application | infrastructure | embedded | browser-extension | game | monorepo | documentation-site`
 
-#### A. Architectural Risks
+Infer from the repository's manifests, frameworks and layout when neither declares it (for example a Dockerfile plus a web framework or OpenAPI file is `web-service`; `[project.scripts]` or a `bin` entry is `cli`; prompt directories or LLM SDK imports are `llm-application`; Terraform/Bicep without app code is `infrastructure`).
 
-**ASYNC/CONCURRENCY RISKS** (Python async, Node.js, Go goroutines, etc.):
+Print the detected archetype in the report header. If undetectable, default to `web-service` and record the inference in the header. Per assurance-contract.md §6.1, a missing or ambiguous archetype is **resolved and reported, never emitted as a finding**. If the ambiguity genuinely prevents meaningful review, say so in the Executive Summary and narrow the declared scope — that is a scope statement, not a defect.
 
-- Blocking I/O in async contexts (wrong driver, sync calls in async functions)
-- Connection pool exhaustion
-- Missing timeout configuration
-- Race conditions and deadlocks
-- Improper resource cleanup
+### 4. Detect Technology Stack
 
-**SCALE NAIVETY:**
+From plan.md (or repo manifests if plan absent): Language, Framework, Storage, Infra/Runtime, Concurrency model. Used to load matching checklists in §8.
 
-- N+1 query patterns in ORM usage
-- Missing pagination on list endpoints (or offset pagination at scale)
-- No caching strategy for hot paths
-- Database schema without proper indexes
-- Single-instance deployment without scaling strategy
-- Large file operations without streaming
+### 5. Detect Context Mode & Risk Profile
 
-**DISTRIBUTED SYSTEM BLINDNESS:**
+**Context mode** (drives emphasis): `greenfield | brownfield | migration | hotfix`
 
-- Missing handling of network partitions
-- No strategy for eventual consistency
-- Assuming atomic cross-service operations
-- Missing circuit breakers or retry logic
-- No plan for handling stale data
-- Missing distributed tracing
+Read `change_type` from spec.md frontmatter. If missing, infer from file deltas (mostly-new = greenfield; modified existing = brownfield; "migrate"/"port"/"cutover" language = migration; tiny scope + bug ID = hotfix) and record the inference in the header — never as a finding.
 
-**DEPENDENCY RISKS:**
+| Mode       | Emphasis                                                                    |
+| ---------- | --------------------------------------------------------------------------- |
+| greenfield | Full adversarial baseline                                                   |
+| brownfield | Regression risk, backward compat, blast radius, rollback ease               |
+| migration  | Dual-write hazards, cutover, data parity, idempotent replay                 |
+| hotfix     | Minimum-viable scrutiny: "fix without making it worse"; preserve invariants |
 
-- Expensive operations without caching
-- Circular dependencies
-- Missing proper dependency injection for testability
-- Hard-coded configuration values
+**Risk profile** (drives severity scaling): `experimental | internal | customer-facing | revenue-critical | safety-critical | regulated`
 
-#### F. Rationale & Traceability Risks
+Read `risk_profile` from spec.md frontmatter; fall back to constitution; default to `internal` and record the inference in the header — never as a finding (assurance-contract.md §6.1).
 
-**RATIONALE COMPLETENESS:**
+`risk_level` and `risk_profile` scale severity only. Neither decides whether Critic runs; that is §2.
 
-- Missing or incomplete Rationale Summary in spec.md → HIGH
-- Missing or incomplete Rationale Summary in plan.md → HIGH
-- Missing or incomplete Rationale Summary in tasks.md → HIGH
-- Rationale drift between spec and plan (Core Problem mismatch) → CRITICAL
-- Tradeoffs not documented for major architecture decisions → HIGH
+**Severity scaling rule** (deterministic). Each finding has a *base severity* from the category registry. Apply this shift to derive *effective severity*:
 
-#### B. Security & Compliance Risks
+| Profile          | Shift                                                                  |
+| ---------------- | ---------------------------------------------------------------------- |
+| experimental     | −1 (CRITICAL → HIGH; HIGH → MEDIUM; floor at LOW)                      |
+| internal         | 0                                                                      |
+| customer-facing  | 0                                                                      |
+| revenue-critical | +1 (HIGH → CRITICAL; CRITICAL → SHOWSTOPPER)                           |
+| safety-critical  | +1 AND treated as constitution violation → SHOWSTOPPER floor           |
+| regulated        | +1 for any finding touching data handling, audit, retention, or access |
 
-**AUTHENTICATION/AUTHORIZATION:**
+If `risk_profile` is missing, default to `internal` and mark it `inferred` in the report header. Never emit a finding for the missing field.
 
-- Missing or incomplete auth middleware
-- No API key/token validation on protected endpoints
-- Overly permissive CORS configuration
-- Missing rate limiting on auth endpoints
-- Secrets hardcoded or in environment without vault
+Print mode and profile in the report header, each marked `declared` or `inferred`.
 
-**INPUT VALIDATION:**
+### 6. Load Artifacts with Risk Lens
 
-- Unvalidated path parameters
-- Missing input sanitization
-- No request size limits
-- SQL injection vectors
-- XSS vulnerabilities
+Extract failure-prone elements (skip sections whose artifact is absent):
 
-**REGULATORY BLINDNESS:**
+**spec.md**: unrealistic perf/scale targets; vague security requirements; third-party lock-in / API limits; missing edge cases; data-consistency naivety; undefined trust boundaries.
 
-- No mention of GDPR/data residency if handling user data
-- Missing data retention policies
-- No backup/restore procedures
-- Inadequate PII handling strategy
-- Missing audit logging for sensitive operations
+**plan.md**: bleeding-edge stack choices; over/under-engineering; persistent-storage access patterns without performance analysis; safe-release strategy gaps; testing strategy gaps.
 
-#### C. Operational Hazards
+**tasks.md**: hidden contention in parallel tasks; optimistic estimates; missing operational tasks (monitoring, alerting, backups, DR, runbooks). Task *sequencing and dependency validity* belongs to `/devspark-analyze` — route it, do not emit it.
 
-**OBSERVABILITY GAPS:**
+**Current knowledge and tests**: identify affected `.knowledge/` nodes through `appliesTo` and verify
+the plan includes changes to current truth and proportionate executable coverage. Treat omitted
+knowledge updates for changed behavior as HIGH and omitted tests according to runtime risk. Never
+create feature, requirement, task, decision, or rationale nodes from planning artifacts.
 
-- No structured logging strategy
-- Missing metrics/monitoring configuration
-- No alerting thresholds defined
-- Inadequate error tracking plan
-- Missing health check endpoints
-- No distributed tracing
+When `qa-acceptance.md` exists, challenge it as open-world evidence: a scenario that depends on internals rather than observable behavior, duplication of an existing durable test without justification, an append-only regression disposition where `update` or `retire` fits, coverage disproportionate to the risk, and evidence that would not actually prove the requirement it traces to. Trace validity is Analyze's lane; do not emit it here.
 
-**DEPLOYMENT RISKS:**
+#### 6a. Baseline Evidence Pass (required before any claim about existing behavior)
 
-- Zero-downtime deployment not addressed
-- Missing database migration strategy
-- No rollback procedure
-- Inadequate staging/production parity
-- Missing feature flags for risky changes
-- No graceful shutdown handling
+Per assurance-contract.md §3.1, Critic MUST inspect the relevant existing code, tests, and `.knowledge/` before asserting anything about current system behavior. For each requirement that depends on the baseline behaving a particular way, locate the code that establishes that behavior and ask:
 
-**TESTING GAPS:**
+- Can the condition this requirement depends on **actually occur** in the current system, or does some existing path always prevent it?
+- Is behavior being removed as "redundant" in fact the **sole** path that satisfies a requirement, guard, or safety case?
+- Do existing consumers depend on the shape, timing, or vocabulary this change alters?
+- Does the proposed design assume an interface, field, or guarantee that current source does not provide?
 
-- Missing integration test strategy
-- No database fixtures for tests
-- Missing API contract testing
-- No load/performance testing
-- Missing test coverage requirements
+State findings as a contradiction between a plan statement and an inspected source fact, citing the file and symbol:
 
-#### D. Implementation Traps
+```text
+Plan states:      <X> will be absent at this point.
+Baseline proves:  <path:symbol> always populates <X>.
+Therefore:        the condition the requirement depends on cannot occur.
+```
 
-**OPTIMISTIC ESTIMATES:**
+A claim about the baseline with no cited evidence MUST NOT be emitted as a finding. If the baseline cannot be inspected, record it as a verification obligation (§9a) instead.
 
-- Integration tasks without buffer for API issues
-- No time for debugging race conditions
-- Missing tasks for performance optimization
-- Inadequate testing time allocation
+This pass reads the **baseline being modified**, never the implementation being written. If implementation of this route has materially begun, do not trace it — route observations about the new delta to `/devspark-verify` or `/devspark-pr-review` (assurance-contract.md §3.2).
 
-**MISSING DEPENDENCIES:**
+The Plan's `expected_change_surface`, when present, is optional orientation for where to look first. It does not limit what you examine: a risk outside the listed paths is still yours to find.
 
-- Tasks referencing undefined data models
-- Parallel tasks with hidden shared resources
-- No infrastructure provisioning tasks
-- Missing CI/CD pipeline setup
+**Context Resolution sufficiency** (judgment-based, not a hard stop — `/devspark-analyze` already
+confirmed every entry *resolves*; this asks whether the resolved set is *complete*): does
+`plan.md`'s `## Context Resolution` list look like it's missing something the delta obviously
+touches — an entity or flat Knowledge document referenced in spec.md's requirements or data-model.md
+with no corresponding `context_resolved` entry, a `governance/decisions/` doc whose `constrains` list
+names an entity this delta changes but that decision was never resolved, or a relation one hop away
+from a resolved item that looks directly relevant. Judge the set on what it covers, never on which
+kinds it contains — a set made entirely of flat documents can be perfectly sufficient.
 
-**TECHNICAL DEBT SEEDS:**
+Emit a sufficiency finding only when the omission is **demonstrably material**: name the specific
+missing item, and state the design consequence of having planned without it. "The list looks short",
+"consider adding more context", or an omission with no stated consequence are not findings. When
+useful, re-run Context Projection (`/devspark-context-projection --seed <id>`) against the same seeds
+`/devspark-plan` used, purely as a diagnostic cross-check — its candidate list is a hint for this
+judgment call, not a second authoritative source; an omitted candidate is never an automatic finding.
+An empty section on a delta that clearly touches existing knowledge is itself a finding (severity per
+§9). This is the natural place to ask "what did design time miss" — escalation past one hop during
+`/devspark-implement` on this same feature is a signal this check should have caught the gap here.
 
-- "Quick and dirty" approaches without refactor tasks
-- Hardcoded values without configuration management
-- Missing documentation tasks
-- No code review or quality gate tasks
+### 7. Risk Category Registry (archetype-gated)
 
-#### E. Business Continuity Risks
+Apply only categories whose `archetypes` set includes the detected archetype (or `*`). Each category has a *base severity ceiling*; the §5 profile shift adjusts findings up or down.
 
-**DATA LOSS SCENARIOS:**
+| Category                    | Archetypes                                                               | Base ceiling |
+| --------------------------- | ------------------------------------------------------------------------ | ------------ |
+| `dependency_supply_chain`   | \*                                                                       | CRITICAL     |
+| `testing_strategy`          | \*                                                                       | CRITICAL     |
+| `secrets_handling`          | \*                                                                       | SHOWSTOPPER  |
+| `trust_boundaries`          | \*                                                                       | SHOWSTOPPER  |
+| `error_handling_resilience` | \*                                                                       | CRITICAL     |
+| `concurrency_async`         | web-service, cli, desktop-app, mobile-app, data-pipeline, game, embedded | CRITICAL     |
+| `scale_bottlenecks`         | web-service, data-pipeline, ml-training, llm-application                 | CRITICAL     |
+| `auth_authz`                | web-service, mobile-app, desktop-app, browser-extension, infrastructure  | SHOWSTOPPER  |
+| `input_validation`          | web-service, cli, mobile-app, desktop-app, browser-extension             | SHOWSTOPPER  |
+| `observability`             | web-service, data-pipeline, infrastructure, mobile-app, llm-application  | CRITICAL     |
+| `deployment_rollback`       | web-service, mobile-app, desktop-app, infrastructure, browser-extension  | CRITICAL     |
+| `data_loss_continuity`      | web-service, data-pipeline, infrastructure, mobile-app, desktop-app      | SHOWSTOPPER  |
+| `regulatory_privacy`        | web-service, mobile-app, data-pipeline, llm-application                  | SHOWSTOPPER  |
+| `llm_eval_guardrails`       | llm-application                                                           | SHOWSTOPPER  |
+| `llm_prompt_integrity`      | llm-application                                                           | SHOWSTOPPER  |
+| `api_compatibility`         | library, cli                                                             | CRITICAL     |
+| `cli_ergonomics`            | cli                                                                      | HIGH         |
+| `mobile_platform`           | mobile-app                                                               | CRITICAL     |
+| `pipeline_semantics`        | data-pipeline                                                            | SHOWSTOPPER  |
+| `ml_reproducibility`        | ml-training                                                              | CRITICAL     |
+| `iac_blast_radius`          | infrastructure                                                           | SHOWSTOPPER  |
+| `embedded_safety`           | embedded                                                                 | SHOWSTOPPER  |
+| `binary_size_perf`          | mobile-app, embedded, browser-extension, game                            | HIGH         |
+| `offline_sync`              | mobile-app, desktop-app                                                  | CRITICAL     |
+| `monorepo_coupling`         | monorepo                                                                 | HIGH         |
 
-- No backup strategy
-- Missing validation before destructive operations
-- Inadequate testing of restore procedures
-- No transaction management in complex operations
-- Missing soft delete strategy
+**Category cue sheets** (capability-level, stack-agnostic):
 
-**AVAILABILITY RISKS:**
+- `dependency_supply_chain`: unpinned versions; transitive vulns unmonitored; abandoned packages; license incompatibility; build reproducibility.
+- `testing_strategy`: no failure-mode tests; missing fixtures; no contract tests at boundaries; no load/perf tests where scale matters.
+- `secrets_handling`: hardcoded secrets; secrets in env without vault/KMS; no rotation; secrets in logs.
+- `trust_boundaries`: enforcement on privileged operations missing or implicit; ambient authority; missing tenant isolation.
+- `error_handling_resilience`: swallowed errors; non-idempotent retries; missing timeouts/backoff; no circuit-breaker equivalent where appropriate.
+- `concurrency_async`: blocking I/O on async runtimes; pool exhaustion; race conditions; deadlocks; task/thread/goroutine leaks; resource cleanup paths.
+- `scale_bottlenecks`: unbounded result sets (endpoints, queries, iterators, streams); N+1 access patterns; no caching on hot paths; persistent-storage access patterns without index/partition analysis; no horizontal-scaling path.
+- `auth_authz`: trust boundary enforcement on privileged operations; rate limiting on auth surfaces; session/credential lifecycle.
+- `input_validation`: untrusted input crossing trust boundaries unvalidated; injection vectors (SQL, command, template, deserialization); size/shape limits.
+- `observability`: no structured logs/metrics/traces; no liveness/readiness signal appropriate to the runtime; no alert thresholds; no error tracking.
+- `deployment_rollback`: no safe-release strategy for this artifact type; no migration plan; no rollback procedure; no staging/prod parity; no graceful shutdown. This concern stays CRITICAL and pre-merge: a `stage: post-deploy` deferral never waives a missing rollback or migration plan, and the plan itself must exist before merge.
+- `data_loss_continuity`: no backup/restore; destructive ops without confirmation; missing transactional boundaries; no DR plan.
+- `regulatory_privacy`: PII handling unspecified; retention/residency unaddressed; missing audit logging.
+- `api_compatibility`: undocumented public surface; missing semver discipline; no deprecation policy; breaking-change detection absent in CI.
+- `cli_ergonomics`: undefined exit codes; ignored signals (SIGINT/SIGTERM/SIGPIPE); stdout/stderr/stdin discipline; non-portable paths/encoding; no `--help`/`--version` contract.
+- `mobile_platform`: battery / background-execution limits; store-policy compliance; OS-version fragmentation; permissions model; deep-link/intent handling.
+- `pipeline_semantics`: idempotency; exactly-once vs at-least-once semantics; backfill strategy; schema evolution; late/out-of-order data; watermark policy.
+- `ml_reproducibility`: seeds; env/data pinning; train/serve skew; data leakage; eval contamination; model/artifact versioning.
+- `llm_eval_guardrails`: no eval-suite or holdout coverage for prompt/model changes; no judge/referee calibration; no pass/fail threshold defined for behavior-changing updates.
+- `llm_prompt_integrity`: prompt-injection surfaces unmitigated; PHI/PII handling in prompts undefined; output-validator/guardrail absent; model/deployment blast radius unbounded; no cost-per-call regression watch.
+- `iac_blast_radius`: drift detection; state file locking & backups; secret rotation; cost runaway; change scope review; destroy guards.
+- `embedded_safety`: memory bounds; watchdog; OTA safety & rollback; power-loss recovery; real-time deadlines; flash wear.
+- `binary_size_perf`: artifact size budgets; cold-start; startup memory; asset compression.
+- `offline_sync`: conflict resolution; offline queue durability; clock skew; partial-sync recovery.
+- `monorepo_coupling`: cross-package import violations; version skew; CI graph correctness; release coordination.
 
-- Single point of failure in architecture
-- No rate limiting strategy
-- Missing DDoS mitigation considerations
-- Inadequate capacity planning
-- No horizontal scaling strategy
+**Universal failure-mode lens** (apply if no specific cue fires):
 
-### 5. Framework-Specific Risk Checklists
+`resource_leaks | error_swallowing | race_conditions | unbounded_growth | missing_timeouts | missing_input_validation | trust_boundary_violations | non_idempotent_retries | silent_data_corruption`
 
-Start the output with a gate result block:
+### 8. Load Stack/Archetype Checklists (Externalized)
+
+Load all matching checklists from disk. Resolve each from `/.devspark/templates/risk-checklists/`
+(installed repos) or `templates/risk-checklists/` (source repos), with
+`.devspark.work/risk-checklists/` taking precedence over both when a team overrides a file of the
+same name. Installed repos keep framework templates under `.devspark/templates/` — there is no
+`risk-checklists/` directory at the `.devspark/` root, and anything found there is a legacy leftover:
+
+- `{stack}.md` (e.g., `python-fastapi.md`, `node-express.md`, `go-gin.md`, `java-spring.md`, `dotnet-aspnet.md`)
+- `{archetype}.md` (e.g., `library.md`, `cli.md`, `data-pipeline.md`, `llm-application.md`)
+
+If none exist at any of those paths, derive risks from first principles using the universal
+failure-mode lens above. Note in the report output: *"No stack/archetype checklists found — consider
+seeding from prior critic runs."* Stock seeds ship with DevSpark; teams override by placing
+files of the same name in `.devspark.work/risk-checklists/`.
+
+Every named tool in a checklist must be paired with the underlying capability so the model can translate across ecosystems. Pattern:
+
+> "[Capability needed] — e.g., [Tool A in stack X], [Tool B in stack Y], [Tool C in stack Z]"
+
+Example: "Long-running work without a durable queue with retry semantics (e.g., Celery, RQ, Sidekiq, BullMQ, Hangfire)."
+
+### 9. Severity Classification (base, before §5 shift)
+
+- **SHOWSTOPPER**: production outage, data loss, security breach, safety incident, or constitution violation.
+- **CRITICAL**: major user-facing issue or costly rework (no rollback, no observability, unbounded growth, broken backward compat for a published library).
+- **HIGH**: technical debt or operational burden (missing structured logging, hardcoded configs, missing type checks).
+- **MEDIUM**: development friction or minor issues.
+
+Both base and effective severity must appear in each finding.
+
+**Behavioral-intent phrasing (command-preamble-contract.md §9.1)**: when a finding cites a structural smell, complexity/length metric, or lint rule, phrase its `description` and `recommended_action` around the behavioral intent the metric is a proxy for — not the bare number — and populate the finding's `intent_cue`. A finding written as "cyclomatic complexity 11 > 5" invites a gamed fix (branches shuffled into helpers, count lowered, behavior unchanged); the same finding written as "this handler does more than one thing — extract the <X> responsibility" drives a genuine one. A published eval measured genuine-fix rates of ~5.6% for bare-metric phrasing vs. ~83% when intent was stated first.
+
+### 9a. Consolidate, Qualify, and Bound
+
+Run this pass over the candidate findings **before** writing the report. It is what separates a short list of material defects from a long list of plausible observations.
+
+**Deduplicate across capabilities** (assurance-contract.md §5.1). Discard any candidate whose substantive concern is already explicitly recognized and appropriately handled by `spec.md`, `plan.md`, `tasks.md`, or an open `/devspark-analyze` finding. Reference it in narrative if useful; never mint a second id to restate it.
+
+**Deduplicate within Critic** (assurance-contract.md §5.2). One root concern yields **one** finding. Do not serialize a root cause into a chain of consequences:
+
+```text
+WRONG   risk → telemetry consequence → fallback consequence → task consequence   (4 ids)
+RIGHT   one finding: root cause, impact, evidence, required decision             (1 id)
+```
+
+Split only when consequences require **independent decisions** by different owners, and then record the shared `root_cause:` on each.
+
+**Apply the quality bar** (assurance-contract.md §6). Every remaining finding must answer: what is wrong; why it is material to *this* change; what evidence supports it; why Critic owns it; and what decision, mitigation, or proof resolves it. If all five cannot be answered, do not emit it. Generic advice — "consider scalability", "ensure observability", "think about security" — fails by construction.
+
+**Least-complex mitigation first** (Minimum Sufficient Change, command-preamble-contract.md §13).
+
+> **A Critic finding identifies a risk. It does not prescribe architecture.**
+>
+> **Critic should prefer the least-complex mitigation capable of preserving the requirement or invariant.**
+
+For every actionable finding, reason in this order before suggesting anything new: **Risk** → **least-complex viable mitigation** → **why it is or is not sufficient** → **additional machinery, only if the lighter option cannot preserve the requirement or invariant**. Prefer, lightest first: accept a bounded limitation; an operational procedure or human review; delete or simplify the behavior; reuse an existing capability; deterministic validation or a test; and only then new machinery (state, configuration, persistence, cache, endpoint, background process). Record the lightest viable option in `least_complex_mitigation` and its kind in `mitigation_kind`. Never say "risk, therefore add a mechanism". Correctness, security, safety, data integrity, and explicit contracts are not optional simplifications. Critic still does not decide scope: Judge does.
+
+**Route what is not Critic's** (assurance-contract.md §4.2). Move any candidate in another capability's lane into `routed_findings:`. It does not count as a Critic finding and never affects the verdict.
+
+**Convert uncertainty into proof, not into defects** (assurance-contract.md §7). When something cannot be known until execution, do not escalate it into a pseudo-defect. Record it as a verification obligation so `/devspark-verify` can settle it:
 
 ```yaml
+verification_obligations:
+  - assumption: <what is being assumed>
+    why_material: <what breaks if it is false>
+    proposed_proof: <the verify mode or test that would settle it>
+```
+
+**Respect the pass boundary** (assurance-contract.md §8). If `FEATURE_DIR/gates/critic.md` already exists for this route, this run is a **recheck**: confirm the disposition of the previous findings. Do not open a new open-ended discovery pass, and do not review the work performed to resolve the earlier findings. A new observation noticed during a recheck is classified under `closeout-contract.md` §4 and expands the route only if it hits one of the five expansion triggers in `closeout-contract.md` §2.
+
+**Measure the run by material unique findings**, not by how much could plausibly be mentioned.
+
+### 10. Produce Risk Assessment Report
+
+Output Markdown with this structure (omit empty sections — do not emit empty headers):
+
+````markdown
+```yaml
 gate: critic
+devspark_version: "<installed version, or `unknown`>"
+generated: "<ISO-8601 timestamp of this run>"
+planning_review:
+  run_id: "<PLANNING_REVIEW_RUN_ID from the hand-off; omit this block when not invoked by /devspark-planning-review>"
 status: pass | warn | fail
 blocking: true | false
 severity: info | warning | error | showstopper
 summary: "<concise outcome>"
+reviewed_artifacts:
+  # One entry per artifact this review actually read (spec.md, plan.md, tasks.md, etc.).
+  # hash = `git hash-object <path>` (falls back to a sha256 of the file if git is unavailable).
+  # Downstream gate consumers (e.g. /devspark-implement) recompute this hash to detect drift
+  # since the review ran -- an open SHOWSTOPPER/CRITICAL against a changed artifact is STALE.
+  - path: spec.md
+    hash: "<git-hash-object-output>"
 ```
 
-Based on detected stack, apply relevant checklist:
-
-**Python + FastAPI/Django:**
-
-- [ ] Blocking I/O in async endpoints
-- [ ] Missing async database driver (psycopg2 vs asyncpg)
-- [ ] No Pydantic validation constraints
-- [ ] Missing lifespan events for resource management
-- [ ] BackgroundTasks for long operations (should use Celery)
-- [ ] Debug mode in production config
-- [ ] Missing mypy type checking in CI
-
-**Node.js + Express/Next.js:**
-
-- [ ] Unhandled promise rejections
-- [ ] Missing async error middleware
-- [ ] No connection pool management
-- [ ] Callback hell without proper structure
-- [ ] Missing TypeScript strict mode
-- [ ] No proper process management (PM2, cluster)
-
-**Go + Gin/Fiber:**
-
-- [ ] Goroutine leaks
-- [ ] Missing context cancellation
-- [ ] No connection pooling configuration
-- [ ] Improper error handling (silent failures)
-- [ ] Missing structured logging
-
-**Java + Spring Boot:**
-
-- [ ] Missing @Transactional boundaries
-- [ ] N+1 queries in JPA/Hibernate
-- [ ] No connection pool tuning (HikariCP)
-- [ ] Missing actuator endpoints for monitoring
-- [ ] Improper exception handling
-
-**General Web:**
-
-- [ ] Missing CORS configuration
-- [ ] No HTTPS enforcement
-- [ ] Missing security headers
-- [ ] No API versioning strategy
-- [ ] Missing request/response logging
-
-### 6. Severity Classification
-
-**SHOWSTOPPER**: Will cause production outage, data loss, or security breach
-
-- Examples: No authentication, blocking I/O causing event loop starvation, missing connection pooling, SQL injection vectors, constitution violations
-
-**CRITICAL**: Will cause major user-facing issues or costly rework
-
-- Examples: Missing pagination, no error handling strategy, missing health checks, inadequate monitoring, no migration strategy
-
-**HIGH**: Will cause technical debt or operational burden
-
-- Examples: Missing structured logging, hardcoded configs, no rollback plan, missing type checking, no pre-commit hooks
-
-**MEDIUM**: Will slow development or cause minor issues
-
-- Examples: Suboptimal query patterns, missing edge case handling, inconsistent code style
-
-### 7. Produce Risk Assessment Report
-
-Output Markdown report with this structure:
-
-```markdown
 ## Technical Risk Assessment
 
-**Analysis Date:** [timestamp]
-**Risk Posture:** [RED/YELLOW/GREEN based on showstopper count]
-**Detected Stack:** [Language] + [Framework] + [Database]
+**Analysis Date:** [ISO timestamp]
+**Scope:** [SPEC-ONLY | SPEC+PLAN | FULL]
+**Pass:** [DISCOVERY | RECHECK]
+**Applicable:** [true | false] — signals: [list, or "none"]; invoked: [automatic | explicit]
+**Detected Archetype:** [archetype] (declared | inferred)
+**Detected Stack:** [language] + [framework] + [storage]
+**Context Mode:** [greenfield | brownfield | migration | hotfix] (declared | inferred)
+**Risk Profile:** [experimental | internal | customer-facing | revenue-critical | safety-critical | regulated] (declared | inferred)
+**Risk Posture:** [RED | YELLOW | GREEN]
+
+Inferred values are reported here and never emitted as findings (assurance-contract.md §6.1).
 
 ### Executive Summary
-[2-3 sentence verdict on whether this should proceed to implementation]
 
-### Showstopper Risks (Must Fix Before Implementation)
+[2–3 sentences: verdict + degradation note if not FULL]
 
-| ID | Category | Location | Risk Description | Likely Impact | Mitigation Required |
-|----|----------|----------|------------------|---------------|---------------------|
+### Findings (source of truth)
 
-### Critical Risks (High Probability of Costly Issues)
+```yaml
+findings:
+  - finding_id: critic-001
+    owner: critic
+    category: <registry-category>
+    archetype_applicable: true
+    location: <spec.md#section | plan.md#L42 | tasks.md#T07>
+    description: <1–3 sentences>
+    evidence: <REQUIRED when this finding claims anything about current system behavior: the file and symbol inspected that establishes the claim, per assurance-contract.md §3.1. Empty string when the finding is purely about the proposed design.>
+    root_cause: <short stable label naming the shared cause when this finding shares one with another finding or with a remediation, e.g. "unbounded-bulk-change"; empty string when no causal relationship is supported by evidence. Do not fabricate causal certainty — an empty value is legal and Judge does not depend on it.>
+    intent_cue: <REQUIRED when this finding cites a structural smell, complexity/length metric, or lint rule: one sentence naming the behavioral intent the metric is a proxy for, per command-preamble-contract.md §9.1 (e.g. "this function should do one thing — what is it?"). Empty string otherwise.>
+    base_severity: showstopper | critical | high | medium | low
+    effective_severity: showstopper | critical | high | medium | low
+    classification: blocking-defect | accepted-limitation | deferred-work | learning
+    least_complex_mitigation: <the lightest viable mitigation that preserves the requirement or invariant, and why it is or is not sufficient; empty string only when the finding is purely informational>
+    mitigation_kind: accept | operational-procedure | delete | simplify | reuse | validation | new-machinery
+    recommended_action: <machine-actionable next step; names new machinery only when least_complex_mitigation explains why the lighter option is insufficient>
+    execution_mode: auto | selective | manual
+    status: open
+    outcome: ""
 
-| ID | Category | Location | Risk Description | Likely Impact | Recommended Action |
-|----|----------|----------|------------------|---------------|--------------------|
+# Observations belonging to another assurance capability (assurance-contract.md §4.2).
+# These are NOT Critic findings: they never affect the verdict and are addressed by
+# re-running the owning capability. Omit the block when empty.
+routed_findings:
+  - routed_id: critic-routed-001
+    owner: analyze | verify | pr-review
+    description: <what was noticed>
+    rationale: <why that lane owns it>
 
-### 8. Persist Gate Artifact
-
-After producing the report:
-
-- Ensure `FEATURE_DIR/gates/` exists
-- Save the report as `FEATURE_DIR/gates/critic.md`
-- Treat the YAML gate block as authoritative for downstream commands such as `/devspark.tasks`, `/devspark.implement`, `/devspark.create-pr`, and `/devspark.pr-review`
-- When rerun, replace the previous `critic.md` artifact instead of appending duplicate reports
-
-### High-Priority Concerns
-
-| ID | Category | Location | Issue | Impact | Suggestion |
-|----|----------|----------|-------|--------|------------|
-
-### Framework-Specific Red Flags
-
-[Checklist based on detected technology stack]
-
-### Architecture Red Flags
-
-- [ ] Over-engineered for stated requirements
-- [ ] Under-engineered for implied scale
-- [ ] Single point of failure without redundancy
-- [ ] Missing standard patterns for problem domain
-- [ ] Inadequate async/concurrency handling
-
-### Missing Critical Tasks
-
-- **Observability:** [list missing monitoring/logging/alerting tasks]
-- **Operations:** [list missing deployment/backup/DR tasks]
-- **Testing:** [list missing integration/load testing]
-- **Documentation:** [list missing runbooks/architecture docs]
-- **Security:** [list missing auth/validation/rate limiting]
-
-### Questionable Assumptions
-
-1. **[Assumption from spec/plan]** → Why this will fail: [specific failure mode]
-2. **[Another assumption]** → Why this will fail: [specific failure mode]
-
-### Dependencies Risk Assessment
-
-| Dependency | Concern | Alternative to Consider |
-|------------|---------|-------------------------|
-
-### Estimated Technical Debt at Launch
-
-- **Code Debt:** [areas requiring refactor post-launch]
-- **Operational Debt:** [missing automation, manual processes]
-- **Documentation Debt:** [undocumented systems]
-- **Testing Debt:** [missing test coverage areas]
-
-### Metrics
-
-- Showstopper Count: [N]
-- Critical Risk Count: [N]
-- Missing Operational Tasks: [N]
-- Underspecified Security Requirements: [N]
-- Scale Bottlenecks Identified: [N]
+# Assumptions that cannot be settled before execution (assurance-contract.md §7).
+# These are obligations for /devspark-verify, not defects. Omit the block when empty.
+verification_obligations:
+  - assumption: <what is being assumed>
+    why_material: <what breaks if it is false>
+    proposed_proof: <the verify mode or test that would settle it>
 ```
 
-### 8. Provide Verdict
+`classification` uses the canonical convergence vocabulary from `closeout-contract.md` §4. Severity and blocking are **separate dimensions**: a SHOWSTOPPER finding may be an Accepted Limitation and not block; a MEDIUM finding that violates a required invariant blocks.
 
-End report with:
+### Summary Tables
 
-**GO/NO-GO RECOMMENDATION:**
+The YAML above is the single source of truth. Add at most one compact table per non-empty effective severity (`showstopper`, `critical`, `high`) with columns `ID | Category | Location | Risk | Mitigation`, one row per `finding_id`, and a one-line count of findings, routed findings and verification obligations. Missing operational tasks (FULL scope only), questionable assumptions and risky dependencies are findings, not separate sections. Documentation drift is never a Critic finding; route it to `/devspark-analyze`.
 
-```text
-[ ] STOP - Showstoppers present, cannot proceed to implementation
-[ ] CONDITIONAL - Fix critical risks first, then reassess
-[ ] PROCEED WITH CAUTION - Document acknowledged risks, add mitigation tasks
-```
+**VERDICT:** STOP | CONDITIONAL | PROCEED
+
+The verdict is **derived**, never authored (assurance-contract.md §9):
+
+- **STOP** — at least one open finding is classified `blocking-defect`.
+- **CONDITIONAL** — no blocking defect, but at least one open finding needs a consequential human decision or authorization before implementation.
+- **PROCEED** — neither of the above.
+
+No other verdict word is permitted. `GO`, `PASS`, `MOSTLY READY`, and `PROCEED AFTER …` are contract
+violations. `PROCEED` alongside an open blocking defect, or `blocking: false` alongside required
+pre-implementation actions, is a self-contradiction — recompute before writing the gate artifact.
 
 **Required Actions Before Implementation:**
 
-1. [Specific fix for showstopper #1]
-2. [Specific fix for showstopper #2]
-...
+1. […]
 
 **Recommended Risk Mitigations:**
 
-- Add tasks for: [specific missing tasks]
-- Revise plan to address: [architectural concerns]
-- Clarify spec requirements for: [ambiguous areas]
+- […]
+````
+
+Every table row MUST correspond to a `finding_id` in the YAML `findings:` list — the YAML list is the single source of truth. Tables are projections, never additive. `routed_findings` and `verification_obligations` are never rendered as findings tables.
+
+### 11. Persist Gate Artifact
+
+Skip this step on a work branch (`WORK` scope): the §13 result is reported, not persisted.
+
+Before writing the report, compute `reviewed_artifacts`: for each artifact actually read in this review (typically `spec.md`, and `plan.md`/`tasks.md` when scope is SPEC+PLAN or FULL), run `git hash-object <path>` and record the `path`/`hash` pair. This is a mechanical step (a hash, not a judgment) -- do not skip it even when findings are empty.
+
+For each supported planning artifact, also call `scripts/judge.py semantic-hash --path <path>`
+(installed: `.devspark/scripts/judge.py`) and record an available `sem1:` value as the additive
+`semantic_hash` on that reviewed entry. Retain raw hashes for every inspected source/test/Knowledge
+input. Missing helper/interpreter support or an unavailable fingerprint omits this optional field;
+it never justifies invented metadata or a review failure. Stamp only the newly produced gate.
+
+These raw input hashes preserve what Critic inspected; implementation does not refresh them.
+Judge distinguishes planning freshness from execution evidence: a changed source/test file within
+the approved Plan surface, after unchanged planning semantics and a recorded `PROCEED`, is visible
+as an execution change and does not by itself require Critic to rerun. Verify and PR Review retain
+execution correctness and diff-acceptance responsibility. An out-of-surface or governance change
+continues through the existing applicable recheck.
+
+After producing the report:
+
+- Ensure `FEATURE_DIR/gates/` exists.
+- Save report as `FEATURE_DIR/gates/critic.md` (replace, do not append).
+- The gate YAML block is authoritative for downstream commands (`/devspark-tasks`, `/devspark-implement`, `/devspark-create-pr`, `/devspark-pr-review`, `/devspark-address-pr-review`).
+- `reviewed_artifacts` hashes are what let `/devspark-implement`'s gate pre-flight detect a stale review (artifact changed since this gate ran) instead of trusting a point-in-time verdict forever.
 
 ## Guidelines
 
 ### Adversarial Mindset
 
-- **Assume Murphy's Law**: If it can fail, it will fail
-- **Challenge optimism**: Estimates are always optimistic; dependencies always hide
-- **Real-world bias**: Prioritize issues you've seen cause production incidents
-- **No benefit of doubt**: Vague = wrong; missing = will bite you
+Assume it can fail and the estimates are optimistic. Vague means wrong and missing means it will bite. Prefer incidents seen in production, and be direct.
 
-### Focus Areas
+### Focus Areas (priority order, modulated by archetype)
 
-**Prioritize finding:**
+1. Constitution violations (always SHOWSTOPPER)
+2. Trust boundary / authz / secrets exposure
+3. Data loss & non-idempotent / silent corruption
+4. Concurrency / resource leaks / unbounded growth
+5. Missing observability appropriate to runtime
+6. Stack/archetype-specific traps from loaded checklists
+7. Missing operational tasks (FULL scope only)
 
-1. Security vulnerabilities (no auth, input validation, misconfiguration)
-2. Async/concurrency bugs (blocking I/O, race conditions, deadlocks)
-3. Scale bottlenecks (N+1 queries, missing pagination, no caching)
-4. Missing operational tasks (monitoring, health checks, graceful shutdown)
-5. Database risks (missing migrations, no indexes, improper drivers)
-6. Missing testing strategy (no integration tests, no async test support)
-7. Constitution violations (always SHOWSTOPPER)
-
-**Ignore:**
+### Ignore
 
 - Code style preferences (if linter configured)
-- Minor inconsistencies in documentation format
-- Theoretical edge cases with <1% probability
+- Documentation drift and documentation-format inconsistencies (route to `/devspark-analyze`)
+- **Low-probability AND low-impact** issues *(low-probability/high-impact events must still be surfaced)*
 - Micro-optimizations without proven bottlenecks
+- Any observation that would restate a concern the spec, plan, or tasks already handles
 
 ### Output Quality
 
-- **Be specific**: "Missing async database driver - using psycopg2 blocks event loop" not "database concerns"
-- **Cite locations**: Reference spec/plan/task sections or line numbers
-- **Quantify impact**: "N+1 query in GET /users causes 1000+ DB calls for 1000 users"
-- **Suggest fixes**: Don't just complain, propose concrete solutions
-  - Bad: "Authentication is incomplete"
-  - Good: "No JWT validation middleware - add auth dependency to protected routes"
+- **Be specific and quantify**: "Blocking sync DB driver on async runtime starves the event loop", "N+1 access → 1000+ round trips per 1000 items" — not "database concerns".
+- **Cite locations and baseline evidence**: the spec/plan/task section, and the file and symbol behind any claim about how the system behaves today.
+- **Suggest fixes**: concrete remediation, the least-complex mitigation first, new machinery only with a reason the lighter option fails.
+- **Translate across stacks**: pair every named tool with its capability.
+- **Challenge NFRs concretely**: name the target, the mechanism that makes it unreachable, and what would have to change.
 
-### Context Efficiency
+### Interaction Policy
 
-- **Minimal high-signal tokens**: Focus on actionable findings, not exhaustive documentation
-- **Progressive disclosure**: Load artifacts incrementally; don't dump all content into analysis
-- **Token-efficient output**: Limit findings table to 30 rows; summarize overflow
-- **Deterministic results**: Rerunning without changes should produce consistent IDs and counts
+Critic having run is not by itself a reason to interrupt the developer. Report and continue on `PROCEED` or already-classified non-blocking findings; ask exactly the one question an unresolved consequential judgment needs; stop on `STOP` or a blocker needing authority or a scope decision (assurance-contract.md §10).
 
-### Analysis Guidelines
+### Analysis Rules
 
-- **NEVER modify files** (this is read-only analysis)
-- **NEVER hallucinate missing sections** (if absent, report them accurately)
-- **Prioritize showstoppers** (these block implementation)
-- **Use examples over exhaustive rules** (cite specific instances, not generic patterns)
-- **Report zero issues gracefully** (emit success report with risk summary)
-- **Be brutally honest**: This is adversarial review - sugar-coating helps nobody
+- **NEVER modify files** other than the gate artifact.
+- **NEVER hallucinate missing sections**; report absence accurately.
+- Be specific and cite locations and baseline evidence; keep each table to ≤30 rows (summarize overflow in `findings_overflow`); the same inputs give the same `finding_id`s.
+- Prioritize showstoppers. Report zero issues gracefully with a positive summary.
 
-## Key Differences from /devspark.analyze
+The boundary with `/devspark-analyze` is defined in `assurance-contract.md` §2–§4: Analyze checks that the artifacts are internally sound (closed world), Critic challenges that sound plan against the real system (open world).
 
-This command produces a **"pre-mortem"** analysis - imagining the project has failed in production and explaining why.
+## Backward Compatibility
 
-| Aspect | /devspark.analyze | /devspark.critic |
-|--------|------------------|-----------------|
-| **Purpose** | Consistency checking | Risk identification |
-| **Mindset** | Neutral validator | Adversarial skeptic |
-| **Focus** | Alignment across artifacts | Production failure modes |
-| **Severity** | Quality issues | Business impact |
-| **Output** | Remediation suggestions | Go/No-Go recommendation |
-| **Constitution** | CRITICAL violations | SHOWSTOPPER violations |
+If spec.md lacks `archetype`, `risk_profile`, or `change_type` frontmatter, the command runs with sensible defaults (`web-service`, `internal`, `greenfield`), reports the inferred values in the gate header marked `inferred`, and never emits missing metadata as a finding (assurance-contract.md §6.1).
+
+The `findings:` list gains `owner`, `evidence`, `root_cause`, and `classification`; the optional `routed_findings:` and `verification_obligations:` blocks are additive and omitted when empty. Existing consumers that read `finding_id`, severity, `status`, and `outcome` are unaffected.
 
 ## Context
 
-$ARGUMENTS
+{ARGS}
 
-## Shared Review Resolution Contract Output
+## Shared Review Resolution Contract
 
-When emitting findings (review observations, issues, recommendations), structure each entry to include the shared resolution contract fields so downstream tools (/devspark.address-pr-review, telemetry, harvest) can act on them deterministically:
+Findings use the shared resolution contract so downstream tools (`/devspark-address-pr-review`, telemetry, release) can act deterministically.
 
-```yaml
-findings:
-  - finding_id: <stable-id-unique-within-this-command-output>   # e.g., analyze-001, clarify-002
-    severity: critical | high | medium | low
-    description: <1-3 sentence problem statement>
-    recommended_action: <machine-actionable next step>
-    execution_mode: auto | selective | manual
-    status: open                                                  # set to `resolved` after remediation
-    outcome: ""                                                  # populated post-resolution by address-pr-review
-```
-
-inding_id MUST be stable across re-runs when the underlying issue is unchanged. xecution_mode MUST be one of: `auto` (safe to apply automatically), `selective` (apply with reviewer approval), `manual` (requires human implementation). The `status` and `outcome` fields are written by `/devspark.address-pr-review` (FR-028).
+- `finding_id` MUST be stable across re-runs when the underlying issue is unchanged.
+- `execution_mode` MUST be one of: `auto` (safe to apply automatically), `selective` (apply with reviewer approval), `manual` (requires human implementation).
+- `status` and `outcome` are written by `/devspark-address-pr-review` (FR-028).

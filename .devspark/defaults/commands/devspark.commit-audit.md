@@ -1,12 +1,16 @@
 ---
+source: "DevSpark — © 2026 Make Bold Solutions. Source: https://dev.makeboldspark.com"
 description: Analyze git commit history patterns for contributor velocity, commit hygiene, DORA metrics, AI adoption level, and architecture maturity
 handoffs:
   - label: Run Site Audit
-    agent: devspark.site-audit
+    agent: devspark-site-audit
     prompt: Run a full codebase audit to complement commit history insights
-  - label: View Harvest Report
-    agent: devspark.harvest
-    prompt: Review completed specs and stale documentation before archiving
+  - label: Run Current-State Cleanup
+    agent: devspark-release
+    prompt: Review retained work products and current knowledge for cleanup
+scripts:
+  sh: .devspark/scripts/bash/commit-audit.sh $ARGUMENTS --json
+  ps: .devspark/scripts/powershell/commit-audit.ps1 $ARGUMENTS -Json
 ---
 
 ## User Input
@@ -48,9 +52,9 @@ Multiple scope flags may be combined: `--scope=velocity,hygiene`
 
 ### 1. Initialize Audit Context
 
-> **Script Resolution**: Before running `.devspark/scripts/powershell/commit-audit.ps1 $ARGUMENTS -Json`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
+Load and obey the shared preamble contract core at `/.devspark/templates/command-preamble-contract.md` (installed repos) or `templates/command-preamble-contract.md` (source repos) before step 1 — it covers the 2-tier override check for scripts.
 
-Run `.devspark/scripts/powershell/commit-audit.ps1 $ARGUMENTS -Json` and parse its JSON output.
+Run `{SCRIPT}` and parse its JSON output.
 
 Expected fields include:
 
@@ -187,7 +191,7 @@ Summarize findings as a brief paragraph and flag any concerning patterns (e.g., 
 
 ### 8. Generate Commit Audit Report
 
-Write a report to the script-provided `report_path` (or `/.documentation/copilot/commit-audit-YYYY-MM-DD.md` if not provided).
+Write a report to the script-provided `report_path` (or `/.devspark.work/audit/commit-audit-YYYY-MM-DD.md` if not provided).
 
 #### Report Structure
 
@@ -200,7 +204,7 @@ Write a report to the script-provided `report_path` (or `/.documentation/copilot
 - **Branch**: [BRANCH_NAME]
 - **Date Range**: [FIRST_COMMIT_DATE] to [LAST_COMMIT_DATE]
 - **Total Commits Analyzed**: [N]
-- **Auditor**: devspark.commit-audit
+- **Auditor**: devspark-commit-audit
 
 ## Executive Summary
 
@@ -259,7 +263,7 @@ Display a concise summary:
 ```text
 ✅ Commit Audit Complete!
 
-📄 Report saved: /.documentation/copilot/commit-audit-{DATE}.md
+📄 Report saved: /.devspark.work/audit/commit-audit-{DATE}.md
 📅 Range: {FIRST_DATE} to {LAST_DATE}
 🔢 {N} commits analyzed across {N} contributors
 
@@ -269,7 +273,7 @@ Highlights:
 - Deployment Frequency: {N}/month ({STATUS})
 - Bus Factor: {N} ({STATUS})
 
-View full report: /.documentation/copilot/commit-audit-{DATE}.md
+View full report: /.devspark.work/audit/commit-audit-{DATE}.md
 ```
 
 ## Guidelines

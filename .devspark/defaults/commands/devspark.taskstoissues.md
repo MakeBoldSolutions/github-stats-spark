@@ -1,6 +1,6 @@
 ---
-description: Convert existing tasks into actionable, dependency-ordered GitHub issues for the feature based on available design artifacts.
-tools: ['github/github-mcp-server/issue_write']
+source: "DevSpark — © 2026 Make Bold Solutions. Source: https://dev.makeboldspark.com"
+description: Explain why temporary DevSpark tasks cannot be exported as durable issue-tracker records.
 ---
 
 ## User Input
@@ -11,22 +11,13 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
-## Outline
+## Deprecated Behavior
 
-> **Script Resolution**: Before running `.devspark/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
+DevSpark treats `spec.md`, `plan.md`, and `tasks.md` as temporary implementation aids. Exporting
+their task breakdown into an issue tracker would turn disposable planning detail into a second
+durable history and conflict with the rule that Git is the sole implementation history.
 
-1. Run `.devspark/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
-2. From the executed script, extract the path to **tasks**.
-3. Get the Git remote by running:
-
-```bash
-git config --get remote.origin.url
-```
-
-> [!CAUTION]
-> ONLY PROCEED TO NEXT STEPS IF THE REMOTE IS A GITHUB URL
-
-1. For each task in the list, use the GitHub MCP server to create a new issue in the repository that is representative of the Git remote.
-
-> [!CAUTION]
-> UNDER NO CIRCUMSTANCES EVER CREATE ISSUES IN REPOSITORIES THAT DO NOT MATCH THE REMOTE URL
+Do not read a temporary task list, call an issue API, or create issues from planning identifiers.
+Explain that this command no longer performs writes. For durable follow-up work discovered during
+implementation or review, create a separately worded issue from current repository behavior and the
+remaining user outcome, with no spec, requirement, task, or phase references.

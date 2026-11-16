@@ -1,9 +1,16 @@
 ---
-description: Draft or update a spec-aware pull request with task, checklist, and gate visibility before review.
+source: "DevSpark — © 2026 Make Bold Solutions. Source: https://dev.makeboldspark.com"
+description: Draft or update a pull request from the verified code, knowledge, tests, and Git delta.
 handoffs:
+  - label: Run Verification (optional)
+    agent: devspark-verify
+    prompt: Produce proof-of-change evidence before opening the PR
   - label: Review Pull Request
-    agent: devspark.pr-review
+    agent: devspark-pr-review
     prompt: Review the pull request for constitution compliance
+scripts:
+  sh: .devspark/scripts/bash/create-pr.sh --mode preflight --json $ARGUMENTS
+  ps: .devspark/scripts/powershell/create-pr.ps1 -Mode Preflight -Json $ARGUMENTS
 ---
 
 ## User Input
@@ -16,42 +23,57 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Routing Contract
 
-If a spec exists for the active branch, read the YAML frontmatter in `spec.md` before drafting the PR. Treat `classification`, `risk_level`, and `required_gates` as authoritative metadata.
-
-If no spec exists but a quickfix record exists for the current branch under `/.documentation/quickfixes/`, use that quickfix record as the lifecycle source of truth.
-
-If the spec body and frontmatter disagree, surface the inconsistency to the user rather than overriding the metadata.
+Completed planning records remain in `.devspark.work/` for
+in-sprint validation. Their presence is not unfinished implementation. Use existing lifecycle
+evidence to check completion; only Release archives eligible records. Do not warn about a missing
+spec or quickfix, search Git history for one, or reconstruct one. Keep the PR self-contained rather
+than making a temporary record its durable content.
 
 ## Overview
 
-`/devspark.create-pr` is the default post-implementation step for quick-spec and full-spec routes. It gathers PR context, checks task and checklist completion, summarizes any gate artifacts it can find, drafts a PR title/body, and asks the user to confirm before creating or updating the pull request.
+`/devspark-create-pr` is the default post-implementation step for every route. It gathers the branch
+delta, current knowledge, tests, verification evidence, and host metadata; drafts a self-contained PR;
+and asks the user to confirm before creating or updating it.
 
-This command is advisory. Dirty trees, missing specs, incomplete tasks, unresolved gates, and explicit gate acknowledgements are warnings that the agent must explain, not hard blocks. The user decides whether to proceed, adjust the draft, or stop.
+This command is advisory, with one exception: it is the **readiness boundary**. A successful run means
+DevSpark believes the committed, pushed HEAD is complete, internally consistent, and ready for other
+people to review. It never means "open the PR so `/devspark-pr-review` can find out whether the work is
+finished." Three known deterministic committed-state failures stop the command: Knowledge that cannot
+be built (`knowledge.readiness: blocked`; see *Knowledge Readiness Boundary* below), a mandatory
+obligation without satisfying evidence (`lifecycle` failure `required-obligation-unresolved`; see
+*Completed-Work Invariant*), and declared mandatory obligations that the lifecycle check could not
+evaluate (`lifecycle.status: unavailable` with `obligations_declared: true`).
+Dirty trees, failed verification,
+code/knowledge mismatches, and unresolved review findings are otherwise warnings the agent must
+explain. Missing planning records are normal.
+
+## Definition of Done
+
+Done when: `knowledge.readiness` is not `blocked`, `lifecycle` reports no `required-obligation-unresolved` failure and is not `unavailable` with `obligations_declared: true`, the user has explicitly confirmed (step 4), and the PR has been created or updated (step 5), with the step-6 result report printed. Do not call the create/update script before that confirmation, and do not keep re-drafting once the user has approved — act on their decision.
 
 ## Outline
 
-**Multi-app support**: If this repository uses multi-app mode (`.documentation/devspark.json` exists with `mode: "multi-app"`), check for `--app <id>` in the user input to scope this workflow to a specific application. When app context is provided, resolve artifacts from `{app.path}/.documentation/` instead of the repository root `.documentation/`. Print the resolved scope (app name, doc root) at the start of output.
+Load and obey the shared preamble contract core at `/.devspark/templates/command-preamble-contract.md` (installed repos) or `templates/command-preamble-contract.md` (source repos) before step 1 — it covers multi-app scope resolution and the 2-tier override check for scripts. Preamble modules: `convergence`, `configuration`.
 
 ### 1. Run Preflight Context
 
-> **Script Resolution**: Before running `.devspark/scripts/powershell/create-pr.ps1 -Mode Preflight -Json $ARGUMENTS`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
-
-Run `.devspark/scripts/powershell/create-pr.ps1 -Mode Preflight -Json $ARGUMENTS` once from the repository root and parse the returned JSON.
+Run `{SCRIPT}` once from the repository root and parse the returned JSON.
 
 Use the script output as the source of truth for:
 
-- current branch
-- target branch
-- dirty tree status
-- authentication status
-- existing PR detection
-- spec detection
-- task completion counts
-- checklist completion summary
-- gate artifact scan results
-- gate summaries and severities
-- explicit gate acknowledgements captured in tasks or quickfix records
-- diff stats and recent commit subjects
+- current branch, target branch, dirty tree status, and push status
+- authentication status and creation support
+- existing PR (number, URL, title, state, draft flag)
+- changed code, tests, and current `.knowledge/` nodes
+- `knowledge.readiness` (`ready`, `blocked`, `not-applicable`, `unknown`), `knowledge.blockers[]`
+  (`kind`, `path`, `message`), `knowledge.checked_head`, and `knowledge.gap_summary` — computed
+  by `build_knowledge_index.py --check`, which proves the committed Knowledge builds (`check_output` is
+  display evidence only). `unknown` means the engine or interpreter was unavailable: report it as a
+  compatibility warning, never as clean
+- gate artifact scan results and severities
+- `lifecycle` — the lifecycle check for the branch's work directory or planning bundle (see below)
+- gate acknowledgements from tasks or quickfix records
+- `diff.lines_summary`, `diff.commit_log` (hash/subject/author/date), `diff.file_changes` (status/path)
 
 If auth is unavailable or the platform does not support automated PR creation, report that clearly and stop before any create/update action.
 
@@ -61,54 +83,131 @@ Present any relevant warnings before drafting the PR:
 
 - dirty working tree
 - existing PR already open for this branch
-- missing spec
-- incomplete tasks
-- incomplete checklists
+- failed or missing verification for behavior-bearing changes
+- material code/knowledge mismatch
+- incomplete required work recorded in a retained planning artifact
 - unresolved blocking gate artifacts
 - explicit gate acknowledgements already recorded in tasks or quickfix artifacts
 - no gate artifacts found
+- **incomplete lifecycle evidence** — use the lifecycle check below to route unfinished work to
+  its owner. Retain completed artifacts; never attach them as permanent PR records.
 
-Use recommendation language, not hard-block language. Example:
+Use recommendation language, not hard-block language.
 
-> "3 of 8 tasks are incomplete. I recommend either finishing them first or creating the PR as a draft."
+**Advisory-only noise**: If preflight surfaces environment or tooling problems you did not cause and cannot fix from the diff — missing/expired credentials, network errors, missing CLI tools, truncated terminal output — report them as an advisory note only. Do not cite them as a reason for reject/needs-changes language; that judgment belongs to actual code-risk findings in the diff itself.
+
+#### Completed-Work Invariant
+
+> **A pull request represents completed spec work offered for acceptance.**
+>
+> **Merge terminates the spec lifecycle.**
+
+Everything the active spec requires is finished before this command runs: implementation, tests, Knowledge synchronization, required Verify obligations, finding dispositions, and Closeout. No required task is scheduled for after the PR or after merge, and the design never includes "merge, then branch again to finish the old spec". PR Review may still find new blockers; those are corrected on this branch and PR.
+
+A universal work branch (any `NNN-work-*` branch, whatever its directory holds) is held to the same invariant with less to prove: the requested change is implemented and verified in proportion to its risk, and any mandatory obligation has satisfying evidence. It needs no Verify or Closeout document.
+
+Preflight already runs the lifecycle check and reports it as `lifecycle`: `status` (`pass`, `fail`, `unavailable`, `not-applicable`), `failures[]` (`code`, `message`, and `obligations[]` with each obligation's `authority`), and `pending_later_phase[]`. Read it; do not run the check again. `not-applicable` means the branch has no work directory or planning bundle — a bundle-free work branch with no resume note — and needs nothing further. `unavailable` means the check could not run, and is never a pass: `reason` says why (`judge-missing`, `python-unavailable`, or `invalid-output`) and `obligations_declared` says whether `work.md` has a `## Required Obligations` section. When obligations are declared, the script refuses create and update mode with `CREATE PR BLOCKED — LIFECYCLE CHECK UNAVAILABLE` and the recovery step for that reason, because an obligation that could not be evaluated has not been shown to pass; stop and relay it. DevSpark has no override for this; where organizational policy authorizes a different approval path, the developer follows it outside DevSpark. Otherwise, run `scripts/judge.py lifecycle --feature-dir <FEATURE_DIR>` yourself (installed repos: `.devspark/scripts/bash/judge.sh` or `.devspark/scripts/powershell/judge.ps1`); if that also cannot run, say readiness is unconfirmed rather than calling it clean. The check reads the committed local HEAD (`remote.local_head`); creation requires that HEAD to be the published branch tip (`remote.remote_head`), so when they differ say which one the evidence describes. It reports unchecked required tasks, an incomplete optional `work.md` resume note, a required planning review that is missing, an unresolved verdict or pending human decision, a stale Judge (or a child gate that needs a recheck — a stale `PROCEED` is not evidence), routed obligations whose owner has not completed, preserved future work that was never materialized, a `not-complete` closeout, and an unchecked `## Required Obligations` entry in `work.md`, or one checked without its authority or an evidence reference. Obligations routed to `pr-review` are pending for that later phase and are fine. A bundle-free work branch with no resume note uses the same normal PR preflight without a synthetic planning bundle.
+
+Treat a failure here as a **stop**, not a nudge: route back to `/devspark-implement` (or `/devspark-verify`). The developer may still proceed by saying so explicitly; record each unmet item under the PR's acknowledged gaps. The exception is `required-obligation-unresolved`: a mandatory obligation is not the developer's to waive, and the script itself refuses create and update mode with `CREATE PR BLOCKED — REQUIRED OBLIGATION UNRESOLVED`, naming each obligation and the authority it belongs to. Stop before drafting. It clears only when the satisfying evidence, or an explicit decision from the named authority, is recorded by checking the `## Required Obligations` entry in `work.md` with a reference to it; then commit, push and rerun this command. Proceeding past the check is never how that decision is recorded. No flag, `--auto` or Gate Acknowledgement bypasses it. Where a deferral must outlive the spec, it lives as a Future Work Plan, a new spec, an external work item, an explicit accepted limitation, or a release/deployment activity — never as an unchecked task in a spec that is about to be archived.
+
+#### Knowledge Readiness Boundary (blocking)
+
+The only mechanical Knowledge check is whether the committed Knowledge **builds**. Derived files
+(`.knowledge/index.json`, `coverage.json`) and `last_verified` dates are not compared or required here:
+whether a document still matches the code is a content question for `/devspark-pr-review`, not a gate.
+This command proves the build against the HEAD it is about to submit (`checked_head`, which preflight
+requires to equal the remote branch tip).
+
+- **Blocked** (`knowledge.readiness: blocked`, blocker `build-error`): a source or frontmatter error
+  stops the Knowledge from building. **Stop before drafting.** Print the headline and required action
+  below, and do not call create or update mode; the script refuses in both modes with the same message.
+- **Not blocking**: `ready`; `not-applicable` (no tracked `.knowledge/` content); `unknown`
+  (compatibility warning).
+
+No flag, mode or acknowledgement bypasses this: `--draft`, `--auto` and Gate Acknowledgements do not
+bypass it, and there is no readiness override. A developer who must open a PR anyway uses the platform
+CLI directly, outside this command.
+
+This command only detects readiness. It never regenerates files, edits Knowledge, amends a commit,
+creates a finalization commit, or runs a remediation step.
+
+Headline: `CREATE PR BLOCKED — KNOWLEDGE CANNOT BE BUILT`. Show the committed HEAD and the blocker
+`message`. Then: 1) fix the source or frontmatter error; 2) confirm it builds with
+`build_knowledge_index.py --check`; 3) commit the `.knowledge/**` changes; 4) push; 5) rerun
+`/devspark-create-pr`.
+
+#### Verify Reminder (optional, non-blocking)
+
+After the warnings, surface a short, one-time reminder that **offers** — but never requires — running verification, so the developer makes an informed choice without adding a mandatory step:
+
+- Explain in one or two sentences what `/devspark-verify` does: it runs the change and records the actual command output as empirical proof that it works, as opposed to a document review.
+- Offer the choice explicitly:
+  - **Run it now** → hand off to `/devspark-verify`, then return here to draft the PR.
+  - **Skip and continue** → proceed straight to drafting. This is the **default**, and it keeps the fast `quickfix → create-pr → pr-review` path at three steps.
+- Tailor the strength of the reminder to context, but keep it advisory in every case:
+  - If `spec.md` declares one or more `verify:<mode>` gates and no passing `gates/verify.md` exists, phrase it as a clear recommendation ("this change declared verification; running it is recommended before review").
+  - On a universal work branch, offer verification proportional to the change's risk; it needs no spec, no declared mode and no gate document, and skipping it is never a failure.
+  - Otherwise (e.g. a low-risk quickfix with no declared verify mode), phrase it as a light optional nudge ("optional: prove the fix works before review").
+- Never block on this, and never run verify without the developer choosing it. If `--auto` (or a standing autonomy instruction) is in effect, skip the offer and continue without running verify, noting in the step-6 result that verification was not run.
+
+#### Work-Item Linkage (optional, non-mutating)
+
+Where a repository tracks work externally, a reference in the PR body is the only thread connecting
+the change to the request behind it. A reference that resolves to nothing is worth knowing about
+before review, not after.
+
+Run this check only when `.devspark/scripts/bash/workitem.sh --operation check --json` (or the
+PowerShell twin) reports `work_tracking_configured: true`. When it reports `false`, skip this
+subsection entirely and say nothing about work items.
+
+- Collect the references already present in the branch, the commit messages, and any body drafted so
+  far — forms such as `AB#1234`, `#1234`, or a full work-item URL.
+- Pass them to the `verify-link` operation. **This operation only reads.** It resolves each
+  reference and reports whether the item exists and whether it sits inside the configured area path.
+  It never writes to the work item, never posts a comment, and never changes a state — creating the
+  PR must not mutate the board as a side effect.
+- **Reproduce every reference verbatim** in the PR body. Do not normalise `#1234` to `AB#1234`, do
+  not re-order them, and do not drop one because it failed to resolve. The reference the developer
+  wrote is the one their tooling matches on.
+- Surface a warning for any reference that does not resolve, or that resolves outside the configured
+  area path. Both are advisory — report them and continue drafting.
+
+**Posting back to the work item is a separate decision.** Announcing the pull request on the item is
+useful to some teams and unwanted noise to others, so it is **off unless the repository opts in**,
+and even then it is confirmed on its own. Never fold it into the confirmation for creating the PR:
+agreeing to open a pull request is not agreeing to write on someone's board. Show the exact comment
+text before posting, and treat a refusal as final for this run. A standing autonomy instruction does
+not supply this confirmation, because the effect lands outside the repository where nobody reviewing
+the diff would see it.
 
 ### 3. Draft the PR Title and Description
 
-Derive the title in this order:
+Derive the title from the resulting delta: most recent `diff.commit_log` subject, changed behavior,
+then branch name.
 
-1. spec title
-2. branch name
-3. recent commit subjects
+Build the body from the preflight JSON (keep total under 4,000 characters):
 
-Draft the body using this structure:
-
-```markdown
-## Summary
-{From spec intent/summary, or inferred from commits if no spec}
-
-## Changes
-{From diff stats and changed file analysis}
-
-## Task Completion
-{N/M tasks complete, plus checklist summary if present}
-
-## Quality Gates
-{Gate summary, or "No gate artifacts found"}
-
-## Gate Acknowledgements
-{Explicit user decisions to proceed despite unresolved findings, if any}
-
-## Spec Reference
-{Path to spec directory or N/A}
-
-## Quickfix Reference
-{Path to quickfix record or N/A}
-
-## Notes
-{Warnings, reviewer hints, or user-supplied notes}
-```
-
-Keep the draft concise and under 4,000 characters.
+- **Summary** — resulting behavior and user impact inferred from code, tests, knowledge, and commits
+- Include material exclusions and explicit operating assumptions (target environment, supported
+  users, configuration and decision owner) from the developer's delivery handoff in that summary.
+  If they are absent, do not invent them or recover planning files; ask only when an unknown
+  materially affects the claim of readiness.
+- **Changes** — file list from `diff.file_changes` (status + path) and `diff.lines_summary`
+- **Code/Knowledge Consistency** — whether changed behavior is accurately represented by current
+  `.knowledge/`, including any gap requiring reviewer attention
+- **Verification** — exact commands and outcomes for tests, lint, builds, or runtime checks
+- **Quality Gates** — gate artifact statuses, or "No gate artifacts found". **Test signal wording**: if you observed both a functional test result and a separate policy/coverage-gate result (e.g. a test run that passes but a coverage or lint threshold that fails, or vice versa), report them as two distinct statements — never collapse them into a single "tests failed"/"tests passed" line. Name the specific gate that failed when it isn't the tests themselves.
+- **Deployment status** — when the closeout gate lists deferred `stage: post-deploy` items, state "ready to deploy, not deployed" and list each carried item with its `captured_as` record and required evidence. On a work branch, do the same for each requirement that `work.md` or the verification report names as provable only after deployment, with how it will be proven. Deferred post-deploy items do not block the PR and are never reported as passed. Omit this bullet when none exist.
+- **Knowledge Evidence** — for `.knowledge/` nodes changed in this diff, note whether each cites a
+  test-verified (`verified_by: execution`) claim or a code-only one, and whether a code-only entry
+  carries a `fallback_reason`. A code-only entry with no adjacent reason is a note for the reviewer,
+  not a blocker — surfaces the same signal `/devspark-pr-review` §6c checks mechanically, so a human
+sees it here without digging. Also state `knowledge.readiness` from the preflight JSON plainly
+  ("knowledge is ready" / "readiness unknown: <gap_summary>") — this is a real computed fact from
+  `build_knowledge_index.py --check`, not a judgment call. Omit this
+  bullet entirely if the diff touches no `.knowledge/` nodes AND readiness is `ready`.
+- **Gate Acknowledgements** — explicit decisions to proceed (omit section if none)
+- **Notes** — warnings, reviewer hints, user-supplied notes
 
 ### 4. Ask for Explicit Confirmation
 
@@ -128,6 +227,8 @@ Ask explicitly whether to:
 
 Do **not** call the create/update script mode until the user confirms.
 
+**Autonomy override**: if `--auto` (or a standing autonomy instruction) is in effect, skip the wait — create or update the PR as `--draft` (regardless of whether `--draft` was otherwise requested) and proceed without waiting for a reply. Opening a PR is visible to others but a draft is reversible, so this is the one auto-bypass in this command that defaults to the more conservative flag rather than the literal request. Report the action taken (and that it was auto-selected) in the step-6 result.
+
 ### 5. Create or Update the PR
 
 When the user confirms, run the platform script in create or update mode.
@@ -143,6 +244,13 @@ Supported flags:
 
 Use create mode when no PR exists. Use update mode when a PR already exists for the branch or the user explicitly chooses update.
 
+Create and update mode exit `0` only when they return `status: ok`; every refusal or failure returns `error: true` and exits `1` in both the PowerShell and Bash scripts. Read the exit code, not the message text, to tell them apart. Preflight always exits `0` and reports problems in its JSON.
+
+If a quickfix record for this branch still lives under `.devspark.work/quickfixes/` with a blank
+`**PR**` field, fill in the new PR number now and commit that one-line update on the same branch —
+this is the only place that field gets populated, so a quickfix record left over from before this
+command existed should not be treated as an error.
+
 ### 6. Report Result
 
 After creation or update, report:
@@ -153,9 +261,23 @@ After creation or update, report:
 - whether it is draft or ready for review
 - any warnings that still remain unresolved
 
+#### PR-Review Reminder (optional, non-blocking)
+
+After reporting the result above, offer — but never require — an immediate handoff into review:
+
+- Ask explicitly: "Run `/devspark-pr-review` now for this PR? [Y/n]".
+- **Yes** → hand off to `/devspark-pr-review` for this PR number.
+- **No / no answer** → stop here. This is the default, and it keeps the fast
+  `quickfix → create-pr → pr-review` path at three separate, deliberate steps.
+- **Autonomy override**: if `--auto` (or a standing autonomy instruction) is in effect, skip the
+  ask and do not run pr-review automatically — note in this result that it was not run. Review
+  stays a distinct, separately-invoked pass even under autonomy: pr-review needs a real PR number
+  that only exists after this step, and running it in the same breath risks the same commit
+  reviewing its own work with no independent pass.
+
 ## Guidelines
 
-- Branches with no spec are valid. If a quickfix record exists for the current branch, use it before falling back to branch name, diff stats, and commit subjects.
-- If task or checklist artifacts are missing, report that plainly and continue with a lighter draft.
-- If gate artifacts are absent, recommend `/devspark.analyze` or `/devspark.critic` before merge.
-- If gate acknowledgements exist, surface them plainly in the draft instead of burying them in prose.
+- Branches with no spec are the expected post-implementation state.
+- Never include spec, task, quickfix, feature, or requirement identifiers in the PR title or body.
+- If gate artifacts are absent, say so plainly. Their absence is the normal state for work that needed no extra assurance; recommend `/devspark-analyze` or `/devspark-critic` only for a specific, named concern in this change.
+- Surface gate acknowledgements plainly in the draft body rather than burying them in prose.

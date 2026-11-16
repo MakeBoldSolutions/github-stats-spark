@@ -1,9 +1,88 @@
+---
+source: "DevSpark — © 2026 Make Bold Solutions. Source: https://dev.makeboldspark.com"
+devspark_version: "<version that authored this spec; omit if undeterminable>"
+classification: full-spec
+risk_level: medium
+target_workflow: specify-full
+required_artifacts: spec, plan, tasks
+recommended_next_step: plan
+required_gates: checklist, analyze, critic # optionally add verify:<mode> entries when empirical proof is required
+depends_on: [] # optional cross-repo references, e.g. ["devspark.category:054-shadow-events"]
+supersedes: [] # optional cross-repo supersession refs, e.g. ["triage:003-classify-intent-v1"]
+participants:
+  owner: human
+  planner: ai
+  implementer: ai
+  reviewer: human
+  critic: ai
+  scribe: ai
+---
+
+<!--
+  A specification is not a blueprint for software. It is a bounded hypothesis about the next
+  valuable change to working software. The repository defines the current state; the spec defines
+  the intended delta; implementation and verification create the next state.
+  Describe the bounded delta from existing working software rather than restating the entire system.
+  A specification delivers a releasable change; product release packaging and distribution are
+  handled separately by the release workflow.
+-->
+
 # Feature Specification: [FEATURE NAME]
 
-**Feature Branch**: `[###-feature-name]`  
-**Created**: [DATE]  
-**Status**: Draft  
+**Feature Branch**: `[###-feature-name]`
+**Created**: [DATE]
+**Status**: Draft <!-- Valid: Draft | In Progress | Complete -->
 **Input**: User description: "$ARGUMENTS"
+
+## Product Owner TLDR
+
+[High-level summary for Product Owner: what this spec changes and why now. Keep this to 3-5 sentences, non-technical, outcome-focused.]
+
+## Rationale Summary
+
+### Core Problem
+
+[One or two sentences on the unmet outcome; do not restate requirements or acceptance scenarios.]
+
+### Decision Summary
+
+[Consequential scope or behavior decisions and why. Include only decisions that affect implementation or acceptance.]
+
+### Key Drivers
+
+- [Distinct driver not already clear from the requirements or decision.]
+
+### Source Inputs
+
+- [Link or concise reference; summarize evidence only when the decision depends on it.]
+
+### External Contracts
+
+- [Only when an external contract or cross-repository dependency affects this spec: name/version and the exact relied-on fields or behavior; link to the source rather than copying it.]
+
+### Reviewer Guidance
+
+[Specific decision or acceptance risk to verify; omit generic review instructions.]
+
+Keep this summary as a concise decision record. Do not accumulate research notes, superseded
+alternatives, roadmap ideas, requirement prose, or architecture; keep research in `research.md`
+only when planning needed it, and architecture in the Plan.
+
+## Minimum Sufficient Change
+
+<!--
+  Keep this short. It makes non-scope explicit before planning begins (MVP).
+  Fill it from what is known; "none known" is a valid answer. Not a questionnaire.
+-->
+
+```yaml
+minimum_sufficient_change:
+  minimum_valuable_outcome: "[the smallest outcome that is worth shipping]"
+  explicitly_not_required:
+    - "[something a reader might assume is in scope but is not]"
+  acceptable_manual_operations:
+    - "[a manual or operator-driven step that is acceptable here, or none known]"
+```
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -11,7 +90,7 @@
   IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
   Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
   you should still have a viable MVP (Minimum Viable Product) that delivers value.
-  
+
   Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
   Think of each story as a standalone slice of functionality that can be:
   - Developed independently
@@ -84,8 +163,10 @@
 
 ### Functional Requirements
 
+> Each `FR-###` is a stable traceability anchor. Every functional requirement should be satisfied by at least one task in `tasks.md` (referenced there via `Implements: FR-###`). `/devspark-analyze` flags any requirement with zero implementing tasks and any task that references an `FR-###` not defined here.
+
 - **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
-- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]  
+- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]
 - **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
 - **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
 - **FR-005**: System MUST [behavior, e.g., "log all security events"]

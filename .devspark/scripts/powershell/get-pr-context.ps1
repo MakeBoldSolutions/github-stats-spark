@@ -1,4 +1,5 @@
 #!/usr/bin/env pwsh
+# DevSpark - (c) 2026 Make Bold Solutions. Source: https://dev.makeboldspark.com
 #requires -Version 7.0
 # Extract PR context for review
 #
@@ -14,7 +15,7 @@
 param(
     [Parameter(Position=0)]
     [string]$PrNumber,
-    
+
     [Parameter()]
     [switch]$Json,
 
@@ -27,7 +28,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# Multi-app support (T042, T067)
+# Multi-app support
 if (-not (Get-Command Detect-DevSparkMode -ErrorAction SilentlyContinue)) {
     . "$PSScriptRoot/common.ps1"
 }
@@ -52,7 +53,7 @@ function Write-JsonError {
         [string]$Message,
         [string]$Details = ""
     )
-    
+
     if ($Json) {
         $errorObj = @{
             error = $true
@@ -87,7 +88,7 @@ function Get-DetectedPrNumber {
     if ($env:PR_NUMBER) {
         return $env:PR_NUMBER
     }
-    
+
     # Method 3: Try platform CLI for current branch
     switch ($DevSparkPlatform.Name) {
         'github' {
@@ -116,7 +117,7 @@ function Get-DetectedPrNumber {
             }
         }
     }
-    
+
     return $null
 }
 
@@ -134,7 +135,7 @@ if ([string]::IsNullOrWhiteSpace($PrNumber)) {
     $PrNumber = Get-DetectedPrNumber
     if (-not $PrNumber) {
         Write-JsonError -Message "Unable to detect PR number" `
-            -Details "Please provide PR number explicitly: /devspark.pr-review #123"
+            -Details "Please provide PR number explicitly: /devspark-pr-review #123"
         exit 1
     }
 }
@@ -315,8 +316,46 @@ if (-not $IncludeAllFiles -and $filesChangedTotal -gt $FileSampleLimit) {
     $filesChangedTruncated = $true
 }
 
+# Compute which changed files match no .knowledge/ appliesTo pattern (PRD5 hint, non-blocking)
+$unmappedFiles = @()
+$unmappedFilesAvailable = $false
+$knowledgeEngine = Resolve-KnowledgeEngine -RepoRoot $repoRoot
+if ($knowledgeEngine -and $filesChangedTotal -gt 0) {
+    # Windows installs commonly expose only `python`, so an unresolved interpreter must be
+    # reported rather than silently reducing this signal to "nothing unmapped".
+    $python = Get-Command python3 -ErrorAction SilentlyContinue
+    if (-not $python) { $python = Get-Command python -ErrorAction SilentlyContinue }
+    if ($python) {
+        try {
+            $unmappedJson = & $python.Source $knowledgeEngine --repo-root $repoRoot --unmapped-files @filesChanged 2>$null
+            if ($LASTEXITCODE -eq 0) {
+                $unmappedFilesAvailable = $true
+                if ($unmappedJson) { $unmappedFiles = @($unmappedJson | ConvertFrom-Json) }
+            }
+        } catch {
+            $unmappedFilesAvailable = $false
+        }
+    }
+}
+
+# Deterministic risk digest (tiers, flags, score); null when the helper or Python is unavailable
+$riskDigest = $null
+$riskEngine = Join-Path (Split-Path $scriptPath -Parent) 'pr-risk.py'
+if ((Test-Path $riskEngine) -and $filesChangedTotal -gt 0) {
+    $riskPython = Get-Command python3 -ErrorAction SilentlyContinue
+    if (-not $riskPython) { $riskPython = Get-Command python -ErrorAction SilentlyContinue }
+    if ($riskPython) {
+        try {
+            $riskRange = @()
+            if ($sourceBranch -and $targetBranch) { $riskRange = @('--range', "origin/$targetBranch...origin/$sourceBranch") }
+            $riskJson = & $riskPython.Source $riskEngine --repo-root $repoRoot --lines-added $linesAdded --lines-deleted $linesDeleted @riskRange @allFilesChanged 2>$null
+            if ($LASTEXITCODE -eq 0 -and $riskJson) { $riskDigest = ($riskJson -join "`n") | ConvertFrom-Json }
+        } catch { $riskDigest = $null }
+    }
+}
+
 # Check for constitution
-$constitutionPath = Join-Path $repoRoot ".documentation\memory\constitution.md"
+$constitutionPath = Join-Path $repoRoot ".knowledge\governance\constitution.md"
 $constitutionExists = Test-Path $constitutionPath
 
 #==============================================================================
@@ -337,7 +376,7 @@ if ($sourceBranch -match '^(\d+-[a-zA-Z].*)$') {
     $specFeatureId = $sourceBranch
 
     # Check for spec directory
-    $featureDir = Join-Path $repoRoot ".documentation\specs\$specFeatureId"
+    $featureDir = Join-Path $repoRoot ".devspark.work\specs\$specFeatureId"
     $specPath = Join-Path $featureDir "spec.md"
 
     if (Test-Path $specPath) {
@@ -367,12 +406,13 @@ if ($sourceBranch -match '^(\d+-[a-zA-Z].*)$') {
 }
 
 # Prepare review directory
-$reviewDir = Join-Path $repoRoot ".documentation\specs\pr-review"
+$reviewDir = Join-Path $repoRoot ".devspark.work\pr-review"
 
 # Build output
 if ($Json) {
     $output = @{
         REPO_ROOT = $repoRoot
+        DEVSPARK_VERSION = (Get-DevSparkVersion -RepoRoot $repoRoot).VERSION
         PR_CONTEXT = @{
             enabled = $true
             pr_number = $prNumber_int
@@ -387,6 +427,8 @@ if ($Json) {
             files_changed = $filesChanged
             files_changed_total = $filesChangedTotal
             files_changed_truncated = $filesChangedTruncated
+            unmapped_files = $unmappedFiles
+            unmapped_files_available = $unmappedFilesAvailable
             lines_added = $linesAdded
             lines_deleted = $linesDeleted
             created_at = $createdAt
@@ -396,6 +438,7 @@ if ($Json) {
             include_all_files = [bool]$IncludeAllFiles
             merge_state_status = $mergeStateStatus
             is_behind_target = $isBehindTarget
+            risk = $riskDigest
         }
         CONSTITUTION_PATH = $constitutionPath
         CONSTITUTION_EXISTS = $constitutionExists

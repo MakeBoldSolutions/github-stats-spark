@@ -159,7 +159,7 @@ without a schema rewrite. No tenants, billing, or multi-admin in this roadmap.
    [ps-008 Notifications](specs/ps-008-critical-alert-notifications.md),
    [ps-018 Client and executive reports](specs/ps-018-client-and-executive-reports.md),
    [ps-019 Optional AI-assisted narrative](specs/ps-019-ai-assisted-narrative.md)
-8. **Operations:** [ps-009 Operational hardening](specs/ps-009-operational-hardening.md)
+8. **Operations:** [ps-009 Operational hardening](specs/complete/ps-009-operational-hardening.md)
 
 ### Sequence and dependencies
 

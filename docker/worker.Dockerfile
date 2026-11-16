@@ -2,6 +2,10 @@
 # excluded (screenshot capture is optional and not part of this image).
 
 FROM python:3.11-slim
+# Recorded in the image so a running container can be traced to a commit.
+ARG SPARK_REVISION=unknown
+LABEL org.opencontainers.image.revision=$SPARK_REVISION \
+      org.opencontainers.image.title="github-stats-spark worker"
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     SPARK_CACHE_DIR=/app/.cache
@@ -22,8 +26,8 @@ COPY docker/worker-entrypoint.sh /usr/local/bin/worker-entrypoint.sh
 # Non-root user. Named volumes mounted at these paths inherit this ownership.
 RUN useradd --uid 10001 --create-home app \
     && chmod +x /usr/local/bin/worker-entrypoint.sh \
-    && mkdir -p /app/data /app/output /app/.cache \
-    && chown -R app:app /app/data /app/output /app/.cache /app/config
+    && mkdir -p /app/data /app/output /app/.cache /app/backups \
+    && chown -R app:app /app/data /app/output /app/.cache /app/backups /app/config
 USER app
 
 ENTRYPOINT ["worker-entrypoint.sh"]

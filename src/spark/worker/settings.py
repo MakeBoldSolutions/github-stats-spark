@@ -27,6 +27,15 @@ def parse_duration(value: str, name: str = "duration") -> int:
     return int(match.group(1)) * _UNITS[match.group(2).lower()]
 
 
+def _backup_interval(value: Optional[str]) -> int:
+    """Seconds between backups; ``off`` (or 0) disables scheduled backups."""
+    if value is None or value.strip() == "":
+        return 24 * 3600
+    if value.strip().lower() in {"off", "false", "no", "0"}:
+        return 0
+    return max(3600, parse_duration(value, "SPARK_BACKUP_INTERVAL"))
+
+
 def _flag(value: Optional[str], default: bool) -> bool:
     if value is None or value.strip() == "":
         return default
@@ -50,6 +59,9 @@ class WorkerSettings:
     )
     extra_args: List[str] = field(default_factory=list)
     db_path: Optional[Path] = None
+    backup_dir: Path = Path("/app/backups")
+    backup_interval_seconds: int = 24 * 3600  # 0 disables scheduled backups
+    backup_keep: int = 14
 
     def __post_init__(self) -> None:
         if self.db_path is None:
@@ -93,6 +105,9 @@ class WorkerSettings:
             cache_dir=Path(env.get("SPARK_CACHE_DIR", "/app/.cache")),
             extra_args=shlex.split(env.get("SPARK_EXTRA_ARGS", "")),
             db_path=Path(env["SPARK_DB_PATH"]) if env.get("SPARK_DB_PATH") else None,
+            backup_dir=Path(env.get("SPARK_BACKUP_DIR", "/app/backups")),
+            backup_interval_seconds=_backup_interval(env.get("SPARK_BACKUP_INTERVAL")),
+            backup_keep=max(1, int(env.get("SPARK_BACKUP_KEEP", "14"))),
         )
         if env.get("SPARK_STAGE_DIR"):
             settings.stage_dir = Path(env["SPARK_STAGE_DIR"])

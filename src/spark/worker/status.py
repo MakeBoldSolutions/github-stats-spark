@@ -65,7 +65,12 @@ class StatusStore:
             previous = json.loads(self.path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             return
-        for key in ("last_success_at", "consecutive_failures", "last_attempt"):
+        for key in (
+            "last_success_at",
+            "consecutive_failures",
+            "last_attempt",
+            "backup",
+        ):
             if key in previous:
                 self.state[key] = previous[key]
 
@@ -76,6 +81,29 @@ class StatusStore:
     def schedule(self, next_run: Optional[datetime]) -> None:
         """Publish the planned next run time."""
         self.state["next_run_at"] = iso(next_run)
+        self._save()
+
+    def record_backup(
+        self,
+        *,
+        ok: bool,
+        at: datetime,
+        interval_seconds: int,
+        reason: str = "",
+        sources: Optional[int] = None,
+        repositories: Optional[int] = None,
+    ) -> None:
+        """Publish the outcome of the latest database backup (no paths or secrets)."""
+        previous = self.state.get("backup") or {}
+        self.state["backup"] = {
+            "ok": ok,
+            "last_attempt_at": iso(at),
+            "last_success_at": iso(at) if ok else previous.get("last_success_at"),
+            "interval_seconds": interval_seconds,
+            "reason": "" if ok else sanitize(reason),
+            "sources": sources if ok else previous.get("sources"),
+            "repositories": repositories if ok else previous.get("repositories"),
+        }
         self._save()
 
     def mark_running(self, started: datetime) -> None:

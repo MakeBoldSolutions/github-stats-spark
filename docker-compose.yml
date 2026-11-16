@@ -17,7 +17,9 @@ services:
     build:
       context: .
       dockerfile: docker/web.Dockerfile
-    image: github-stats-spark-web:local
+      args:
+        SPARK_REVISION: ${SPARK_REVISION:-unknown}
+    image: github-stats-spark-web:${SPARK_IMAGE_TAG:-local}
     ports:
       # Defaults to this machine only. On the home server set BIND_ADDRESS=192.168.1.197.
       - "${BIND_ADDRESS:-127.0.0.1}:${WEB_PORT:-8086}:8080"
@@ -25,6 +27,15 @@ services:
       - spark-data:/usr/share/nginx/html/data:ro
       - spark-output:/usr/share/nginx/html/output:ro
     restart: unless-stopped
+    # Bounded so the stack coexists with other workloads on the home server.
+    mem_limit: 128m
+    cpus: 0.5
+    pids_limit: 256
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     read_only: true
     tmpfs:
       - /tmp
@@ -35,10 +46,21 @@ services:
     build:
       context: .
       dockerfile: docker/worker.Dockerfile
-    image: github-stats-spark-worker:local
+      args:
+        SPARK_REVISION: ${SPARK_REVISION:-unknown}
+    image: github-stats-spark-worker:${SPARK_IMAGE_TAG:-local}
     # Long-running scheduler. Collects on start (SPARK_RUN_ON_START) and then
     # every SPARK_REFRESH_INTERVAL. To force a run now, restart this container.
     restart: unless-stopped
+    # Bounded so the stack coexists with other workloads on the home server.
+    mem_limit: 1g
+    cpus: 1.0
+    pids_limit: 256
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     command: ["python", "-m", "spark.worker"]
     environment:
       SPARK_USER: ${SPARK_USER:?Set SPARK_USER to the GitHub user(s) to analyze, comma separated}
@@ -56,8 +78,13 @@ services:
       SPARK_DB_PATH: /app/config/registry.db
       SPARK_SECRET_KEY: ${SPARK_SECRET_KEY:-}
       SPARK_SECRET_KEY_FILE: ${SPARK_SECRET_KEY_FILE:-}
+      # Verified, rotated database backups ("off" disables the schedule).
+      SPARK_BACKUP_DIR: /app/backups
+      SPARK_BACKUP_INTERVAL: ${SPARK_BACKUP_INTERVAL:-24h}
+      SPARK_BACKUP_KEEP: ${SPARK_BACKUP_KEEP:-14}
     volumes:
       - spark-data:/app/data
+      - spark-backups:/app/backups
       - spark-output:/app/output
       - spark-cache:/app/.cache
       - spark-config:/app/config
@@ -77,8 +104,19 @@ services:
     build:
       context: .
       dockerfile: docker/worker.Dockerfile
-    image: github-stats-spark-worker:local
+      args:
+        SPARK_REVISION: ${SPARK_REVISION:-unknown}
+    image: github-stats-spark-worker:${SPARK_IMAGE_TAG:-local}
     restart: unless-stopped
+    # Bounded so the stack coexists with other workloads on the home server.
+    mem_limit: 256m
+    cpus: 0.5
+    pids_limit: 256
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     entrypoint: []
     command: ["python", "-m", "spark.api", "serve", "--port", "8000"]
     environment:
@@ -105,6 +143,7 @@ services:
       - no-new-privileges:true
 
 volumes:
+  spark-backups:
   spark-data:
   spark-output:
   spark-cache:

@@ -12,6 +12,9 @@ COPY frontend frontend
 RUN cd frontend && npm run build
 
 FROM nginxinc/nginx-unprivileged:1.27-alpine
+ARG SPARK_REVISION=unknown
+LABEL org.opencontainers.image.revision=$SPARK_REVISION \
+      org.opencontainers.image.title="github-stats-spark web"
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/docs /usr/share/nginx/html
 EXPOSE 8080

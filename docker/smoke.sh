@@ -14,6 +14,7 @@ check /healthz '^ok'
 check / '<div id="root"'
 check "/data/users/$SLUG/repositories.json" '"repositories"'
 check /data/status.json '"schema_version"'
+check /data/status.json '"backup"'
 code="$(curl -s -o /dev/null -w '%{http_code}' "$BASE/data/.releases/")"
 [ "$code" = 404 ] && echo "ok   /data/.releases hidden" || { echo "FAIL /data/.releases served ($code)"; exit 1; }
 check /api/health '"ok"'

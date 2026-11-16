@@ -1,5 +1,17 @@
 # Fix Score Remediation Prompt
 
+## Dashboard prompt (any repository, any assistant)
+
+The repository detail view has a "Fix score prompt" section. Its text is generic: it is built in
+`frontend/src/components/DrillDown/RepositoryDetail/sections/FixScorePromptSection.jsx`
+(`buildPrompt`) and does not depend on DevSpark or any slash command, so it can be pasted into
+Claude Code, Copilot, or any other coding assistant working in the target repository. It contains the
+repository's current score blockers, a short "how to improve" note for each blocker present
+(`REMEDIATION_GUIDANCE`), the scoring inputs, and rules against hiding problems. Extend
+`REMEDIATION_GUIDANCE` when a new signal is added.
+
+The rest of this page documents the Stats Spark repository's own Copilot prompt file.
+
 Use this prompt with GitHub Copilot when the repository needs an implementation pass to remove issues that prevent a perfect evaluation score.
 
 Prompt file:

@@ -145,6 +145,10 @@ describe("FixScorePromptSection prompt helpers", () => {
   it("includes every scoring input family in the copied prompt", () => {
     const prompt = buildPrompt(repository, getFixScoreBlockers(repository));
 
+    expect(prompt).not.toMatch(/devspark|copilot|\/fix-score/i);
+    expect(prompt).toContain("How to improve each signal:");
+    expect(prompt).toContain("Pull request pressure: Review and merge");
+    expect(prompt).toContain("Do not hide a problem.");
     expect(prompt).toContain("Attention score inputs");
     expect(prompt).toContain("Pull requests: score 18/100");
     expect(prompt).toContain("Security: score 30/100");
@@ -178,7 +182,7 @@ describe("<FixScorePromptSection /> collapsible presentation", () => {
       />,
     );
     expect(screen.getByText("Fix score prompt")).toBeInTheDocument();
-    expect(screen.getByText("/devspark.fix-score")).toBeInTheDocument();
+    expect(screen.queryByText(/devspark/i)).not.toBeInTheDocument();
     expect(screen.getByText(/signals/)).toBeInTheDocument();
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
   });

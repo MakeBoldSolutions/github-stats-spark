@@ -335,6 +335,39 @@ function buildScoringInputAudit(repository) {
   ].join("\n");
 }
 
+/**
+ * What a fix looks like for each blocker, so the prompt works in any
+ * repository and with any coding assistant. Keyed by blocker label.
+ */
+export const REMEDIATION_GUIDANCE = {
+  "Attention score":
+    "Work through the specific signals listed below; the attention score is their weighted total, so fixing the highest-weighted signal first (security, then staleness and pull requests, then dependencies) lowers it fastest.",
+  "Pull request pressure":
+    "Review and merge or close open pull requests, starting with the oldest. Convert finished drafts to ready for review, or close abandoned ones with a note.",
+  "Open pull requests":
+    "Review and merge or close open pull requests, starting with the oldest.",
+  "Security pressure":
+    "Resolve open dependency and code-scanning alerts: upgrade to the fixed version, or dismiss an alert only with a documented reason (for example, the vulnerable code path is unused).",
+  "Security alerts":
+    "Upgrade affected packages to patched versions and re-run the dependency audit. Dismiss an alert only with a documented reason.",
+  Staleness:
+    "Make a small, real maintenance commit if the project is still wanted: update dependencies, fix an open issue, refresh docs. If the project is finished or abandoned, archive the repository rather than adding noise commits.",
+  "Dependency currency":
+    "Update outdated dependencies, run the tests after each batch, and pin versions explicitly so the current version can be read from the manifest or lockfile.",
+  "Dependency input details":
+    "Fix dependencies whose version cannot be determined: declare explicit versions in the manifest and commit the lockfile.",
+  "Workflow failures":
+    "Open the failing workflow runs, fix the root cause (a broken test, an outdated action, or an expired secret), and confirm a green run on the default branch.",
+  "Stale issues":
+    "Triage issues older than 30 days: fix, label, or close them with an explanation.",
+  "Website screenshot":
+    "Check that the homepage URL is reachable and renders. Fix the site, or correct or remove the homepage setting if it points to something that no longer exists.",
+  "README quality":
+    "Improve the README: add clear headings, an install or quick-start section, usage examples in code blocks, and a screenshot or badges.",
+  "Quality indicators":
+    "Add what is missing: a LICENSE, a CI workflow, tests, a docs folder or link, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, or enabled Discussions, as listed.",
+};
+
 export function buildPrompt(repository, blockers) {
   const blockerLines =
     blockers.length > 0
@@ -344,28 +377,48 @@ export function buildPrompt(repository, blockers) {
               `- ${blocker.label}: ${blocker.detail} (${blocker.severity})`,
           )
           .join("\n")
-      : "- No specific blocker is visible in the dashboard data; inspect the latest audit and verification gates.";
+      : "- No specific blocker is visible in the dashboard data; review the repository against the signals below.";
+  const guidanceLines = [
+    ...new Set(
+      blockers
+        .map((blocker) => blocker.label)
+        .filter((label) => REMEDIATION_GUIDANCE[label]),
+    ),
+  ]
+    .map((label) => `- ${label}: ${REMEDIATION_GUIDANCE[label]}`)
+    .join("\n");
   const scoringInputAudit = buildScoringInputAudit(repository);
 
-  return `/devspark.fix-score repo:${repository.name}
+  return `Improve the health score of the GitHub repository "${repository.name}" by fixing the real problems behind it.
 
-Use the repository detail data below as starting context, then inspect the source repository and latest generated audits before making changes.
-
-Target repository:
+Repository:
 - Name: ${repository.name}
 - URL: ${repository.url || "N/A"}
 - Homepage: ${repository.homepage || repository.website_url || "N/A"}
-- Attention score: ${repository.attention_score ?? "N/A"}
+- Attention score: ${repository.attention_score ?? "N/A"} (0 to 100, lower is better)
 - Attention rank: ${repository.attention_rank ?? "N/A"}
-- Composite score: ${repository.composite_score ?? "N/A"}
+- Composite score: ${repository.composite_score ?? "N/A"} (higher is better)
+
+These figures come from a dashboard snapshot and may be out of date. Check the current state of the repository first, and treat anything that no longer applies as already fixed.
 
 Current score blockers:
 ${blockerLines}
-
-All scoring inputs to account for:
+${guidanceLines ? `\nHow to improve each signal:\n${guidanceLines}\n` : ""}
+All scoring inputs, for reference:
 ${scoringInputAudit}
 
-Fix the root causes that prevent a perfect score. Account for every missing, low, unavailable, or stale input above before deciding a repository issue is fixed. Do not weaken scoring, delete findings, or hand-edit generated JSON/SVG/screenshot/docs artifacts. If a blocker reflects real external state, such as an intentionally offline website, document it as an accepted external limitation and keep the evaluator honest. Regenerate stats, rebuild dashboard artifacts, and run the repo's verification gates before summarizing the result.`;
+How to work:
+1. Inspect the repository and confirm each blocker above is real. Note any that are not.
+2. Fix root causes in the repository itself (source, configuration, documentation, workflows, dependency manifests). Start with the highest-impact blockers.
+3. Run the repository's own tests, linting, and build before finishing.
+4. Make small, reviewable commits grouped by blocker.
+
+Rules:
+- Do not hide a problem. Do not weaken or disable tests, checks, or alert rules, delete findings, or add empty commits to look active.
+- If a blocker reflects something outside the repository's control, such as a website that is intentionally offline, leave it and explain why.
+- Changes to the dashboard score appear only after the next data collection, so do not expect the number to change immediately.
+
+When you finish, summarize what you changed per blocker, what you verified, and what remains and why.`;
 }
 
 const SEVERITY_TONE = {
@@ -407,7 +460,6 @@ function FixScorePromptSection({ repository, expanded, onToggle }) {
       >
         <span className={styles.fixScoreHeaderText}>
           <span>Fix score prompt</span>
-          <code className={styles.fixScoreCommand}>/devspark.fix-score</code>
         </span>
         {blockers.length > 0 ? (
           <Badge tone="caution">{blockers.length} signals</Badge>
@@ -451,7 +503,7 @@ function FixScorePromptSection({ repository, expanded, onToggle }) {
             className={styles.promptText}
             value={prompt}
             readOnly
-            aria-label={`Copilot fix score prompt for ${repository.name}`}
+            aria-label={`Fix score prompt for ${repository.name}`}
           />
 
           <button

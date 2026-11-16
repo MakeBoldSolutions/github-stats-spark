@@ -12,6 +12,7 @@ import { RefreshCw } from "lucide-react";
 import RepositoryGrid from "@/components/RepositoryGrid/RepositoryGrid";
 import TabBar from "@/components/Mobile/TabBar/TabBar";
 import { OfflineIndicator } from "@/components/Mobile/OfflineIndicator/OfflineIndicator";
+import CollectionStatus from "@/components/Common/CollectionStatus";
 import { ToastContainer } from "@/components/Mobile/Toast/Toast";
 
 // SIZE JUSTIFICATION (Constitution I): App composes routing/layout for the
@@ -126,6 +127,7 @@ function App() {
               </div>
             </div>
             <OfflineIndicator onRetry={() => refetch({ cacheBust: false })} />
+            <CollectionStatus />
           </header>
 
           {/* Main Content */}

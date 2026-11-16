@@ -120,7 +120,7 @@ without a schema rewrite. No tenants, billing, or multi-admin in this roadmap.
 ## Capability Map
 
 - **Foundation:** container deployment, scheduling, status, persistence, backup (ps-001, 002, 003, 009).
-- **Portfolio and sources:** registry, domain model, admin API/UI, GitHub connections, discovery (ps-003, 004).
+- **Portfolio and sources:** registry, domain model, admin API/UI, GitHub connections, discovery, tiering (ps-003, 004, 020).
 - **Access and privacy:** admin authentication, private/client data boundary (ps-004, 005).
 - **GitHub intelligence:** Dependabot detail and lifecycle, CI/PR/release evidence (ps-006, 007, 010).
 - **Website health:** availability/TLS, Lighthouse lab audits (ps-011, 012).
@@ -139,7 +139,8 @@ without a schema rewrite. No tenants, billing, or multi-admin in this roadmap.
 2. **Portfolio and source management:**
    [ps-003 Source registry and portfolio model](specs/complete/ps-003-source-registry-and-portfolio-collection.md),
    [ps-004 Admin API and management UI](specs/ps-004-admin-api-and-source-management-ui.md),
-   [ps-005 Private and client data boundary](specs/ps-005-private-data-boundary.md)
+   [ps-005 Private and client data boundary](specs/ps-005-private-data-boundary.md),
+   [ps-020 Portfolio classification and signal scoring](specs/ps-020-portfolio-classification-and-signal-scoring.md)
 3. **GitHub and security intelligence:**
    [ps-006 Dependabot dashboard and lifecycle](specs/ps-006-dependabot-security-dashboard.md),
    [ps-007 Alert history and remediation metrics](specs/ps-007-alert-history-and-trends.md),
@@ -170,6 +171,7 @@ ps-001 → ps-002 → ps-003 ─┬→ ps-004 → ps-005
                           ├→ ps-013  ├→ ps-015 ←─ ps-014 (needs ps-011)
                           └→ ps-016 → ps-017           │
 ps-003 → ps-009 (backup/restore is pulled forward once history exists)
+ps-003 → ps-020 (tiering; recovered from archive tag archive/004-portfolio-intelligence; feeds ps-018)
 ```
 
 Recommended order: 001, 002, 003, 004, 006, 009, 011, 007, 010, 005 (before any private or client-owned

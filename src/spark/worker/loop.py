@@ -13,7 +13,13 @@ from typing import Callable, Optional
 from github import Auth, Github
 
 from spark.cli_output_layout import slugify_username
-from spark.backup import BackupError, backup_due, create_backup
+from spark.backup import (
+    BackupError,
+    backup_due,
+    create_backup,
+    latest_backup,
+    verify_backup,
+)
 from spark.registry import Registry, seed_users
 from spark.registry.connections import resolve_token
 from spark.registry.secrets import SecretBox, SecretError, load_key
@@ -253,6 +259,7 @@ class CollectionWorker:
         if not self._backup_retry_ready(now) or not backup_due(
             s.backup_dir, s.backup_interval_seconds, now
         ):
+            self._publish_existing_backup()
             return None
         try:
             info = create_backup(
@@ -284,6 +291,27 @@ class CollectionWorker:
             f"Backup ok ({info.sources} sources, {info.repositories} repositories)"
         )
         return True
+
+    def _publish_existing_backup(self) -> None:
+        """If status.json has no backup state (a fresh start, or it was written
+        by an older release), report the newest existing backup instead of
+        staying silent until the next one is due."""
+        if self.status.state.get("backup"):
+            return
+        newest = latest_backup(self.settings.backup_dir)
+        if newest is None:
+            return
+        try:
+            info = verify_backup(newest[0])
+        except BackupError:
+            return  # an unusable file is not evidence of protection
+        self.status.record_backup(
+            ok=True,
+            at=newest[1],
+            interval_seconds=self.settings.backup_interval_seconds,
+            sources=info.sources,
+            repositories=info.repositories,
+        )
 
     def _backup_retry_ready(self, now: datetime) -> bool:
         failed = self._backup_failed_at

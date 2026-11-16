@@ -1,11 +1,11 @@
 ---
 id: ps-009
 title: Operational hardening and backup
-status: proposed
+status: complete
 order: 55
 depends_on: [ps-003]
 blockers: []
-delivery: []
+delivery: ["branch 001-work-ps-009-operational-hardening", "commit ef81314", "commit 001fb11", "commit ccd482c"]
 ---
 
 # ps-009: Operational hardening and backup

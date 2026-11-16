@@ -1,7 +1,9 @@
-# GitHub Stats Spark - self-hosted stack (ps-001: Docker foundation).
+# GitHub Stats Spark - self-hosted stack.
 #
-#   docker compose up -d --build     # start the dashboard on port 8086
-#   docker compose up worker         # (re)run one data collection
+#   docker compose up -d --build     # dashboard on port 8086 + scheduled worker
+#
+# The worker collects on a schedule (SPARK_REFRESH_INTERVAL), publishes each
+# run atomically, and writes data/status.json shown in the dashboard header.
 #
 # Collected data lives in named volumes, separate from configuration:
 #   spark-data / spark-output  - generated JSON and reports (rebuildable)
@@ -34,11 +36,19 @@ services:
       context: .
       dockerfile: docker/worker.Dockerfile
     image: github-stats-spark-worker:local
-    # One-shot collection. Restart the container (Portainer) or run
-    # `docker compose up worker` to refresh. Scheduling arrives in a later item.
-    restart: "no"
-    command: ["spark", "unified", "--user", "${SPARK_USER:?Set SPARK_USER to the GitHub user to analyze}"]
+    # Long-running scheduler. Collects on start (SPARK_RUN_ON_START) and then
+    # every SPARK_REFRESH_INTERVAL. To force a run now, restart this container.
+    restart: unless-stopped
+    command: ["python", "-m", "spark.worker"]
     environment:
+      SPARK_USER: ${SPARK_USER:?Set SPARK_USER to the GitHub user(s) to analyze, comma separated}
+      SPARK_REFRESH_INTERVAL: ${SPARK_REFRESH_INTERVAL:-6h}
+      SPARK_RUN_ON_START: ${SPARK_RUN_ON_START:-true}
+      SPARK_RUN_TIMEOUT: ${SPARK_RUN_TIMEOUT:-2h}
+      SPARK_RETRY_DELAY: ${SPARK_RETRY_DELAY:-30m}
+      SPARK_MIN_RATE_REMAINING: ${SPARK_MIN_RATE_REMAINING:-300}
+      # Extra `spark unified` flags, e.g. --include-ai-summaries (needs ANTHROPIC_API_KEY; costs money).
+      SPARK_EXTRA_ARGS: ${SPARK_EXTRA_ARGS:-}
       GITHUB_TOKEN: ${GITHUB_TOKEN:-}
       GITHUB_TOKEN_FILE: ${GITHUB_TOKEN_FILE:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
@@ -48,6 +58,12 @@ services:
       - spark-output:/app/output
       - spark-cache:/app/.cache
       - spark-config:/app/config
+    healthcheck:
+      test: ["CMD", "python", "-m", "spark.worker", "--healthcheck"]
+      interval: 60s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
     security_opt:
       - no-new-privileges:true
 

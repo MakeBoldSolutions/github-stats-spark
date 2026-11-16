@@ -1,11 +1,11 @@
 ---
 id: ps-004
 title: Admin API and management UI
-status: proposed
+status: complete
 order: 40
 depends_on: [ps-003]
 blockers: []
-delivery: []
+delivery: ["branch 001-work-ps-004-admin-api", "commit 1a306f2", "commit f33d27a", "commit 47794c5", "commit 930b914"]
 ---
 
 # ps-004: Admin API and management UI

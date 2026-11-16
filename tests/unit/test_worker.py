@@ -401,3 +401,73 @@ def test_registry_is_seeded_from_spark_user_once(settings):
     registry = Registry.open(settings.db_path)
     assert [s["identifier"] for s in registry.list_sources()] == ["Octo"]
     registry.close()
+
+
+# -- admin integration (ps-004) ---------------------------------------------
+def test_refresh_request_from_the_api_is_consumed_once(settings):
+    from spark.registry import Registry
+
+    registry = Registry.open(settings.db_path)
+    registry.request_refresh()
+    registry.close()
+    worker = _make(settings, _good_runner())
+    assert worker._refresh_requested() is True
+    assert worker._refresh_requested() is False
+
+
+def test_each_user_source_collects_with_its_own_connection_token(settings, monkeypatch):
+    from spark.registry import Registry, connections
+    from spark.registry.secrets import SecretBox, generate_key
+
+    key = generate_key()
+    monkeypatch.setenv("SPARK_SECRET_KEY", key)
+    registry = Registry.open(settings.db_path)
+    conn = connections.create_connection(
+        registry, SecretBox(key), name="octo", token="github_pat_" + "o" * 40
+    )
+    source = registry.add_source("user", "Octo")
+    registry.update_source(source["id"], connection_id=conn["id"])
+    registry.close()
+    seen = {}
+
+    def runner(command, cwd, env, timeout_seconds, stop_event, tick):
+        seen["token"] = env.get("GITHUB_TOKEN")
+        _write_repos(cwd, "Octo", ["a"])
+        return RunResult(exit_code=0)
+
+    monkeypatch.setenv("GITHUB_TOKEN", "default-token")
+    assert _make(settings, runner).run_once() == "success"
+    assert seen["token"] == "github_pat_" + "o" * 40
+
+
+def test_user_with_an_expired_connection_is_skipped_not_run_unauthenticated(
+    settings, monkeypatch
+):
+    from spark.registry import Registry, connections
+    from spark.registry.secrets import SecretBox, generate_key
+
+    key = generate_key()
+    monkeypatch.setenv("SPARK_SECRET_KEY", key)
+    registry = Registry.open(settings.db_path)
+    conn = connections.create_connection(
+        registry,
+        SecretBox(key),
+        name="old",
+        token="github_pat_" + "o" * 40,
+        expires_at="2020-01-01",
+    )
+    source = registry.add_source("user", "Octo")
+    registry.update_source(source["id"], connection_id=conn["id"])
+    registry.close()
+    calls = []
+
+    def runner(*args, **kwargs):
+        calls.append(1)
+        return RunResult(exit_code=0)
+
+    worker = _make(settings, runner)
+    assert worker.run_once() == "failed"
+    assert calls == []
+    registry = Registry.open(settings.db_path)
+    assert registry.list_sources()[0]["error_code"] == "connection_unusable"
+    registry.close()

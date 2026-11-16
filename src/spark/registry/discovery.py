@@ -7,10 +7,11 @@ client, so it can be tested without network access.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
 from github import GithubException
 
+from spark.registry.secrets import SecretError
 from spark.registry.store import Registry
 
 ERROR_HINTS = {
@@ -24,6 +25,9 @@ ERROR_HINTS = {
     "rate_limited": "The GitHub API rate limit is exhausted. Discovery resumes "
     "on the next cycle after the limit resets.",
     "bad_credentials": "GitHub rejected the token as invalid or expired.",
+    "connection_unusable": "The source's saved connection cannot be used "
+    "(expired, removed, or its secret cannot be read). Replace the token on the "
+    "Connections tab.",
     "network": "GitHub could not be reached.",
     "error": "Unexpected error talking to GitHub.",
 }
@@ -146,9 +150,37 @@ def discover_source(registry: Registry, github: Any, source: Dict[str, Any]) -> 
     return {"source_id": sid, "state": "ok", "code": None, "count": len(seen)}
 
 
-def run_discovery(registry: Registry, github: Any) -> List[dict]:
-    """Discover every enabled source. Disabled sources are left as they were."""
-    return [
-        discover_source(registry, github, source)
-        for source in registry.list_sources(enabled_only=True)
-    ]
+def run_discovery(
+    registry: Registry,
+    github: Any = None,
+    *,
+    github_for: Optional[Callable[[Dict[str, Any]], Any]] = None,
+) -> List[dict]:
+    """Discover every enabled source. Disabled sources are left as they were.
+
+    ``github_for(source)`` supplies a per-source client (so each source can use
+    its own connection); if it raises, that source is marked
+    ``connection_unusable`` and the others still run.
+    """
+    results = []
+    for source in registry.list_sources(enabled_only=True):
+        try:
+            client = github_for(source) if github_for else github
+        except SecretError as error:
+            registry.record_source_status(
+                source["id"],
+                "error",
+                error_code="connection_unusable",
+                error_message=f"{ERROR_HINTS['connection_unusable']} ({error})",
+            )
+            results.append(
+                {
+                    "source_id": source["id"],
+                    "state": "error",
+                    "code": "connection_unusable",
+                    "count": 0,
+                }
+            )
+            continue
+        results.append(discover_source(registry, client, source))
+    return results

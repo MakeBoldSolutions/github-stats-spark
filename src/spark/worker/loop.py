@@ -13,7 +13,9 @@ from typing import Callable, Optional
 from github import Auth, Github
 
 from spark.cli_output_layout import slugify_username
-from spark.registry import Registry, collection_users, seed_users
+from spark.registry import Registry, seed_users
+from spark.registry.connections import resolve_token
+from spark.registry.secrets import SecretBox, SecretError, load_key
 from spark.registry.discovery import run_discovery
 from spark.registry.export import write_portfolio
 from spark.worker import publish
@@ -44,6 +46,8 @@ class CollectionWorker:
         self.rate_limit_fn = rate_limit_fn
         self.now = now_fn
         self.github_factory = github_factory
+        self.secret_box = SecretBox(load_key())
+        self._user_tokens: dict = {}
         self.log = log
         self.stop_event = threading.Event()
         self.status = StatusStore(
@@ -109,10 +113,13 @@ class CollectionWorker:
             ok_users, failed_users = [], []
             for user in users:
                 self.log(f"Collecting {user}")
+                user_env = dict(env)
+                if self._user_tokens.get(user):
+                    user_env["GITHUB_TOKEN"] = self._user_tokens[user]
                 result = self.runner(
                     build_command(user, s.config_path, s.extra_args),
                     cwd=stage,
-                    env=env,
+                    env=user_env,
                     timeout_seconds=s.run_timeout_seconds,
                     stop_event=self.stop_event,
                     tick=self.heartbeat,
@@ -172,7 +179,19 @@ class CollectionWorker:
         registry = Registry.open(self.settings.db_path)
         try:
             seed_users(registry, self.settings.users)
-            results = run_discovery(registry, self.github_factory(token))
+            clients: dict = {}
+
+            def github_for(source):
+                # Each source uses its own connection, else the default token.
+                # A client is reused for sources that share a token.
+                source_token = resolve_token(
+                    registry, self.secret_box, source, default=token
+                )
+                if source_token not in clients:
+                    clients[source_token] = self.github_factory(source_token)
+                return clients[source_token]
+
+            results = run_discovery(registry, github_for=github_for)
             payload = write_portfolio(registry, stage / "data" / "portfolio.json")
             sources = {src["id"]: src for src in registry.list_sources()}
             problems = [
@@ -181,7 +200,17 @@ class CollectionWorker:
                 for r in results
                 if r["state"] == "error"
             ]
-            users = collection_users(registry)
+            users, self._user_tokens = [], {}
+            for source in registry.list_sources(enabled_only=True):
+                if source["type"] != "user":
+                    continue
+                try:
+                    self._user_tokens[source["identifier"]] = resolve_token(
+                        registry, self.secret_box, source
+                    )
+                except SecretError:
+                    continue  # reported by discovery; do not run it unauthenticated
+                users.append(source["identifier"])
             self.status.state["users"] = users
             return users, problems, payload["repository_count"]
         finally:
@@ -209,6 +238,20 @@ class CollectionWorker:
         return f"{user}: no repositories were collected"
 
     # -- scheduling ----------------------------------------------------
+    def _refresh_requested(self) -> bool:
+        """True once if the admin asked for a refresh (via the database)."""
+        path = self.settings.db_path
+        if not path.exists():
+            return False
+        try:
+            registry = Registry.open(path)
+            try:
+                return registry.consume_refresh_requests() > 0
+            finally:
+                registry.close()
+        except Exception:  # noqa: BLE001 - a busy DB must not stop the loop
+            return False
+
     def run_forever(self) -> None:
         s = self.settings
         next_due = (
@@ -219,7 +262,7 @@ class CollectionWorker:
         self.status.schedule(next_due)
         while not self.stop_event.is_set():
             self.heartbeat()
-            if self.now() >= next_due:
+            if self.now() >= next_due or self._refresh_requested():
                 self.run_once()
                 next_run = self.status.state.get("next_run_at")
                 next_due = (

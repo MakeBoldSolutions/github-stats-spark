@@ -97,6 +97,36 @@ MIGRATIONS: List[str] = [
     );
     CREATE INDEX observation_lookup ON observation (subject, kind, observed_at);
     """,
+    # 2: administrator, sessions, stored connections, refresh requests
+    """
+    CREATE TABLE admin_user (
+        id INTEGER PRIMARY KEY,
+        username TEXT NOT NULL UNIQUE COLLATE NOCASE,
+        password_hash TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    );
+    -- Only a hash of the session token is stored, so a copied database cannot
+    -- be used to impersonate a signed-in administrator.
+    CREATE TABLE admin_session (
+        id INTEGER PRIMARY KEY,
+        token_hash TEXT NOT NULL UNIQUE,
+        csrf_token TEXT NOT NULL,
+        user_id INTEGER NOT NULL REFERENCES admin_user(id) ON DELETE CASCADE,
+        created_at TEXT NOT NULL,
+        expires_at TEXT NOT NULL
+    );
+    -- secret_encrypted is a Fernet token; the key lives outside the database.
+    ALTER TABLE connection ADD COLUMN secret_encrypted TEXT;
+    ALTER TABLE connection ADD COLUMN owner TEXT;
+    ALTER TABLE connection ADD COLUMN expires_at TEXT;
+    ALTER TABLE connection ADD COLUMN last_validated_at TEXT;
+    -- The API asks; the worker (a separate process) acts. No RPC.
+    CREATE TABLE refresh_request (
+        id INTEGER PRIMARY KEY,
+        requested_at TEXT NOT NULL,
+        handled_at TEXT
+    );
+    """,
 ]
 
 
@@ -104,7 +134,7 @@ def connect(path: Union[str, Path]) -> sqlite3.Connection:
     """Open the registry database, creating and migrating it as needed."""
     if str(path) != ":memory:":
         Path(path).parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(path), timeout=30)
+    conn = sqlite3.connect(str(path), timeout=30, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     if str(path) != ":memory:":

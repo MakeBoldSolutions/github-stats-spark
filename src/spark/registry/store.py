@@ -308,6 +308,146 @@ class Registry:
                 (client_id, project_id, application_id, row[0]),
             )
 
+    # -- clients, projects, applications ----------------------------------
+    def create_client(self, name: str) -> Dict[str, Any]:
+        name = (name or "").strip()
+        if not name or len(name) > 120:
+            raise RegistryError("client name must be 1-120 characters")
+        return {"id": self._client_id(name, create=True), "name": name}
+
+    def create_project(self, client_id: Optional[int], name: str) -> Dict[str, Any]:
+        name = (name or "").strip()
+        if not name or len(name) > 120:
+            raise RegistryError("project name must be 1-120 characters")
+        if client_id is not None:
+            self._require("client", client_id)
+        found = self.conn.execute(
+            "SELECT id FROM project WHERE name = ? AND client_id IS ?",
+            (name, client_id),
+        ).fetchone()
+        if found:
+            return {"id": found[0], "client_id": client_id, "name": name}
+        with self.conn:
+            new_id = self.conn.execute(
+                "INSERT INTO project (client_id, name, created_at) VALUES (?, ?, ?)",
+                (client_id, name, now_iso()),
+            ).lastrowid
+        return {"id": new_id, "client_id": client_id, "name": name}
+
+    def create_application(self, project_id: int, name: str) -> Dict[str, Any]:
+        name = (name or "").strip()
+        if not name or len(name) > 120:
+            raise RegistryError("application name must be 1-120 characters")
+        project = self._require("project", project_id)
+        found = self.conn.execute(
+            "SELECT id FROM application WHERE name = ? AND project_id = ?",
+            (name, project_id),
+        ).fetchone()
+        if found:
+            return {"id": found[0], "project_id": project_id, "name": name}
+        with self.conn:
+            new_id = self.conn.execute(
+                "INSERT INTO application (client_id, project_id, name, created_at)"
+                " VALUES (?, ?, ?, ?)",
+                (project["client_id"], project_id, name, now_iso()),
+            ).lastrowid
+        return {"id": new_id, "project_id": project_id, "name": name}
+
+    def _require(self, table: str, row_id: int) -> sqlite3.Row:
+        if table not in ("client", "project", "application", "connection"):
+            raise ValueError(table)
+        row = self.conn.execute(
+            f"SELECT * FROM {table} WHERE id = ?", (row_id,)
+        ).fetchone()
+        if not row:
+            raise RegistryError(f"no {table} with id {row_id}")
+        return row
+
+    def portfolio_tree(self) -> List[Dict[str, Any]]:
+        """Clients with their projects and applications (for pickers)."""
+        clients = [
+            dict(r)
+            for r in self.conn.execute("SELECT id, name FROM client ORDER BY name")
+        ]
+        for client in clients:
+            client["projects"] = self._projects_for(client["id"])
+        internal = self._projects_for(None)
+        if internal:
+            clients.insert(0, {"id": None, "name": "Internal", "projects": internal})
+        return clients
+
+    def _projects_for(self, client_id: Optional[int]) -> List[Dict[str, Any]]:
+        projects = [
+            dict(r)
+            for r in self.conn.execute(
+                "SELECT id, name FROM project WHERE client_id IS ? ORDER BY name",
+                (client_id,),
+            )
+        ]
+        for project in projects:
+            project["applications"] = [
+                dict(r)
+                for r in self.conn.execute(
+                    "SELECT id, name FROM application WHERE project_id = ?"
+                    " ORDER BY name",
+                    (project["id"],),
+                )
+            ]
+        return projects
+
+    # -- source editing ---------------------------------------------------
+    def update_source(
+        self,
+        source_id: int,
+        *,
+        client: Optional[str] = None,
+        connection_id: Optional[int] = None,
+        clear_connection: bool = False,
+    ) -> Dict[str, Any]:
+        self.get_source(source_id)
+        with self.conn:
+            if client is not None:
+                self.conn.execute(
+                    "UPDATE source SET client_id = ? WHERE id = ?",
+                    (
+                        self._client_id(client, create=True) if client else None,
+                        source_id,
+                    ),
+                )
+            if clear_connection:
+                self.conn.execute(
+                    "UPDATE source SET connection_id = NULL WHERE id = ?", (source_id,)
+                )
+            elif connection_id is not None:
+                self._require("connection", connection_id)
+                self.conn.execute(
+                    "UPDATE source SET connection_id = ? WHERE id = ?",
+                    (connection_id, source_id),
+                )
+        return self.get_source(source_id)
+
+    # -- refresh requests (the API asks, the worker acts) -------------------
+    def request_refresh(self) -> int:
+        with self.conn:
+            return self.conn.execute(
+                "INSERT INTO refresh_request (requested_at) VALUES (?)", (now_iso(),)
+            ).lastrowid
+
+    def pending_refresh(self) -> bool:
+        return (
+            self.conn.execute(
+                "SELECT 1 FROM refresh_request WHERE handled_at IS NULL LIMIT 1"
+            ).fetchone()
+            is not None
+        )
+
+    def consume_refresh_requests(self) -> int:
+        with self.conn:
+            return self.conn.execute(
+                "UPDATE refresh_request SET handled_at = ? WHERE handled_at IS NULL",
+                (now_iso(),),
+            ).rowcount
+
     # -- collected data -------------------------------------------------
     def record_observation(
         self,

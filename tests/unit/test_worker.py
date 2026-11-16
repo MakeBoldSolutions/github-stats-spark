@@ -61,7 +61,8 @@ def _write_repos(cwd: Path, user: str, repos):
 
 def _good_runner(repos=("a",)):
     def runner(command, cwd, env, timeout_seconds, stop_event, tick):
-        _write_repos(cwd, command[command.index("--user") + 1], list(repos))
+        folder = command[command.index("--slug") + 1] if "--slug" in command else None
+        _write_repos(cwd, folder or command[command.index("--user") + 1], list(repos))
         return RunResult(exit_code=0)
 
     return runner
@@ -371,15 +372,49 @@ def test_bad_source_makes_the_run_partial_with_the_reason(settings):
     assert _published(settings)["repositories"] == ["a"]  # others still published
 
 
-def test_org_only_registry_publishes_the_portfolio_without_user_collection(settings):
+def test_org_and_repo_sources_each_get_their_own_dashboard(settings):
     from tests.unit.registry_fakes import make_repo
     from spark.registry import Registry
 
     registry = Registry.open(settings.db_path)
     registry.add_source("org", "Acme")
+    registry.add_source("repo", "Acme/Widget")
     registry.set_source_enabled(registry.find_source("org", "Acme")["id"], True)
     registry.close()
-    # Settings still seed "Octo" only when the registry is empty; it is not.
+    commands = []
+
+    def runner(command, cwd, env, timeout_seconds, stop_event, tick):
+        commands.append(command)
+        return _good_runner()(command, cwd, env, timeout_seconds, stop_event, tick)
+
+    github = FakeGithub(
+        orgs={"Acme": [make_repo("Acme/a")]},
+        repos={"Acme/Widget": make_repo("Acme/Widget")},
+    )
+    outcome = _make_with_github(settings, runner, github).run_once()
+
+    assert outcome == "success"
+    org_command = next(c for c in commands if "--repository" not in c)
+    assert org_command[org_command.index("--user") + 1] == "Acme"
+    repo_command = next(c for c in commands if "--repository" in c)
+    assert repo_command[repo_command.index("--repository") + 1] == "Widget"
+    assert repo_command[repo_command.index("--slug") + 1] == "acme--widget"
+    assert (settings.data_dir / "users" / "acme" / "repositories.json").exists()
+    assert (settings.data_dir / "users" / "acme--widget" / "repositories.json").exists()
+    portfolio = json.loads((settings.data_dir / "portfolio.json").read_text())
+    slugs = {s["identifier"]: s["slug"] for s in portfolio["sources"]}
+    assert slugs == {"Acme": "acme", "Acme/Widget": "acme--widget"}
+
+
+def test_a_disabled_source_is_not_collected(settings):
+    from tests.unit.registry_fakes import make_repo
+    from spark.registry import Registry
+
+    registry = Registry.open(settings.db_path)
+    registry.add_source("org", "Acme")
+    source = registry.find_source("org", "Acme")
+    registry.set_source_enabled(source["id"], False)
+    registry.close()
     calls = []
 
     def runner(*args, **kwargs):
@@ -387,11 +422,8 @@ def test_org_only_registry_publishes_the_portfolio_without_user_collection(setti
         return RunResult(exit_code=0)
 
     github = FakeGithub(orgs={"Acme": [make_repo("Acme/a")]})
-    outcome = _make_with_github(settings, runner, github).run_once()
-
-    assert outcome == "success"
+    _make_with_github(settings, runner, github).run_once()
     assert calls == []
-    assert (settings.data_dir / "portfolio.json").exists()
 
 
 def test_registry_is_seeded_from_spark_user_once(settings):
@@ -471,3 +503,23 @@ def test_user_with_an_expired_connection_is_skipped_not_run_unauthenticated(
     registry = Registry.open(settings.db_path)
     assert registry.list_sources()[0]["error_code"] == "connection_unusable"
     registry.close()
+
+
+def test_source_slug_never_collides_with_a_login():
+    from spark.cli_output_layout import source_slug
+
+    assert source_slug("user", "MarkHazleton") == "markhazleton"
+    assert source_slug("org", "West-Wichita-Rotary-Club") == "west-wichita-rotary-club"
+    assert source_slug("repo", "Acme/My.Repo") == "acme--my.repo"
+    # GitHub logins cannot contain "--", so a repo slug is never a login.
+    assert "--" in source_slug("repo", "a/b")
+
+
+def test_build_command_scopes_a_repository_run():
+    from spark.worker.runner import build_command
+
+    command = build_command(
+        "acme", Path("c.yml"), [], slug="acme--widget", repository="Widget"
+    )
+    assert command[-4:] == ["--slug", "acme--widget", "--repository", "Widget"]
+    assert "--slug" not in build_command("acme", Path("c.yml"), [])

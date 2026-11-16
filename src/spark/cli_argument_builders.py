@@ -91,6 +91,12 @@ def _add_unified_parser(subparsers: argparse._SubParsersAction) -> None:
         default=None,
         help="Run for a single repository (for testing)",
     )
+    parser.add_argument(
+        "--slug",
+        type=str,
+        default="",
+        help="Output folder name under users/ (default: the user, lower-cased)",
+    )
 
 
 def _add_analyze_parser(subparsers: argparse._SubParsersAction) -> None:

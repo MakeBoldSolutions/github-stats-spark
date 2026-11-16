@@ -12,7 +12,7 @@ from typing import Callable, Optional
 
 from github import Auth, Github
 
-from spark.cli_output_layout import slugify_username
+from spark.cli_output_layout import source_slug
 from spark.backup import (
     BackupError,
     backup_due,
@@ -56,7 +56,6 @@ class CollectionWorker:
         self.github_factory = github_factory
         self.secret_box = SecretBox(load_key())
         self._backup_failed_at: Optional[datetime] = None
-        self._user_tokens: dict = {}
         self.log = log
         self.stop_event = threading.Event()
         self.status = StatusStore(
@@ -118,28 +117,36 @@ class CollectionWorker:
 
             env = dict(os.environ)
             env["SPARK_CACHE_DIR"] = str(s.cache_dir)
-            users, problems, portfolio_count = self._refresh_registry(token, stage)
+            jobs, problems, portfolio_count = self._refresh_registry(token, stage)
+            users = [job["label"] for job in jobs]
             ok_users, failed_users = [], []
-            for user in users:
-                self.log(f"Collecting {user}")
-                user_env = dict(env)
-                if self._user_tokens.get(user):
-                    user_env["GITHUB_TOKEN"] = self._user_tokens[user]
+            for job in jobs:
+                label = job["label"]
+                self.log(f"Collecting {label}")
+                job_env = dict(env)
+                if job["token"]:
+                    job_env["GITHUB_TOKEN"] = job["token"]
                 result = self.runner(
-                    build_command(user, s.config_path, s.extra_args),
+                    build_command(
+                        job["owner"],
+                        s.config_path,
+                        s.extra_args,
+                        slug=job["slug"],
+                        repository=job["repository"],
+                    ),
                     cwd=stage,
-                    env=user_env,
+                    env=job_env,
                     timeout_seconds=s.run_timeout_seconds,
                     stop_event=self.stop_event,
                     tick=self.heartbeat,
                 )
                 errors += result.error_count
                 exit_code = result.exit_code
-                if result.ok and self._has_valid_data(stage, user):
-                    ok_users.append(user)
+                if result.ok and self._has_valid_data(stage, job["slug"]):
+                    ok_users.append(label)
                 else:
-                    failed_users.append(user)
-                    reason = self._failure_reason(result, user) or reason
+                    failed_users.append(label)
+                    reason = self._failure_reason(result, label) or reason
 
             if ok_users or (not users and portfolio_count):
                 release_id = started.strftime("%Y%m%dT%H%M%SZ")
@@ -149,7 +156,7 @@ class CollectionWorker:
                     "partial" if (failed_users or errors or problems) else "success"
                 )
                 if failed_users:
-                    reason = f"{len(failed_users)} user(s) failed: " + reason
+                    reason = f"{len(failed_users)} source(s) failed: " + reason
                 elif errors:
                     reason = f"completed with {errors} logged error(s)"
                 elif problems:
@@ -181,7 +188,7 @@ class CollectionWorker:
     def _refresh_registry(self, token: str, stage):
         """Discover sources and write portfolio.json into the stage.
 
-        Returns (users to collect, source problems, portfolio repository count).
+        Returns (dashboards to collect, source problems, portfolio repository count).
         A failing source is recorded on that source and reported; it never
         blocks the others.
         """
@@ -209,25 +216,43 @@ class CollectionWorker:
                 for r in results
                 if r["state"] == "error"
             ]
-            users, self._user_tokens = [], {}
+            jobs = []
             for source in registry.list_sources(enabled_only=True):
-                if source["type"] != "user":
-                    continue
-                try:
-                    self._user_tokens[source["identifier"]] = resolve_token(
-                        registry, self.secret_box, source
-                    )
-                except SecretError:
-                    continue  # reported by discovery; do not run it unauthenticated
-                users.append(source["identifier"])
-            self.status.state["users"] = users
-            return users, problems, payload["repository_count"]
+                job = self._dashboard_job(registry, source)
+                if job:
+                    jobs.append(job)
+            self.status.state["users"] = [job["label"] for job in jobs]
+            return jobs, problems, payload["repository_count"]
         finally:
             registry.close()
 
+    def _dashboard_job(self, registry, source) -> Optional[dict]:
+        """One collection run for an enabled source, or None to skip it.
+
+        Users and organizations collect every public repository they own; a
+        repository source collects just that repository. Dashboards live under
+        ``data/users/<slug>/`` with the slug from ``source_slug``."""
+        kind, identifier = source["type"], source["identifier"]
+        if kind not in ("user", "org", "repo"):
+            return None
+        try:
+            token = resolve_token(registry, self.secret_box, source)
+        except SecretError:
+            return None  # reported by discovery; do not run it unauthenticated
+        owner, repository = identifier, ""
+        if kind == "repo":
+            owner, _, repository = identifier.partition("/")
+        return {
+            "label": identifier,
+            "owner": owner,
+            "repository": repository,
+            "slug": source_slug(kind, identifier),
+            "token": token,
+        }
+
     @staticmethod
-    def _has_valid_data(stage, user: str) -> bool:
-        path = stage / "data" / "users" / slugify_username(user) / "repositories.json"
+    def _has_valid_data(stage, slug: str) -> bool:
+        path = stage / "data" / "users" / slug / "repositories.json"
         try:
             payload = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):

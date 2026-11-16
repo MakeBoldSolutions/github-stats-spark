@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List
 
+from spark.cli_output_layout import source_slug
 from spark.registry.store import Registry, now_iso
 
 SCHEMA_VERSION = 1
@@ -66,7 +67,11 @@ def build_portfolio(registry: Registry) -> Dict[str, Any]:
         "generated_at": now_iso(),
         "repository_count": len(repositories),
         "sources": [
-            {**{k: s[k] for k in _SOURCE_FIELDS}, "enabled": bool(s["enabled"])}
+            {
+                **{k: s[k] for k in _SOURCE_FIELDS},
+                "enabled": bool(s["enabled"]),
+                "slug": source_slug(s["type"], s["identifier"]),
+            }
             for s in sources
         ],
         "repositories": repositories,

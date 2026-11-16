@@ -358,7 +358,8 @@ class UnifiedDataGenerator:
         phase1_start = time()
         raw_repos = self._fetch_repository_list()
         if single_repository:
-            raw_repos = [r for r in raw_repos if r.get("name") == single_repository]
+            wanted = single_repository.lower()
+            raw_repos = [r for r in raw_repos if str(r.get("name")).lower() == wanted]
             logger.info(f"Filtered to single repository: {single_repository}")
         phase1_time = time() - phase1_start
         logger.info(f"Found {len(raw_repos)} repositories ({phase1_time:.2f}s)")

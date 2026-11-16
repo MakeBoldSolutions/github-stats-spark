@@ -29,8 +29,17 @@ class RunResult:
         return self.exit_code == 0 and not self.timed_out and not self.stopped
 
 
-def build_command(user: str, config_path: Path, extra_args: List[str]) -> List[str]:
-    return [
+def build_command(
+    user: str,
+    config_path: Path,
+    extra_args: List[str],
+    slug: str = "",
+    repository: str = "",
+) -> List[str]:
+    """Command for one dashboard: a user or organization (``user`` is the
+    login) or a single repository (``user`` is the owner, ``repository`` its
+    name). ``slug`` names the output folder when it differs from the login."""
+    command = [
         sys.executable,
         "-m",
         "spark.cli",
@@ -39,8 +48,12 @@ def build_command(user: str, config_path: Path, extra_args: List[str]) -> List[s
         user,
         "--config",
         str(config_path),
-        *extra_args,
     ]
+    if slug:
+        command += ["--slug", slug]
+    if repository:
+        command += ["--repository", repository]
+    return [*command, *extra_args]
 
 
 def run_collection(

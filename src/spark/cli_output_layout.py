@@ -26,18 +26,33 @@ def slugify_username(username: str) -> str:
     return slug or "user"
 
 
+def source_slug(source_type: str, identifier: str) -> str:
+    """Dashboard folder name for a registered source.
+
+    Users and organizations use their login (GitHub logins are unique across
+    both). A single repository is ``<owner>--<name>``; GitHub logins cannot
+    contain two consecutive hyphens, so it can never collide with a login.
+    """
+    if source_type == "repo" and "/" in identifier:
+        owner, name = identifier.split("/", 1)
+        return f"{slugify_username(owner)}--{slugify_username(name)}"
+    return slugify_username(identifier)
+
+
 def to_posix_path(path: Path) -> str:
     """Return a repository-relative path string suitable for JSON payloads."""
     return path.as_posix()
 
 
-def build_output_layout(username: str, data_output_dir: str) -> OutputLayout:
+def build_output_layout(
+    username: str, data_output_dir: str, slug: str = ""
+) -> OutputLayout:
     """Resolve output directories for unified generation.
 
     Outputs are always scoped to the username so that multiple users can
     coexist on the same filesystem and the same GitHub Pages deployment.
     """
-    user_slug = slugify_username(username)
+    user_slug = slugify_username(slug or username)
     data_dir = Path(data_output_dir) / "users" / user_slug
     output_root = Path("output") / "users" / user_slug
 

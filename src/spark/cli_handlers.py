@@ -27,7 +27,9 @@ def handle_unified(args, logger):
     logger.info("=" * 70)
     logger.info("Stats Spark - ALL-IN-ONE Unified Generation")
     logger.info("=" * 70)
-    output_layout = build_output_layout(args.user, args.output_dir)
+    output_layout = build_output_layout(
+        args.user, args.output_dir, getattr(args, "slug", "")
+    )
     logger.info(f"User: {args.user}")
     logger.info(f"Data output: {output_layout['data_dir']}")
     logger.info(f"Artifacts output: {output_layout['artifact_root']}")

@@ -9,11 +9,37 @@ export function navigateToUser(slug) {
   window.location.assign(url.toString());
 }
 
+const GROUPS = [
+  ["user", "Users"],
+  ["org", "Organizations"],
+  ["repo", "Repositories"],
+];
+
+const sourceShape = PropTypes.shape({
+  login: PropTypes.string.isRequired,
+  slug: PropTypes.string.isRequired,
+  type: PropTypes.string,
+  ready: PropTypes.bool,
+});
+
 /**
- * Presentational picker. Users whose data has not been collected yet are
- * listed but disabled, with the reason in the label.
+ * Presentational picker. Sources whose data has not been collected yet are
+ * listed but disabled, with the reason in the label. Grouped by type once
+ * more than one type is registered.
  */
 export function UserPickerView({ users, selected, onSelect }) {
+  const option = (user) => (
+    <option
+      key={user.slug}
+      value={user.slug}
+      disabled={!user.ready && user.slug !== selected}
+    >
+      {user.login}
+      {user.ready ? "" : " (not collected yet)"}
+    </option>
+  );
+  const types = new Set(users.map((user) => user.type || "user"));
+
   return (
     <select
       className={styles.picker}
@@ -22,34 +48,28 @@ export function UserPickerView({ users, selected, onSelect }) {
       onChange={(event) => onSelect(event.target.value)}
       data-testid="user-picker"
     >
-      {users.map((user) => (
-        <option
-          key={user.slug}
-          value={user.slug}
-          disabled={!user.ready && user.slug !== selected}
-        >
-          {user.login}
-          {user.ready ? "" : " (not collected yet)"}
-        </option>
-      ))}
+      {types.size < 2
+        ? users.map(option)
+        : GROUPS.map(([type, label]) => {
+            const members = users.filter((u) => (u.type || "user") === type);
+            return members.length ? (
+              <optgroup key={type} label={label}>
+                {members.map(option)}
+              </optgroup>
+            ) : null;
+          })}
     </select>
   );
 }
 
 UserPickerView.propTypes = {
-  users: PropTypes.arrayOf(
-    PropTypes.shape({
-      login: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      ready: PropTypes.bool,
-    }),
-  ).isRequired,
+  users: PropTypes.arrayOf(sourceShape).isRequired,
   selected: PropTypes.string.isRequired,
   onSelect: PropTypes.func.isRequired,
 };
 
 /**
- * Renders nothing unless at least two users are registered, so single-user
+ * Renders nothing unless at least two sources are registered, so single-user
  * and static (GitHub Pages) deployments look exactly as before. `users`
  * comes from useUserOptions (the caller also needs the count).
  */
@@ -73,11 +93,5 @@ export default function UserPicker({ users }) {
 }
 
 UserPicker.propTypes = {
-  users: PropTypes.arrayOf(
-    PropTypes.shape({
-      login: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      ready: PropTypes.bool,
-    }),
-  ).isRequired,
+  users: PropTypes.arrayOf(sourceShape).isRequired,
 };

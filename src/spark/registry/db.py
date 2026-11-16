@@ -8,6 +8,7 @@ client carries a nullable ``client_id`` (NULL means an internal asset).
 
 from __future__ import annotations
 
+import os
 import sqlite3
 from pathlib import Path
 from typing import List, Union
@@ -130,15 +131,44 @@ MIGRATIONS: List[str] = [
 ]
 
 
+def copy_database(source: Union[str, Path], target: Union[str, Path]) -> None:
+    """Consistent copy using SQLite's online backup API, so it is safe while
+    other processes are writing. The target appears only once complete."""
+    target = Path(target)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    partial = target.with_name(target.name + ".partial")
+    partial.unlink(missing_ok=True)
+    src = sqlite3.connect(str(source), timeout=30)
+    dst = sqlite3.connect(str(partial))
+    try:
+        src.backup(dst)
+    finally:
+        dst.close()
+        src.close()
+    os.replace(partial, target)
+
+
+def _save_pre_migration_copy(path: Path, conn: sqlite3.Connection) -> None:
+    """Before upgrading an existing database, keep a copy of it as it was, so a
+    rollback to the previous release has something it can open."""
+    current = schema_version(conn)
+    if 0 < current < len(MIGRATIONS):
+        keep = path.with_name(f"{path.name}.pre-v{current}.bak")
+        if not keep.exists():
+            copy_database(path, keep)
+
+
 def connect(path: Union[str, Path]) -> sqlite3.Connection:
     """Open the registry database, creating and migrating it as needed."""
-    if str(path) != ":memory:":
+    on_disk = str(path) != ":memory:"
+    if on_disk:
         Path(path).parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(path), timeout=30, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
-    if str(path) != ":memory:":
+    if on_disk:
         conn.execute("PRAGMA journal_mode = WAL")
+        _save_pre_migration_copy(Path(path), conn)
     conn.execute("PRAGMA synchronous = NORMAL")
     migrate(conn)
     return conn

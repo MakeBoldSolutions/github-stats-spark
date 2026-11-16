@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import argparse
+import json
 import signal
 import sys
 import time
+from datetime import datetime, timezone
+from typing import Optional
 
 from spark.worker.loop import CollectionWorker
 from spark.worker.settings import SettingsError, WorkerSettings
@@ -13,13 +16,50 @@ from spark.worker.settings import SettingsError, WorkerSettings
 HEALTHY_HEARTBEAT_SECONDS = 120
 
 
-def healthcheck(settings: WorkerSettings) -> int:
-    """Healthy when the worker loop has beaten recently."""
+def _age_seconds(value, now: datetime):
+    try:
+        return (now - datetime.fromisoformat(value)).total_seconds()
+    except (TypeError, ValueError):
+        return None
+
+
+def health_problem(settings: WorkerSettings, now: Optional[datetime] = None) -> str:
+    """Why the worker is unhealthy, or "" when it is healthy.
+
+    Unhealthy means the loop has stalled, collection has not succeeded for two
+    intervals (or keeps failing with no success yet), or backups have been
+    failing for two backup intervals.
+    """
+    now = now or datetime.now(timezone.utc)
     try:
         beat = float(settings.heartbeat_path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
-        return 1
-    return 0 if time.time() - beat < HEALTHY_HEARTBEAT_SECONDS else 1
+        return "no worker heartbeat"
+    if time.time() - beat >= HEALTHY_HEARTBEAT_SECONDS:
+        return "worker loop has stalled"
+    try:
+        status = json.loads(settings.status_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return ""  # first start: nothing recorded yet
+    interval = status.get("interval_seconds") or settings.interval_seconds
+    age = _age_seconds(status.get("last_success_at"), now)
+    if age is not None and age > 2 * interval + settings.retry_seconds:
+        return "no successful collection for over two refresh intervals"
+    if age is None and (status.get("consecutive_failures") or 0) >= 3:
+        return "collection has failed repeatedly with no success"
+    backup = status.get("backup")
+    if backup and settings.backup_interval_seconds > 0 and not backup.get("ok"):
+        since = _age_seconds(backup.get("last_success_at"), now)
+        if since is None or since > 2 * settings.backup_interval_seconds:
+            return "database backups are failing"
+    return ""
+
+
+def healthcheck(settings: WorkerSettings) -> int:
+    problem = health_problem(settings)
+    if problem:
+        print(f"unhealthy: {problem}", file=sys.stderr)
+    return 1 if problem else 0
 
 
 def main(argv=None) -> int:

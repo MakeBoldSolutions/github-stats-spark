@@ -13,6 +13,7 @@ from typing import Callable, Optional
 from github import Auth, Github
 
 from spark.cli_output_layout import slugify_username
+from spark.backup import BackupError, backup_due, create_backup
 from spark.registry import Registry, seed_users
 from spark.registry.connections import resolve_token
 from spark.registry.secrets import SecretBox, SecretError, load_key
@@ -26,6 +27,7 @@ from spark.worker.status import StatusStore, utcnow
 
 HEARTBEAT_EVERY_SECONDS = 15
 RATE_LIMIT_RESUME_PAD_SECONDS = 60
+BACKUP_RETRY_SECONDS = 15 * 60
 
 
 class CollectionWorker:
@@ -47,6 +49,7 @@ class CollectionWorker:
         self.now = now_fn
         self.github_factory = github_factory
         self.secret_box = SecretBox(load_key())
+        self._backup_failed_at: Optional[datetime] = None
         self._user_tokens: dict = {}
         self.log = log
         self.stop_event = threading.Event()
@@ -237,6 +240,55 @@ class CollectionWorker:
             )
         return f"{user}: no repositories were collected"
 
+    # -- database backup -------------------------------------------------
+    def backup_if_due(self) -> Optional[bool]:
+        """Take a verified backup when one is due. Returns None if nothing was
+        due (or backups are off), else whether it succeeded. A failure is
+        published in status.json and retried on the next tick interval, never
+        raised: collection must not depend on backups."""
+        s = self.settings
+        if s.backup_interval_seconds <= 0 or not s.db_path.exists():
+            return None
+        now = self.now()
+        if not self._backup_retry_ready(now) or not backup_due(
+            s.backup_dir, s.backup_interval_seconds, now
+        ):
+            return None
+        try:
+            info = create_backup(
+                s.db_path,
+                s.backup_dir,
+                keep=s.backup_keep,
+                config_path=s.config_path,
+                now=now,
+            )
+        except (BackupError, OSError) as error:
+            self._backup_failed_at = now
+            self.status.record_backup(
+                ok=False,
+                at=now,
+                interval_seconds=s.backup_interval_seconds,
+                reason=f"backup failed: {error}",
+            )
+            self.log(f"Backup failed: {error}")
+            return False
+        self._backup_failed_at = None
+        self.status.record_backup(
+            ok=True,
+            at=now,
+            interval_seconds=s.backup_interval_seconds,
+            sources=info.sources,
+            repositories=info.repositories,
+        )
+        self.log(
+            f"Backup ok ({info.sources} sources, {info.repositories} repositories)"
+        )
+        return True
+
+    def _backup_retry_ready(self, now: datetime) -> bool:
+        failed = self._backup_failed_at
+        return failed is None or (now - failed).total_seconds() >= BACKUP_RETRY_SECONDS
+
     # -- scheduling ----------------------------------------------------
     def _refresh_requested(self) -> bool:
         """True once if the admin asked for a refresh (via the database)."""
@@ -262,6 +314,7 @@ class CollectionWorker:
         self.status.schedule(next_due)
         while not self.stop_event.is_set():
             self.heartbeat()
+            self.backup_if_due()
             if self.now() >= next_due or self._refresh_requested():
                 self.run_once()
                 next_run = self.status.state.get("next_run_at")

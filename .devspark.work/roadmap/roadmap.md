@@ -140,7 +140,8 @@ without a schema rewrite. No tenants, billing, or multi-admin in this roadmap.
    [ps-003 Source registry and portfolio model](specs/complete/ps-003-source-registry-and-portfolio-collection.md),
    [ps-004 Admin API and management UI](specs/complete/ps-004-admin-api-and-source-management-ui.md),
    [ps-005 Private and client data boundary](specs/ps-005-private-data-boundary.md),
-   [ps-020 Portfolio classification and signal scoring](specs/ps-020-portfolio-classification-and-signal-scoring.md)
+   [ps-020 Portfolio classification and signal scoring](specs/ps-020-portfolio-classification-and-signal-scoring.md),
+   [ps-021 Organization and repository dashboards with source switching](specs/ps-021-source-dashboards-and-switching.md)
 3. **GitHub and security intelligence:**
    [ps-006 Dependabot dashboard and lifecycle](specs/ps-006-dependabot-security-dashboard.md),
    [ps-007 Alert history and remediation metrics](specs/ps-007-alert-history-and-trends.md),
@@ -171,6 +172,7 @@ ps-001 → ps-002 → ps-003 ─┬→ ps-004 → ps-005
                           ├→ ps-013  ├→ ps-015 ←─ ps-014 (needs ps-011)
                           └→ ps-016 → ps-017           │
 ps-003 → ps-009 (backup/restore is pulled forward once history exists)
+ps-004 → ps-021 (org/repo dashboards and switching; extends ps-003/004 collection)
 ps-003 → ps-020 (tiering; recovered from archive tag archive/004-portfolio-intelligence; feeds ps-018)
 ```
 

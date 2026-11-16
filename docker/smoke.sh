@@ -1,0 +1,16 @@
+#!/bin/sh
+# Smoke check for a running stack: the page, health endpoint, and generated data must load.
+# Usage: docker/smoke.sh [base-url] [github-user-slug]
+set -eu
+BASE="${1:-http://127.0.0.1:8086}"
+SLUG="${2:-$(printf '%s' "${SPARK_USER:-makeboldsolutions}" | tr '[:upper:]' '[:lower:]')}"
+
+check() { # $1=path $2=pattern
+    body="$(curl -fsS "$BASE$1")" || { echo "FAIL $1 (request)"; exit 1; }
+    printf '%s' "$body" | grep -q "$2" || { echo "FAIL $1 (missing '$2')"; exit 1; }
+    echo "ok   $1"
+}
+check /healthz '^ok'
+check / '<div id="root"'
+check "/data/users/$SLUG/repositories.json" '"repositories"'
+echo "smoke passed"

@@ -1,4 +1,6 @@
 #!/usr/bin/env pwsh
+# DevSpark - (c) 2026 Make Bold Solutions. Source: https://dev.makeboldspark.com
+#requires -Version 7.0
 
 # Consolidated prerequisite checking script (PowerShell)
 #
@@ -9,6 +11,7 @@
 #
 # OPTIONS:
 #   -Json               Output in JSON format
+#   -RequirePlan        Require plan.md to exist (full-spec routes only; quick-spec/quickfix have no plan.md)
 #   -RequireTasks       Require tasks.md to exist (for implementation phase)
 #   -IncludeTasks       Include tasks.md in AVAILABLE_DOCS list
 #   -PathsOnly          Only output path variables (no validation)
@@ -17,13 +20,16 @@
 [CmdletBinding()]
 param(
     [switch]$Json,
+    [switch]$RequirePlan,
     [switch]$RequireTasks,
     [switch]$IncludeTasks,
     [switch]$PathsOnly,
+    [int]$TimeoutSeconds = 300,
     [switch]$Help
 )
 
 $ErrorActionPreference = 'Stop'
+$scriptStart = Get-Date
 
 # Show help if requested
 if ($Help) {
@@ -34,17 +40,22 @@ Consolidated prerequisite checking for Spec-Driven Development workflow.
 
 OPTIONS:
   -Json               Output in JSON format
+  -RequirePlan        Require plan.md to exist (full-spec routes only)
   -RequireTasks       Require tasks.md to exist (for implementation phase)
   -IncludeTasks       Include tasks.md in AVAILABLE_DOCS list
   -PathsOnly          Only output path variables (no prerequisite validation)
+    -TimeoutSeconds     Timeout value reported in diagnostics (default: 300)
   -Help, -h           Show this help message
 
 EXAMPLES:
-  # Check task prerequisites (plan.md required)
-  .\check-prerequisites.ps1 -Json
+  # Check task prerequisites (plan.md required, full-spec route)
+  .\check-prerequisites.ps1 -Json -RequirePlan
   
   # Check implementation prerequisites (plan.md + tasks.md required)
-  .\check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks
+  .\check-prerequisites.ps1 -Json -RequirePlan -RequireTasks -IncludeTasks
+  
+  # Degrade gracefully for quick-spec/quickfix routes (no plan.md/tasks.md required)
+  .\check-prerequisites.ps1 -Json -IncludeTasks
   
   # Get feature paths only (no validation)
   .\check-prerequisites.ps1 -PathsOnly
@@ -91,22 +102,24 @@ if ($PathsOnly) {
 }
 
 # Validate required directories and files
-if (-not (Test-Path $paths.FEATURE_DIR -PathType Container)) {
+if (-not (Test-Path $paths.FEATURE_DIR -PathType Container) -and $paths.CURRENT_BRANCH -notmatch '^\d{3}-work-') {
     Write-Output "ERROR: Feature directory not found: $($paths.FEATURE_DIR)"
-    Write-Output "Run /devspark.specify first to create the feature structure."
+    Write-Output "Run /devspark-specify first to create the feature structure."
     exit 1
 }
 
-if (-not (Test-Path $paths.IMPL_PLAN -PathType Leaf)) {
+# Check for plan.md if required (full-spec routes only; quick-spec/quickfix never produce plan.md).
+# On a work branch planning is optional, so a missing plan never blocks.
+if ($RequirePlan -and -not (Test-Path $paths.IMPL_PLAN -PathType Leaf) -and $paths.CURRENT_BRANCH -notmatch '^\d{3}-work-') {
     Write-Output "ERROR: plan.md not found in $($paths.FEATURE_DIR)"
-    Write-Output "Run /devspark.plan first to create the implementation plan."
+    Write-Output "Run /devspark-plan first to create the implementation plan."
     exit 1
 }
 
 # Check for tasks.md if required
 if ($RequireTasks -and -not (Test-Path $paths.TASKS -PathType Leaf)) {
     Write-Output "ERROR: tasks.md not found in $($paths.FEATURE_DIR)"
-    Write-Output "Run /devspark.tasks first to create the task list."
+    Write-Output "Run /devspark-tasks first to create the task list."
     exit 1
 }
 
@@ -128,14 +141,42 @@ if (Test-Path $paths.QUICKSTART) { $docs += 'quickstart.md' }
 if ($IncludeTasks -and (Test-Path $paths.TASKS)) { 
     $docs += 'tasks.md' 
 }
+if ($paths.CURRENT_BRANCH -match '^\d{3}-work-' -and (Test-Path $paths.FEATURE_SPEC -PathType Leaf)) {
+    $docs += 'work.md'
+}
+if ($paths.CURRENT_BRANCH -match '^\d{3}-work-' -and (Test-Path $paths.IMPL_PLAN -PathType Leaf)) {
+    $docs += 'plan.md'
+}
+
+# Checklist status (M-03: scripts compute, models judge -- exact counts, not LLM arithmetic)
+$checklistSummary = @()
+$checklistsDir = Join-Path $paths.FEATURE_DIR 'checklists'
+if (Test-Path $checklistsDir -PathType Container) {
+    Get-ChildItem -Path $checklistsDir -Filter '*.md' -File -ErrorAction SilentlyContinue | ForEach-Object {
+        $content = Get-Content $_.FullName -Raw
+        $total = ([regex]::Matches($content, '(?m)^\s*-\s*\[[xX ]\]')).Count
+        $completed = ([regex]::Matches($content, '(?m)^\s*-\s*\[[xX]\]')).Count
+        $checklistSummary += [PSCustomObject]@{
+            name       = $_.Name
+            total      = $total
+            completed  = $completed
+            incomplete = $total - $completed
+            status     = if (($total - $completed) -eq 0) { 'PASS' } else { 'FAIL' }
+        }
+    }
+}
+$checklistsOverall = if (($checklistSummary | Where-Object { $_.incomplete -gt 0 }).Count -gt 0) { 'FAIL' } else { 'PASS' }
 
 # Output results
 if ($Json) {
     # JSON output
     [PSCustomObject]@{ 
+        contract = 1
         FEATURE_DIR = $paths.FEATURE_DIR
         AVAILABLE_DOCS = $docs 
-    } | ConvertTo-Json
+        CHECKLISTS = $checklistSummary
+        CHECKLISTS_OVERALL = $checklistsOverall
+    } | ConvertTo-Json -Depth 5
 } else {
     # Text output
     Write-Output "FEATURE_DIR:$($paths.FEATURE_DIR)"
@@ -150,4 +191,18 @@ if ($Json) {
     if ($IncludeTasks) {
         Test-FileExists -Path $paths.TASKS -Description 'tasks.md' | Out-Null
     }
+
+    if ($checklistSummary.Count -gt 0) {
+        Write-Output "CHECKLISTS:"
+        foreach ($c in $checklistSummary) {
+            Write-Output "  $($c.name): total=$($c.total) completed=$($c.completed) incomplete=$($c.incomplete) status=$($c.status)"
+        }
+        Write-Output "CHECKLISTS_OVERALL: $checklistsOverall"
+    }
+}
+
+$durationMs = [int]((Get-Date) - $scriptStart).TotalMilliseconds
+Add-DevSparkMetric -Command 'check-prerequisites' -Status 'success' -DurationMs $durationMs -Extra @{
+    include_tasks = [bool]$IncludeTasks
+    require_tasks = [bool]$RequireTasks
 }

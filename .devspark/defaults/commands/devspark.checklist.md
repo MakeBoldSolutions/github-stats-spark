@@ -1,12 +1,13 @@
 ---
-description: Generate a custom checklist for the current feature based on user requirements.
+source: "DevSpark — © 2026 Make Bold Solutions. Source: https://dev.makeboldspark.com"
+description: For an existing specification, generate a requirements-quality checklist (unit tests for the written requirements). Not used on a work branch.
 handoffs:
-  - label: Implement Project
-    agent: devspark.implement
-    prompt: Start the implementation in phases
-  - label: Run Analysis
-    agent: devspark.analyze
-    prompt: Analyze spec consistency after checklist review
+  - label: Continue Implementation
+    agent: devspark-implement
+    prompt: Continue implementation with the checklist findings in mind
+scripts:
+  sh: .devspark/scripts/bash/check-prerequisites.sh --json
+  ps: .devspark/scripts/powershell/check-prerequisites.ps1 -Json
 ---
 
 ## Overview: "Unit Tests for English"
@@ -38,16 +39,18 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Work Branch
+
+A checklist tests the writing of an existing specification. On a `NNN-work-*` branch there is no specification, and a checklist is not part of that route: write no `checklists/` file and no `gates/checklist.md`. If the developer names a specific requirements-quality concern, answer it in conversation against `work.md`, the optional `plan.md`, and the current code and tests, then return to `/devspark-implement`.
+
 ## Outline
 
-**Multi-app support**: If this repository uses multi-app mode (`.documentation/devspark.json` exists with `mode: "multi-app"`), check for `--app <id>` in the user input to scope this workflow to a specific application. When app context is provided, resolve artifacts from `{app.path}/.documentation/` instead of the repository root `.documentation/`. Print the resolved scope (app name, doc root) at the start of output.
+Load and obey the shared preamble contract core at `/.devspark/templates/command-preamble-contract.md` (installed repos) or `templates/command-preamble-contract.md` (source repos) before step 1 — it covers multi-app scope resolution and the 2-tier override check for scripts. Preamble modules: `convergence`.
 
-> **Script Resolution**: Before running `.devspark/scripts/powershell/check-prerequisites.ps1 -Json`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
-
-1. **Setup**: Run `.devspark/scripts/powershell/check-prerequisites.ps1 -Json` from repo root and parse JSON for FEATURE_DIR and AVAILABLE_DOCS list.
+1. **Setup**: Run `{SCRIPT}` from repo root and parse JSON for FEATURE_DIR and AVAILABLE_DOCS list.
    - All file paths must be absolute.
    - For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
-   - If `/.documentation/memory/constitution.md` exists, load it. Use constitution principles to inform checklist categories (e.g., if the constitution mandates accessibility, include accessibility items).
+   - If `/.knowledge/governance/constitution.md` exists, load it. Use constitution principles to inform checklist categories (e.g., if the constitution mandates accessibility, include accessibility items).
 
 2. **Clarify intent (dynamic)**: Derive up to THREE initial contextual clarifying questions (no pre-baked catalog). They MUST:
    - Be generated from the user's phrasing + extracted signals from spec/plan/tasks
@@ -99,6 +102,9 @@ You **MUST** consider the user input before proceeding (if not empty).
    - If source docs are large, generate interim summary items instead of embedding raw text
 
 5. **Generate checklist** - Create "Unit Tests for Requirements":
+   - Assess requirement coverage and consistency, not document length or repeated rationale.
+   - Reference the authoritative Spec/Plan statements instead of copying their prose into checklist
+     items. Ask only about a concrete gap, ambiguity, conflict, or untestable criterion.
    - Create `FEATURE_DIR/checklists/` directory if it doesn't exist
    - Create or update `FEATURE_DIR/gates/checklist.md` with a concise checklist gate summary after writing the checklist file
    - Generate unique checklist filename:
@@ -106,7 +112,7 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Format: `[domain].md`
      - If file exists, append to existing file
    - Number items sequentially starting from CHK001
-   - Each `/devspark.checklist` run creates a NEW file (never overwrites existing checklists)
+   - Each `/devspark-checklist` run creates a NEW file (never overwrites existing checklists)
 
    **CORE PRINCIPLE - Test the Requirements, Not the Implementation**:
    Every checklist item MUST evaluate the REQUIREMENTS THEMSELVES for:
@@ -196,9 +202,8 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Missing definitions: "Is 'visual hierarchy' defined with measurable criteria? [Gap]"
 
    **Content Consolidation**:
-   - Soft cap: If raw candidate items > 40, prioritize by risk/impact
-   - Merge near-duplicates checking the same requirement aspect
-   - If >5 low-impact edge cases, create one item: "Are edge cases X, Y, Z addressed in requirements? [Coverage]"
+   - Merge duplicate items that check the same requirement aspect; keep distinct acceptance behaviors
+     and risks separate. Item count follows the actual gaps, not a target size.
 
    **🚫 ABSOLUTELY PROHIBITED** - These make it an implementation test, not a requirements test:
    - ❌ Any item starting with "Verify", "Test", "Confirm", "Check" + implementation behavior
@@ -236,7 +241,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    Below the gate block, summarize all current checklist files under `FEATURE_DIR/checklists/` with total items, completed items, incomplete items, and the checklist purpose. Replace the prior gate summary instead of appending duplicates.
 
-**Important**: Each `/devspark.checklist` command invocation creates a checklist file using short, descriptive names unless file already exists. This allows:
+**Important**: Each `/devspark-checklist` command invocation creates a checklist file using short, descriptive names unless file already exists. This allows:
 
 - Multiple checklists of different types (e.g., `ux.md`, `test.md`, `security.md`)
 - Simple, memorable filenames that indicate checklist purpose

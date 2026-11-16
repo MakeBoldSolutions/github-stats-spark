@@ -5,14 +5,11 @@
       "key": "copilot",
       "name": "GitHub Copilot",
       "folder": ".github/",
-      "context_file": ".github/agents/copilot-instructions.md",
+      "context_file": "AGENTS.md",
       "requires_cli": false,
       "install_url": null,
       "release": {
-        "commands_dir": ".github/agents",
-        "extension": "agent.md",
-        "arg_format": "$ARGUMENTS",
-        "prompt_dir": ".github/prompts",
+        "skills_dir": ".github/skills",
         "support_files": [
           {
             "source": "templates/vscode-settings.json",
@@ -27,7 +24,7 @@
       "folder": ".claude/",
       "context_file": "CLAUDE.md",
       "requires_cli": true,
-      "install_url": "https://docs.anthropic.com/en/docs/claude-code/setup",
+      "install_url": null,
       "release": {
         "commands_dir": ".claude/commands",
         "extension": "md",
@@ -40,7 +37,7 @@
       "folder": ".gemini/",
       "context_file": "GEMINI.md",
       "requires_cli": true,
-      "install_url": "https://github.com/google-gemini/gemini-cli",
+      "install_url": null,
       "release": {
         "commands_dir": ".gemini/commands",
         "extension": "toml",
@@ -72,7 +69,7 @@
       "folder": ".qwen/",
       "context_file": "QWEN.md",
       "requires_cli": true,
-      "install_url": "https://github.com/QwenLM/qwen-code",
+      "install_url": null,
       "release": {
         "commands_dir": ".qwen/commands",
         "extension": "toml",
@@ -91,7 +88,7 @@
       "folder": ".opencode/",
       "context_file": "AGENTS.md",
       "requires_cli": true,
-      "install_url": "https://opencode.ai",
+      "install_url": null,
       "release": {
         "commands_dir": ".opencode/command",
         "extension": "md",
@@ -104,7 +101,7 @@
       "folder": ".codex/",
       "context_file": "AGENTS.md",
       "requires_cli": true,
-      "install_url": "https://github.com/openai/codex",
+      "install_url": null,
       "release": {
         "commands_dir": ".codex/prompts",
         "extension": "md",
@@ -143,7 +140,7 @@
       "folder": ".augment/",
       "context_file": ".augment/rules/devspark-rules.md",
       "requires_cli": true,
-      "install_url": "https://docs.augmentcode.com/cli/setup-auggie/install-auggie-cli",
+      "install_url": null,
       "release": {
         "commands_dir": ".augment/commands",
         "extension": "md",
@@ -169,7 +166,7 @@
       "folder": ".codebuddy/",
       "context_file": "CODEBUDDY.md",
       "requires_cli": true,
-      "install_url": "https://www.codebuddy.ai/cli",
+      "install_url": null,
       "release": {
         "commands_dir": ".codebuddy/commands",
         "extension": "md",
@@ -182,7 +179,7 @@
       "folder": ".qoder/",
       "context_file": "QODER.md",
       "requires_cli": true,
-      "install_url": "https://qoder.com/cli",
+      "install_url": null,
       "release": {
         "commands_dir": ".qoder/commands",
         "extension": "md",
@@ -195,7 +192,7 @@
       "folder": ".amazonq/",
       "context_file": "AGENTS.md",
       "requires_cli": true,
-      "install_url": "https://aws.amazon.com/developer/learning/q-developer-cli/",
+      "install_url": null,
       "release": {
         "commands_dir": ".amazonq/prompts",
         "extension": "md",
@@ -208,7 +205,7 @@
       "folder": ".agents/",
       "context_file": "AGENTS.md",
       "requires_cli": true,
-      "install_url": "https://ampcode.com/manual#install",
+      "install_url": null,
       "release": {
         "commands_dir": ".agents/commands",
         "extension": "md",
@@ -221,7 +218,7 @@
       "folder": ".shai/",
       "context_file": "SHAI.md",
       "requires_cli": true,
-      "install_url": "https://github.com/ovh/shai",
+      "install_url": null,
       "release": {
         "commands_dir": ".shai/commands",
         "extension": "md",
@@ -237,6 +234,19 @@
       "install_url": null,
       "release": {
         "commands_dir": ".bob/commands",
+        "extension": "md",
+        "arg_format": "$ARGUMENTS"
+      }
+    },
+    {
+      "key": "antigravity",
+      "name": "Antigravity",
+      "folder": ".gemini/",
+      "context_file": "ANTIGRAVITY.md",
+      "requires_cli": false,
+      "install_url": null,
+      "release": {
+        "commands_dir": ".gemini/commands",
         "extension": "md",
         "arg_format": "$ARGUMENTS"
       }

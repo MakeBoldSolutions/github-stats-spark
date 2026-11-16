@@ -1,4 +1,6 @@
 #!/usr/bin/env pwsh
+# DevSpark - (c) 2026 Make Bold Solutions. Source: https://dev.makeboldspark.com
+#requires -Version 7.0
 # Constitution evolution context gathering script
 # Analyzes PR reviews and audits to propose constitution amendments
 
@@ -10,7 +12,7 @@ param(
 
 . (Join-Path $PSScriptRoot 'common.ps1')
 
-# Multi-app support (T092)
+# Multi-app support
 if (-not (Get-Command Detect-DevSparkMode -ErrorAction SilentlyContinue)) {
     . "$PSScriptRoot/common.ps1"
 }
@@ -44,11 +46,10 @@ while ($i -lt $Arguments.Count) {
 
 # Get repository context
 $repoRoot = Get-RepoRoot
-$constitutionPath = Join-Path $repoRoot ".documentation/memory/constitution.md"
-$prReviewDir = Join-Path $repoRoot ".documentation/specs/pr-review"
-$auditDir = Join-Path $repoRoot ".documentation/copilot/audit"
-$proposalsDir = Join-Path $repoRoot ".documentation/memory/proposals"
-$historyFile = Join-Path $repoRoot ".documentation/memory/constitution-history.md"
+$constitutionPath = Join-Path $repoRoot ".knowledge/governance/constitution.md"
+$prReviewDir = Join-Path $repoRoot ".devspark.work/pr-review"
+$auditDir = Join-Path $repoRoot ".devspark.work/audit"
+$proposalsDir = Join-Path $repoRoot ".devspark.work/governance"
 
 # Check constitution exists
 $constitutionExists = Test-Path $constitutionPath
@@ -134,7 +135,6 @@ if ($Json) {
         PR_REVIEW_DIR            = $prReviewDir
         AUDIT_DIR                = $auditDir
         PROPOSALS_DIR            = $proposalsDir
-        HISTORY_FILE             = $historyFile
         PR_REVIEWS               = $prReviews
         PR_REVIEW_COUNT          = $prReviewCount
         AUDIT_REPORTS            = $auditReports

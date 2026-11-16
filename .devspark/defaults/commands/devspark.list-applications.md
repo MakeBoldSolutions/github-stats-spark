@@ -1,4 +1,5 @@
 ---
+source: "DevSpark — © 2026 Make Bold Solutions. Source: https://dev.makeboldspark.com"
 description: Display all registered applications in the multi-app repository with metadata, dependencies, and documentation roots.
 ---
 
@@ -14,7 +15,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 Read and display the DevSpark multi-app registry. This is a **read-only** command — no files are modified.
 
-1. **Load the registry** from `.documentation/devspark.json`:
+1. **Load the registry** from `.devspark.work/devspark.registry.json`:
    - If the file does not exist, report: "No multi-app registry configured. This repository operates in single-app mode."
    - If the file is invalid JSON, report the parse error
 

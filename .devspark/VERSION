@@ -1,4 +1,6 @@
-version: 2.1.1
-installed: 2026-05-12
-method: copilot-quickstart
-migrated-from: fresh
+product: DevSpark
+edition: Make-Bold
+version: 9.6.0
+installed: 2026-11-15
+method: claude-code-quickstart
+migrated-from: public-devspark

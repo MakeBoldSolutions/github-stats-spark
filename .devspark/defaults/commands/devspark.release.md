@@ -1,12 +1,13 @@
 ---
-description: Archive development artifacts at release, distill key decisions into permanent documentation, and prepare for next development cycle
+source: "DevSpark - (c) 2026 Make Bold Solutions. Source: https://dev.makeboldspark.com"
+description: Seal a release from the verified repository delta, sweep .devspark.work retention and archive-eligible work, and keep current knowledge accurate.
 handoffs:
-  - label: View Release History
-    agent: devspark.release
-    prompt: Show me previous releases in .documentation/releases/
   - label: Run Final Audit
-    agent: devspark.site-audit
-    prompt: Run a final site audit before release
+    agent: devspark-site-audit
+    prompt: Run a final delta and documentation audit before release
+scripts:
+  sh: .devspark/scripts/bash/release-context.sh $ARGUMENTS --json
+  ps: .devspark/scripts/powershell/release-context.ps1 $ARGUMENTS -Json
 ---
 
 ## User Input
@@ -15,664 +16,190 @@ handoffs:
 $ARGUMENTS
 ```
 
-You **MUST** consider the user input before proceeding (if not empty).
+You MUST consider non-empty user input. Load and obey the shared command preamble contract before
+step 1.
 
-## Overview
+## Purpose
 
-This command performs release documentation by:
+Release seals the verified delta between the previous release and HEAD, and is the **sole** command
+that ever moves anything from `.devspark.work/` into `.archive/{YYYY-MM-DD}/` (or the same dated
+folder under the archive root a team has configured; see step 4). `{YYYY-MM-DD}` is
+always *this release's own cut date* (today, the date this run tags) — never an individual swept
+artifact's own internal date, timestamp, or filename stamp. Every artifact swept in steps 4–5 goes
+into the one archive folder for the release being cut right now, regardless of what date it happens
+to be stamped with internally. Its sources are code, current `.knowledge/`, tests, verification
+results, Git history, merged PR metadata, and existing user-facing documentation.
 
-1. Archiving completed development artifacts (specs, plans, tasks)
-2. Distilling key architectural decisions into ADRs (Architecture Decision Records)
-3. Generating CHANGELOG entries
-4. Creating release notes
-5. Preparing a clean slate for the next development cycle
-
-**IMPORTANT**: This command modifies documentation files. Use `--dry-run` to preview changes before committing.
-
-## Prerequisites
-
-- Git repository with version tags (recommended)
-- Completed feature specs in `/.documentation/specs/`
-- Quickfixes in `/.documentation/quickfixes/` (optional)
+`/devspark-implement` deliberately leaves every completed spec and quickfix record live in
+`.devspark.work/` so the delta can be validated against code, tests, and knowledge for as long as it
+stays there, which can span more than one sprint. Release is what eventually archives it, and also
+runs the maintenance sweep: work-product
+retention, orphaned in-flight state, current-knowledge backstop checks, and leaked-planning-identifier
+scans all run here.
 
 ## Options
 
-Parse `$ARGUMENTS` for options:
-
-| Option | Description |
-|--------|-------------|
-| `{version}` | Explicit version (e.g., `2.0.0` or `v2.0.0`) |
-| `--from <date>` | Override the release window start date (`YYYY-MM-DD`) |
-| `--dry-run` | Preview changes without writing files |
-
-## Outline
-
-**Multi-app support**: If this repository uses multi-app mode (`.documentation/devspark.json` exists with `mode: "multi-app"`), check for `--app <id>` in the user input to scope this workflow to a specific application. When app context is provided, resolve artifacts from `{app.path}/.documentation/` instead of the repository root `.documentation/`. Print the resolved scope (app name, doc root) at the start of output.
-
-### 1. Initialize Release Context
-
-> **Script Resolution**: Before running `.devspark/scripts/powershell/release-context.ps1 $ARGUMENTS -Json`, apply the 2-tier override check — if `.documentation/scripts/powershell/<filename>` (PowerShell) or `.documentation/scripts/bash/<filename>` (Bash) exists on disk, run that file instead, preserving all arguments. Team overrides in `.documentation/scripts/` always take priority over `.devspark/scripts/`.
-
-Run `.devspark/scripts/powershell/release-context.ps1 $ARGUMENTS -Json` to gather context and parse JSON output for:
-
-- `REPO_ROOT`: Repository root path
-- `SPECS_DIR`: Path to specs directory
-- `RELEASES_DIR`: Path to releases archive
-- `QUICKFIX_DIR`: Path to quickfixes directory
-- `DECISIONS_DIR`: Path to ADR directory
-- `CURRENT_VERSION`: Current version from package file
-- `VERSION_SOURCE`: Where version was read from
-- `NEXT_VERSION`: Proposed next version
-- `VERSION_BUMP`: Type of bump (major/minor/patch)
-- `RELEASE_FROM`: Start date for the release window
-- `RELEASE_TO`: End date for the release window
-- `COMPLETED_SPECS`: List of specs ready for archival
-- `PENDING_SPECS`: List of incomplete specs
-- `QUICKFIXES`: List of quickfixes since last release
-- `LAST_TAG`: Most recent git tag
-- `LAST_RELEASE_DATE`: Date of last release
-- `COMMITS_SINCE_RELEASE`: Commit count since last release
-- `CONTRIBUTORS`: List of contributors
-- `MERGED_PR_NUMBERS`: Pull request numbers detected in the release window
-- `MERGED_PR_COUNT`: Number of merged PRs detected in the release window
-- `PR_REVIEW_SUMMARY`: Aggregated PR review stats (`files_changed`, `tests_added`, `breaking_changes`, `resolved_high_findings`)
-- `DRY_RUN`: Whether this is a preview run
-- `DEVSPARK_VERSION_PATH`: Path to `.devspark/VERSION`
-- `INSTALLED_VERSION`: Version recorded in the stamp file (blank if absent)
-
-The release context should be built from the full release window, not only the specs archived during the current command run. Prefer the following sources in order:
-
-1. Active `.documentation/` artifacts
-2. `.archive/<date>/` batches whose dates fall within `{RELEASE_FROM}..{RELEASE_TO}`
-3. Git history and PR review metadata within the same window
-
-### 2. Version Confirmation
-
-Display proposed version:
-
-```markdown
-## Release Version
-
-- **Current Version**: {CURRENT_VERSION} (from {VERSION_SOURCE})
-- **Proposed Version**: {NEXT_VERSION} ({VERSION_BUMP} bump)
-- **Release Window**: {RELEASE_FROM} → {RELEASE_TO}
-- **Reason**: {N} completed specs, {M} quickfixes
-
-Confirm this version or provide explicit version:
-- To accept: continue
-- To change: `/devspark.release {version}`
-```
-
-**Version Bump Logic:**
-
-| Content | Bump Type | Example |
-|---------|-----------|---------|
-| Completed feature specs | Minor | 1.2.4 → 1.3.0 |
-| Quickfixes only | Patch | 1.2.4 → 1.2.5 |
-| Breaking changes in specs | Major | 1.2.4 → 2.0.0 |
-
-### 3. Classify Artifacts
-
-#### A. Completed Specs (Ready for Archive)
-
-For each spec in COMPLETED_SPECS:
-
-- Verify the `**Status**:` field in `spec.md` is `Complete` (not `Draft` or `In Progress`)
-- Verify all tasks are checked in `tasks.md`
-- Confirm associated PR merged (if trackable)
-- If spec status is NOT `Complete` but tasks are all checked, **flag as inconsistency** — update spec status to `Complete` before archiving
-- If spec status is `Draft` or `In Progress` and tasks are incomplete, move to Pending Specs (section B)
-- Mark for archival only when both status is `Complete` AND all tasks are checked
-
-#### B. Pending Specs (Keep Active)
-
-For each spec in PENDING_SPECS:
-
-- Keep in `/.documentation/specs/`
-- Note as "Deferred to next release"
-- Include in release notes as "Coming Soon"
-
-#### C. Quickfixes
-
-All quickfixes in QUICKFIXES:
-
-- Archive to release directory
-- Include in CHANGELOG under "Fixed"
-
-### 4. Extract Architectural Decisions
-
-For each completed spec, analyze `research.md` and `plan.md` for ADR-worthy decisions:
-
-**ADR Criteria:**
-
-- Technology stack choices (frameworks, databases, libraries)
-- Architecture pattern decisions (microservices, event-driven, etc.)
-- Security or compliance decisions
-- Performance trade-offs
-- Integration approaches
-
-**Skip:**
-
-- Implementation details
-- Bug fixes
-- Minor configuration choices
-
-For each identified decision, create ADR at `/.documentation/decisions/ADR-{NNN}.md`:
-
-```markdown
-# ADR-{NNN}: {Decision Title}
-
-## Status
-
-Accepted
-
-## Context
-
-{Why this decision was needed - extracted from spec/research}
-
-## Decision
-
-{What was decided - extracted from plan}
-
-## Consequences
-
-### Positive
-
-- {Benefit 1}
-- {Benefit 2}
-
-### Negative
-
-- {Trade-off 1}
-
-## Source
-
-- **Spec**: {spec-name}
-- **Release**: v{NEXT_VERSION}
-- **Date**: {RELEASE_DATE}
-```
-
-### 5. Generate CHANGELOG Entry
-
-Create or update `CHANGELOG.md` at repository root:
-
-```markdown
-## [v{NEXT_VERSION}] - {RELEASE_DATE}
-
-### Added
-
-{For each completed spec with new features:}
-- **{Feature Name}**: {Brief description from spec}
-
-### Changed
-
-{For each completed spec with modifications:}
-- **{Change Name}**: {Brief description}
-
-### Fixed
-
-{For each quickfix:}
-- **{QF-ID}**: {Problem fixed}
-
-### Architectural Decisions
-
-{For each ADR created:}
-- **ADR-{NNN}**: {Decision title}
-
-### Contributors
-
-{List each contributor from CONTRIBUTORS}
-```
-
-**If CHANGELOG.md exists:**
-
-- Insert new entry at the top (after header)
-- Preserve existing entries
-
-**If CHANGELOG.md doesn't exist:**
-
-- Create with header and first entry
-
-### 6. Create Release Archive
-
-Create directory structure at `/.documentation/releases/v{NEXT_VERSION}/`:
-
-```text
-releases/v{NEXT_VERSION}/
-├── release-notes.md      # Human-readable release summary
-├── specs/                # Archived specs
-│   ├── {spec-001}/
-│   │   ├── spec.md
-│   │   ├── plan.md
-│   │   ├── tasks.md
-│   │   └── research.md
-│   └── {spec-002}/
-├── quickfixes/           # Archived quickfixes
-│   ├── QF-{YYYY}-{NNN}.md
-│   └── ...
-└── metrics.json          # Release statistics
-```
-
-### 7. Generate Release Notes
-
-Create `/.documentation/releases/v{NEXT_VERSION}/release-notes.md`:
-
-```markdown
-# Release Notes: v{NEXT_VERSION}
-
-## Release Metadata
-
-- **Version**: v{NEXT_VERSION}
-- **Release Date**: {RELEASE_DATE}
-- **Release Window**: {RELEASE_FROM} → {RELEASE_TO}
-- **Previous Version**: {LAST_TAG}
-- **Commits**: {COMMITS_SINCE_RELEASE}
-- **Contributors**: {CONTRIBUTORS count}
-- **Merged PRs**: {MERGED_PR_COUNT}
-
-## Highlights
-
-{Executive summary - 2-3 paragraphs summarizing major changes}
-
-## New Features
-
-{For each completed spec:}
-
-### {Feature Name}
-
-{Description from spec summary}
-
-**Spec**: [View archived spec](specs/{spec-name}/spec.md)
-
-## Bug Fixes
-
-{For each quickfix:}
-
-- **{QF-ID}**: {Description}
-
-## Breaking Changes
-
-{If any specs marked as breaking:}
-
-- {Breaking change description with migration guide}
-
-## Deprecations
-
-{If any features deprecated:}
-
-- {Deprecated feature with replacement guidance}
-
-## Architectural Decisions
-
-{For each ADR:}
-
-- **ADR-{NNN}**: {Title} - [View](../../decisions/ADR-{NNN}.md)
-
-## Deferred Features
-
-{For each pending spec:}
-
-- **{Feature Name}**: Planned for future release
-
-## Upgrade Guide
-
-{Steps to upgrade from previous version - auto-generate based on breaking changes}
-
-## Metrics
-
-| Metric | Value |
-|--------|-------|
-| Features Delivered | {completed specs count} |
-| Bugs Fixed | {quickfixes count} |
-| PRs Merged | {MERGED_PR_COUNT} |
-| Files Changed | {PR_REVIEW_SUMMARY.files_changed} |
-| Tests Added | {PR_REVIEW_SUMMARY.tests_added} |
-| Breaking Changes | {PR_REVIEW_SUMMARY.breaking_changes} |
-| ADRs Created | {ADR count} |
-| Contributors | {contributors count} |
-| Commits | {commits count} |
-
----
-
-*Release documentation generated by /devspark.release v1.0*
-```
-
-### 8. Generate Metrics JSON
-
-Create `/.documentation/releases/v{NEXT_VERSION}/metrics.json`:
-
-```json
-{
-  "version": "{NEXT_VERSION}",
-  "releaseDate": "{RELEASE_DATE}",
-   "release": {
-      "from": "{RELEASE_FROM}",
-      "to": "{RELEASE_TO}"
-   },
-  "previousVersion": "{LAST_TAG}",
-  "features": {
-    "completed": {count},
-    "deferred": {count}
-  },
-  "quickfixes": {count},
-   "pullRequests": {
-      "merged": {MERGED_PR_COUNT},
-      "numbers": [{MERGED_PR_NUMBERS}],
-      "filesChanged": {PR_REVIEW_SUMMARY.files_changed},
-      "testsAdded": {PR_REVIEW_SUMMARY.tests_added},
-      "breakingChanges": {PR_REVIEW_SUMMARY.breaking_changes},
-      "resolvedHighFindings": {PR_REVIEW_SUMMARY.resolved_high_findings}
-   },
-  "adrs": {count},
-  "commits": {count},
-  "contributors": {count},
-  "specs": [{list of spec names}],
-  "timestamp": "{TIMESTAMP}"
-}
-```
-
-### 9. Bump Version in Source Files
-
-After generating the CHANGELOG entry and release archive, and **before** committing,
-update the canonical version number so the next `devspark upgrade` stamps the new
-version into consumer projects.
-
-**Skip if DRY_RUN.**
-
-#### A. Bump `pyproject.toml` (DevSpark source repo)
-
-Edit `pyproject.toml` at the repository root:
-
-```toml
-[project]
-version = "{NEXT_VERSION}"   # was {CURRENT_VERSION}
-```
-
-Make this edit now if {NEXT_VERSION} differs from {CURRENT_VERSION}.
-
-#### B. Confirm `.devspark/VERSION` (consumer repos)
-
-`.devspark/VERSION` is **written automatically** by quickstart, `devspark init`, and
-upgrade flows. Maintainers do not need to update it manually in the source repo — it is
-a per-consumer-project stamp. Legacy installs may still contain `.documentation/DEVSPARK_VERSION`.
-
-After bumping `pyproject.toml` and publishing the new release, consumer projects
-will receive the correct version stamp the next time they run `devspark upgrade`.
-
-#### C. Verify version consistency
-
-Confirm these three sources agree on {NEXT_VERSION}:
-
-| Source | Expected Value |
-|--------|----------------|
-| `pyproject.toml` → `version` | {NEXT_VERSION} |
-| `CHANGELOG.md` top entry | `## [{NEXT_VERSION}]` |
-| Git tag (to be created) | `v{NEXT_VERSION}` |
-
-If any are out of sync, fix before tagging.
-
-#### D. Manual workflow dispatch version (recommended)
-
-When running **Create Release** via `workflow_dispatch`, set `release_version` to
-`{NEXT_VERSION}` (or `v{NEXT_VERSION}`) so the workflow publishes the intended tag
-instead of auto-incrementing from the latest existing tag.
-
-### 10. Update Public-Facing Version References
-
-After bumping `pyproject.toml` (Step 9), update **all** public documents that mention the current release version so they stay in sync. **Skip if DRY_RUN** — but list the files that would change.
-
-#### A. Roadmap files
-
-Update **both** roadmap files to reflect the new current release:
-
-| File | Field to update |
-|------|-----------------|
-| `README.md` → `## 🗺️ Roadmap` | `### Current Release (v{NEXT_VERSION})` — add any new capabilities to the checked list |
-| `/.documentation/roadmap.md` | `## Current Release: v{NEXT_VERSION}` — move newly shipped items from Near-Term into Current, update version example |
-
-Ensure future roadmap section version ranges (`Near-Term`, `Medium-Term`, `Long-Term`) are **ahead** of `{NEXT_VERSION}`. If any future section uses a version number ≤ `{NEXT_VERSION}`, bump it forward.
-
-#### B. Release notes / index page
-
-| File | Field to update |
-|------|-----------------|
-| `release_notes.md` | Update highlights and "What's New" to `{NEXT_VERSION}` |
-| `/.documentation/index.md` | Update any version badges or "latest" references |
-
-#### C. Verify — no stale version strings
-
-Run a quick search for the **old** version string (`{CURRENT_VERSION}`) across `README.md`, `release_notes.md`, `.documentation/*.md`, and confirm every remaining reference is intentional (e.g., CHANGELOG history). Flag any stale occurrences for manual review.
-
-### 11. Markdownlint Preflight (Required)
-
-Before finalizing release output, run a full markdown lint pass and fail closed on any violations.
-
-#### A. Run markdownlint-cli2
-
-Execute from repository root:
-
-```bash
-npx markdownlint-cli2 "**/*.md" "#node_modules"
-```
-
-If local policy requires a different invocation, use the repository-standard equivalent but keep full-repo coverage.
-
-#### B. Produce a detailed findings report
-
-If lint fails, parse and print a structured report with:
-
-- Rule ID (e.g., `MD036`, `MD050`)
-- File path
-- Line number
-- Short message
-
-Include grouped counts by rule and by file so the author can fix quickly.
-
-#### C. Block release completion on lint errors
-
-If any markdownlint violations remain:
-
-- Mark release as **BLOCKED**
-- Do **not** proceed to completion messaging
-- Return explicit remediation guidance with the failing file/line/rule list
-
-Continue only when markdownlint exits cleanly.
-
-### 12. Clean Slate Preparation
-
-After archival (skip if DRY_RUN):
-
-#### A. Archive Specs
-
-For each spec in COMPLETED_SPECS:
-
-1. Copy entire spec directory to `releases/v{NEXT_VERSION}/specs/`
-2. Remove from `/.documentation/specs/`
-
-#### B. Archive Quickfixes
-
-For each quickfix in QUICKFIXES:
-
-1. Copy to `releases/v{NEXT_VERSION}/quickfixes/`
-2. Remove from `/.documentation/quickfixes/`
-
-#### C. Reset State
-
-1. Create `/.documentation/specs/.gitkeep` if directory is empty
-2. Create `/.documentation/quickfixes/.gitkeep` if directory is empty
-
-### 13. Output Summary
-
-#### Dry Run Output
-
-If DRY_RUN is true:
-
-```markdown
-## Release Preview: v{NEXT_VERSION}
-
-**This is a dry run - no changes will be made**
-
-### Proposed Changes
-
-#### Archive to releases/v{NEXT_VERSION}/
-
-- **Specs**: {list of completed specs}
-- **Quickfixes**: {list of quickfixes}
-
-#### Files to Create
-
-- `/.documentation/releases/v{NEXT_VERSION}/release-notes.md`
-- `/.documentation/releases/v{NEXT_VERSION}/metrics.json`
-- `CHANGELOG.md` entry
-
-#### ADRs to Generate
-
-{List of ADRs with titles}
-
-#### Specs to Keep (Deferred)
-
-{List of pending specs}
-
----
-
-To execute this release:
-`/devspark.release {NEXT_VERSION}`
-```
-
-#### Actual Release Output
-
-```markdown
-## Release Complete: v{NEXT_VERSION}
-
-### Archive Created
-
-`/.documentation/releases/v{NEXT_VERSION}/`
-
-- Specs archived: {N}
-- Quickfixes archived: {M}
-- ADRs created: {P}
-
-### Documentation Updated
-
-- CHANGELOG.md: New entry added
-- Release notes: Created
-- Metrics: Recorded
-
-### Clean Slate
-
-- Specs directory: {Cleared / {N} deferred specs remain}
-- Quickfixes directory: Cleared
-
-### Next Steps
-
-1. Confirm `pyproject.toml` has been bumped to `{NEXT_VERSION}` (Step 9A above).
-
-2. Confirm roadmap and public docs reference `{NEXT_VERSION}` (Step 10 above).
-
-3. Review generated documentation:
-   - `/.documentation/releases/v{NEXT_VERSION}/release-notes.md`
-   - `CHANGELOG.md`
-
-3. Commit changes:
-
-   ```bash
-   git add -A
-   git commit -m "docs: release v{NEXT_VERSION}"
-   ```
-
-1. Tag release:
-
-   ```bash
-   git tag -a v{NEXT_VERSION} -m "Release v{NEXT_VERSION}"
-   ```
-
-2. Push to remote:
-
-   ```bash
-   git push origin main --tags
-   ```
-
-3. Create GitHub Release (optional):
-
-   ```bash
-   gh release create v{NEXT_VERSION} --notes-file .documentation/releases/v{NEXT_VERSION}/release-notes.md
-   ```
-
-4. Consumer projects will receive the new version stamp the next time they run:
-
-   ```bash
-   devspark upgrade
-   ```
-
-## Guidelines
-
-### Spec Completion Validation
-
-A spec is considered complete when:
-
-- The `**Status**:` field in `spec.md` is `Complete`
-- All tasks in `tasks.md` are checked (`[x]`)
-- At least one task exists (not an empty file)
-- `spec.md` exists in the directory
-
-If tasks are all checked but status is not `Complete`, this is a lifecycle inconsistency — update the status field to `Complete` before proceeding with archival.
-
-### ADR Quality
-
-ADRs should be:
-
-- **Concise**: 1-2 paragraphs per section
-- **Factual**: Based on documented decisions in specs
-- **Actionable**: Help future developers understand context
-- **Numbered**: Sequential ADR-001, ADR-002, etc.
-
-### Version Numbering
-
-Follow semantic versioning:
-
-- **MAJOR**: Breaking changes, removed features
-- **MINOR**: New features, backwards compatible
-- **PATCH**: Bug fixes, documentation updates
-
-### Handling Edge Cases
-
-**No completed specs:**
-
-- Generate release with quickfixes only
-- Note: "Maintenance release - bug fixes only"
-
-**No quickfixes:**
-
-- Generate release with features only
-- Standard release notes
-
-**No artifacts to archive:**
-
-```markdown
-No Release Artifacts
-
-No completed specs or quickfixes found since last release.
-
-To create a release:
-1. Complete pending features or
-2. Add quickfixes for bug fixes
-
-Run `/devspark.release` again when ready.
-```
-
-**Pending specs warning:**
-
-```markdown
-Pending Specs Detected
-
-The following specs are incomplete and will NOT be archived:
-
-{List of pending specs with status}
-
-These will remain active for the next development cycle.
-Continue with release? The above specs will be noted as "Deferred".
-```
-
-## Context
-
-$ARGUMENTS
+| Option              | Behavior                                                                                     |
+| ------------------- | -------------------------------------------------------------------------------------------- |
+| `{version}`         | Use the explicit semantic version                                                            |
+| `--from <ref>`      | Override the release-window base ref                                                         |
+| `--archive-root`    | Archive to this folder instead of `archive.root` (see Archive location in step 4)            |
+| `--scope=work`      | Evaluate `.devspark.work/` retention and archiving only; skip the version/CHANGELOG workflow |
+| `--scope=knowledge` | Evaluate current-knowledge currentness and code/knowledge consistency only                   |
+| `--scope=scan`      | Report candidates only; make no changes                                                      |
+| `--dry-run`         | Print the complete plan without writing files                                                |
+
+## Workflow
+
+1. Resolve repository or app scope and run the release-context script. Its JSON output is
+   diagnostic input for this run only — never commit it to Git under any name (e.g.
+   `release-context-*.json`). Check the script's `STRAY_RELEASE_ARTIFACTS` field: any match is a
+   file matching that pattern that was already committed by a prior, interrupted release run that
+   never reached step 10's version bump/tag. Treat it as stray, remove it, and do not treat its
+   presence as evidence that prior release work exists.
+2. Establish the release window from the previous version tag to HEAD. Use commits and merged PR
+   metadata to classify the semantic version bump, and fix the release version now (the explicit
+   `{version}` argument, else the calculated one). Archival in steps 4–5 is recorded against that
+   version, so it must be settled first.
+3. Verify the delta:
+   - required tests, lint, builds, and declared release gates pass;
+   - changed behavior and current `.knowledge/` are complete and mutually consistent;
+   - the Knowledge builds (`python3 scripts/build_knowledge_index.py --repo-root . --check`;
+     `KNOWLEDGE_BUILDS` in the release context). Derived index files are not compared or regenerated;
+   - `.knowledge/` structural completeness and knowledge/code mapping accuracy are clean — require a
+     current `/devspark-site-audit` result (full scope, or at least `--scope=knowledge`) covering
+     this release window with no open `KNOW1`–`KNOW6` findings. Re-run site-audit's knowledge scope
+     now if the most recent result predates the window; release does not duplicate that check
+     itself, only confirms it has run and passed;
+   - shipped code, tests, and `.knowledge/` contain no planning identifiers.
+4. **Archive completed work with the release-archive script** — never move files by hand. This is
+   the only place in DevSpark archiving happens, and it covers steps 4 and 5 in one operation:
+   - Preview: `.devspark/scripts/bash/release-archive.sh plan --version {version} --json`
+     (PowerShell: `.devspark/scripts/powershell/release-archive.ps1 plan --version {version} -Json`).
+     `plan` writes nothing. It reports `TO_ARCHIVE`, `IN_FLIGHT`, `NEEDS_DECISION` (orphaned
+     bundles, untracked files, uncategorized work areas), `COLLISIONS`, and `STALE_REFERENCES`.
+   - **Archive location.** The archive is `.archive/` in this repository unless the team keeps its
+     history elsewhere: `archive.root` in `.devspark.work/devspark.json`, or `--archive-root <path>`
+     on `plan`, `apply`, and `validate` (the argument wins; `ARCHIVE_SOURCE` reports `argument`,
+     `config`, or `default`). The root is `.archive/` itself, a folder inside it, or an **existing**
+     folder outside the repository, such as a clone of a separate archive repository. Any other
+     folder inside the repository is refused, because scans and Knowledge tooling would read the
+     archived history as live content; the script never creates the folder. Keep the same root for
+     every run of one release, since its journal lives there. Paths below name the default
+     `.archive/`; under another root, read `ARCHIVE_ROOT` in its place. When `ARCHIVE_EXTERNAL` is
+     true:
+     - reported paths are absolute, and each file is copied, hash-checked against the plan, and only
+       then removed from `.devspark.work/`, so an interruption leaves the original in place and
+       `apply` resumes the move;
+     - the archived files belong to the other folder, so this repository's release commit records
+       only their removal. Relay `ARCHIVE_NOTICE` and have the folder's owner commit the archive
+       there;
+     - a bundle with uncommitted changes is listed in `NEEDS_DECISION` until it is committed, because
+       Git could not recover what leaves the repository;
+     - `--include-roadmap` leaves the roadmap untouched, and `ROADMAP_NOTICE` says why: a link to a
+       file outside the repository would break for everyone else.
+   - Show the plan and put every `NEEDS_DECISION` entry to the user. Never archive, delete, or
+     reclassify one of them on your own, and never edit a bundle's status to make it
+     eligible: eligibility rests on completion evidence that already exists. A spec is complete
+     when `spec.md` says `Status: Complete` or `gates/closeout.md` records `status: pass` with
+     `decision: complete`.
+   - After the user confirms the plan, run the same command with `apply` instead
+     of `plan` (`--dry-run` still never writes). It journals every move in
+     `.archive/{YYYY-MM-DD}/release/archive-manifest-{version}.json`
+     (original path, archived path, sha256, last commit) before moving anything, never overwrites
+     an existing archived file (a collision stops the run, exit 2, with nothing moved), stages the
+     moves so Git records them as renames, and is safe to rerun after an interruption.
+   - Then run `validate --version {version}`. It must report `OK` before the release commit: every
+     journaled file is in the archive with its recorded hash and none remains under `.devspark.work/`.
+   - Resolve every `STALE_REFERENCES` entry (a tracked file outside `.archive/` that still names a
+     moved path) by updating it to the archived path or removing it.
+   - **Optional roadmap.** When `ROADMAP_COMPLETED` is non-empty, the repository's roadmap (the
+     configured `roadmap.root`, default `.devspark.work/roadmap/`; `ROADMAP_ROOT` names it) has
+     resolved Prospective Specs (`complete` or `dropped`) staged in `specs/complete/`. Offer to
+     archive them with this release; never archive them without that agreement. When the user
+     agrees, add `--include-roadmap` to `plan` and `apply`, which journals them in the same manifest
+     under `.archive/{YYYY-MM-DD}/roadmap/specs/complete/` and then rewrites each live roadmap link to
+     an archived item so it points at the archived copy (`ROADMAP_RELINK` previews the files,
+     `ROADMAP_RELINKED` reports them). Existing prose stays as written apart from moved link targets;
+     do not edit these links by hand. Every archived item also gets one permanent `## Delivered` line
+     in the selected roadmap overview (normally `roadmap.md`; the roadmap checker reports its
+     `ROADMAP_FILE`), with its link and
+     explicit `complete;` or `dropped;` status, even if another roadmap file already links to it.
+     Supporting files stay in place. A layout that preserves published paths keeps every Prospective
+     Spec in place and reports `ROADMAP_NOTICE`. The status is captured from the live item in the release
+     journal before the move, so interrupted runs can finish the record without reading archived
+     planning content. The checker uses only the live Delivered records: a recorded `complete` item
+     still satisfies dependencies, while a dropped or unknown item does not. A bare archive link or
+     an older journal without status remains `unknown`; confirm its status from current delivery
+     evidence rather than opening the archive. A staged item that is malformed, not
+     resolved, a symbolic link, or that would relink a roadmap file with uncommitted changes appears
+     in `NEEDS_DECISION` instead and stays in place. Everything else under the roadmap root is live
+     planning and stays. A roadmap outside this repository (`ROADMAP_EXTERNAL`) is never read,
+     archived, or rewritten here; relay `ROADMAP_NOTICE` and leave its archival to an authorized run
+     in the planning repository. `ROADMAP_ERROR` means the roadmap was skipped unchanged. An archive
+     outside this repository also leaves the roadmap in place (see Archive location). No
+     roadmap, or declining the offer, changes nothing else, and the roadmap never blocks a release.
+   - The script reads the archive only to refuse an overwrite and to resume this release's own
+     manifest; no command, release included, scans or lists archived history for any other purpose.
+
+   The classification behind `plan` is the release context's: `ARCHIVE_ELIGIBLE` lists the bundles
+   that qualify, `ARCHIVE_BLOCKED` lists each remaining bundle with its `blockers`, and
+   `ORPHAN_CANDIDATES` lists bundles whose branch no longer exists. Treat those as the decision, and
+   spot-check rather than re-derive them:
+   - A bundle is **archive-eligible** when its own completion marker reads `Complete` (`spec.md`
+     `**Status**`, or the quickfix record's completion marker). Legacy `code_ref`/`knowledge_ref`
+     fields, populated or not, are ignored.
+   - Every archive-eligible bundle moves into `.archive/{YYYY-MM-DD}/` (preserving its relative path
+     minus the `.devspark.work/` prefix, e.g. `.devspark.work/specs/042-foo/` →
+     `.archive/{YYYY-MM-DD}/specs/042-foo/`), whole and intact — plan, tasks, research, checklists,
+     gates, contracts, `context_resolved`, and any other file in the bundle. No copy is left under
+     `.devspark.work/`, and nothing moves to `.knowledge/`.
+   - A bundle that is **not yet** `Complete` stays exactly where it is — spanning more than one
+     release window is normal, not an error. Report it as still in flight; never archive it.
+   - Separately, flag a bundle whose branch is stale, merged, or deleted but that never reached
+     `Complete` — this is orphaned, abandoned in-flight state, not a normal rollover. Surface it for
+     human disposition; never archive it automatically.
+5. The same `apply` moves every other categorized `.devspark.work/` artifact — `pr-review/`,
+   `audit/`, `metrics/`, `telemetry/` per `.knowledge/taxonomy-registry.json` — into
+   `.archive/{YYYY-MM-DD}/` the same way. Every release sweeps all of them unconditionally: there is
+   no age, count, or eligibility check for these categories, unlike specs/quickfixes in step 4. A file
+   that is not tracked by Git is reported in `NEEDS_DECISION` instead of moved, and nothing is ever
+   deleted outright. Operational files stay: `devspark.json`, `devspark.user.json`, `README.md`,
+   `commands/`, `scripts/`, `extensions/`, `intake/`, `roadmap/`, and dotfiles. A top-level work area with no
+   taxonomy lifecycle is reported for a decision, never guessed at. (`.devspark.work/runs/`
+   no longer exists — it was tied to the now-removed CLI; ignore any leftover copy as stray, not a
+   category to sweep.)
+6. Check `.knowledge/` for obsolete, duplicate, historical, decision-log, rationale-archive,
+   lifecycle, or supersession content as a lighter, non-blocking backstop — `/devspark-pr-review` and
+   `/devspark-site-audit` are the authoritative checks for this; release only catches what they missed
+   between runs. This includes `.knowledge/governance/decisions/` docs: flag any that have drifted
+   into a numbered/ADR-style filename, a "superseded by" chain, or a `constrains`/`constrained_by`
+   pointer that no longer matches an existing entity — correct in place or delete, never archive.
+7. Scan shipped code and `.knowledge/` for leaked spec, task, feature, quickfix, or requirement
+   identifiers. Remove the reference; do not rewrite it into another planning reference.
+8. Generate user-facing CHANGELOG and release notes from the release delta. Do not mention archived
+   spec, task, quickfix, feature, or requirement identifiers.
+9. Write operational release output — including a summary of what was archived (cite the manifest),
+   what retention swept, and every artifact left for a decision — directly to the archive's
+   `{YYYY-MM-DD}/release/` folder (`.archive/{YYYY-MM-DD}/release/` by default; `ARCHIVE_ROOT` names
+   it). Release output is never staged under `.devspark.work/`, even temporarily: the archive is the
+   only place any of this release's output lives once the run completes.
+10. Bump source version files and the `.devspark/VERSION` stamp where applicable.
+11. Show the exact commit, version, and tag plan, including the archive already applied in step 4.
+    Require explicit confirmation before the release commit, tags, pushes, or publication;
+    `--dry-run` never writes.
+12. Re-run `release-archive validate` and the release gates (Knowledge build and integrity, package
+    checks) against the post-archive workspace. Create the release commit — archive moves, release
+    note, version metadata — only after success, create the tag only when authorized, and report
+    publication status from the host.
+
+Git is the sole history for `.knowledge/`: release never archives it, only corrects it in place or
+deletes it. `.devspark.work/` retained work products and archive-eligible specs/quickfixes are the
+one exception — those move to `.archive/{YYYY-MM-DD}/` per steps 4–5 above, never deleted
+outright; orphaned planning bundles wait for an explicit owner decision. No DevSpark command,
+release included, reads, lists, or globs the archive (`.archive/` or the configured root) afterward
+beyond the script's own scoped reads in step 4; a human decides when an entry there is safe to
+remove, outside any DevSpark command.
+
+Where you are: release sealed, `.devspark.work/` swept
+Next: monitor for the next release window

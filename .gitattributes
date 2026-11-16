@@ -6,3 +6,8 @@
 *.json text eol=lf
 *.yml text eol=lf
 *.mjs text eol=lf
+
+# Files copied into Linux containers must keep LF endings (CRLF breaks shell shebangs).
+docker/*.sh text eol=lf
+docker/*.Dockerfile text eol=lf
+docker/nginx.conf text eol=lf

@@ -396,3 +396,6 @@ MagicMock/
 .validation/
 frontend/.lighthouse/
 frontend/bundle-stats.html
+
+# DevSpark — personal overrides (never commit)
+.documentation/*/commands/

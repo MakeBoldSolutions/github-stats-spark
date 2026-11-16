@@ -1,0 +1,26 @@
+# Keep images small and free of secrets, caches, and generated data.
+.git
+.env
+.env*
+.venv
+.cache
+.mypy_cache
+.pytest_cache
+.ruff_cache
+.vs
+**/__pycache__
+**/node_modules
+frontend/coverage
+frontend/dist
+frontend/public/data
+frontend/bundle-stats.html
+data
+output
+docs
+preview
+MagicMock
+coverage.json
+audit_output.json
+.devspark.work
+.archive
+secrets

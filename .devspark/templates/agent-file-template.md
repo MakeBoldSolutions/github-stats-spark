@@ -1,5 +1,7 @@
 # [PROJECT NAME] Development Guidelines
 
+<!-- DevSpark — © 2026 Make Bold Solutions. Source: https://dev.makeboldspark.com -->
+
 Auto-generated from all feature plans. Last updated: [DATE]
 
 ## Active Technologies

@@ -1,11 +1,13 @@
 #!/usr/bin/env pwsh
+# DevSpark - (c) 2026 Make Bold Solutions. Source: https://dev.makeboldspark.com
+#requires -Version 7.0
 # Build repository history context for /devspark.repo-story
 # Usage:
 #   .\repo-story-context.ps1 [-Output <path>] [-Months 12] [-Scope full] [-CompareBaseline YYYY-MM] [-Stdout]
 
 [CmdletBinding()]
 param(
-    [string]$Output = ".documentation/repo-story/history.json",
+    [string]$Output = ".knowledge/guides/repo-story/history.json",
     [int]$Months = 12,
     [ValidateSet("full", "velocity", "quality", "business", "team")]
     [string]$Scope = "full",
@@ -38,7 +40,7 @@ Options:
 
 $ErrorActionPreference = 'Stop'
 
-# Multi-app support (T088)
+# Multi-app support
 if (-not (Get-Command Detect-DevSparkMode -ErrorAction SilentlyContinue)) {
     . "$PSScriptRoot/common.ps1"
 }
@@ -394,8 +396,8 @@ if ($subjectRaw) {
 }
 
 $governancePath = ""
-if (Test-Path (Join-Path $repoRoot ".documentation/memory/constitution.md")) {
-    $governancePath = Join-Path $repoRoot ".documentation/memory/constitution.md"
+if (Test-Path (Join-Path $repoRoot ".knowledge/governance/constitution.md")) {
+    $governancePath = Join-Path $repoRoot ".knowledge/governance/constitution.md"
 } elseif (Test-Path (Join-Path $repoRoot ".specify/memory/constitution.md")) {
     $governancePath = Join-Path $repoRoot ".specify/memory/constitution.md"
 }
@@ -409,11 +411,6 @@ if ($governancePath) {
     }
     $constitutionAmendmentCount = ([regex]::Matches($constitutionText, '(?im)^##\s+amendment\b|CAP-\d{4}-\d{3}')).Count
 }
-
-$specDirs = @(Get-ChildItem -Path (Join-Path $repoRoot ".documentation/specs") -Directory -ErrorAction SilentlyContinue | Where-Object { $_.Name -ne "pr-review" })
-$archivedSpecs = @(Get-ChildItem -Path (Join-Path $repoRoot ".archive") -Recurse -Directory -ErrorAction SilentlyContinue | Where-Object { $_.FullName -match '(\\|/)specs(\\|/)' })
-$governanceArtifactsCount = @(Get-ChildItem -Path (Join-Path $repoRoot ".documentation") -Recurse -File -ErrorAction SilentlyContinue |
-    Where-Object { $_.Name -match 'audit|harvest|pr-review|constitution-history' }).Count
 
 $recent = @()
 $recentRaw = Invoke-GitSafe @("log", "--all", "--since=$sinceDate", "-n", "40", "--date=iso-strict", "--pretty=format:%H%x09%ad%x09%ae%x09%s")
@@ -520,9 +517,6 @@ $history = [PSCustomObject]@{
         constitution_exists = [bool]$governancePath
         constitution_version = $constitutionVersion
         constitution_amendment_count = $constitutionAmendmentCount
-        active_spec_count = $specDirs.Count
-        archived_spec_directory_count = $archivedSpecs.Count
-        governance_artifact_count = $governanceArtifactsCount
     }
     milestones = [PSCustomObject]@{
         tags = @($tags)

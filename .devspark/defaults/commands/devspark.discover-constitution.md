@@ -1,11 +1,12 @@
 ---
+source: "DevSpark — © 2026 Make Bold Solutions. Source: https://dev.makeboldspark.com"
 description: Analyze existing codebase to discover implicit patterns and conventions, then guide user through crafting a constitution via interactive questioning.
-handoffs: 
+handoffs:
   - label: Create Constitution
-    agent: devspark.constitution
+    agent: devspark-constitution
     prompt: Formalize the discovered principles into the constitution template
   - label: Run Site Audit
-    agent: devspark.site-audit
+    agent: devspark-site-audit
     prompt: Audit the codebase against the new constitution
 ---
 
@@ -16,6 +17,14 @@ $ARGUMENTS
 ```
 
 You **MUST** consider the user input before proceeding (if not empty). User may provide focus areas (e.g., "focus on security and testing") or specific directories to analyze.
+
+## Lifecycle Position
+
+**Brownfield bootstrap** step: `discover → constitution`, then later `evolve → constitution`.
+
+- **Owns**: scanning the codebase for implicit patterns, interactive validation, and producing a *draft* at `/.devspark.work/governance/constitution-draft.md`.
+- **Does NOT own**: writing or amending the real `constitution.md` (→ always `/devspark-constitution`); evidence-based amendment proposals once a constitution exists (→ `/devspark-evolve-constitution`).
+- **When NOT to use**: constitution already exists and is broadly accurate (→ `/devspark-evolve-constitution`); greenfield codebase (→ `/devspark-constitution` directly with aspirational principles).
 
 ## Overview
 
@@ -40,10 +49,10 @@ Identify the codebase structure:
 - Identify source directories (src/, lib/, app/, etc.)
 - Locate test directories and patterns
 - Find configuration files (.eslintrc, tsconfig, .editorconfig, etc.)
-- Check for existing documentation (README, CONTRIBUTING, .documentation/)
+- Check for existing documentation (README, CONTRIBUTING, `.knowledge/guides/`)
 - Look for existing AI instruction files (.github/copilot-instructions.md, CLAUDE.md, etc.)
 
-If `/.documentation/memory/constitution.md` already exists:
+If `/.knowledge/governance/constitution.md` already exists:
 
 - Warn user: "A constitution already exists. This will create a draft to compare/merge."
 - Proceed with analysis to identify gaps or conflicts
@@ -58,63 +67,63 @@ Scan the codebase for patterns across these categories. For each, note:
 
 #### A. Code Quality Patterns
 
-| Pattern | Detection Method |
-|---------|------------------|
-| TypeScript strict mode | Check tsconfig.json for strict: true |
-| ESLint/linting rules | Parse .eslintrc* for enabled rules |
-| Formatting tools | Presence of .prettierrc, .editorconfig |
-| Maximum file length | Analyze distribution of file sizes |
-| Naming conventions | Analyze function/class/file naming patterns |
-| Comment density | Ratio of comments to code |
-| JSDoc/documentation | Presence of doc comments on exports |
+| Pattern                | Detection Method                            |
+| ---------------------- | ------------------------------------------- |
+| TypeScript strict mode | Check tsconfig.json for strict: true        |
+| ESLint/linting rules   | Parse .eslintrc\* for enabled rules         |
+| Formatting tools       | Presence of .prettierrc, .editorconfig      |
+| Maximum file length    | Analyze distribution of file sizes          |
+| Naming conventions     | Analyze function/class/file naming patterns |
+| Comment density        | Ratio of comments to code                   |
+| JSDoc/documentation    | Presence of doc comments on exports         |
 
 #### B. Testing Patterns
 
-| Pattern | Detection Method |
-|---------|------------------|
-| Test framework | Detect jest, vitest, mocha, pytest, etc. |
-| Test file location | Co-located vs. separate test directory |
-| Test file naming | *.test.ts, *.spec.ts, test_*.py patterns |
-| Coverage configuration | Presence of coverage config, thresholds |
-| Test types present | Unit, integration, e2e directories |
+| Pattern                | Detection Method                           |
+| ---------------------- | ------------------------------------------ |
+| Test framework         | Detect jest, vitest, mocha, pytest, etc.   |
+| Test file location     | Co-located vs. separate test directory     |
+| Test file naming       | `*.test.ts`, `*.spec.ts`, `test_*.py` patterns |
+| Coverage configuration | Presence of coverage config, thresholds    |
+| Test types present     | Unit, integration, e2e directories         |
 
 #### C. Security Patterns
 
-| Pattern | Detection Method |
-|---------|------------------|
-| Secret management | Environment variable usage vs. hardcoded values |
-| Input validation | Presence of validation libraries (Zod, Joi, etc.) |
-| Auth patterns | Authentication library usage |
-| SQL patterns | Parameterized queries vs. string concatenation |
-| Dependency scanning | Security audit in package.json scripts |
+| Pattern             | Detection Method                                  |
+| ------------------- | ------------------------------------------------- |
+| Secret management   | Environment variable usage vs. hardcoded values   |
+| Input validation    | Presence of validation libraries (Zod, Joi, etc.) |
+| Auth patterns       | Authentication library usage                      |
+| SQL patterns        | Parameterized queries vs. string concatenation    |
+| Dependency scanning | Security audit in package.json scripts            |
 
 #### D. Architecture Patterns
 
-| Pattern | Detection Method |
-|---------|------------------|
-| Directory structure | Analyze folder organization |
-| Layer separation | Presence of routes/, services/, models/ etc. |
-| API patterns | REST conventions, GraphQL, tRPC usage |
-| Database access | ORM usage (Prisma, TypeORM, SQLAlchemy) |
-| Error handling | Custom error classes, try/catch patterns |
+| Pattern             | Detection Method                             |
+| ------------------- | -------------------------------------------- |
+| Directory structure | Analyze folder organization                  |
+| Layer separation    | Presence of routes/, services/, models/ etc. |
+| API patterns        | REST conventions, GraphQL, tRPC usage        |
+| Database access     | ORM usage (Prisma, TypeORM, SQLAlchemy)      |
+| Error handling      | Custom error classes, try/catch patterns     |
 
 #### E. Observability Patterns
 
-| Pattern | Detection Method |
-|---------|------------------|
-| Logging | Logger library usage, console.log presence |
-| Structured logging | JSON logging patterns |
-| Error tracking | Sentry, Rollbar, etc. integration |
-| Health checks | /health or /healthz endpoints |
+| Pattern            | Detection Method                           |
+| ------------------ | ------------------------------------------ |
+| Logging            | Logger library usage, console.log presence |
+| Structured logging | JSON logging patterns                      |
+| Error tracking     | Sentry, Rollbar, etc. integration          |
+| Health checks      | /health or /healthz endpoints              |
 
 #### F. Workflow Patterns
 
-| Pattern | Detection Method |
-|---------|------------------|
-| Git workflow | Branch naming in .git, protected branches |
-| CI/CD | Presence of .github/workflows, .gitlab-ci.yml |
-| Pre-commit hooks | .husky/, .pre-commit-config.yaml |
-| Changelog maintenance | CHANGELOG.md updates |
+| Pattern               | Detection Method                              |
+| --------------------- | --------------------------------------------- |
+| Git workflow          | Branch naming in .git, protected branches     |
+| CI/CD                 | Presence of .github/workflows, .gitlab-ci.yml |
+| Pre-commit hooks      | .husky/, .pre-commit-config.yaml              |
+| Changelog maintenance | CHANGELOG.md updates                          |
 
 ### 3. Generate Discovery Report
 
@@ -128,24 +137,24 @@ Produce an internal discovery summary (shown to user before questions):
 
 ### High-Confidence Patterns (>80% consistent)
 
-| Pattern | Evidence | Recommendation |
-|---------|----------|----------------|
-| TypeScript strict mode | tsconfig.json strict: true | → MUST principle |
-| Jest testing | All 47 test files use Jest | → MUST principle |
-| Prisma ORM | No raw SQL found | → SHOULD principle |
+| Pattern                | Evidence                   | Recommendation     |
+| ---------------------- | -------------------------- | ------------------ |
+| TypeScript strict mode | tsconfig.json strict: true | → MUST principle   |
+| Jest testing           | All 47 test files use Jest | → MUST principle   |
+| Prisma ORM             | No raw SQL found           | → SHOULD principle |
 
 ### Medium-Confidence Patterns (50-80% consistent)
 
-| Pattern | Evidence | Needs Decision |
-|---------|----------|----------------|
-| JSDoc on exports | 73% of exported functions | Formalize or relax? |
-| Error classes | 60% use CustomError | Standardize pattern? |
+| Pattern          | Evidence                  | Needs Decision       |
+| ---------------- | ------------------------- | -------------------- |
+| JSDoc on exports | 73% of exported functions | Formalize or relax?  |
+| Error classes    | 60% use CustomError       | Standardize pattern? |
 
 ### Inconsistent Areas (Needs Discussion)
 
-| Area | Observation | Question |
-|------|-------------|----------|
-| Logging | Mixed console.log and winston | Which to standardize? |
+| Area          | Observation                    | Question              |
+| ------------- | ------------------------------ | --------------------- |
+| Logging       | Mixed console.log and winston  | Which to standardize? |
 | Test coverage | /api has tests, /utils doesn't | Coverage requirement? |
 
 ### Gaps Detected (No Clear Pattern)
@@ -157,7 +166,7 @@ Produce an internal discovery summary (shown to user before questions):
 
 ### 4. Interactive Question Loop
 
-Based on discovery findings, generate targeted questions. Use the same interaction pattern as `/devspark.clarify`:
+Based on discovery findings, generate targeted questions. Use the same interaction pattern as `/devspark-clarify`:
 
 **Question Categories** (prioritized):
 
@@ -179,12 +188,12 @@ I found that **100% of test files use Jest** and tests are co-located with sourc
 
 **Recommended:** Formalize as MUST principle
 
-| Option | Description |
-|--------|-------------|
-| A | MUST: All code must have Jest tests in co-located *.test.ts files |
-| B | SHOULD: Tests strongly encouraged but not blocking |
-| C | No principle: Leave testing as informal convention |
-| D | Different approach (describe in <=10 words) |
+| Option | Description                                                        |
+| ------ | ------------------------------------------------------------------ |
+| A      | MUST: All code must have Jest tests in co-located \*.test.ts files |
+| B      | SHOULD: Tests strongly encouraged but not blocking                 |
+| C      | No principle: Leave testing as informal convention                 |
+| D      | Different approach (describe in <=10 words)                        |
 
 Reply with option letter, "yes"/"recommended" to accept, or your own answer.
 ```
@@ -206,8 +215,8 @@ After questions complete (or user terminates early), generate a draft constituti
 ```markdown
 # [Project Name] Constitution (DRAFT)
 
-> ⚠️ **DRAFT**: Generated by /devspark.discover-constitution on YYYY-MM-DD
-> Review carefully before finalizing. Run /devspark.constitution to formalize.
+> ⚠️ **DRAFT**: Generated by /devspark-discover-constitution on YYYY-MM-DD
+> Review carefully before finalizing. Run /devspark-constitution to formalize.
 
 ## Discovery Context
 
@@ -247,23 +256,23 @@ After draft generation, identify what's NOT covered:
 
 Based on common best practices, these areas have no discovered pattern or explicit decision:
 
-| Area | Common Principle | Why Consider |
-|------|------------------|--------------|
-| Input Validation | All user input MUST be validated | Security best practice |
-| Rate Limiting | Public APIs SHOULD have rate limits | DDoS protection |
-| Accessibility | UI SHOULD meet WCAG AA | Legal/ethical requirement |
+| Area             | Common Principle                    | Why Consider              |
+| ---------------- | ----------------------------------- | ------------------------- |
+| Input Validation | All user input MUST be validated    | Security best practice    |
+| Rate Limiting    | Public APIs SHOULD have rate limits | DDoS protection           |
+| Accessibility    | UI SHOULD meet WCAG AA              | Legal/ethical requirement |
 
 Would you like to add any of these? (Reply with area names, or "none")
 ```
 
 ### 7. Output Draft and Next Steps
 
-Write draft to `/.documentation/memory/constitution-draft.md` (not overwriting existing constitution if present).
+Write draft to `/.devspark.work/governance/constitution-draft.md` (not overwriting existing constitution if present).
 
 ```markdown
 ## Discovery Complete
 
-**Draft saved to**: `/.documentation/memory/constitution-draft.md`
+**Draft saved to**: `/.devspark.work/governance/constitution-draft.md`
 
 ### Summary
 
@@ -274,16 +283,16 @@ Write draft to `/.documentation/memory/constitution-draft.md` (not overwriting e
 
 ### Recommended Next Steps
 
-1. **Review the draft**: Open `/.documentation/memory/constitution-draft.md` and refine wording
+1. **Review the draft**: Open `/.devspark.work/governance/constitution-draft.md` and refine wording
 2. **Team discussion**: Share draft with team for feedback
-3. **Finalize**: Run `/devspark.constitution` to create the official constitution
-4. **Validate**: Run `/devspark.site-audit` to check codebase against new principles
+3. **Finalize**: Run `/devspark-constitution` to create the official constitution
+4. **Validate**: Run `/devspark-site-audit` to check codebase against new principles
 
 ### Comparison (if existing constitution found)
 
 | Principle | Existing | Discovered | Conflict? |
-|-----------|----------|------------|-----------|
-| ... | ... | ... | ... |
+| --------- | -------- | ---------- | --------- |
+| ...       | ...      | ...        | ...       |
 ```
 
 ## Question Templates
@@ -294,6 +303,7 @@ Write draft to `/.documentation/memory/constitution-draft.md` (not overwriting e
 I found that **[pattern description]** with **[X]% consistency** across [Y] files.
 
 Examples:
+
 - `src/api/users.ts` - [specific example]
 - `src/services/auth.ts` - [specific example]
 
@@ -322,11 +332,11 @@ What's your preference?
 ```markdown
 For **[principle]**, what severity should violations have?
 
-| Option | Meaning |
-|--------|---------|
-| A | **MUST** - Violations are blocking (CRITICAL in PR review) |
-| B | **SHOULD** - Strongly recommended (HIGH in PR review) |
-| C | **MAY** - Optional guideline (LOW in PR review) |
+| Option | Meaning                                                    |
+| ------ | ---------------------------------------------------------- |
+| A      | **MUST** - Violations are blocking (CRITICAL in PR review) |
+| B      | **SHOULD** - Strongly recommended (HIGH in PR review)      |
+| C      | **MAY** - Optional guideline (LOW in PR review)            |
 ```
 
 ### Governance Questions
@@ -334,12 +344,12 @@ For **[principle]**, what severity should violations have?
 ```markdown
 How should constitution amendments be handled?
 
-| Option | Description |
-|--------|-------------|
-| A | Any team member can propose; requires team approval |
-| B | Tech lead approval required |
-| C | Documented but informal process |
-| D | Other (describe briefly) |
+| Option | Description                                         |
+| ------ | --------------------------------------------------- |
+| A      | Any team member can propose; requires team approval |
+| B      | Tech lead approval required                         |
+| C      | Documented but informal process                     |
+| D      | Other (describe briefly)                            |
 ```
 
 ## Edge Cases
@@ -379,4 +389,4 @@ If user says "done" before any questions:
 
 ## Context
 
-$ARGUMENTS
+{ARGS}

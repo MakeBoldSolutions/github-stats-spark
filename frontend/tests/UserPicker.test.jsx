@@ -20,6 +20,14 @@ const portfolio = {
     { type: "user", identifier: "NotYet", enabled: true },
     { type: "user", identifier: "Disabled", enabled: false },
     { type: "org", identifier: "SomeOrg", enabled: true },
+    { type: "org", identifier: "OffOrg", enabled: false },
+    {
+      type: "repo",
+      identifier: "Acme/Widget",
+      slug: "acme--widget",
+      enabled: true,
+    },
+    { type: "repo", identifier: "Acme/Gadget", enabled: true },
   ],
 };
 
@@ -44,7 +52,7 @@ function Probe() {
 }
 
 describe("useUserOptions", () => {
-  it("lists only enabled user sources and marks uncollected ones not ready", async () => {
+  it("lists enabled users, organizations and repositories, marking uncollected ones not ready", async () => {
     stubFetch(async (url, options) => {
       if (url.endsWith("portfolio.json")) return json(portfolio);
       if (options?.method === "HEAD")
@@ -62,8 +70,17 @@ describe("useUserOptions", () => {
       "MakeBoldSolutions",
       "MarkHazleton",
       "NotYet (not collected yet)",
+      "SomeOrg",
+      "Acme/Widget",
+      "Acme/Gadget",
     ]);
     expect(picker.querySelector('option[value="notyet"]')).toBeDisabled();
+    // The worker's slug wins; otherwise the same scheme is derived.
+    expect(picker.querySelector('option[value="acme--widget"]')).not.toBeNull();
+    expect(picker.querySelector('option[value="acme--gadget"]')).not.toBeNull();
+    expect(
+      [...picker.querySelectorAll("optgroup")].map((g) => g.label),
+    ).toEqual(["Users", "Organizations", "Repositories"]);
   });
 
   it("offers nothing on a static host that returns HTML for portfolio.json", async () => {

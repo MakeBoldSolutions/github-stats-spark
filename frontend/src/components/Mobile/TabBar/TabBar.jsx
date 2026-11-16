@@ -1,4 +1,4 @@
-import { LayoutGrid, BarChart3, AlertTriangle } from "lucide-react";
+import { LayoutGrid, BarChart3, AlertTriangle, Settings } from "lucide-react";
 import "./TabBar.css";
 
 /**
@@ -13,7 +13,10 @@ const TABS = [
   { id: "attention", label: "Health", Icon: AlertTriangle },
 ];
 
-const TabBar = ({ activeTab = "table", onTabChange }) => {
+const ADMIN_TAB = { id: "sources", label: "Sources", Icon: Settings };
+
+const TabBar = ({ activeTab = "table", onTabChange, showAdmin = false }) => {
+  const tabs = showAdmin ? [...TABS, ADMIN_TAB] : TABS;
   const handleTabClick = (tabId) => {
     if (onTabChange && tabId !== activeTab) {
       onTabChange(tabId);
@@ -23,7 +26,7 @@ const TabBar = ({ activeTab = "table", onTabChange }) => {
   return (
     <nav className="tab-bar" role="navigation" aria-label="Primary navigation">
       <div className="tab-bar__container">
-        {TABS.map(({ id, label, Icon }) => (
+        {tabs.map(({ id, label, Icon }) => (
           <button
             key={id}
             className={`tab-bar__tab ${activeTab === id ? "tab-bar__tab--active" : ""}`}

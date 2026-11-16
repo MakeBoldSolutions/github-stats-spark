@@ -13,6 +13,7 @@ import RepositoryGrid from "@/components/RepositoryGrid/RepositoryGrid";
 import TabBar from "@/components/Mobile/TabBar/TabBar";
 import { OfflineIndicator } from "@/components/Mobile/OfflineIndicator/OfflineIndicator";
 import CollectionStatus from "@/components/Common/CollectionStatus";
+import useAdminAvailable from "@/hooks/useAdminAvailable";
 import { ToastContainer } from "@/components/Mobile/Toast/Toast";
 
 // SIZE JUSTIFICATION (Constitution I): App composes routing/layout for the
@@ -25,6 +26,7 @@ const DashboardView = lazy(
 const AttentionView = lazy(
   () => import("@/components/Attention/AttentionView"),
 );
+const SourcesView = lazy(() => import("@/components/Admin/SourcesView"));
 const RepositoryDetail = lazy(
   () => import("@/components/DrillDown/RepositoryDetail"),
 );
@@ -39,7 +41,13 @@ const RepositoryDetail = lazy(
  * @component
  */
 function App() {
-  const { data, loading, error, refetch } = useRepositoryData();
+  const {
+    data,
+    loading: dataLoading,
+    error: dataError,
+    refetch,
+  } = useRepositoryData();
+  const adminAvailable = useAdminAvailable();
 
   const {
     toasts,
@@ -61,6 +69,11 @@ function App() {
     formatGeneratedAt,
     handleForceRefresh,
   } = useDashboardShell({ data, refetch });
+
+  // Admin pages do not depend on dashboard data, so a data failure must not hide them.
+  const onAdminView = adminAvailable && currentView === "sources";
+  const loading = dataLoading && !onAdminView;
+  const error = onAdminView ? null : dataError;
 
   return (
     <ThemeProvider>
@@ -123,6 +136,18 @@ function App() {
                   >
                     Health
                   </button>
+                  {adminAvailable && (
+                    <button
+                      className={`nav-menu-item ${currentView === "sources" ? "nav-menu-item--active" : ""}`}
+                      onClick={() => handleViewChange("sources")}
+                      aria-current={
+                        currentView === "sources" ? "page" : undefined
+                      }
+                      aria-label="Sources — manage organizations and repositories"
+                    >
+                      Sources
+                    </button>
+                  )}
                 </nav>
               </div>
             </div>
@@ -139,6 +164,14 @@ function App() {
           >
             <div className="container">
               <div className="mt-xl mb-xl">
+                {onAdminView && (
+                  <Suspense
+                    fallback={<LoadingState message="Loading admin..." />}
+                  >
+                    <SourcesView onToast={addToast} />
+                  </Suspense>
+                )}
+
                 {/* Loading State */}
                 {loading && (
                   <LoadingState
@@ -292,7 +325,11 @@ function App() {
           </main>
 
           {/* Mobile TabBar Navigation */}
-          <TabBar activeTab={currentView} onTabChange={handleViewChange} />
+          <TabBar
+            activeTab={currentView}
+            onTabChange={handleViewChange}
+            showAdmin={adminAvailable}
+          />
 
           {/* Footer */}
           <footer className="footer" role="contentinfo">

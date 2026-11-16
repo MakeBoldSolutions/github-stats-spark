@@ -20,6 +20,9 @@ function resolveViewFromHash(hash) {
   if (value === "attention" || value === "health") {
     return "attention";
   }
+  if (value === "sources") {
+    return "sources";
+  }
   return "table";
 }
 
@@ -27,6 +30,7 @@ const VIEW_HASH = {
   table: "",
   visualizations: "visualizations",
   attention: "attention",
+  sources: "sources",
 };
 
 /**

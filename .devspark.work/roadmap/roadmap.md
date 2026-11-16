@@ -135,7 +135,7 @@ without a schema rewrite. No tenants, billing, or multi-admin in this roadmap.
 
 1. **Self-hosted foundation:**
    [ps-001 Docker foundation](specs/complete/ps-001-docker-foundation.md),
-   [ps-002 Scheduled collection and status](specs/ps-002-scheduled-collection-and-status.md)
+   [ps-002 Scheduled collection and status](specs/complete/ps-002-scheduled-collection-and-status.md)
 2. **Portfolio and source management:**
    [ps-003 Source registry and portfolio model](specs/ps-003-source-registry-and-portfolio-collection.md),
    [ps-004 Admin API and management UI](specs/ps-004-admin-api-and-source-management-ui.md),

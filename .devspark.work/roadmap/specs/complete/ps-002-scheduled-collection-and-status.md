@@ -1,11 +1,11 @@
 ---
 id: ps-002
 title: Scheduled collection and status
-status: proposed
+status: complete
 order: 20
 depends_on: [ps-001]
 blockers: []
-delivery: []
+delivery: ["branch 005-work-ps-002-scheduled-collection", "commit 96fde36", "commit 93c1d2d", "commit 7c104f9"]
 ---
 
 # ps-002: Scheduled collection and status

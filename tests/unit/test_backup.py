@@ -283,6 +283,28 @@ def test_worker_backs_up_when_due_and_publishes_the_result(settings):
     )  # no paths in the public file
 
 
+def test_a_restart_republishes_the_newest_existing_backup(settings):
+    first = make_worker(settings)
+    assert first.backup_if_due() is True
+    # An older release rewrote status.json without the backup field.
+    settings.status_path.write_text(json.dumps({"schema_version": 1}))
+
+    restarted = make_worker(settings, now=NOW + timedelta(minutes=5))
+    assert restarted.backup_if_due() is None  # nothing due, but status is restored
+    state = json.loads(settings.status_path.read_text())["backup"]
+    assert state["ok"] is True and state["sources"] == 1
+
+
+def test_a_restart_does_not_vouch_for_a_corrupt_backup(settings):
+    make_worker(settings).backup_if_due()
+    newest = next(settings.backup_dir.glob("registry-*.db"))
+    newest.write_bytes(b"corrupt" * 100)
+    settings.status_path.write_text(json.dumps({"schema_version": 1}))
+    restarted = make_worker(settings, now=NOW + timedelta(minutes=5))
+    restarted.backup_if_due()
+    assert "backup" not in json.loads(settings.status_path.read_text())
+
+
 def test_worker_reports_a_failed_backup_and_backs_off(settings):
     settings.backup_dir = settings.db_path  # a file where a directory is needed
     worker = make_worker(settings)

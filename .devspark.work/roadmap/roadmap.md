@@ -199,11 +199,14 @@ The first release does not need the rest.
   amendment itself is made through `/devspark-constitution`, not by this roadmap, and must land before
   ps-005 and ps-006 are delivered.
 - **ntfy is the notification channel** (ps-008).
+- **GitHub authentication: fine-grained PAT connections first, schema ready for a GitHub App** (approved
+  2026-11-16). One connection per owner; expiry is tracked and surfaced; `GITHUB_TOKEN` remains the fallback.
+  The App comes forward if a client wants to grant access themselves, owners multiply, or an org blocks tokens.
+  No known organization forbids personal tokens.
 
 **Recommendations still awaiting developer decision:**
 
 - **FastAPI** for the API.
-- **GitHub authentication:** fine-grained PAT connections first, schema ready for GitHub App.
 - **Single administrator** signing in against the SQLite-stored credential with a server-side session;
   per-client scoping deferred.
 - **DevSpark integration:** parse existing roadmap artifacts read-only; no export contract unless parsing

@@ -4,7 +4,7 @@ title: Admin API and management UI
 status: proposed
 order: 40
 depends_on: [ps-003]
-blockers: ["Developer decision: initial GitHub authentication strategy (PAT vs GitHub App)"]
+blockers: []
 delivery: []
 ---
 
@@ -44,8 +44,15 @@ design leaves room for per-client authorization. The worker is triggered through
 ## Dependencies and Decisions
 
 Approved: the administrator credential lives in SQLite (salted slow hash, server-side session); stored
-third-party secrets are encrypted with a key kept outside the database. Open: PAT scopes (org policy may block PATs
-from org alerts, which would bring the GitHub App forward); client/project naming conventions.
+third-party secrets are encrypted with a key kept outside the database. Approved (2026-11-16): fine-grained
+personal access tokens first, one connection per owner (a fine-grained token covers a single user or org), with
+the connection schema ready for `kind: app` later; no known organization forbids personal tokens. Consequences
+for this item: collection resolves a source's own connection and falls back to the environment `GITHUB_TOKEN`
+when a source has none; each connection records its expiry so the UI warns before it lapses and a lapsed token
+shows as an actionable source error, not a silent gap. A GitHub App is brought forward if a client wants to grant
+access without minting tokens, owners multiply enough that expiry becomes busywork, or an org policy blocks tokens
+from Dependabot alerts. Open: required PAT permissions (read-only metadata, contents, pull requests, actions,
+Dependabot alerts) to confirm during implementation; client/project naming conventions.
 
 ## Completion Expectations
 

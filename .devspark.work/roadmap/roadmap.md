@@ -141,7 +141,7 @@ without a schema rewrite. No tenants, billing, or multi-admin in this roadmap.
    [ps-004 Admin API and management UI](specs/complete/ps-004-admin-api-and-source-management-ui.md),
    [ps-005 Private and client data boundary](specs/ps-005-private-data-boundary.md),
    [ps-020 Portfolio classification and signal scoring](specs/ps-020-portfolio-classification-and-signal-scoring.md),
-   [ps-021 Organization and repository dashboards with source switching](specs/ps-021-source-dashboards-and-switching.md)
+   [ps-021 Organization and repository dashboards with source switching](specs/complete/ps-021-source-dashboards-and-switching.md)
 3. **GitHub and security intelligence:**
    [ps-006 Dependabot dashboard and lifecycle](specs/ps-006-dependabot-security-dashboard.md),
    [ps-007 Alert history and remediation metrics](specs/ps-007-alert-history-and-trends.md),

@@ -1,11 +1,11 @@
 ---
 id: ps-021
 title: Organization and repository dashboards with full source switching
-status: proposed
+status: complete
 order: 62
 depends_on: [ps-003, ps-004]
 blockers: []
-delivery: []
+delivery: ["branch 001-work-ps-021-org-and", "commit bf1725e"]
 ---
 
 # ps-021: Organization and repository dashboards with full source switching

@@ -134,7 +134,7 @@ without a schema rewrite. No tenants, billing, or multi-admin in this roadmap.
 ## Themes
 
 1. **Self-hosted foundation:**
-   [ps-001 Docker foundation](specs/ps-001-docker-foundation.md),
+   [ps-001 Docker foundation](specs/complete/ps-001-docker-foundation.md),
    [ps-002 Scheduled collection and status](specs/ps-002-scheduled-collection-and-status.md)
 2. **Portfolio and source management:**
    [ps-003 Source registry and portfolio model](specs/ps-003-source-registry-and-portfolio-collection.md),

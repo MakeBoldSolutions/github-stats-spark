@@ -1,11 +1,11 @@
 ---
 id: ps-001
 title: Docker foundation
-status: proposed
+status: complete
 order: 10
 depends_on: []
 blockers: []
-delivery: []
+delivery: ["branch 005-work-ps-001-docker-foundation", "commit eeedf4a", "commit 07e7dac"]
 ---
 
 # ps-001: Docker foundation
@@ -47,3 +47,10 @@ No prerequisites. Open: bind mounts vs named volumes under Portainer; build on s
 `docker compose up` serves a working dashboard at `http://localhost:8086`; a one-shot worker run refreshes
 data in the volume and a reload shows it; images contain no token or `.env`; containers run non-root;
 existing pytest, vitest, and Pages workflow still pass.
+
+## Delivery Assessment
+
+Deployed to the home server via Portainer (stack `github-stats-spark`, `192.168.1.197:8086`) from the
+delivery branch, not yet merged to `main`. Verified: images build, web healthy and non-root, worker ran
+once for MakeBoldSolutions (15 repositories), `docker/smoke.sh` passed, and the developer confirmed the
+dashboard displays correctly.

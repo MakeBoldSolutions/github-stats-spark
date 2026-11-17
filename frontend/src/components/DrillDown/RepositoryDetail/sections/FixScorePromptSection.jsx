@@ -18,6 +18,9 @@ export const COMMUNITY_CHECKS = [
   ["Security Policy", "has_security_policy"],
 ];
 
+/** Quality flags that are GitHub settings, not files in the repository. */
+const SETTINGS_CHECKS = ["Discussions"];
+
 function formatList(values) {
   const formatted = values.filter(Boolean).join(", ");
   return formatted || "none";
@@ -108,7 +111,15 @@ export function getFixScoreBlockers(repository) {
     });
   }
 
-  if ((components.security?.score || 0) > 0) {
+  const securityAvailability = components.security?.availability;
+  if (securityAvailability && securityAvailability !== "available") {
+    // The collector could not read alerts. That is not a repository defect.
+    blockers.push({
+      label: "Security data unavailable",
+      detail: `${formatValue(securityAvailability)} (${formatValue(components.security.reason, "unknown reason")})`,
+      severity: "external",
+    });
+  } else if ((components.security?.score || 0) > 0) {
     const counts = components.security.active_alert_counts || {};
     blockers.push({
       label: "Security pressure",
@@ -194,11 +205,24 @@ export function getFixScoreBlockers(repository) {
     });
   }
 
-  if (missingQuality.length > 0) {
+  const missingFiles = missingQuality.filter(
+    (label) => !SETTINGS_CHECKS.includes(label),
+  );
+  const missingSettings = missingQuality.filter((label) =>
+    SETTINGS_CHECKS.includes(label),
+  );
+  if (missingFiles.length > 0) {
     blockers.push({
       label: "Quality indicators",
-      detail: `Missing ${formatList(missingQuality)}`,
+      detail: `Missing ${formatList(missingFiles)}`,
       severity: "medium",
+    });
+  }
+  if (missingSettings.length > 0) {
+    blockers.push({
+      label: "Repository settings",
+      detail: `Not enabled: ${formatList(missingSettings)}`,
+      severity: "low",
     });
   }
 
@@ -335,6 +359,84 @@ function buildScoringInputAudit(repository) {
   ].join("\n");
 }
 
+/**
+ * What a fix looks like for each blocker, so the prompt works in any
+ * repository and with any coding assistant. Keyed by blocker label.
+ *
+ * kind says where the fix lives:
+ *   commit   - a change to files in the repository
+ *   settings - a GitHub setting, not a file (needs repository admin access)
+ *   external - cannot be fixed from the repository; report it, do not chase it
+ */
+export const REMEDIATION_GUIDANCE = {
+  "Attention score": {
+    kind: "commit",
+    text: "Work through the specific signals below; the attention score is their weighted total, so the highest-weighted signal (security, then staleness and pull requests, then dependencies) lowers it fastest.",
+  },
+  "Pull request pressure": {
+    kind: "commit",
+    text: "Review and merge or close open pull requests, starting with the oldest. Convert finished drafts to ready for review, or close abandoned ones with a note.",
+  },
+  "Open pull requests": {
+    kind: "commit",
+    text: "Review and merge or close open pull requests, starting with the oldest.",
+  },
+  "Security pressure": {
+    kind: "commit",
+    text: "Resolve open dependency and code-scanning alerts: upgrade to the fixed version, or dismiss an alert only with a documented reason (for example, the vulnerable code path is unused).",
+  },
+  "Security alerts": {
+    kind: "commit",
+    text: "Upgrade affected packages to patched versions and re-run the dependency audit. Dismiss an alert only with a documented reason.",
+  },
+  Staleness: {
+    kind: "commit",
+    text: "Make a small, real maintenance change if the project is still wanted: update dependencies, fix an open issue, refresh docs. If the project is finished or abandoned, archive the repository instead of adding noise commits.",
+  },
+  "Dependency currency": {
+    kind: "commit",
+    text: "Update outdated dependencies and make the versions explicit in the manifest or lockfile. Treat major-version upgrades as separate, riskier changes (see How to work).",
+  },
+  "Dependency input details": {
+    kind: "commit",
+    text: "Fix dependencies whose version cannot be determined: declare explicit versions in the manifest and commit the lockfile.",
+  },
+  "Workflow failures": {
+    kind: "commit",
+    text: "Open the failing workflow runs, fix the root cause (a broken test, an outdated action, or an expired secret), and confirm a green run on the default branch.",
+  },
+  "Stale issues": {
+    kind: "settings",
+    text: "Triage issues older than 30 days on GitHub: fix, label, or close them with an explanation. This is issue housekeeping, not a code change.",
+  },
+  "README quality": {
+    kind: "commit",
+    text: "Improve the README so it is useful to a new reader: clear headings, what the project is, how to install and run it, and a usage example. Add images or badges only if they say something.",
+  },
+  "Quality indicators": {
+    kind: "commit",
+    text: "Add a missing file only if it fits this project: a LICENSE (choose one deliberately), a CI workflow that runs the project's real checks (lint and build count if there is no test suite), and tests if the project has logic worth testing. For CONTRIBUTING, CODE_OF_CONDUCT, and SECURITY files, add a short one only if the project takes outside contributions or reports; otherwise recommend skipping it and say so. Do not generate boilerplate just to satisfy a checker.",
+  },
+  "Repository settings": {
+    kind: "settings",
+    text: "These are GitHub repository settings, not files. Do not try to commit them. List what to enable and let the repository owner decide.",
+  },
+  "Website screenshot": {
+    kind: "external",
+    text: "Check that the homepage URL is reachable and renders. Fix the site, or correct or remove the homepage setting if it points to something that no longer exists.",
+  },
+  "Security data unavailable": {
+    kind: "external",
+    text: "The dashboard's access token could not read this repository's security data, so the repository cannot fix this. Report it and do not change the repository for it.",
+  },
+};
+
+const GUIDANCE_GROUPS = [
+  ["commit", "Needs a change in the repository:"],
+  ["settings", "Needs a GitHub setting or housekeeping, not a commit:"],
+  ["external", "Cannot be fixed from the repository (report, do not chase):"],
+];
+
 export function buildPrompt(repository, blockers) {
   const blockerLines =
     blockers.length > 0
@@ -344,28 +446,51 @@ export function buildPrompt(repository, blockers) {
               `- ${blocker.label}: ${blocker.detail} (${blocker.severity})`,
           )
           .join("\n")
-      : "- No specific blocker is visible in the dashboard data; inspect the latest audit and verification gates.";
+      : "- No specific blocker is visible in the dashboard data; review the repository against the signals below.";
+  const labels = [...new Set(blockers.map((blocker) => blocker.label))].filter(
+    (label) => REMEDIATION_GUIDANCE[label],
+  );
+  const guidanceBlocks = GUIDANCE_GROUPS.map(([kind, heading]) => {
+    const lines = labels
+      .filter((label) => REMEDIATION_GUIDANCE[label].kind === kind)
+      .map((label) => `- ${label}: ${REMEDIATION_GUIDANCE[label].text}`);
+    return lines.length ? `${heading}\n${lines.join("\n")}` : "";
+  })
+    .filter(Boolean)
+    .join("\n\n");
   const scoringInputAudit = buildScoringInputAudit(repository);
 
-  return `/devspark.fix-score repo:${repository.name}
+  return `Make the GitHub repository "${repository.name}" healthier and more maintainable: current dependencies, no known security problems, passing builds, a clear README, and nothing left to rot. A dashboard score measures this, but the score is not the goal. Fix real problems, and do not change anything only to move a number.
 
-Use the repository detail data below as starting context, then inspect the source repository and latest generated audits before making changes.
-
-Target repository:
+Repository:
 - Name: ${repository.name}
 - URL: ${repository.url || "N/A"}
 - Homepage: ${repository.homepage || repository.website_url || "N/A"}
-- Attention score: ${repository.attention_score ?? "N/A"}
+- Attention score: ${repository.attention_score ?? "N/A"} (0 to 100, lower is better)
 - Attention rank: ${repository.attention_rank ?? "N/A"}
-- Composite score: ${repository.composite_score ?? "N/A"}
+- Composite score: ${repository.composite_score ?? "N/A"} (higher is better)
+
+These figures come from a dashboard snapshot and may be out of date. Check the current state of the repository first, and treat anything that no longer applies as already fixed.
 
 Current score blockers:
 ${blockerLines}
-
-All scoring inputs to account for:
+${guidanceBlocks ? `\nHow to improve each signal:\n${guidanceBlocks}\n` : ""}
+All scoring inputs, for reference:
 ${scoringInputAudit}
 
-Fix the root causes that prevent a perfect score. Account for every missing, low, unavailable, or stale input above before deciding a repository issue is fixed. Do not weaken scoring, delete findings, or hand-edit generated JSON/SVG/screenshot/docs artifacts. If a blocker reflects real external state, such as an intentionally offline website, document it as an accepted external limitation and keep the evaluator honest. Regenerate stats, rebuild dashboard artifacts, and run the repo's verification gates before summarizing the result.`;
+How to work:
+1. Inspect the repository and confirm each blocker above is real. Note any that are not, and any the repository cannot fix.
+2. Fix root causes in the repository itself, highest impact first. Keep to what a maintainer would actually want; skip changes that only satisfy a checker.
+3. Do major-version dependency upgrades separately from minor and patch ones, one at a time, after reading the release notes for breaking changes. If a major upgrade cannot be verified (see step 4), leave it and report it instead of guessing.
+4. Verify with the repository's own tests, linting, and build. If the repository has no test suite, say so: run lint and build, and also run or open the project and check it by eye (for a website, load the main pages), especially after dependency or toolchain upgrades. Do not add placeholder tests to fill the gap.
+5. Work on a new branch and make small commits grouped by blocker. Do not push, open a pull request, or change repository settings unless you were asked to; finish by saying what to review and what to run.
+
+Rules:
+- Do not hide a problem. Do not weaken or disable tests, checks, or alert rules, delete findings, or add empty commits to look active.
+- If a blocker reflects something outside the repository's control, such as a website that is intentionally offline or security data the dashboard could not read, leave it and explain why.
+- Changes to the dashboard score appear only after the next data collection, so do not expect the number to change immediately.
+
+When you finish, summarize per blocker: what you changed, what you verified and how, and what remains and why. Separate what still needs a repository change from what needs a GitHub setting or is outside the repository's control.`;
 }
 
 const SEVERITY_TONE = {
@@ -407,7 +532,6 @@ function FixScorePromptSection({ repository, expanded, onToggle }) {
       >
         <span className={styles.fixScoreHeaderText}>
           <span>Fix score prompt</span>
-          <code className={styles.fixScoreCommand}>/devspark.fix-score</code>
         </span>
         {blockers.length > 0 ? (
           <Badge tone="caution">{blockers.length} signals</Badge>
@@ -451,7 +575,7 @@ function FixScorePromptSection({ repository, expanded, onToggle }) {
             className={styles.promptText}
             value={prompt}
             readOnly
-            aria-label={`Copilot fix score prompt for ${repository.name}`}
+            aria-label={`Fix score prompt for ${repository.name}`}
           />
 
           <button

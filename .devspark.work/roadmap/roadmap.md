@@ -126,7 +126,7 @@ without a schema rewrite. No tenants, billing, or multi-admin in this roadmap.
 
 - **Foundation:** container deployment, scheduling, status, persistence, backup (ps-001, 002, 003, 009), delivered.
 - **Portfolio and sources:** registry, domain model, admin API/UI, GitHub connections, discovery, per-source dashboards and switching (ps-003, 004, 021 delivered), tiering (ps-020, open).
-- **Access and privacy:** admin authentication (ps-004, delivered), private/client data boundary (ps-005, blocked on the constitution amendment).
+- **Access and privacy:** admin authentication (ps-004, delivered), private/client data boundary (ps-005, unblocked: constitution v1.2.0 amended 2026-11-16).
 - **GitHub intelligence:** Dependabot detail and lifecycle, CI/PR/release evidence (ps-006, 007, 010).
 - **Website health:** availability/TLS, Lighthouse lab audits (ps-011, 012).
 - **Delivery intelligence:** DevSpark roadmap visibility, synthetic smoke checks, release/verification timeline (ps-013, 014, 015).
@@ -190,7 +190,7 @@ incremental requests, not from collecting faster.
 
 **Smallest useful first increment (done): ps-001** (existing dashboard in Docker on port 8086). The smallest
 increment that *monitors real things* is ps-001 → 003 → 006, with ps-011 giving an early website view. Of
-that path ps-001 and ps-003 are delivered; ps-006 is blocked on the constitution amendment, so ps-011
+that path ps-001 and ps-003 are delivered; ps-006 is no longer blocked (constitution v1.2.0), though ps-011
 (website availability) is the next item that adds monitoring without waiting on a decision.
 
 ## Decisions
@@ -203,10 +203,9 @@ that path ps-001 and ps-003 are delivered; ps-006 is blocked on the constitution
   bcrypt), never the password; stored third-party secrets (GitHub tokens, API keys, test logins) are
   encrypted at rest with a key supplied outside the database (Docker secret or env), so a copied
   database file or backup does not expose them.
-- **The constitution will be amended for a scoped self-hosted mode** (private/client data, time-based
-  security and monitoring refresh). The public CLI/Pages path stays under the existing rules. The
-  amendment itself is made through `/devspark-constitution`, not by this roadmap, and must land before
-  ps-005 and ps-006 are delivered.
+- **The constitution is amended for a scoped self-hosted mode** (v1.2.0, 2026-11-16, Principle VII:
+  private/client data, time-based security and monitoring refresh). The public CLI/Pages path stays under
+  the existing rules.
 - **ntfy is the notification channel** (ps-008).
 - **GitHub authentication: fine-grained PAT connections first, schema ready for a GitHub App** (approved
   2026-11-16). One connection per owner; expiry is tracked and surfaced; `GITHUB_TOKEN` remains the fallback.
@@ -260,5 +259,5 @@ Known gaps and notes:
   (a cron example is in the Docker deployment guide).
 - Credentials still to tidy: the initial admin password sits in the stack environment and should be
   changed and removed; the Portainer and GitHub token files should be rotated.
-- ps-005 and ps-006 remain blocked on the constitution amendment (`/devspark-constitution`).
+- The constitution amendment landed as v1.2.0 (2026-11-16, Principle VII Self-Hosted Mode); ps-005 and ps-006 are unblocked.
 - 45 Dependabot alerts are open on this repository; ps-006 is the planned home for handling them.

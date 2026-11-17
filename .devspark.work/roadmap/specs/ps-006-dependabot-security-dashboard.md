@@ -4,7 +4,7 @@ title: Dependabot dashboard and lifecycle
 status: proposed
 order: 50
 depends_on: [ps-003]
-blockers: ["Constitution amendment for time-based security refresh (approved in principle; must be made via /devspark-constitution)"]
+blockers: []
 delivery: []
 ---
 

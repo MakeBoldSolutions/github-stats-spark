@@ -4,7 +4,7 @@ title: Private and client data boundary
 status: proposed
 order: 85
 depends_on: [ps-004]
-blockers: ["Constitution amendment for self-hosted mode (approved in principle; must be made via /devspark-constitution)"]
+blockers: []
 delivery: []
 ---
 
@@ -24,8 +24,9 @@ protects configuration only.
 
 ## Scope and Independence
 
-In scope: constitution amendment (private/client data only in explicit self-hosted mode; Pages and CLI
-stay public-only; time-based refresh permitted for security and monitoring data); per-source/repo
+In scope: implementing constitution Principle VII (v1.2.0, amended 2026-11-16: private/client data only in
+explicit self-hosted mode; Pages and CLI stay public-only; time-based refresh permitted for security and
+monitoring data); per-source/repo
 "include private" off by default; private and client data confined to the server data root, with the Pages
 build and public exports unable to read it (enforced by test); the whole app requires authentication when
 such data exists; log-redaction and secret-handling checks; least-privilege token guidance; client

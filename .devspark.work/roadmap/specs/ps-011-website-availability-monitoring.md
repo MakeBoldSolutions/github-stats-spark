@@ -43,7 +43,7 @@ Uptime is labelled "observed from this host", not an SLA.
 ## Dependencies and Decisions
 
 Open: probe vantage point (home network only); default timeout and expected status; whether monitoring
-interval needs the ps-005 amendment (yes if private, else time-based refresh amendment already needed).
+interval is covered by constitution Principle VII (v1.2.0, time-based refresh in self-hosted mode).
 
 ## Completion Expectations
 

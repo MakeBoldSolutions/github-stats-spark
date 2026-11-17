@@ -30,7 +30,7 @@ manageable by one person; add dependencies and services only when demonstrated n
 
 ## Current Baseline
 
-Evidence from the repository on `main` (after ps-021, commit 159620c). Rows marked Missing or Partial are
+Evidence from the repository on `main` (after ps-021 and constitution v1.2.0, commit 94df49b). Rows marked Missing or Partial are
 the remaining roadmap.
 
 | Area | Status | Evidence |
@@ -47,7 +47,7 @@ the remaining roadmap.
 | Header source switcher (users, orgs, repositories, grouped) | Implemented | `UserPicker.jsx`, `useUserOptions.js`; listed from `data/portfolio.json`; hidden on Pages |
 | Repository "fix score" prompt | Implemented, generic | `FixScorePromptSection.jsx`; no DevSpark dependency; per-signal guidance |
 | GitHub Pages publication (public only) and CI | Implemented | `.github/workflows/generate-stats.yml`, `validate.yml` |
-| Tests (pytest 515, vitest 137, Lighthouse CI config, a11y audit) | Implemented | `tests/`, `frontend/tests`, `frontend/scripts` |
+| Tests (pytest 515, vitest 140, Lighthouse CI config, a11y audit) | Implemented | `tests/`, `frontend/tests`, `frontend/scripts` |
 | Docker/Compose, scheduler, long-running worker, status, healthcheck | Implemented (ps-001, 002) | `docker-compose.yml`, `docker/`, `src/spark/worker/`; stack runs under Portainer on 192.168.1.197:8086 |
 | SQLite registry, sources, connections, dedupe, discovery, `portfolio.json` | Implemented (ps-003) | `src/spark/registry/` |
 | Backend API, admin authentication, encrypted token store, admin UI | Implemented (ps-004) | `src/spark/api/`, `frontend/src/components/Admin/`; Argon2id, server-side sessions, CSRF, Fernet |
@@ -61,12 +61,12 @@ the remaining roadmap.
 | DevSpark roadmap consumption | Unverified | format is inspectable: `roadmap.md` plus `specs/ps-NNN-*.md` with YAML front matter (`id`, `status`, `depends_on`, `blockers`, `delivery`); read-only parse appears feasible |
 | Provider API capabilities (Clarity, GA4 quotas, CrUX coverage, Search Console access) | Unverified | to verify at the start of each item that depends on them |
 
-**Constitution conflicts** (`.knowledge/governance/constitution.md`): Principle II forbids private
-repository data and `exclude_private=True` is the default; Principle IV mandates change-driven caching
-with no time-based invalidation; "What We Never Do" bans private data and API calls for unchanged data.
-Private data, client data, and time-based security/availability refresh all need developer-approved
-amendments, scoped to a self-hosted mode, before the affected items. The public Pages/CLI path stays under
-the existing rules.
+**Constitution** (`.knowledge/governance/constitution.md`): amended to v1.2.0 on 2026-11-16. The
+original conflicts (Principle II forbade private data; Principle IV forbade time-based refresh) are
+resolved by the new Principle VII, Self-Hosted Mode, which permits private and client data and
+time-based security and monitoring refresh only in an explicit, authenticated, single-administrator
+deployment. The public CLI and Pages path stays under the original rules. ps-005 implements the data
+boundary that Principle VII requires.
 
 ## Target Architecture
 
@@ -261,3 +261,31 @@ Known gaps and notes:
   changed and removed; the Portainer and GitHub token files should be rotated.
 - The constitution amendment landed as v1.2.0 (2026-11-16, Principle VII Self-Hosted Mode); ps-005 and ps-006 are unblocked.
 - 45 Dependabot alerts are open on this repository; ps-006 is the planned home for handling them.
+
+## Where we are and what is next
+
+**Current state (2026-11-16).** The dashboard runs as a three-container stack (web, api, worker) on the home
+server. It collects every enabled user, organization, and repository source on a schedule, publishes one
+dashboard per source with a header switcher, and is managed through a signed-in admin UI backed by SQLite
+with encrypted tokens and verified backups. The constitution permits the self-hosted features still to
+come. Nothing is blocked on a decision from the developer except the items that name one below.
+
+**Next steps, in recommended order** (all unblocked unless noted):
+
+1. **ps-006 Dependabot dashboard** starts the history that compounds and is the home for this
+   repository's 45 open alerts.
+2. **ps-011 Website availability** is the earliest view of real running sites and is independent of ps-006.
+3. **ps-007 Alert history and trends** follows ps-006.
+4. **ps-010 GitHub delivery evidence** (releases, CI runs, deployments).
+5. **ps-005 Private and client data boundary**, required before any private or client-owned data or
+   client reports. Open decisions: LAN HTTP or internal TLS, and whether private names may appear in
+   notifications.
+6. **ps-013** (read DevSpark roadmaps) and **ps-020** (portfolio tiering) can slot in at any point.
+7. **Blocked on a developer decision:** ps-012 (Chromium host budget), ps-014 (which application first),
+   ps-015 (how a deployment is evidenced), ps-016 and ps-017 (provider access), ps-019 (AI provider and
+   client-data policy).
+
+**Housekeeping that is not a roadmap item:** change the admin password and remove it from the stack
+environment; rotate the Portainer and GitHub token files; set up an off-host backup copy; consider a
+per-source "collect now"; and have the collector count a lint or test script in `package.json` as tests so
+static sites are not flagged for missing tests.

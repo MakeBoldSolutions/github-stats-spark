@@ -36,6 +36,15 @@ def _backup_interval(value: Optional[str]) -> int:
     return max(3600, parse_duration(value, "SPARK_BACKUP_INTERVAL"))
 
 
+def _security_interval(value: Optional[str], default: int) -> int:
+    """Seconds between Dependabot refreshes; ``off`` (or 0) disables them."""
+    if value is None or value.strip() == "":
+        return default
+    if value.strip().lower() in {"off", "false", "no", "0"}:
+        return 0
+    return max(15 * 60, parse_duration(value, "SPARK_SECURITY_INTERVAL"))
+
+
 def _flag(value: Optional[str], default: bool) -> bool:
     if value is None or value.strip() == "":
         return default
@@ -62,6 +71,7 @@ class WorkerSettings:
     backup_dir: Path = Path("/app/backups")
     backup_interval_seconds: int = 24 * 3600  # 0 disables scheduled backups
     backup_keep: int = 14
+    security_interval_seconds: int = 6 * 3600  # 0 disables the refresh
 
     def __post_init__(self) -> None:
         if self.db_path is None:
@@ -108,6 +118,9 @@ class WorkerSettings:
             backup_dir=Path(env.get("SPARK_BACKUP_DIR", "/app/backups")),
             backup_interval_seconds=_backup_interval(env.get("SPARK_BACKUP_INTERVAL")),
             backup_keep=max(1, int(env.get("SPARK_BACKUP_KEEP", "14"))),
+            security_interval_seconds=_security_interval(
+                env.get("SPARK_SECURITY_INTERVAL"), interval
+            ),
         )
         if env.get("SPARK_STAGE_DIR"):
             settings.stage_dir = Path(env["SPARK_STAGE_DIR"])

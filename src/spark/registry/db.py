@@ -128,6 +128,48 @@ MIGRATIONS: List[str] = [
         handled_at TEXT
     );
     """,
+    # 3: Dependabot alert detail and per-repository coverage. Keyed by the
+    # lower-cased repository name rather than a foreign key, so history
+    # survives pruning a repository nothing reaches any more.
+    """
+    CREATE TABLE dependabot_alert (
+        repo TEXT NOT NULL,
+        number INTEGER NOT NULL,
+        state TEXT NOT NULL,
+        auto_dismissed INTEGER NOT NULL DEFAULT 0,
+        severity TEXT NOT NULL,
+        ecosystem TEXT,
+        package TEXT,
+        manifest_path TEXT,
+        scope TEXT,
+        ghsa_id TEXT,
+        cve_id TEXT,
+        summary TEXT,
+        vulnerable_range TEXT,
+        fixed_version TEXT,
+        created_at TEXT,
+        updated_at TEXT,
+        dismissed_at TEXT,
+        dismissed_reason TEXT,
+        fixed_at TEXT,
+        html_url TEXT,
+        first_seen_at TEXT NOT NULL,
+        last_seen_at TEXT NOT NULL,
+        PRIMARY KEY (repo, number)
+    );
+    CREATE INDEX dependabot_alert_state ON dependabot_alert (state, severity);
+    -- What the last check of each repository found out, including why it
+    -- could not read alerts. last_success_at only moves when alerts were read.
+    CREATE TABLE dependabot_coverage (
+        repo TEXT PRIMARY KEY,
+        status TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        alert_count INTEGER NOT NULL DEFAULT 0,
+        truncated INTEGER NOT NULL DEFAULT 0,
+        checked_at TEXT NOT NULL,
+        last_success_at TEXT
+    );
+    """,
 ]
 
 

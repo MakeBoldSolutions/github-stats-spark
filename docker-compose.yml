@@ -82,6 +82,8 @@ services:
       SPARK_BACKUP_DIR: /app/backups
       SPARK_BACKUP_INTERVAL: ${SPARK_BACKUP_INTERVAL:-24h}
       SPARK_BACKUP_KEEP: ${SPARK_BACKUP_KEEP:-14}
+      # Dependabot alert refresh, on its own timer ("off" disables it).
+      SPARK_SECURITY_INTERVAL: ${SPARK_SECURITY_INTERVAL:-6h}
     volumes:
       - spark-data:/app/data
       - spark-backups:/app/backups

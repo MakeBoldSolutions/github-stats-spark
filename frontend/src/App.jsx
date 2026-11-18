@@ -16,6 +16,7 @@ import CollectionStatus from "@/components/Common/CollectionStatus";
 import UserPicker from "@/components/Common/UserPicker";
 import useUserOptions from "@/hooks/useUserOptions";
 import useAdminAvailable from "@/hooks/useAdminAvailable";
+import useDependabot from "@/hooks/useDependabot";
 import { ToastContainer } from "@/components/Mobile/Toast/Toast";
 
 // SIZE JUSTIFICATION (Constitution I): App composes routing/layout for the
@@ -29,6 +30,7 @@ const AttentionView = lazy(
   () => import("@/components/Attention/AttentionView"),
 );
 const SourcesView = lazy(() => import("@/components/Admin/SourcesView"));
+const SecurityView = lazy(() => import("@/components/Security/SecurityView"));
 const RepositoryDetail = lazy(
   () => import("@/components/DrillDown/RepositoryDetail"),
 );
@@ -50,6 +52,7 @@ function App() {
     refetch,
   } = useRepositoryData();
   const adminAvailable = useAdminAvailable();
+  const dependabot = useDependabot();
   const userOptions = useUserOptions();
   const showUserPicker = userOptions.length >= 2;
 
@@ -76,8 +79,10 @@ function App() {
 
   // Admin pages do not depend on dashboard data, so a data failure must not hide them.
   const onAdminView = adminAvailable && currentView === "sources";
-  const loading = dataLoading && !onAdminView;
-  const error = onAdminView ? null : dataError;
+  const onSecurityView = currentView === "security";
+  const standaloneView = onAdminView || onSecurityView;
+  const loading = dataLoading && !standaloneView;
+  const error = standaloneView ? null : dataError;
 
   return (
     <ThemeProvider>
@@ -153,6 +158,18 @@ function App() {
                   >
                     Health
                   </button>
+                  {dependabot && (
+                    <button
+                      className={`nav-menu-item ${currentView === "security" ? "nav-menu-item--active" : ""}`}
+                      onClick={() => handleViewChange("security")}
+                      aria-current={
+                        currentView === "security" ? "page" : undefined
+                      }
+                      aria-label="Security — Dependabot alerts"
+                    >
+                      Security
+                    </button>
+                  )}
                   {adminAvailable && (
                     <button
                       className={`nav-menu-item ${currentView === "sources" ? "nav-menu-item--active" : ""}`}
@@ -187,6 +204,28 @@ function App() {
                   >
                     <SourcesView onToast={addToast} />
                   </Suspense>
+                )}
+
+                {onSecurityView && (
+                  <section aria-labelledby="security-heading">
+                    <div className="mb-lg">
+                      <Eyebrow>Security</Eyebrow>
+                      <h2 id="security-heading">Dependabot alerts</h2>
+                    </div>
+                    {dependabot ? (
+                      <Suspense
+                        fallback={
+                          <LoadingState message="Loading security view..." />
+                        }
+                      >
+                        <SecurityView file={dependabot} onToast={addToast} />
+                      </Suspense>
+                    ) : (
+                      <p className="text-muted" role="status">
+                        Dependabot data is not available in this deployment yet.
+                      </p>
+                    )}
+                  </section>
                 )}
 
                 {/* Loading State */}
@@ -346,6 +385,7 @@ function App() {
             activeTab={currentView}
             onTabChange={handleViewChange}
             showAdmin={adminAvailable}
+            showSecurity={Boolean(dependabot)}
           />
 
           {/* Footer */}

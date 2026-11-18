@@ -26,6 +26,7 @@ from spark.registry.secrets import SecretBox, SecretError, load_key
 from spark.registry.discovery import run_discovery
 from spark.registry.export import write_portfolio
 from spark.worker import publish
+from spark.worker import security as security_refresh
 from spark.worker.rate_limit import fetch_rate_limit
 from spark.worker.runner import RunResult, build_command, run_collection
 from spark.worker.settings import WorkerSettings
@@ -342,6 +343,82 @@ class CollectionWorker:
         failed = self._backup_failed_at
         return failed is None or (now - failed).total_seconds() >= BACKUP_RETRY_SECONDS
 
+    # -- Dependabot refresh ----------------------------------------------
+    def security_due(self, now: datetime) -> bool:
+        """True when no refresh has run yet, or the interval (or, after a
+        total failure, the retry delay) has passed since the last attempt."""
+        s = self.settings
+        if s.security_interval_seconds <= 0 or not s.db_path.exists():
+            return False
+        last = self.status.state.get("security") or {}
+        attempted = last.get("last_attempt_at")
+        if not attempted:
+            return True
+        try:
+            elapsed = (now - datetime.fromisoformat(attempted)).total_seconds()
+        except ValueError:
+            return True
+        wait = (
+            min(s.retry_seconds, s.security_interval_seconds)
+            if last.get("outcome") in ("failed", "skipped")
+            else s.security_interval_seconds
+        )
+        return elapsed >= wait
+
+    def security_if_due(self, force: bool = False) -> Optional[str]:
+        """Refresh Dependabot alerts when due. Returns the outcome, or None if
+        nothing was due. Never raises: collection must not depend on it."""
+        s = self.settings
+        started = self.now()
+        if not (force and s.security_interval_seconds > 0) and not self.security_due(
+            started
+        ):
+            return None
+        token = os.environ.get("GITHUB_TOKEN", "")
+        rate = self.rate_limit_fn(token) if token else None
+        if rate and rate["remaining"] < s.min_rate_remaining:
+            self.status.record_security(
+                at=started,
+                outcome="skipped",
+                interval_seconds=s.security_interval_seconds,
+                reason=f"GitHub rate limit low ({rate['remaining']} remaining)",
+            )
+            self.log("Dependabot refresh skipped: rate limit low")
+            return "skipped"
+        try:
+            result = security_refresh.refresh_dependabot(
+                s,
+                self.secret_box,
+                token,
+                stop_event=self.stop_event,
+                log=self.log,
+                on_progress=self.heartbeat,
+            )
+        except Exception as error:  # noqa: BLE001 - the loop must survive anything
+            self.status.record_security(
+                at=started,
+                outcome="failed",
+                interval_seconds=s.security_interval_seconds,
+                reason=f"{type(error).__name__}: {error}",
+            )
+            self.log(f"Dependabot refresh failed: {error}")
+            return "failed"
+        self.status.record_security(
+            at=started,
+            outcome=result.outcome,
+            interval_seconds=s.security_interval_seconds,
+            checked=result.checked,
+            read=result.read,
+            open_alerts=result.open_alerts,
+            reason=result.stopped_reason
+            or (
+                f"{result.checked - result.read} repositories could not be read"
+                if result.read < result.checked
+                else ""
+            ),
+        )
+        return result.outcome
+
     # -- scheduling ----------------------------------------------------
     def _refresh_requested(self) -> bool:
         """True once if the admin asked for a refresh (via the database)."""
@@ -368,12 +445,16 @@ class CollectionWorker:
         while not self.stop_event.is_set():
             self.heartbeat()
             self.backup_if_due()
-            if self.now() >= next_due or self._refresh_requested():
+            requested = self._refresh_requested()
+            if self.now() >= next_due or requested:
                 self.run_once()
+                self.security_if_due(force=requested)
                 next_run = self.status.state.get("next_run_at")
                 next_due = (
                     datetime.fromisoformat(next_run)
                     if next_run
                     else self.now() + timedelta(seconds=s.interval_seconds)
                 )
+            else:
+                self.security_if_due()
             self.stop_event.wait(timeout=5)

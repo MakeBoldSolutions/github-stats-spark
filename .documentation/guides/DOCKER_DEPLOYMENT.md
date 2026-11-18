@@ -144,6 +144,19 @@ dashboard shows a **Sources** page only when the API answers; on GitHub Pages it
 A backup without the key still restores sources and history, but saved tokens become unreadable
 (re-enter them). A key without a backup restores nothing.
 
+### Dependabot alerts
+After the first collection, and then every `SPARK_SECURITY_INTERVAL` (default `6h`, minimum `15m`,
+`off` disables it), the worker reads every Dependabot alert (open, dismissed and fixed, all pages) for
+each **public** repository an enabled source reaches. Alerts are kept in the database, one observation
+of the counts is added per read, and `/data/security/dependabot.json` is rewritten for the **Security**
+view. "Refresh now" also triggers it. The result appears in `/data/status.json` under `security`.
+
+The token needs read access to Dependabot alerts: for a fine-grained token, the **Dependabot alerts**
+repository permission set to read. A repository that cannot be read is listed in the view's Coverage
+panel with its reason (alerts disabled, token cannot read them, GitHub unreachable, not checked yet),
+so it is never shown as having zero alerts. The refresh stops early, and resumes next time, when the
+GitHub rate limit falls below `SPARK_MIN_RATE_REMAINING`.
+
 ### Automatic backups
 The worker takes a **verified** backup shortly after start and then every `SPARK_BACKUP_INTERVAL`
 (default `24h`), into the `spark-backups` volume (`/app/backups`), keeping the newest

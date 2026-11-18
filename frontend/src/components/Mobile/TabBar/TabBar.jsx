@@ -1,4 +1,10 @@
-import { LayoutGrid, BarChart3, AlertTriangle, Settings } from "lucide-react";
+import {
+  LayoutGrid,
+  BarChart3,
+  AlertTriangle,
+  Settings,
+  ShieldAlert,
+} from "lucide-react";
 import "./TabBar.css";
 
 /**
@@ -13,10 +19,20 @@ const TABS = [
   { id: "attention", label: "Health", Icon: AlertTriangle },
 ];
 
+const SECURITY_TAB = { id: "security", label: "Security", Icon: ShieldAlert };
 const ADMIN_TAB = { id: "sources", label: "Sources", Icon: Settings };
 
-const TabBar = ({ activeTab = "table", onTabChange, showAdmin = false }) => {
-  const tabs = showAdmin ? [...TABS, ADMIN_TAB] : TABS;
+const TabBar = ({
+  activeTab = "table",
+  onTabChange,
+  showAdmin = false,
+  showSecurity = false,
+}) => {
+  const tabs = [
+    ...TABS,
+    ...(showSecurity ? [SECURITY_TAB] : []),
+    ...(showAdmin ? [ADMIN_TAB] : []),
+  ];
   const handleTabClick = (tabId) => {
     if (onTabChange && tabId !== activeTab) {
       onTabChange(tabId);

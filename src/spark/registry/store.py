@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import sqlite3
 from datetime import datetime, timezone
@@ -463,3 +464,108 @@ class Registry:
                 " observed_at) VALUES (?, ?, ?, ?, ?, ?)",
                 (subject, kind, str(value), source, client_id, now_iso()),
             )
+
+    # -- Dependabot alerts ----------------------------------------------
+    def save_dependabot_result(
+        self,
+        full_name: str,
+        collection: Any,
+        client_id: Optional[int] = None,
+    ) -> None:
+        """Store one repository's check: the alerts read, the coverage outcome,
+        and an observation of the counts so history accumulates.
+
+        Alerts are upserted by (repository, number) and never deleted: GitHub
+        keeps dismissed and fixed alerts, and a failed check must not erase
+        what an earlier one found.
+        """
+        repo = full_name.lower()
+        now = now_iso()
+        with self.conn:
+            if collection.alerts:
+                for alert in collection.alerts:
+                    self.conn.execute(
+                        _UPSERT_ALERT, {**alert, "repo": repo, "now": now}
+                    )
+            read = collection.read_alerts
+            self.conn.execute(
+                _UPSERT_COVERAGE,
+                {
+                    "repo": repo,
+                    "status": collection.status,
+                    "reason": collection.reason,
+                    "count": len(collection.alerts),
+                    "truncated": int(collection.truncated),
+                    "now": now,
+                    "success": now if read else None,
+                },
+            )
+            if read:
+                counts = self._dependabot_counts(repo)
+                self.conn.execute(
+                    "INSERT INTO observation (subject, kind, value, source,"
+                    " client_id, observed_at) VALUES (?, 'dependabot.counts', ?,"
+                    " 'rest.dependabot.alerts', ?, ?)",
+                    (full_name, json.dumps(counts, sort_keys=True), client_id, now),
+                )
+
+    def _dependabot_counts(self, repo: str) -> Dict[str, Any]:
+        counts: Dict[str, Any] = {"open": 0, "dismissed": 0, "fixed": 0}
+        by_severity: Dict[str, int] = {}
+        for row in self.conn.execute(
+            "SELECT state, severity, COUNT(*) AS n FROM dependabot_alert"
+            " WHERE repo = ? GROUP BY state, severity",
+            (repo,),
+        ):
+            if row["state"] in counts:
+                counts[row["state"]] += row["n"]
+            if row["state"] == "open":
+                by_severity[row["severity"]] = row["n"]
+        counts["open_by_severity"] = by_severity
+        return counts
+
+    def list_dependabot_alerts(self) -> List[Dict[str, Any]]:
+        rows = self.conn.execute(
+            "SELECT * FROM dependabot_alert ORDER BY repo, number DESC"
+        )
+        return [dict(r) for r in rows]
+
+    def list_dependabot_coverage(self) -> Dict[str, Dict[str, Any]]:
+        return {
+            r["repo"]: dict(r)
+            for r in self.conn.execute("SELECT * FROM dependabot_coverage")
+        }
+
+
+_UPSERT_ALERT = """
+INSERT INTO dependabot_alert (repo, number, state, auto_dismissed, severity,
+    ecosystem, package, manifest_path, scope, ghsa_id, cve_id, summary,
+    vulnerable_range, fixed_version, created_at, updated_at, dismissed_at,
+    dismissed_reason, fixed_at, html_url, first_seen_at, last_seen_at)
+VALUES (:repo, :number, :state, :auto_dismissed, :severity, :ecosystem,
+    :package, :manifest_path, :scope, :ghsa_id, :cve_id, :summary,
+    :vulnerable_range, :fixed_version, :created_at, :updated_at, :dismissed_at,
+    :dismissed_reason, :fixed_at, :html_url, :now, :now)
+ON CONFLICT (repo, number) DO UPDATE SET
+    state = excluded.state, auto_dismissed = excluded.auto_dismissed,
+    severity = excluded.severity, ecosystem = excluded.ecosystem,
+    package = excluded.package, manifest_path = excluded.manifest_path,
+    scope = excluded.scope, ghsa_id = excluded.ghsa_id, cve_id = excluded.cve_id,
+    summary = excluded.summary, vulnerable_range = excluded.vulnerable_range,
+    fixed_version = excluded.fixed_version, created_at = excluded.created_at,
+    updated_at = excluded.updated_at, dismissed_at = excluded.dismissed_at,
+    dismissed_reason = excluded.dismissed_reason, fixed_at = excluded.fixed_at,
+    html_url = excluded.html_url, last_seen_at = excluded.last_seen_at
+"""
+
+_UPSERT_COVERAGE = """
+INSERT INTO dependabot_coverage (repo, status, reason, alert_count, truncated,
+    checked_at, last_success_at)
+VALUES (:repo, :status, :reason, :count, :truncated, :now, :success)
+ON CONFLICT (repo) DO UPDATE SET
+    status = excluded.status, reason = excluded.reason,
+    alert_count = excluded.alert_count, truncated = excluded.truncated,
+    checked_at = excluded.checked_at,
+    last_success_at = COALESCE(excluded.last_success_at,
+                               dependabot_coverage.last_success_at)
+"""

@@ -70,6 +70,7 @@ class StatusStore:
             "consecutive_failures",
             "last_attempt",
             "backup",
+            "security",
         ):
             if key in previous:
                 self.state[key] = previous[key]
@@ -103,6 +104,34 @@ class StatusStore:
             "reason": "" if ok else sanitize(reason),
             "sources": sources if ok else previous.get("sources"),
             "repositories": repositories if ok else previous.get("repositories"),
+        }
+        self._save()
+
+    def record_security(
+        self,
+        *,
+        at: datetime,
+        outcome: str,
+        interval_seconds: int,
+        checked: int = 0,
+        read: int = 0,
+        open_alerts: int = 0,
+        reason: str = "",
+    ) -> None:
+        """Publish the latest Dependabot refresh (counts and a short reason)."""
+        previous = self.state.get("security") or {}
+        succeeded = outcome in ("success", "partial")
+        self.state["security"] = {
+            "outcome": outcome,
+            "last_attempt_at": iso(at),
+            "last_success_at": (
+                iso(at) if succeeded else previous.get("last_success_at")
+            ),
+            "interval_seconds": interval_seconds,
+            "repositories_checked": checked,
+            "repositories_read": read,
+            "open_alerts": open_alerts,
+            "reason": sanitize(reason),
         }
         self._save()
 

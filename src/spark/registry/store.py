@@ -484,7 +484,9 @@ class Registry:
         with self.conn:
             if collection.alerts:
                 for alert in collection.alerts:
-                    self.conn.execute(_UPSERT_ALERT, {**alert, "repo": repo, "now": now})
+                    self.conn.execute(
+                        _UPSERT_ALERT, {**alert, "repo": repo, "now": now}
+                    )
             read = collection.read_alerts
             self.conn.execute(
                 _UPSERT_COVERAGE,

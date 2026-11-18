@@ -105,15 +105,37 @@ def test_zero_alerts_is_a_real_zero_not_unavailable():
 @pytest.mark.parametrize(
     "status, body, headers, expected",
     [
-        (403, {"message": "Dependabot alerts are disabled for this repository."}, {},
-         ("disabled", "dependabot_disabled")),
-        (403, {"message": "Resource not accessible by personal access token"}, {},
-         ("unauthorized", "permission_denied")),
-        (401, {"message": "Bad credentials"}, {}, ("unauthorized", "permission_denied")),
+        (
+            403,
+            {"message": "Dependabot alerts are disabled for this repository."},
+            {},
+            ("disabled", "dependabot_disabled"),
+        ),
+        (
+            403,
+            {"message": "Resource not accessible by personal access token"},
+            {},
+            ("unauthorized", "permission_denied"),
+        ),
+        (
+            401,
+            {"message": "Bad credentials"},
+            {},
+            ("unauthorized", "permission_denied"),
+        ),
         (404, {"message": "Not Found"}, {}, ("unauthorized", "not_found_or_no_access")),
-        (403, {"message": "API rate limit exceeded"}, {}, ("unavailable", "rate_limited")),
-        (403, {"message": "Forbidden"}, {"X-RateLimit-Remaining": "0"},
-         ("unavailable", "rate_limited")),
+        (
+            403,
+            {"message": "API rate limit exceeded"},
+            {},
+            ("unavailable", "rate_limited"),
+        ),
+        (
+            403,
+            {"message": "Forbidden"},
+            {"X-RateLimit-Remaining": "0"},
+            ("unavailable", "rate_limited"),
+        ),
         (500, {"message": "oops"}, {}, ("unavailable", "api_error")),
     ],
 )
@@ -133,7 +155,9 @@ def test_network_error_is_unavailable_not_an_exception():
 
 def test_failure_on_a_later_page_keeps_what_was_read():
     get = pager(
-        response(body=[raw_alert(1), raw_alert(2)], next_url="https://api.github.com/p2"),
+        response(
+            body=[raw_alert(1), raw_alert(2)], next_url="https://api.github.com/p2"
+        ),
         response(502, {"message": "Bad Gateway"}),
     )
     result = collect_dependabot_alerts("o", "r", get=get)
@@ -142,7 +166,9 @@ def test_failure_on_a_later_page_keeps_what_was_read():
 
 
 def test_runaway_pagination_is_bounded_and_flagged():
-    get = pager(*[response(body=[raw_alert(n)], next_url="https://x/next") for n in range(1, 4)])
+    get = pager(
+        *[response(body=[raw_alert(n)], next_url="https://x/next") for n in range(1, 4)]
+    )
     result = collect_dependabot_alerts("o", "r", get=get, max_pages=2)
     assert result.truncated and result.status == "partial"
     assert result.reason == "truncated" and len(result.alerts) == 2
@@ -225,8 +251,12 @@ def test_alerts_are_upserted_and_history_is_kept():
 
 def test_each_read_adds_a_counts_observation():
     registry = make_registry("o/r")
-    registry.save_dependabot_result("o/r", available(raw_alert(1), raw_alert(2, severity="low")))
-    registry.save_dependabot_result("o/r", available(raw_alert(1), raw_alert(2, severity="low")))
+    registry.save_dependabot_result(
+        "o/r", available(raw_alert(1), raw_alert(2, severity="low"))
+    )
+    registry.save_dependabot_result(
+        "o/r", available(raw_alert(1), raw_alert(2, severity="low"))
+    )
     rows = registry.conn.execute(
         "SELECT value FROM observation WHERE kind = 'dependabot.counts'"
     ).fetchall()
@@ -247,9 +277,12 @@ def test_a_failed_check_keeps_alerts_and_last_success():
     assert after["last_success_at"] == first["last_success_at"]
     assert len(registry.list_dependabot_alerts()) == 1
     # A failure is not an observation of zero alerts.
-    assert registry.conn.execute(
-        "SELECT COUNT(*) FROM observation WHERE kind = 'dependabot.counts'"
-    ).fetchone()[0] == 1
+    assert (
+        registry.conn.execute(
+            "SELECT COUNT(*) FROM observation WHERE kind = 'dependabot.counts'"
+        ).fetchone()[0]
+        == 1
+    )
 
 
 def test_alerts_survive_pruning_the_repository():
@@ -266,13 +299,19 @@ def test_alerts_survive_pruning_the_repository():
 def test_age_uses_the_end_of_the_open_period():
     created = "2025-12-01T00:00:00Z"
     assert age_days({"state": "open", "created_at": created}, NOW) == 31
-    fixed = {"state": "fixed", "created_at": created, "fixed_at": "2025-12-11T00:00:00Z"}
+    fixed = {
+        "state": "fixed",
+        "created_at": created,
+        "fixed_at": "2025-12-11T00:00:00Z",
+    }
     assert age_days(fixed, NOW) == 10
     assert age_days({"state": "open", "created_at": None}, NOW) is None
 
 
 def test_export_counts_states_and_distinguishes_coverage():
-    registry = make_registry("o/ok", "o/off", "o/new", "o/secret", private=("o/secret",))
+    registry = make_registry(
+        "o/ok", "o/off", "o/new", "o/secret", private=("o/secret",)
+    )
     registry.save_dependabot_result(
         "o/ok",
         available(
@@ -292,11 +331,19 @@ def test_export_counts_states_and_distinguishes_coverage():
     assert "o/secret" not in repos  # private data stays out
     assert all(a["repository"] != "o/secret" for a in payload["alerts"])
     assert repos["o/ok"]["counts"]["open"]["critical"] == 1
-    assert repos["o/ok"]["counts"]["fixed"] == 1 and repos["o/ok"]["counts"]["dismissed"] == 1
-    assert repos["o/off"]["status"] == "disabled" and repos["o/off"]["counts"]["open"]["total"] == 0
+    assert (
+        repos["o/ok"]["counts"]["fixed"] == 1
+        and repos["o/ok"]["counts"]["dismissed"] == 1
+    )
+    assert (
+        repos["o/off"]["status"] == "disabled"
+        and repos["o/off"]["counts"]["open"]["total"] == 0
+    )
     assert repos["o/new"]["status"] == "not_checked"
     assert len(payload["alerts"]) == 3
-    assert {"html_url", "ghsa_id", "fixed_version", "age_days"} <= set(payload["alerts"][0])
+    assert {"html_url", "ghsa_id", "fixed_version", "age_days"} <= set(
+        payload["alerts"][0]
+    )
 
 
 def test_export_leaves_out_repositories_only_disabled_sources_reach(tmp_path):
@@ -351,10 +398,14 @@ def test_refresh_reads_public_repositories_and_writes_the_export(settings):
         seen.append((owner, repo))
         return available(raw_alert(1))
 
-    result = refresh_dependabot(settings, SecretBox(None), "tok", collect=collect, log=lambda m: None)
+    result = refresh_dependabot(
+        settings, SecretBox(None), "tok", collect=collect, log=lambda m: None
+    )
     assert sorted(seen) == [("o", "a"), ("o", "b")]  # the private repository is skipped
     assert (result.checked, result.read, result.outcome) == (2, 2, "success")
-    exported = json.loads((settings.data_dir / "security" / "dependabot.json").read_text())
+    exported = json.loads(
+        (settings.data_dir / "security" / "dependabot.json").read_text()
+    )
     assert len(exported["alerts"]) == 2
 
 
@@ -366,7 +417,9 @@ def test_one_unreadable_repository_makes_the_run_partial(settings):
             return AlertCollection(status="disabled", reason="dependabot_disabled")
         return available(raw_alert(1))
 
-    result = refresh_dependabot(settings, SecretBox(None), "t", collect=collect, log=lambda m: None)
+    result = refresh_dependabot(
+        settings, SecretBox(None), "t", collect=collect, log=lambda m: None
+    )
     assert result.outcome == "partial" and (result.read, result.checked) == (1, 2)
 
 
@@ -378,7 +431,9 @@ def test_low_rate_limit_stops_and_leaves_the_rest_for_next_time(settings):
         out.rate_remaining = 10
         return out
 
-    result = refresh_dependabot(settings, SecretBox(None), "t", collect=collect, log=lambda m: None)
+    result = refresh_dependabot(
+        settings, SecretBox(None), "t", collect=collect, log=lambda m: None
+    )
     assert result.checked == 1 and result.skipped == 2
     assert "rate limit" in result.stopped_reason and result.outcome == "partial"
 
@@ -428,9 +483,15 @@ def test_security_status_is_published_and_survives_a_restart(settings, monkeypat
     from spark.worker import security as sec
 
     monkeypatch.setattr(
-        sec, "refresh_dependabot",
+        sec,
+        "refresh_dependabot",
         lambda *a, **k: SimpleNamespace(
-            outcome="success", checked=1, read=1, open_alerts=1, stopped_reason="", skipped=0
+            outcome="success",
+            checked=1,
+            read=1,
+            open_alerts=1,
+            stopped_reason="",
+            skipped=0,
         ),
     )
     worker = make_worker(settings)
@@ -439,7 +500,10 @@ def test_security_status_is_published_and_survives_a_restart(settings, monkeypat
     assert status["open_alerts"] == 1 and status["repositories_read"] == 1
 
     restarted = make_worker(settings)
-    assert restarted.status.state["security"]["last_attempt_at"] == status["last_attempt_at"]
+    assert (
+        restarted.status.state["security"]["last_attempt_at"]
+        == status["last_attempt_at"]
+    )
     assert restarted.security_if_due() is None  # not due again straight away
 
 
@@ -473,6 +537,21 @@ def test_low_rate_limit_skips_the_refresh(settings):
 def test_security_interval_setting_parses_and_clamps():
     base = {"SPARK_USER": "o"}
     assert WorkerSettings.from_env(base).security_interval_seconds == 6 * 3600
-    assert WorkerSettings.from_env({**base, "SPARK_SECURITY_INTERVAL": "2h"}).security_interval_seconds == 7200
-    assert WorkerSettings.from_env({**base, "SPARK_SECURITY_INTERVAL": "off"}).security_interval_seconds == 0
-    assert WorkerSettings.from_env({**base, "SPARK_SECURITY_INTERVAL": "1m"}).security_interval_seconds == 900
+    assert (
+        WorkerSettings.from_env(
+            {**base, "SPARK_SECURITY_INTERVAL": "2h"}
+        ).security_interval_seconds
+        == 7200
+    )
+    assert (
+        WorkerSettings.from_env(
+            {**base, "SPARK_SECURITY_INTERVAL": "off"}
+        ).security_interval_seconds
+        == 0
+    )
+    assert (
+        WorkerSettings.from_env(
+            {**base, "SPARK_SECURITY_INTERVAL": "1m"}
+        ).security_interval_seconds
+        == 900
+    )

@@ -124,7 +124,9 @@ class StatusStore:
         self.state["security"] = {
             "outcome": outcome,
             "last_attempt_at": iso(at),
-            "last_success_at": iso(at) if succeeded else previous.get("last_success_at"),
+            "last_success_at": (
+                iso(at) if succeeded else previous.get("last_success_at")
+            ),
             "interval_seconds": interval_seconds,
             "repositories_checked": checked,
             "repositories_read": read,

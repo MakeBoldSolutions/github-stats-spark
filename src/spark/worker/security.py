@@ -117,7 +117,9 @@ def refresh_dependabot(
                     f"GitHub rate limit low ({collection.rate_remaining} remaining)"
                 )
                 break
-        write_dependabot(registry, settings.data_dir, settings.security_interval_seconds)
+        write_dependabot(
+            registry, settings.data_dir, settings.security_interval_seconds
+        )
         result.open_alerts = _open_total(registry)
     finally:
         registry.close()

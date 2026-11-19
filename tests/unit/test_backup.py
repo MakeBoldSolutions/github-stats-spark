@@ -1,7 +1,6 @@
 """Tests for backup, restore, migration safety and health (ps-009)."""
 
 import json
-import os
 import sqlite3
 import time
 from datetime import datetime, timedelta, timezone

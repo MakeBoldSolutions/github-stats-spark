@@ -78,6 +78,13 @@ class WorkerSettings:
             self.db_path = self.config_path.parent / "registry.db"
 
     @property
+    def registry_path(self) -> Path:
+        """The registry database path; always set once the settings exist."""
+        if self.db_path is None:  # pragma: no cover - __post_init__ fills it
+            raise SettingsError("db_path is not set")
+        return self.db_path
+
+    @property
     def heartbeat_path(self) -> Path:
         return self.cache_dir / ".worker-heartbeat"
 

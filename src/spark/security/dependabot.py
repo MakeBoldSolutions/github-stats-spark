@@ -143,8 +143,8 @@ def normalize_alert(raw: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 
 def _remaining(response: requests.Response) -> Optional[int]:
     try:
-        return int(response.headers.get("X-RateLimit-Remaining"))
-    except (TypeError, ValueError):
+        return int(response.headers["X-RateLimit-Remaining"])
+    except (KeyError, TypeError, ValueError):
         return None
 
 

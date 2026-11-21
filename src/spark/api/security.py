@@ -17,7 +17,7 @@ from typing import Dict, Optional, Tuple
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError
 
-from spark.registry.store import Registry, RegistryError, now_iso
+from spark.registry.store import Registry, RegistryError, inserted_id, now_iso
 
 MIN_PASSWORD_LENGTH = 12
 _hasher = PasswordHasher()
@@ -60,11 +60,13 @@ def create_admin(registry: Registry, username: str, password: str) -> int:
         raise RegistryError("username must be 1-64 characters")
     hashed = hash_password(password)
     with registry.conn:
-        return registry.conn.execute(
-            "INSERT INTO admin_user (username, password_hash, created_at)"
-            " VALUES (?, ?, ?)",
-            (username, hashed, now_iso()),
-        ).lastrowid
+        return inserted_id(
+            registry.conn.execute(
+                "INSERT INTO admin_user (username, password_hash, created_at)"
+                " VALUES (?, ?, ?)",
+                (username, hashed, now_iso()),
+            )
+        )
 
 
 def set_admin_password(registry: Registry, username: str, password: str) -> None:
@@ -142,7 +144,9 @@ def end_session(registry: Registry, token: Optional[str]) -> None:
 
 
 def csrf_matches(expected: str, provided: Optional[str]) -> bool:
-    return bool(provided) and hmac.compare_digest(expected, provided)
+    if not provided:
+        return False
+    return hmac.compare_digest(expected, provided)
 
 
 class LoginThrottle:

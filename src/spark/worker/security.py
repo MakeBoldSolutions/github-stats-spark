@@ -82,7 +82,7 @@ def refresh_dependabot(
     """Check every public repository and rewrite ``security/dependabot.json``."""
     stop_event = stop_event or threading.Event()
     result = SecurityRunResult()
-    registry = Registry.open(settings.db_path)
+    registry = Registry.open(settings.registry_path)
     try:
         pairs = _repository_tokens(registry, box, default_token)
         for index, (repo, token) in enumerate(pairs):

@@ -162,8 +162,9 @@ def _rotate(backup_dir: Path, keep: int) -> None:
     for path, _ in list_backups(backup_dir)[keep:]:
         for suffix in ("", "-wal", "-shm"):
             Path(str(path) + suffix).unlink(missing_ok=True)
-        stamp = _NAME.match(path.name).group(1)
-        (backup_dir / f"spark-{stamp}.yml").unlink(missing_ok=True)
+        match = _NAME.match(path.name)
+        if match:  # list_backups only returns names that match
+            (backup_dir / f"spark-{match.group(1)}.yml").unlink(missing_ok=True)
 
 
 def restore_backup(

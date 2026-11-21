@@ -253,8 +253,8 @@ def create_app(
                 raise bad_request(error) from error
         token = token_for(registry, body.connection_id)
         # Validate first: a source that cannot be read is not saved.
-        ok, problem = validate_access(github_factory(token), body.type, identifier)
-        if not ok:
+        _, problem = validate_access(github_factory(token), body.type, identifier)
+        if problem is not None:
             raise HTTPException(422, {"code": problem.code, "message": problem.message})
         source = registry.add_source(body.type, identifier, client=body.client)
         if body.connection_id is not None:

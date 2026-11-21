@@ -30,7 +30,7 @@ manageable by one person; add dependencies and services only when demonstrated n
 
 ## Current Baseline
 
-Evidence from the repository on `main` (after ps-021 and constitution v1.2.0, commit 94df49b). Rows marked Missing or Partial are
+Evidence from the repository on `main` (after ps-006 and the green-CI baseline, commit 40a0cb5). Rows marked Missing or Partial are
 the remaining roadmap.
 
 | Area | Status | Evidence |
@@ -40,20 +40,21 @@ the remaining roadmap.
 | Repository metadata, activity, PRs, issues, Actions summary, dependency parsing | Implemented | `fetcher.py`, `dependencies/`, `models/repository.py` |
 | Change-driven cache (`pushed_at`), `SPARK_CACHE_DIR`, force refresh | Implemented | `fetcher.py`, `cache*.py`; constitution Principle IV |
 | Rate-limit handling and retries | Partial | worker skips a cycle when remaining quota is low; `fetcher.handle_rate_limit` is unused and its naive-datetime comparison unverified |
-| Dependabot summary (severity counts, availability/reason) | Partial | open state only, first page of 100, no detail/age/advisory/fix/URL (`fetcher.py`); ps-006 |
+| Dependabot alert detail, lifecycle, Security view | Implemented (ps-006) | `src/spark/security/`, `worker/security.py`, `SecurityView.jsx`; all pages and states, public repositories, own refresh interval (`SPARK_SECURITY_INTERVAL`) |
+| Dependabot summary used by attention scoring | Partial | still `fetcher.py`: open state only, first page of 100, so a repository with more than 100 open alerts is undercounted in the attention view |
 | Code-scanning summary, repo security feature flags | Partial | same functions |
 | Attention scoring (security/PR/dependency/staleness) | Implemented | `unified_data_generator.py`, `ranker.py` |
 | React dashboard: attention view, drill-down, filters, export, offline cache | Implemented | `frontend/src/components/*`, `services/dataService.js` |
 | Header source switcher (users, orgs, repositories, grouped) | Implemented | `UserPicker.jsx`, `useUserOptions.js`; listed from `data/portfolio.json`; hidden on Pages |
 | Repository "fix score" prompt | Implemented, generic | `FixScorePromptSection.jsx`; no DevSpark dependency; per-signal guidance |
 | GitHub Pages publication (public only) and CI | Implemented | `.github/workflows/generate-stats.yml`, `validate.yml` |
-| Tests (pytest 515, vitest 140, Lighthouse CI config, a11y audit) | Implemented | `tests/`, `frontend/tests`, `frontend/scripts` |
+| Tests (pytest 548, vitest 152, Lighthouse CI config, a11y audit); CI validation green | Implemented | `tests/`, `frontend/tests`, `frontend/scripts` |
 | Docker/Compose, scheduler, long-running worker, status, healthcheck | Implemented (ps-001, 002) | `docker-compose.yml`, `docker/`, `src/spark/worker/`; stack runs under Portainer on 192.168.1.197:8086 |
 | SQLite registry, sources, connections, dedupe, discovery, `portfolio.json` | Implemented (ps-003) | `src/spark/registry/` |
 | Backend API, admin authentication, encrypted token store, admin UI | Implemented (ps-004) | `src/spark/api/`, `frontend/src/components/Admin/`; Argon2id, server-side sessions, CSRF, Fernet |
 | Backup, restore, rotation, resource limits, log rotation, secrets override | Implemented (ps-009) | `src/spark/backup.py`, `docker-compose*.yml`; backups sit on the same host disk |
 | Clients/projects/applications model | Partial | tables and API exist (ps-003/004); environments and websites are not modelled until ps-011 |
-| Persistent history, observations, alert lifecycle | Missing | the `observation` table exists but nothing writes history yet (ps-006/007) |
+| Persistent history, observations, alert lifecycle | Partial | ps-006 keeps every alert record and writes a counts observation per collection; trends and remediation metrics are ps-007 |
 | Releases/tags, CI run history, deployments, Dependabot PRs | Missing | Actions *summary* only (ps-010) |
 | Website availability, TLS, Lighthouse, synthetic checks | Missing | `screenshot.py` / `web_scraper.py` capture screenshots and page signals for repo sites only |
 | Search/analytics integrations, reports (client/PDF), notifications | Missing | markdown/SVG reports for a GitHub user exist |
@@ -127,7 +128,7 @@ without a schema rewrite. No tenants, billing, or multi-admin in this roadmap.
 - **Foundation:** container deployment, scheduling, status, persistence, backup (ps-001, 002, 003, 009), delivered.
 - **Portfolio and sources:** registry, domain model, admin API/UI, GitHub connections, discovery, per-source dashboards and switching (ps-003, 004, 021 delivered), tiering (ps-020, open).
 - **Access and privacy:** admin authentication (ps-004, delivered), private/client data boundary (ps-005, unblocked: constitution v1.2.0 amended 2026-11-16).
-- **GitHub intelligence:** Dependabot detail and lifecycle, CI/PR/release evidence (ps-006, 007, 010).
+- **GitHub intelligence:** Dependabot detail and lifecycle (ps-006, delivered), alert history, CI/PR/release evidence (ps-007, 010).
 - **Website health:** availability/TLS, Lighthouse lab audits (ps-011, 012).
 - **Delivery intelligence:** DevSpark roadmap visibility, synthetic smoke checks, release/verification timeline (ps-013, 014, 015).
 - **Digital presence:** search visibility, traffic and field performance (ps-016, 017).
@@ -148,7 +149,7 @@ without a schema rewrite. No tenants, billing, or multi-admin in this roadmap.
    [ps-020 Portfolio classification and signal scoring](specs/ps-020-portfolio-classification-and-signal-scoring.md),
    [ps-021 Organization and repository dashboards with source switching](specs/complete/ps-021-source-dashboards-and-switching.md)
 3. **GitHub and security intelligence:**
-   [ps-006 Dependabot dashboard and lifecycle](specs/ps-006-dependabot-security-dashboard.md),
+   [ps-006 Dependabot dashboard and lifecycle](specs/complete/ps-006-dependabot-security-dashboard.md),
    [ps-007 Alert history and remediation metrics](specs/ps-007-alert-history-and-trends.md),
    [ps-010 GitHub delivery evidence](specs/ps-010-github-delivery-evidence.md)
 4. **Website health:**
@@ -181,8 +182,8 @@ ps-004 → ps-021 (delivered: org/repo dashboards and switching; extends ps-003/
 ps-003 → ps-020 (tiering; recovered from archive tag archive/004-portfolio-intelligence; feeds ps-018)
 ```
 
-Done so far: 001, 002, 003, 004, 009, 021 (021 was added after the original sequence, at the
-developer's request). Recommended order for the rest: 006, 011, 007, 010, 005 (before any private or client-owned
+Done so far: 001, 002, 003, 004, 006, 009, 021 (021 was added after the original sequence, at the
+developer's request). Recommended order for the rest: 011, 007, 010, 005 (before any private or client-owned
 data is stored, which is required before client reporting), 012, 013, 020, 014, 015, 008, 016, 017, 018, 019.
 `order` values in the items reflect this. History starts accumulating at ps-006, because its value
 compounds; note GitHub rate limits cannot be banked, so value comes from retained observations and
@@ -190,8 +191,8 @@ incremental requests, not from collecting faster.
 
 **Smallest useful first increment (done): ps-001** (existing dashboard in Docker on port 8086). The smallest
 increment that *monitors real things* is ps-001 → 003 → 006, with ps-011 giving an early website view. Of
-that path ps-001 and ps-003 are delivered; ps-006 is no longer blocked (constitution v1.2.0), though ps-011
-(website availability) is the next item that adds monitoring without waiting on a decision.
+that path ps-001, ps-003, and ps-006 are delivered; ps-011 (website availability) is the next item that
+adds monitoring without waiting on a decision.
 
 ## Decisions
 
@@ -246,6 +247,7 @@ All on `main` and running on the home server (stack `github-stats-spark`, Portai
 | [ps-004 Admin API and management UI](specs/complete/ps-004-admin-api-and-source-management-ui.md) | Sign-in, add/edit/disable sources, GitHub tokens, refresh now |
 | [ps-009 Operational hardening and backup](specs/complete/ps-009-operational-hardening.md) | Verified backups, restore, limits; rollback drill passed |
 | [ps-021 Organization and repository dashboards](specs/complete/ps-021-source-dashboards-and-switching.md) | Each enabled user, org, and repo source has a dashboard and appears in the header switcher |
+| [ps-006 Dependabot dashboard and lifecycle](specs/complete/ps-006-dependabot-security-dashboard.md) | Security view of every alert (open, dismissed, fixed) with coverage reasons, filters, CSV export, and stored history |
 
 Smaller changes made outside the roadmap items: a header user picker (later extended by ps-021), a
 follow-up fix so a restarted worker keeps reporting the existing backup, and a generic "fix score"
@@ -259,33 +261,37 @@ Known gaps and notes:
   (a cron example is in the Docker deployment guide).
 - Credentials still to tidy: the initial admin password sits in the stack environment and should be
   changed and removed; the Portainer and GitHub token files should be rotated.
-- The constitution amendment landed as v1.2.0 (2026-11-16, Principle VII Self-Hosted Mode); ps-005 and ps-006 are unblocked.
-- 45 Dependabot alerts are open on this repository; ps-006 is the planned home for handling them.
+- The constitution amendment landed as v1.2.0 (2026-11-16, Principle VII Self-Hosted Mode); ps-005 is unblocked.
+- ps-006: the attention view still scores from `fetcher.py`'s first-page summary rather than the new
+  collector (the spec's "extract collection from `fetcher.py`" was not done); moving scoring onto the stored
+  alerts fits ps-007. Not yet confirmed on the server: a security refresh against real repositories, which
+  also settles the spec's open check of Dependabot REST field shapes (tests use fixtures). This repository's
+  own open Dependabot alerts (19 on 2026-11-21) are housekeeping, not part of ps-006.
 
 ## Where we are and what is next
 
-**Current state (2026-11-16).** The dashboard runs as a three-container stack (web, api, worker) on the home
+**Current state (2026-11-21).** The dashboard runs as a three-container stack (web, api, worker) on the home
 server. It collects every enabled user, organization, and repository source on a schedule, publishes one
 dashboard per source with a header switcher, and is managed through a signed-in admin UI backed by SQLite
-with encrypted tokens and verified backups. The constitution permits the self-hosted features still to
-come. Nothing is blocked on a decision from the developer except the items that name one below.
+with encrypted tokens and verified backups. ps-006 adds a Security view of every Dependabot alert with
+stored history. CI validation on `main` is green again (lint, types, tests, dependency audits).
 
 **Next steps, in recommended order** (all unblocked unless noted):
 
-1. **ps-006 Dependabot dashboard** starts the history that compounds and is the home for this
-   repository's 45 open alerts.
-2. **ps-011 Website availability** is the earliest view of real running sites and is independent of ps-006.
-3. **ps-007 Alert history and trends** follows ps-006.
-4. **ps-010 GitHub delivery evidence** (releases, CI runs, deployments).
-5. **ps-005 Private and client data boundary**, required before any private or client-owned data or
+1. **ps-011 Website availability** is the earliest view of real running sites.
+2. **ps-007 Alert history and trends** builds on the alert records ps-006 now keeps; a natural place to move
+   attention scoring onto the stored alerts.
+3. **ps-010 GitHub delivery evidence** (releases, CI runs, deployments).
+4. **ps-005 Private and client data boundary**, required before any private or client-owned data or
    client reports. Open decisions: LAN HTTP or internal TLS, and whether private names may appear in
    notifications.
-6. **ps-013** (read DevSpark roadmaps) and **ps-020** (portfolio tiering) can slot in at any point.
-7. **Blocked on a developer decision:** ps-012 (Chromium host budget), ps-014 (which application first),
+5. **ps-013** (read DevSpark roadmaps) and **ps-020** (portfolio tiering) can slot in at any point.
+6. **Blocked on a developer decision:** ps-012 (Chromium host budget), ps-014 (which application first),
    ps-015 (how a deployment is evidenced), ps-016 and ps-017 (provider access), ps-019 (AI provider and
    client-data policy).
 
-**Housekeeping that is not a roadmap item:** change the admin password and remove it from the stack
-environment; rotate the Portainer and GitHub token files; set up an off-host backup copy; consider a
-per-source "collect now"; and have the collector count a lint or test script in `package.json` as tests so
-static sites are not flagged for missing tests.
+**Housekeeping that is not a roadmap item:** redeploy the stack and confirm a security refresh on real
+repositories; work down this repository's open Dependabot alerts; change the admin password and remove it
+from the stack environment; rotate the Portainer and GitHub token files; set up an off-host backup copy;
+consider a per-source "collect now"; and have the collector count a lint or test script in `package.json`
+as tests so static sites are not flagged for missing tests.

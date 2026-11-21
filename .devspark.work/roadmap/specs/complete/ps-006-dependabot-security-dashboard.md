@@ -1,11 +1,11 @@
 ---
 id: ps-006
 title: Dependabot dashboard and lifecycle
-status: proposed
+status: complete
 order: 50
 depends_on: [ps-003]
 blockers: []
-delivery: []
+delivery: ["branch 001-work-ps-006-dependabot-dashboard", "commit 9d2ef27", "merge 41a85fc"]
 ---
 
 # ps-006: Dependabot dashboard and lifecycle

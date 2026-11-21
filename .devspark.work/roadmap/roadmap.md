@@ -30,7 +30,7 @@ manageable by one person; add dependencies and services only when demonstrated n
 
 ## Current Baseline
 
-Evidence from the repository on `main` (after ps-006 and the green-CI baseline, commit 40a0cb5). Rows marked Missing or Partial are
+Evidence from the repository on `main` (after ps-023 classification domains, merge c9f1770). Rows marked Missing or Partial are
 the remaining roadmap.
 
 | Area | Status | Evidence |
@@ -48,12 +48,12 @@ the remaining roadmap.
 | Header source switcher (users, orgs, repositories, grouped) | Implemented | `UserPicker.jsx`, `useUserOptions.js`; listed from `data/portfolio.json`; hidden on Pages |
 | Repository "fix score" prompt | Implemented, generic | `FixScorePromptSection.jsx`; no DevSpark dependency; per-signal guidance |
 | GitHub Pages publication (public only) and CI | Implemented | `.github/workflows/generate-stats.yml`, `validate.yml` |
-| Tests (pytest 548, vitest 152, Lighthouse CI config, a11y audit); CI validation green | Implemented | `tests/`, `frontend/tests`, `frontend/scripts` |
+| Tests (pytest 572, vitest 169, Lighthouse CI config, a11y audit); CI validation green | Implemented | `tests/`, `frontend/tests`, `frontend/scripts` |
 | Docker/Compose, scheduler, long-running worker, status, healthcheck | Implemented (ps-001, 002) | `docker-compose.yml`, `docker/`, `src/spark/worker/`; stack runs under Portainer on 192.168.1.197:8086 |
 | SQLite registry, sources, connections, dedupe, discovery, `portfolio.json` | Implemented (ps-003) | `src/spark/registry/` |
 | Backend API, admin authentication, encrypted token store, admin UI | Implemented (ps-004) | `src/spark/api/`, `frontend/src/components/Admin/`; Argon2id, server-side sessions, CSRF, Fernet |
 | Backup, restore, rotation, resource limits, log rotation, secrets override | Implemented (ps-009) | `src/spark/backup.py`, `docker-compose*.yml`; backups sit on the same host disk |
-| Clients/projects/applications model | Partial | tables and API exist (ps-003/004), but assignment is free text that creates names on first use and no screen manages the lists (ps-023); environments and websites are not modelled until ps-011 |
+| Clients/projects/applications model, classification domains | Implemented (ps-023) | managed lists with create/rename/retire/merge and duplicate suggestions; unknown names rejected; administrator-defined domains (Tier, Type, Lifecycle, Stack seeded) assigned by dropdown or in bulk; exported in `portfolio.json` (`registry/catalog.py`, `registry/domains.py`, Lists and Domains tabs). Environments and websites are not modelled until ps-011 |
 | Unified operator UI (one scope, shared components, cross-links) | Missing | Security ignores the source switcher, Health and Security count alerts from different sources, patterns are duplicated per view (ps-022) |
 | Persistent history, observations, alert lifecycle | Partial | ps-006 keeps every alert record and writes a counts observation per collection; trends and remediation metrics are ps-007 |
 | Releases/tags, CI run history, deployments, Dependabot PRs | Missing | Actions *summary* only (ps-010) |
@@ -127,7 +127,7 @@ without a schema rewrite. No tenants, billing, or multi-admin in this roadmap.
 ## Capability Map
 
 - **Foundation:** container deployment, scheduling, status, persistence, backup (ps-001, 002, 003, 009), delivered.
-- **Portfolio and sources:** registry, domain model, admin API/UI, GitHub connections, discovery, per-source dashboards and switching (ps-003, 004, 021 delivered), classification domains and managed lists (ps-023), tiering (ps-020, open).
+- **Portfolio and sources:** registry, domain model, admin API/UI, GitHub connections, discovery, per-source dashboards and switching (ps-003, 004, 021 delivered), classification domains and managed lists (ps-023, delivered), tiering (ps-020, open).
 - **Unified experience:** one scope selector, fixed sections, shared components, cross-links (ps-022).
 - **Access and privacy:** admin authentication (ps-004, delivered), private/client data boundary (ps-005, unblocked: constitution v1.2.0 amended 2026-11-16).
 - **GitHub intelligence:** Dependabot detail and lifecycle (ps-006, delivered), alert history, CI/PR/release evidence (ps-007, 010).
@@ -150,7 +150,7 @@ without a schema rewrite. No tenants, billing, or multi-admin in this roadmap.
    [ps-005 Private and client data boundary](specs/ps-005-private-data-boundary.md),
    [ps-020 Portfolio classification and signal scoring](specs/ps-020-portfolio-classification-and-signal-scoring.md),
    [ps-021 Organization and repository dashboards with source switching](specs/complete/ps-021-source-dashboards-and-switching.md),
-   [ps-023 Classification domains and managed lists](specs/ps-023-classification-domains.md)
+   [ps-023 Classification domains and managed lists](specs/complete/ps-023-classification-domains.md)
 3. **GitHub and security intelligence:**
    [ps-006 Dependabot dashboard and lifecycle](specs/complete/ps-006-dependabot-security-dashboard.md),
    [ps-007 Alert history and remediation metrics](specs/ps-007-alert-history-and-trends.md),
@@ -188,9 +188,9 @@ ps-004 → ps-023 (classification domains) → ps-022 (unified UI; also needs ps
 ps-023 → ps-020 (tier overrides come from the Tier domain)
 ```
 
-Done so far: 001, 002, 003, 004, 006, 009, 021 (021 was added after the original sequence, at the
+Done so far: 001, 002, 003, 004, 006, 009, 021, 023 (021 was added after the original sequence, at the
 developer's request; 022 and 023 were added 2026-11-21 after a UI consistency review). Recommended order
-for the rest: 023, 022, 011, 007, 010, 005 (before any private or client-owned
+for the rest: 022, 011, 007, 010, 005 (before any private or client-owned
 data is stored, which is required before client reporting), 012, 013, 020, 014, 015, 008, 016, 017, 018, 019.
 `order` values in the items reflect this. History starts accumulating at ps-006, because its value
 compounds; note GitHub rate limits cannot be banked, so value comes from retained observations and
@@ -259,6 +259,7 @@ All on `main` and running on the home server (stack `github-stats-spark`, Portai
 | [ps-009 Operational hardening and backup](specs/complete/ps-009-operational-hardening.md) | Verified backups, restore, limits; rollback drill passed |
 | [ps-021 Organization and repository dashboards](specs/complete/ps-021-source-dashboards-and-switching.md) | Each enabled user, org, and repo source has a dashboard and appears in the header switcher |
 | [ps-006 Dependabot dashboard and lifecycle](specs/complete/ps-006-dependabot-security-dashboard.md) | Security view of every alert (open, dismissed, fixed) with coverage reasons, filters, CSV export, and stored history |
+| [ps-023 Classification domains and managed lists](specs/complete/ps-023-classification-domains.md) | Clients, projects, applications, and domain values chosen from managed lists; Lists and Domains admin tabs; bulk classify; classifications in `portfolio.json` |
 
 Smaller changes made outside the roadmap items: a header user picker (later extended by ps-021), a
 follow-up fix so a restarted worker keeps reporting the existing backup, and a generic "fix score"
@@ -278,6 +279,11 @@ Known gaps and notes:
   drawer onto the stored alerts. Not yet confirmed on the server: a security refresh against real repositories, which
   also settles the spec's open check of Dependabot REST field shapes (tests use fixtures). This repository's
   own open Dependabot alerts (19 on 2026-11-21) are housekeeping, not part of ps-006.
+- ps-023: classifications reach `portfolio.json` but not the per-source `repositories.json` (the collector
+  writes it without reading the registry); ps-022 picks this up for per-source filtering. Not yet done on
+  the server: back up the registry, deploy (migration 4 runs on start), confirm existing clients and
+  assignments on the Lists tab, and merge suggested duplicates. The two Low review findings were fixed
+  (d7eb401) and await an independent reviewer's confirmation.
 
 ## Where we are and what is next
 
@@ -285,28 +291,27 @@ Known gaps and notes:
 server. It collects every enabled user, organization, and repository source on a schedule, publishes one
 dashboard per source with a header switcher, and is managed through a signed-in admin UI backed by SQLite
 with encrypted tokens and verified backups. ps-006 adds a Security view of every Dependabot alert with
-stored history. CI validation on `main` is green again (lint, types, tests, dependency audits).
+stored history. ps-023 replaces free-text assignment with managed lists and administrator-defined
+classification domains. CI validation on `main` is green (lint, types, tests, dependency audits).
 
 **Next steps, in recommended order** (all unblocked unless noted):
 
-1. **ps-023 Classification domains** replaces free-text client/project/application assignment with managed
-   lists and dropdowns, and adds administrator-defined domains (Tier, Type, Lifecycle, Stack).
-2. **ps-022 Unified operator experience**: one scope selector every view honours, fixed sections later items
+1. **ps-022 Unified operator experience**: one scope selector every view honours, fixed sections later items
    fill, shared components, one source per number, and cross-links, before more views are added.
-3. **ps-011 Website availability**, the first new section (Sites) built on ps-022.
-4. **ps-007 Alert history and trends** builds on the alert records ps-006 now keeps.
-5. **ps-010 GitHub delivery evidence** (releases, CI runs, deployments).
-6. **ps-005 Private and client data boundary**, required before any private or client-owned data or
+2. **ps-011 Website availability**, the first new section (Sites) built on ps-022.
+3. **ps-007 Alert history and trends** builds on the alert records ps-006 now keeps.
+4. **ps-010 GitHub delivery evidence** (releases, CI runs, deployments).
+5. **ps-005 Private and client data boundary**, required before any private or client-owned data or
    client reports. Open decisions: LAN HTTP or internal TLS, and whether private names may appear in
    notifications.
-7. **ps-013** (read DevSpark roadmaps) and **ps-020** (portfolio tiering, after ps-023) can slot in at any
+6. **ps-013** (read DevSpark roadmaps) and **ps-020** (portfolio tiering, now unblocked by ps-023) can slot in at any
    point.
-8. **Blocked on a developer decision:** ps-012 (Chromium host budget), ps-014 (which application first),
+7. **Blocked on a developer decision:** ps-012 (Chromium host budget), ps-014 (which application first),
    ps-015 (how a deployment is evidenced), ps-016 and ps-017 (provider access), ps-019 (AI provider and
    client-data policy).
 
-**Housekeeping that is not a roadmap item:** redeploy the stack and confirm a security refresh on real
-repositories; work down this repository's open Dependabot alerts; change the admin password and remove it
+**Housekeeping that is not a roadmap item:** back up the registry, redeploy the stack, confirm a security
+refresh on real repositories and the ps-023 Lists tab (merge suggested duplicates); work down this repository's open Dependabot alerts; change the admin password and remove it
 from the stack environment; rotate the Portainer and GitHub token files; set up an off-host backup copy;
 consider a per-source "collect now"; and have the collector count a lint or test script in `package.json`
 as tests so static sites are not flagged for missing tests.

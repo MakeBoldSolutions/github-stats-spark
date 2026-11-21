@@ -1,11 +1,11 @@
 ---
 id: ps-023
 title: Classification domains and managed lists
-status: proposed
+status: complete
 order: 56
 depends_on: [ps-003, ps-004]
 blockers: []
-delivery: []
+delivery: ["branch 001-work-ps-023-classification-domains", "PR #7", "commit 62933a4", "review fixes d7eb401", "merge c9f1770"]
 ---
 
 # ps-023: Classification domains and managed lists

@@ -45,7 +45,9 @@ In scope:
 
 - **Scope selector** replacing the source switcher: portfolio, then client (top level, with internal work as
   its own client), then source, then repository. Held in the URL, changed without a page reload, honoured by
-  every view including Security, and filterable by ps-023 domains.
+  every view including Security, and filterable by ps-023 domains. Classifications are in `portfolio.json`
+  only; the per-source `repositories.json` the collector writes does not carry them yet, so this item adds
+  them there (or reads them from the portfolio export) for per-source filtering.
 - **Sections:** Overview, Health, Security, Sites (ps-011, 012, 014), Delivery (ps-010, 013, 015), Presence
   (ps-016, 017), Admin. A section appears only once it has data; existing hashes keep working. The
   repository drawer gains one panel per section, starting with Security.

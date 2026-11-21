@@ -230,6 +230,14 @@ def test_disable_edit_and_remove_a_source_keeps_repositories(admin):
     source = admin.post(
         "/api/sources", json={"type": "org", "identifier": "Acme"}
     ).json()
+    unknown = admin.patch(
+        f"/api/sources/{source['id']}", json={"enabled": False, "client": "Contoso"}
+    )
+    assert unknown.status_code == 422 and unknown.json()["detail"]["code"] == (
+        "unknown_name"
+    )
+    assert admin.get("/api/sources").json()[0]["enabled"] is True  # unchanged
+    admin.post("/api/clients", json={"name": "Contoso"})
     patched = admin.patch(
         f"/api/sources/{source['id']}", json={"enabled": False, "client": "Contoso"}
     )
@@ -248,16 +256,36 @@ def test_exclude_and_assign_repositories_and_build_the_portfolio(admin):
         ).status_code
         == 200
     )
-    admin.patch(
+    assignment = {
+        "full_name": "Acme/a",
+        "assign": True,
+        "client": "Contoso",
+        "project": "Website",
+        "application": "Public site",
+    }
+    rejected = admin.patch("/api/repositories", json=assignment)
+    assert rejected.status_code == 422
+    assert rejected.json()["detail"]["code"] == "unknown_name"
+    combined = admin.patch(
         "/api/repositories",
         json={
-            "full_name": "Acme/a",
+            "full_name": "acme/a",
+            "excluded": True,
             "assign": True,
-            "client": "Contoso",
-            "project": "Website",
-            "application": "Public site",
+            "client": "Nope",
         },
     )
+    assert combined.status_code == 422
+    repos = {r["full_name"]: r for r in admin.get("/api/repositories").json()}
+    assert repos["Acme/a"]["excluded"] is False  # rejected request changed nothing
+    client = admin.post("/api/clients", json={"name": "Contoso"}).json()
+    project = admin.post(
+        f"/api/clients/{client['id']}/projects", json={"name": "Website"}
+    ).json()
+    admin.post(
+        f"/api/projects/{project['id']}/applications", json={"name": "Public site"}
+    )
+    assert admin.patch("/api/repositories", json=assignment).status_code == 200
     repos = {r["full_name"]: r for r in admin.get("/api/repositories").json()}
     assert repos["Acme/b"]["excluded"] is True
     assert repos["Acme/a"]["application"] == "Public site"

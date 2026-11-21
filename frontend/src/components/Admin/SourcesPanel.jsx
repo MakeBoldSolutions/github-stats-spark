@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { Button } from "@/components/Brand";
 import { adminApi } from "@/services/adminApi";
 import useAdminResource from "@/hooks/useAdminResource";
+import { clientOptions } from "./portfolioOptions";
 import styles from "./Admin.module.css";
 
 const TYPE_LABEL = { org: "Organization", user: "User", repo: "Repository" };
@@ -12,9 +13,14 @@ const PLACEHOLDER = {
   repo: "owner/repository",
 };
 
-export default function SourcesPanel({ onUnauthorized, onChanged }) {
+export default function SourcesPanel({
+  onUnauthorized,
+  onChanged,
+  onEditLists,
+}) {
   const sources = useAdminResource(adminApi.sources, onUnauthorized);
   const connections = useAdminResource(adminApi.connections, onUnauthorized);
+  const tree = useAdminResource(adminApi.portfolio, onUnauthorized);
   const [form, setForm] = useState({
     type: "org",
     identifier: "",
@@ -95,12 +101,24 @@ export default function SourcesPanel({ onUnauthorized, onChanged }) {
         </div>
         <div className={styles.field}>
           <label htmlFor="source-client">Client (optional)</label>
-          <input
+          <select
             id="source-client"
             className={styles.input}
             value={form.client}
             onChange={update("client")}
-          />
+          >
+            <option value="">No client</option>
+            {clientOptions(tree.data).map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          {onEditLists && (
+            <Button size="sm" variant="ghost" onClick={onEditLists}>
+              Edit lists
+            </Button>
+          )}
         </div>
         <div className={styles.field}>
           <label htmlFor="source-connection">Token</label>
@@ -247,4 +265,5 @@ export default function SourcesPanel({ onUnauthorized, onChanged }) {
 SourcesPanel.propTypes = {
   onUnauthorized: PropTypes.func.isRequired,
   onChanged: PropTypes.func,
+  onEditLists: PropTypes.func,
 };

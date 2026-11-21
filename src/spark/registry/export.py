@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from spark.cli_output_layout import source_slug
+from spark.registry import domains
 from spark.registry.store import Registry, now_iso
 
 SCHEMA_VERSION = 1
@@ -50,6 +51,7 @@ def build_portfolio(registry: Registry) -> Dict[str, Any]:
     source are left out of the list but retained in the database.
     """
     sources = registry.list_sources()
+    classified = domains.classifications(registry)
     enabled_ids = {s["id"] for s in sources if s["enabled"]}
     repositories: List[Dict[str, Any]] = []
     for repo in registry.list_repositories(include_excluded=False):
@@ -60,6 +62,7 @@ def build_portfolio(registry: Registry) -> Dict[str, Any]:
         for flag in ("is_fork", "is_private", "is_archived"):
             item[flag] = bool(item[flag])
         item["sources"] = [f"{s['type']}:{s['identifier']}" for s in reached_by]
+        item["classifications"] = classified.get(repo["id"])
         repositories.append(item)
 
     return {
@@ -73,6 +76,19 @@ def build_portfolio(registry: Registry) -> Dict[str, Any]:
                 "slug": source_slug(s["type"], s["identifier"]),
             }
             for s in sources
+        ],
+        "domains": [
+            {
+                "key": d["key"],
+                "label": d["label"],
+                "multi": d["multi"],
+                "values": [
+                    {"key": v["key"], "label": v["label"], "retired": v["retired"]}
+                    for v in d["values"]
+                ],
+            }
+            for d in domains.list_domains(registry, include_retired=True)
+            if not d["retired"]
         ],
         "repositories": repositories,
     }

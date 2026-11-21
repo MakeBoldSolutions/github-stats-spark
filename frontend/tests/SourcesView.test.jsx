@@ -27,6 +27,11 @@ beforeEach(() => {
   vi.spyOn(adminApi, "connections").mockResolvedValue([]);
   vi.spyOn(adminApi, "sources").mockResolvedValue([source]);
   vi.spyOn(adminApi, "repositories").mockResolvedValue([]);
+  vi.spyOn(adminApi, "portfolio").mockResolvedValue([
+    { id: 1, name: "Contoso", retired: false, projects: [] },
+    { id: 2, name: "Gone Ltd", retired: true, projects: [] },
+  ]);
+  vi.spyOn(adminApi, "domains").mockResolvedValue([]);
 });
 
 afterEach(() => {
@@ -113,6 +118,46 @@ describe("<SourcesView />", () => {
       }),
     );
     await waitFor(() => expect(screen.getByLabelText("Name")).toHaveValue(""));
+  });
+
+  it("chooses the client from the managed list, never free text", async () => {
+    vi.spyOn(adminApi, "session").mockResolvedValue(session);
+    const add = vi.spyOn(adminApi, "addSource").mockResolvedValue(source);
+    const user = userEvent.setup();
+    render(<SourcesView />);
+    const client = await screen.findByLabelText("Client (optional)");
+    expect(client.tagName).toBe("SELECT");
+    await waitFor(() =>
+      expect([...client.options].map((option) => option.textContent)).toEqual([
+        "No client",
+        "Contoso",
+      ]),
+    );
+    await user.selectOptions(client, "Contoso");
+    await user.type(screen.getByLabelText("Name"), "Octo");
+    await user.click(screen.getByRole("button", { name: "Add source" }));
+    await waitFor(() =>
+      expect(add).toHaveBeenCalledWith(
+        expect.objectContaining({ identifier: "Octo", client: "Contoso" }),
+      ),
+    );
+  });
+
+  it("offers the Lists and Domains tabs", async () => {
+    vi.spyOn(adminApi, "session").mockResolvedValue(session);
+    vi.spyOn(adminApi, "duplicates").mockResolvedValue([]);
+    const user = userEvent.setup();
+    render(<SourcesView />);
+    await user.click(await screen.findByRole("tab", { name: "Lists" }));
+    expect(
+      await screen.findByRole("heading", {
+        name: "Clients, projects and applications",
+      }),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole("tab", { name: "Domains" }));
+    expect(
+      await screen.findByRole("heading", { name: "Domains" }),
+    ).toBeInTheDocument();
   });
 
   it("requires a second click to remove a source", async () => {
@@ -205,7 +250,7 @@ describe("adminApi", () => {
     });
     vi.stubGlobal("fetch", fetchMock);
     await adminApi.signIn("a", "b");
-    await adminApi.portfolio();
+    await adminApi.duplicates();
     await adminApi.refresh();
     const [, read] = fetchMock.mock.calls[1];
     const [, write] = fetchMock.mock.calls[2];

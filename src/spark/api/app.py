@@ -17,7 +17,8 @@ from github import Auth, Github
 from pydantic import BaseModel, Field
 
 from spark.api import security
-from spark.registry import Registry, connections
+from spark.api.catalog_routes import build_router, http_error
+from spark.registry import Registry, connections, domains
 from spark.registry.discovery import (
     ERROR_HINTS,
     classify_error,
@@ -25,7 +26,7 @@ from spark.registry.discovery import (
     validate_access,
 )
 from spark.registry.secrets import SecretBox, SecretError
-from spark.registry.store import RegistryError
+from spark.registry.store import RegistryError, normalize_identifier
 
 COOKIE = "spark_session"
 
@@ -60,10 +61,6 @@ class RepositoryPatch(BaseModel):
     client: Optional[str] = Field(default=None, max_length=120)
     project: Optional[str] = Field(default=None, max_length=120)
     application: Optional[str] = Field(default=None, max_length=120)
-
-
-class NameIn(BaseModel):
-    name: str = Field(max_length=120)
 
 
 class ConnectionIn(BaseModel):
@@ -235,11 +232,10 @@ def create_app(
         registry: Registry = Depends(get_registry),
     ) -> Dict[str, Any]:
         try:
-            from spark.registry.store import normalize_identifier
-
             identifier = normalize_identifier(body.type, body.identifier)
+            registry.client_id_for(body.client)
         except RegistryError as error:
-            raise bad_request(error) from error
+            raise http_error(error) from error
         existing = registry.find_source(body.type, identifier)
         if existing:
             raise HTTPException(
@@ -273,6 +269,10 @@ def create_app(
         registry: Registry = Depends(get_registry),
     ) -> Dict[str, Any]:
         try:
+            source = registry.get_source(source_id)
+            # Check the client before changing anything, so a rejected
+            # request leaves the source as it was.
+            registry.client_id_for(body.client, current=source["client_id"])
             if body.enabled is not None:
                 registry.set_source_enabled(source_id, body.enabled)
             if (
@@ -288,9 +288,7 @@ def create_app(
                 )
             return present_source(registry, registry.get_source(source_id))
         except RegistryError as error:
-            raise HTTPException(
-                404, {"code": "not_found", "message": str(error)}
-            ) from error
+            raise http_error(error) from error
 
     @app.delete("/api/sources/{source_id}", status_code=204)
     def remove_source(
@@ -323,8 +321,12 @@ def create_app(
             "sources",
         )
         flags = ("is_fork", "is_private", "is_archived", "excluded")
+        classified = domains.classifications(registry)
         return [
-            {key: bool(repo[key]) if key in flags else repo[key] for key in keep}
+            {
+                **{key: bool(repo[key]) if key in flags else repo[key] for key in keep},
+                "classifications": classified.get(repo["id"]),
+            }
             for repo in registry.list_repositories()
         ]
 
@@ -335,8 +337,8 @@ def create_app(
         registry: Registry = Depends(get_registry),
     ) -> Dict[str, bool]:
         try:
-            if body.excluded is not None:
-                registry.set_repository_excluded(body.full_name, body.excluded)
+            # The assignment is validated (and rejected) before anything is
+            # written, so a refused request leaves the repository unchanged.
             if body.assign:
                 registry.associate_repository(
                     body.full_name,
@@ -344,50 +346,13 @@ def create_app(
                     project=body.project or None,
                     application=body.application or None,
                 )
+            if body.excluded is not None:
+                registry.set_repository_excluded(body.full_name, body.excluded)
         except RegistryError as error:
-            raise HTTPException(
-                404, {"code": "not_found", "message": str(error)}
-            ) from error
+            raise http_error(error) from error
         return {"ok": True}
 
-    @app.get("/api/portfolio")
-    def portfolio(
-        session=admin, registry: Registry = Depends(get_registry)
-    ) -> List[Dict[str, Any]]:
-        return registry.portfolio_tree()
-
-    @app.post("/api/clients", status_code=201)
-    def add_client(
-        body: NameIn, session=admin, registry: Registry = Depends(get_registry)
-    ) -> Dict[str, Any]:
-        try:
-            return registry.create_client(body.name)
-        except RegistryError as error:
-            raise bad_request(error) from error
-
-    @app.post("/api/clients/{client_id}/projects", status_code=201)
-    def add_project(
-        client_id: int,
-        body: NameIn,
-        session=admin,
-        registry: Registry = Depends(get_registry),
-    ) -> Dict[str, Any]:
-        try:
-            return registry.create_project(client_id, body.name)
-        except RegistryError as error:
-            raise bad_request(error) from error
-
-    @app.post("/api/projects/{project_id}/applications", status_code=201)
-    def add_application(
-        project_id: int,
-        body: NameIn,
-        session=admin,
-        registry: Registry = Depends(get_registry),
-    ) -> Dict[str, Any]:
-        try:
-            return registry.create_application(project_id, body.name)
-        except RegistryError as error:
-            raise bad_request(error) from error
+    app.include_router(build_router(admin, get_registry))
 
     # -- connections -----------------------------------------------------------
     @app.get("/api/connections")

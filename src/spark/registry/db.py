@@ -170,6 +170,76 @@ MIGRATIONS: List[str] = [
         last_success_at TEXT
     );
     """,
+    # 4: managed lists and classification domains. Clients, projects and
+    # applications can be retired (hidden from pickers, kept on what already
+    # uses them). A domain is a named list of allowed values; a repository is
+    # classified by linking it to values. Keys are stable; labels may change.
+    """
+    ALTER TABLE client ADD COLUMN retired_at TEXT;
+    ALTER TABLE project ADD COLUMN retired_at TEXT;
+    ALTER TABLE application ADD COLUMN retired_at TEXT;
+    CREATE TABLE domain (
+        id INTEGER PRIMARY KEY,
+        key TEXT NOT NULL UNIQUE COLLATE NOCASE,
+        label TEXT NOT NULL,
+        description TEXT,
+        multi INTEGER NOT NULL DEFAULT 0,
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        retired_at TEXT,
+        created_at TEXT NOT NULL
+    );
+    CREATE TABLE domain_value (
+        id INTEGER PRIMARY KEY,
+        domain_id INTEGER NOT NULL REFERENCES domain(id) ON DELETE CASCADE,
+        key TEXT NOT NULL COLLATE NOCASE,
+        label TEXT NOT NULL,
+        description TEXT,
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        retired_at TEXT,
+        created_at TEXT NOT NULL,
+        UNIQUE (domain_id, key)
+    );
+    CREATE TABLE repository_classification (
+        repository_id INTEGER NOT NULL REFERENCES repository(id) ON DELETE CASCADE,
+        value_id INTEGER NOT NULL REFERENCES domain_value(id),
+        assigned_at TEXT NOT NULL,
+        PRIMARY KEY (repository_id, value_id)
+    );
+    CREATE INDEX repository_classification_value
+        ON repository_classification (value_id);
+    INSERT INTO domain (key, label, description, multi, sort_order, created_at)
+    VALUES
+        ('tier', 'Tier', 'How much the repository matters to the portfolio now.',
+         0, 10, strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+        ('type', 'Type', 'What the repository is.',
+         0, 20, strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+        ('lifecycle', 'Lifecycle', 'Where the repository is in its life.',
+         0, 30, strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+        ('stack', 'Stack', 'Main technologies; choose all that apply.',
+         1, 40, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'));
+    INSERT INTO domain_value (domain_id, key, label, sort_order, created_at)
+    SELECT d.id, v.key, v.label, v.sort_order, strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+    FROM domain d JOIN (
+        SELECT 'tier' AS domain, 'core' AS key, 'Core' AS label, 10 AS sort_order
+        UNION ALL SELECT 'tier', 'supporting', 'Supporting', 20
+        UNION ALL SELECT 'tier', 'archive', 'Archive', 30
+        UNION ALL SELECT 'type', 'website', 'Website', 10
+        UNION ALL SELECT 'type', 'web-app', 'Web app', 20
+        UNION ALL SELECT 'type', 'api', 'API', 30
+        UNION ALL SELECT 'type', 'library', 'Library', 40
+        UNION ALL SELECT 'type', 'tool', 'Tool', 50
+        UNION ALL SELECT 'type', 'docs', 'Docs', 60
+        UNION ALL SELECT 'type', 'template', 'Template', 70
+        UNION ALL SELECT 'lifecycle', 'active', 'Active', 10
+        UNION ALL SELECT 'lifecycle', 'maintenance', 'Maintenance', 20
+        UNION ALL SELECT 'lifecycle', 'deprecated', 'Deprecated', 30
+        UNION ALL SELECT 'lifecycle', 'experiment', 'Experiment', 40
+        UNION ALL SELECT 'stack', 'dotnet', '.NET', 10
+        UNION ALL SELECT 'stack', 'python', 'Python', 20
+        UNION ALL SELECT 'stack', 'node-react', 'Node/React', 30
+        UNION ALL SELECT 'stack', 'static-site', 'Static site', 40
+    ) v ON v.domain = d.key;
+    """,
 ]
 
 

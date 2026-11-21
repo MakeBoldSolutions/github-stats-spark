@@ -6,7 +6,7 @@ import sqlite3
 import pytest
 from github import GithubException
 
-from spark.registry import Registry, collection_users, seed_users
+from spark.registry import Registry, catalog, collection_users, seed_users
 from spark.registry.db import MIGRATIONS, connect, schema_version
 from spark.registry.discovery import (
     classify_error,
@@ -172,6 +172,9 @@ def test_associations_are_optional_and_reflected_in_the_export(registry):
     gh = FakeGithub(orgs={"Acme": [make_repo("Acme/a"), make_repo("Acme/b")]})
     registry.add_source("org", "Acme")
     run_discovery(registry, gh)
+    client = catalog.create_client(registry, "Contoso")
+    project = catalog.create_project(registry, client["id"], "Website")
+    catalog.create_application(registry, project["id"], "Public site")
     registry.associate_repository(
         "acme/a", client="Contoso", project="Website", application="Public site"
     )

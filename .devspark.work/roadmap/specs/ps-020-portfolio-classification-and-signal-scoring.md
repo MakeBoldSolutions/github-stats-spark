@@ -3,7 +3,7 @@ id: ps-020
 title: Portfolio classification and signal scoring
 status: proposed
 order: 105
-depends_on: [ps-003]
+depends_on: [ps-003, ps-023]
 blockers: []
 delivery: []
 ---
@@ -33,8 +33,8 @@ Today the portfolio (ps-003) is a flat de-duplicated list; only the attention sc
 ## Scope and Independence
 
 In scope: recover the classifier, its tests, and its spec/contract from the archive tag as the starting
-point and port them onto current `main`; take repository tier overrides from the registry (an `excluded`-style
-per-repository field) rather than a separate YAML file, keeping `config/portfolio.yml` only if it is still
+point and port them onto current `main`; take repository tier overrides from the ps-023 Tier domain (an
+administrator-set value always wins) rather than a separate YAML file, keeping `config/portfolio.yml` only if it is still
 needed for the public CLI/Pages path; add tier and signal score to the portfolio export and the dashboard
 views; keep the rules and each score's reasons visible so a tier is never unexplained; missing or malformed
 override input falls back to automated rules with a warning rather than failing.

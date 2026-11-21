@@ -36,7 +36,7 @@ tomli>=2.0.0,<3.0.0; python_version < '3.11'
 playwright>=1.59.0,<2.0.0
 
 # Image analysis for screenshot audit
-Pillow>=12.2.0,<13.0.0
+Pillow>=13.0.0,<14.0.0
 
 # Admin API (self-hosted management UI backend)
 fastapi>=0.115.0,<1.0.0

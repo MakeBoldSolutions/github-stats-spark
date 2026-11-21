@@ -229,6 +229,17 @@
   border-top: 1px solid var(--color-border);
 }
 
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.titleRow h3 {
+  margin: 0;
+}
+
 .srOnly {
   position: absolute;
   width: 1px;

@@ -337,8 +337,8 @@ def create_app(
         registry: Registry = Depends(get_registry),
     ) -> Dict[str, bool]:
         try:
-            if body.excluded is not None:
-                registry.set_repository_excluded(body.full_name, body.excluded)
+            # The assignment is validated (and rejected) before anything is
+            # written, so a refused request leaves the repository unchanged.
             if body.assign:
                 registry.associate_repository(
                     body.full_name,
@@ -346,6 +346,8 @@ def create_app(
                     project=body.project or None,
                     application=body.application or None,
                 )
+            if body.excluded is not None:
+                registry.set_repository_excluded(body.full_name, body.excluded)
         except RegistryError as error:
             raise http_error(error) from error
         return {"ok": True}

@@ -266,6 +266,18 @@ def test_exclude_and_assign_repositories_and_build_the_portfolio(admin):
     rejected = admin.patch("/api/repositories", json=assignment)
     assert rejected.status_code == 422
     assert rejected.json()["detail"]["code"] == "unknown_name"
+    combined = admin.patch(
+        "/api/repositories",
+        json={
+            "full_name": "acme/a",
+            "excluded": True,
+            "assign": True,
+            "client": "Nope",
+        },
+    )
+    assert combined.status_code == 422
+    repos = {r["full_name"]: r for r in admin.get("/api/repositories").json()}
+    assert repos["Acme/a"]["excluded"] is False  # rejected request changed nothing
     client = admin.post("/api/clients", json={"name": "Contoso"}).json()
     project = admin.post(
         f"/api/clients/{client['id']}/projects", json={"name": "Website"}

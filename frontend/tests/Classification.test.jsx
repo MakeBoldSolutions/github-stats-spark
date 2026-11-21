@@ -395,6 +395,17 @@ describe("<DomainsPanel />", () => {
     );
   });
 
+  it("keeps domain headings to the label, with rename beside them", async () => {
+    const user = userEvent.setup();
+    render(<DomainsPanel onUnauthorized={() => {}} />);
+    const heading = await screen.findByRole("heading", { name: "Tier" });
+    expect(screen.getByRole("article", { name: "Tier" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Rename Tier" }));
+    const input = screen.getByLabelText("New label for Tier");
+    expect(heading).not.toContainElement(input);
+    expect(screen.getByRole("heading", { name: "Tier" })).toBeInTheDocument();
+  });
+
   it("offers delete only for unused values and retire for all", async () => {
     render(<DomainsPanel onUnauthorized={() => {}} />);
     const table = await screen.findByRole("table", { name: "Tier values" });

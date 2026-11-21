@@ -79,13 +79,27 @@ NewEntryForm.propTypes = {
   onAdd: PropTypes.func.isRequired,
 };
 
-function Renamable({ id, label, onRename }) {
+/**
+ * A label with a Rename control. With `headingId` the label is rendered as a
+ * heading and the control sits beside it, so the heading holds only the label.
+ */
+function Renamable({ id, label, onRename, headingId }) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(label);
+  const heading = headingId ? <h3 id={headingId}>{label}</h3> : null;
+  const wrap = (content) =>
+    heading ? (
+      <div className={styles.titleRow}>
+        {heading}
+        {content}
+      </div>
+    ) : (
+      content
+    );
   if (!editing) {
-    return (
+    return wrap(
       <>
-        <strong>{label}</strong>{" "}
+        {!heading && <strong>{label}</strong>}{" "}
         <Button
           size="sm"
           variant="ghost"
@@ -97,10 +111,10 @@ function Renamable({ id, label, onRename }) {
         >
           Rename
         </Button>
-      </>
+      </>,
     );
   }
-  return (
+  return wrap(
     <form
       className={styles.inlineForm}
       onSubmit={async (event) => {
@@ -125,7 +139,7 @@ function Renamable({ id, label, onRename }) {
       <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>
         Cancel
       </Button>
-    </form>
+    </form>,
   );
 }
 
@@ -133,6 +147,7 @@ Renamable.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   onRename: PropTypes.func.isRequired,
+  headingId: PropTypes.string,
 };
 
 /**
@@ -212,18 +227,17 @@ export default function DomainsPanel({ onUnauthorized, onChanged }) {
               className={styles.domain}
               aria-labelledby={`domain-${domain.id}-title`}
             >
-              <h3 id={`domain-${domain.id}-title`}>
-                <Renamable
-                  id={`domain-${domain.id}-rename`}
-                  label={domain.label}
-                  onRename={(label) =>
-                    run(
-                      () => adminApi.editDomain(domain.id, { label }),
-                      `Renamed to ${label}.`,
-                    )
-                  }
-                />
-              </h3>
+              <Renamable
+                id={`domain-${domain.id}-rename`}
+                headingId={`domain-${domain.id}-title`}
+                label={domain.label}
+                onRename={(label) =>
+                  run(
+                    () => adminApi.editDomain(domain.id, { label }),
+                    `Renamed to ${label}.`,
+                  )
+                }
+              />
               <p className={styles.muted}>
                 Key <code>{domain.key}</code> ·{" "}
                 {domain.multi ? "multi-choice" : "single-choice"}

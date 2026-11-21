@@ -193,7 +193,7 @@ class CollectionWorker:
         A failing source is recorded on that source and reported; it never
         blocks the others.
         """
-        registry = Registry.open(self.settings.db_path)
+        registry = Registry.open(self.settings.registry_path)
         try:
             seed_users(registry, self.settings.users)
             clients: dict = {}
@@ -279,7 +279,7 @@ class CollectionWorker:
         published in status.json and retried on the next tick interval, never
         raised: collection must not depend on backups."""
         s = self.settings
-        if s.backup_interval_seconds <= 0 or not s.db_path.exists():
+        if s.backup_interval_seconds <= 0 or not s.registry_path.exists():
             return None
         now = self.now()
         if not self._backup_retry_ready(now) or not backup_due(
@@ -289,7 +289,7 @@ class CollectionWorker:
             return None
         try:
             info = create_backup(
-                s.db_path,
+                s.registry_path,
                 s.backup_dir,
                 keep=s.backup_keep,
                 config_path=s.config_path,
@@ -348,7 +348,7 @@ class CollectionWorker:
         """True when no refresh has run yet, or the interval (or, after a
         total failure, the retry delay) has passed since the last attempt."""
         s = self.settings
-        if s.security_interval_seconds <= 0 or not s.db_path.exists():
+        if s.security_interval_seconds <= 0 or not s.registry_path.exists():
             return False
         last = self.status.state.get("security") or {}
         attempted = last.get("last_attempt_at")
@@ -422,7 +422,7 @@ class CollectionWorker:
     # -- scheduling ----------------------------------------------------
     def _refresh_requested(self) -> bool:
         """True once if the admin asked for a refresh (via the database)."""
-        path = self.settings.db_path
+        path = self.settings.registry_path
         if not path.exists():
             return False
         try:

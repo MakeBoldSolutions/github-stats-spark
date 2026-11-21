@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from spark.registry.secrets import SecretBox, SecretError
-from spark.registry.store import Registry, RegistryError, now_iso
+from spark.registry.store import Registry, RegistryError, inserted_id, now_iso
 
 KINDS = ("pat",)
 PUBLIC_FIELDS = (
@@ -74,11 +74,14 @@ def create_connection(
         raise RegistryError(str(error)) from error
     try:
         with registry.conn:
-            new_id = registry.conn.execute(
-                "INSERT INTO connection (name, kind, secret_ref, secret_encrypted,"
-                " owner, expires_at, created_at) VALUES (?, ?, 'stored', ?, ?, ?, ?)",
-                (name, kind, encrypted, owner, expires_at or None, now_iso()),
-            ).lastrowid
+            new_id = inserted_id(
+                registry.conn.execute(
+                    "INSERT INTO connection (name, kind, secret_ref, secret_encrypted,"
+                    " owner, expires_at, created_at)"
+                    " VALUES (?, ?, 'stored', ?, ?, ?, ?)",
+                    (name, kind, encrypted, owner, expires_at or None, now_iso()),
+                )
+            )
     except sqlite3.IntegrityError as error:
         raise RegistryError(f"a connection named {name!r} already exists") from error
     return get_connection(registry, new_id)

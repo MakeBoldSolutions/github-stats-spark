@@ -20,6 +20,13 @@ class RegistryError(ValueError):
     """Raised for invalid registry input or a missing record."""
 
 
+def inserted_id(cursor: sqlite3.Cursor) -> int:
+    """The row id from an INSERT; sqlite3 types it Optional, but an INSERT sets it."""
+    if cursor.lastrowid is None:  # pragma: no cover - only after a non-INSERT
+        raise RegistryError("INSERT did not produce a row id")
+    return cursor.lastrowid
+
+
 def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -72,7 +79,7 @@ class Registry:
                 " VALUES (?, ?, ?, ?, ?)",
                 (source_type, identifier, int(enabled), client_id, now_iso()),
             )
-        return self.get_source(cursor.lastrowid)
+        return self.get_source(inserted_id(cursor))
 
     def find_source(self, source_type: str, identifier: str) -> Optional[dict]:
         row = self.conn.execute(
@@ -430,9 +437,12 @@ class Registry:
     # -- refresh requests (the API asks, the worker acts) -------------------
     def request_refresh(self) -> int:
         with self.conn:
-            return self.conn.execute(
-                "INSERT INTO refresh_request (requested_at) VALUES (?)", (now_iso(),)
-            ).lastrowid
+            return inserted_id(
+                self.conn.execute(
+                    "INSERT INTO refresh_request (requested_at) VALUES (?)",
+                    (now_iso(),),
+                )
+            )
 
     def pending_refresh(self) -> bool:
         return (

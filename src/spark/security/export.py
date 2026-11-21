@@ -106,8 +106,8 @@ def build_dependabot(
 
     alerts: List[Dict[str, Any]] = []
     for row in registry.list_dependabot_alerts():
-        repo = portfolio.get(row["repo"])
-        if repo is None:
+        owner = portfolio.get(row["repo"])
+        if owner is None:
             continue
         counts = counts_by_repo[row["repo"]]
         if row["state"] == "open":
@@ -117,7 +117,7 @@ def build_dependabot(
             counts[row["state"]] += 1
         item = {key: row[key] for key in _ALERT_FIELDS}
         item["auto_dismissed"] = bool(item["auto_dismissed"])
-        item["repository"] = repo["full_name"]
+        item["repository"] = owner["full_name"]
         item["age_days"] = age_days(row, now)
         alerts.append(item)
 

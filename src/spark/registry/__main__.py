@@ -71,8 +71,8 @@ def _run(args, registry: Registry) -> int:
     cmd = args.command
     if cmd == "add":
         if not args.no_validate:
-            ok, problem = validate_access(_github(), args.type, args.identifier)
-            if not ok:
+            _, problem = validate_access(_github(), args.type, args.identifier)
+            if problem is not None:
                 print(
                     f"ERROR: cannot use {args.identifier}: {problem.message}",
                     file=sys.stderr,

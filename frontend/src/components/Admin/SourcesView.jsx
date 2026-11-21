@@ -6,16 +6,21 @@ import LoginForm from "./LoginForm";
 import SourcesPanel from "./SourcesPanel";
 import RepositoriesPanel from "./RepositoriesPanel";
 import ConnectionsPanel from "./ConnectionsPanel";
+import ListsPanel from "./ListsPanel";
+import DomainsPanel from "./DomainsPanel";
 import styles from "./Admin.module.css";
 
 const TABS = [
   { id: "sources", label: "Sources" },
   { id: "repositories", label: "Repositories" },
+  { id: "lists", label: "Lists" },
+  { id: "domains", label: "Domains" },
   { id: "tokens", label: "Tokens" },
 ];
 
 /**
- * Administration: sign-in, then manage sources, repositories and tokens.
+ * Administration: sign-in, then manage sources, repositories, the managed
+ * lists and domains they are classified with, and tokens.
  * Only offered when the self-hosted admin API is present.
  */
 export default function SourcesView({ onToast }) {
@@ -37,6 +42,7 @@ export default function SourcesView({ onToast }) {
 
   const signedOut = useCallback(() => setAuth({ state: "out" }), []);
   const changed = useCallback(() => setChangeCount((count) => count + 1), []);
+  const openLists = useCallback(() => setTab("lists"), []);
 
   const refreshNow = async () => {
     try {
@@ -115,13 +121,24 @@ export default function SourcesView({ onToast }) {
             aria-labelledby={`admin-tab-${tab}`}
           >
             {tab === "sources" && (
-              <SourcesPanel onUnauthorized={signedOut} onChanged={changed} />
+              <SourcesPanel
+                onUnauthorized={signedOut}
+                onChanged={changed}
+                onEditLists={openLists}
+              />
             )}
             {tab === "repositories" && (
               <RepositoriesPanel
                 onUnauthorized={signedOut}
                 refreshKey={changeCount}
+                onEditLists={openLists}
               />
+            )}
+            {tab === "lists" && (
+              <ListsPanel onUnauthorized={signedOut} onChanged={changed} />
+            )}
+            {tab === "domains" && (
+              <DomainsPanel onUnauthorized={signedOut} onChanged={changed} />
             )}
             {tab === "tokens" && (
               <ConnectionsPanel

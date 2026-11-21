@@ -1,7 +1,8 @@
 """Admin CLI: ``python -m spark.registry <command>``.
 
-Manages sources until the management UI exists. The database path comes from
-``--db`` or ``SPARK_DB_PATH``.
+Manages sources until the management UI exists. Client, project and
+application names must already exist; pass ``--create`` to add new ones. The
+database path comes from ``--db`` or ``SPARK_DB_PATH``.
 """
 
 from __future__ import annotations
@@ -13,6 +14,7 @@ from pathlib import Path
 
 from github import Auth, Github
 
+from spark.registry import catalog
 from spark.registry.discovery import run_discovery, validate_access
 from spark.registry.export import write_portfolio
 from spark.registry.store import Registry, RegistryError
@@ -33,6 +35,9 @@ def build_parser() -> argparse.ArgumentParser:
     add.add_argument("identifier", help="login, or owner/name for a repo")
     add.add_argument("--client", help="client the source belongs to")
     add.add_argument("--no-validate", action="store_true")
+    add.add_argument(
+        "--create", action="store_true", help="create the client if it is new"
+    )
 
     sub.add_parser("list", help="show sources and their status")
     for name in ("enable", "disable", "remove"):
@@ -48,6 +53,11 @@ def build_parser() -> argparse.ArgumentParser:
     assign.add_argument("--client")
     assign.add_argument("--project")
     assign.add_argument("--application")
+    assign.add_argument(
+        "--create",
+        action="store_true",
+        help="create any client, project or application that does not exist yet",
+    )
 
     export = sub.add_parser("export", help="write portfolio.json")
     export.add_argument("path", type=Path)
@@ -78,6 +88,8 @@ def _run(args, registry: Registry) -> int:
                     file=sys.stderr,
                 )
                 return 1
+        if args.create:
+            _ensure_names(registry, args.client)
         source = registry.add_source(args.type, args.identifier, client=args.client)
         print(f"source {source['id']}: {source['type']} {source['identifier']}")
     elif cmd == "list":
@@ -99,6 +111,8 @@ def _run(args, registry: Registry) -> int:
     elif cmd in ("exclude", "include"):
         registry.set_repository_excluded(args.repository, cmd == "exclude")
     elif cmd == "assign":
+        if args.create:
+            _ensure_names(registry, args.client, args.project, args.application)
         registry.associate_repository(
             args.repository,
             client=args.client,
@@ -111,6 +125,37 @@ def _run(args, registry: Registry) -> int:
     elif cmd == "prune":
         print(f"deleted {registry.prune_orphans()} orphaned repositories")
     return 0
+
+
+def _ensure_names(registry: Registry, client, project=None, application=None) -> None:
+    """Explicitly create the named client/project/application when missing
+    (``--create``). Without it, unknown names are rejected."""
+    tree = catalog.tree(registry, include_retired=True)
+    by_client = {c["name"].lower(): c for c in tree if c["id"] is not None}
+    internal = next((c for c in tree if c["id"] is None), None)
+    client_id = None
+    projects = internal["projects"] if internal else []
+    if client:
+        found = by_client.get(client.lower())
+        if found:
+            client_id, projects = found["id"], found["projects"]
+        else:
+            client_id, projects = catalog.create_client(registry, client)["id"], []
+            print(f"created client {client!r}")
+    if not project:
+        return
+    found = next((p for p in projects if p["name"].lower() == project.lower()), None)
+    if found:
+        project_id, applications = found["id"], found["applications"]
+    else:
+        project_id = catalog.create_project(registry, client_id, project)["id"]
+        applications = []
+        print(f"created project {project!r}")
+    if application and not any(
+        a["name"].lower() == application.lower() for a in applications
+    ):
+        catalog.create_application(registry, project_id, application)
+        print(f"created application {application!r}")
 
 
 if __name__ == "__main__":

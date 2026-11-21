@@ -78,7 +78,35 @@ export const adminApi = {
 
   repositories: () => request("GET", "/repositories"),
   editRepository: (changes) => request("PATCH", "/repositories", changes),
-  portfolio: () => request("GET", "/portfolio"),
+  classify: (payload) => request("POST", "/repositories/classify", payload),
+
+  // Managed lists. `kind` is "client", "project" or "application".
+  portfolio: (includeRetired = false) =>
+    request(
+      "GET",
+      `/portfolio${includeRetired ? "?include_retired=true" : ""}`,
+    ),
+  duplicates: () => request("GET", "/portfolio/duplicates"),
+  createClient: (name) => request("POST", "/clients", { name }),
+  createProject: (clientId, name) =>
+    request("POST", "/projects", { client_id: clientId, name }),
+  createApplication: (projectId, name) =>
+    request("POST", `/projects/${projectId}/applications`, { name }),
+  editListEntry: (kind, id, changes) =>
+    request("PATCH", `/${kind}s/${id}`, changes),
+  mergeListEntry: (kind, id, intoId) =>
+    request("POST", `/${kind}s/${id}/merge`, { into_id: intoId }),
+
+  domains: (includeRetired = false) =>
+    request("GET", `/domains${includeRetired ? "?include_retired=true" : ""}`),
+  createDomain: (domain) => request("POST", "/domains", domain),
+  editDomain: (id, changes) => request("PATCH", `/domains/${id}`, changes),
+  removeDomain: (id) => request("DELETE", `/domains/${id}`),
+  addDomainValue: (domainId, value) =>
+    request("POST", `/domains/${domainId}/values`, value),
+  editDomainValue: (id, changes) =>
+    request("PATCH", `/domain-values/${id}`, changes),
+  removeDomainValue: (id) => request("DELETE", `/domain-values/${id}`),
 
   connections: () => request("GET", "/connections"),
   addConnection: (connection) => request("POST", "/connections", connection),

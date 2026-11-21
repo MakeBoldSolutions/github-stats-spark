@@ -78,7 +78,7 @@ Sources live in a SQLite registry (`/app/config/registry.db`, in the `spark-conf
 survives container recreation). Manage them from the worker container (uses its `GITHUB_TOKEN`):
 
 ```sh
-docker compose exec worker python -m spark.registry add org MyOrg --client "Acme"
+docker compose exec worker python -m spark.registry add org MyOrg --client "Acme" --create
 docker compose exec worker python -m spark.registry add repo owner/name
 docker compose exec worker python -m spark.registry list
 docker compose exec worker python -m spark.registry exclude owner/name
@@ -93,6 +93,9 @@ docker compose exec worker python -m spark.registry disable 3
   `python -m spark.registry prune`.
 - Full per-repository analytics (`data/users/<name>/...`, the dashboard) still run for `user` sources.
   Organization and explicit-repository sources currently appear in `portfolio.json` only.
+- Client, project and application names must already exist (create them on the admin **Lists**
+  tab); an unknown name is rejected so a typo never creates a second client. Pass `--create` to
+  `add` or `assign` to create a missing name on purpose.
 - Back up `registry.db` (stop the worker, or use `sqlite3 registry.db ".backup out.db"`).
 
 ## Admin UI (sign-in, sources, tokens)
@@ -115,7 +118,18 @@ dashboard shows a **Sources** page only when the API answers; on GitHub Pages it
 - **Sources:** add an organization, user or repository. Access is validated against GitHub first;
   a source that cannot be read is not saved and the error says what to fix. Disable, re-enable or
   remove sources; removing never deletes collected repositories.
-- **Repositories:** include/exclude and assign to a client, project and application.
+- **Repositories:** include/exclude, assign to a client, project and application from dropdowns, and
+  classify by domain (one repository at a time, or select several and classify them in bulk). The
+  **Show** filter lists repositories with no client or no value in a domain.
+- **Lists:** create, rename, retire, restore and merge clients, projects and applications. A project
+  with no client is internal. Retiring hides an entry from the dropdowns but keeps it on whatever
+  already uses it; merging moves every repository and source onto the entry that stays. Likely
+  duplicates (for example "Acme" and "Acme, Inc.") are suggested, never merged on their own.
+- **Domains:** named lists of allowed values. Tier, Type, Lifecycle (one value each) and Stack
+  (several values) are provided and editable; add your own. A value's key never changes, its label
+  can. A value or domain in use can only be retired, not deleted. Classifications are written to
+  `data/portfolio.json` (every active domain is listed per repository, empty when unassigned) on
+  the worker's next cycle.
 - **Tokens:** save fine-grained personal access tokens (read-only; one per user or organization),
   encrypted at rest. A token's expiry is tracked: the page warns when one is within 14 days, and a
   source whose token has expired reports `connection_unusable` instead of silently using another.

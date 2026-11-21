@@ -1,4 +1,10 @@
-"""Registry operations: sources, repositories and portfolio associations."""
+"""Registry operations: sources, repositories and portfolio associations.
+
+SIZE JUSTIFICATION (Constitution I): this is the single data-access class the
+API, worker and CLI share. Managed lists live in ``catalog``, classification in
+``domains``, and tokens in ``connections``; what remains is core record access
+plus the Dependabot upserts, which share its transactions.
+"""
 
 from __future__ import annotations
 
@@ -18,6 +24,15 @@ _REPO = re.compile(r"^[A-Za-z0-9._-]{1,100}$")
 
 class RegistryError(ValueError):
     """Raised for invalid registry input or a missing record."""
+
+
+class NotFoundError(RegistryError):
+    """The record named by an id or repository name does not exist."""
+
+
+class UnknownNameError(RegistryError):
+    """A client, project or application name that is not in its managed list
+    (or is retired). Names are never created as a side effect of assignment."""
 
 
 def inserted_id(cursor: sqlite3.Cursor) -> int:
@@ -72,7 +87,7 @@ class Registry:
         existing = self.find_source(source_type, identifier)
         if existing:
             return existing
-        client_id = self._client_id(client, create=True) if client else None
+        client_id = self.client_id_for(client)
         with self.conn:
             cursor = self.conn.execute(
                 "INSERT INTO source (type, identifier, enabled, client_id, created_at)"
@@ -93,7 +108,7 @@ class Registry:
             "SELECT * FROM source WHERE id = ?", (source_id,)
         ).fetchone()
         if not row:
-            raise RegistryError(f"no source with id {source_id}")
+            raise NotFoundError(f"no source with id {source_id}")
         return dict(row)
 
     def list_sources(self, enabled_only: bool = False) -> List[Dict[str, Any]]:
@@ -211,7 +226,7 @@ class Registry:
         )
         self.conn.commit()
         if cursor.rowcount == 0:
-            raise RegistryError(f"unknown repository {full_name!r}")
+            raise NotFoundError(f"unknown repository {full_name!r}")
 
     def list_repositories(self, include_excluded: bool = True) -> List[Dict[str, Any]]:
         sql = (
@@ -248,20 +263,40 @@ class Registry:
         return cursor.rowcount
 
     # -- portfolio ------------------------------------------------------
-    def _client_id(self, name: Optional[str], create: bool = False) -> Optional[int]:
+    def client_id_for(
+        self, name: Optional[str], *, current: Optional[int] = None
+    ) -> Optional[int]:
+        """Id of an active client by name; ``current`` may stay even if retired."""
+        return self._resolve("client", name, None, None, current)
+
+    def _resolve(
+        self,
+        table: str,
+        name: Optional[str],
+        parent_column: Optional[str],
+        parent_id: Optional[int],
+        current: Optional[int],
+    ) -> Optional[int]:
+        """Look a managed name up; never create it. A retired entry is only
+        accepted when it is what the record already uses."""
         if not name:
             return None
-        row = self.conn.execute(
-            "SELECT id FROM client WHERE name = ?", (name,)
-        ).fetchone()
-        if row:
-            return row[0]
-        if not create:
-            raise RegistryError(f"unknown client {name!r}")
-        with self.conn:
-            return self.conn.execute(
-                "INSERT INTO client (name, created_at) VALUES (?, ?)", (name, now_iso())
-            ).lastrowid
+        sql = f"SELECT id, retired_at FROM {table} WHERE name = ?"
+        params: List[Any] = [name]
+        if parent_column:
+            sql += f" AND {parent_column} IS ?"
+            params.append(parent_id)
+        row = self.conn.execute(sql, params).fetchone()
+        if not row:
+            raise UnknownNameError(
+                f"unknown {table} {name!r}; add it under Admin > Lists first"
+            )
+        if row["retired_at"] and row["id"] != current:
+            raise UnknownNameError(
+                f"{table} {name!r} is retired; restore it under Admin > Lists"
+                " or choose another"
+            )
+        return row["id"]
 
     def associate_repository(
         self,
@@ -271,95 +306,31 @@ class Registry:
         project: Optional[str] = None,
         application: Optional[str] = None,
     ) -> None:
-        """Link a repository to a client/project/application (all optional;
-        names are created on first use). Unassigned repositories are valid."""
+        """Link a repository to an existing client/project/application (all
+        optional; unassigned is valid). A project without a client is an
+        internal project. Unknown or retired names are rejected."""
         row = self.conn.execute(
-            "SELECT id FROM repository WHERE full_name_lower = ?", (full_name.lower(),)
+            "SELECT id, client_id, project_id, application_id FROM repository"
+            " WHERE full_name_lower = ?",
+            (full_name.lower(),),
         ).fetchone()
         if not row:
-            raise RegistryError(f"unknown repository {full_name!r}")
-        client_id = self._client_id(client, create=True)
-        project_id = application_id = None
+            raise NotFoundError(f"unknown repository {full_name!r}")
+        if application and not project:
+            raise RegistryError("an application belongs to a project; choose one")
+        client_id = self.client_id_for(client, current=row["client_id"])
+        project_id = self._resolve(
+            "project", project, "client_id", client_id, row["project_id"]
+        )
+        application_id = self._resolve(
+            "application", application, "project_id", project_id, row["application_id"]
+        )
         with self.conn:
-            if project:
-                found = self.conn.execute(
-                    "SELECT id FROM project WHERE name = ? AND client_id IS ?",
-                    (project, client_id),
-                ).fetchone()
-                project_id = (
-                    found[0]
-                    if found
-                    else self.conn.execute(
-                        "INSERT INTO project (client_id, name, created_at)"
-                        " VALUES (?, ?, ?)",
-                        (client_id, project, now_iso()),
-                    ).lastrowid
-                )
-            if application:
-                found = self.conn.execute(
-                    "SELECT id FROM application WHERE name = ? AND project_id IS ?",
-                    (application, project_id),
-                ).fetchone()
-                application_id = (
-                    found[0]
-                    if found
-                    else self.conn.execute(
-                        "INSERT INTO application"
-                        " (client_id, project_id, name, created_at)"
-                        " VALUES (?, ?, ?, ?)",
-                        (client_id, project_id, application, now_iso()),
-                    ).lastrowid
-                )
             self.conn.execute(
                 "UPDATE repository SET client_id = ?, project_id = ?,"
                 " application_id = ? WHERE id = ?",
-                (client_id, project_id, application_id, row[0]),
+                (client_id, project_id, application_id, row["id"]),
             )
-
-    # -- clients, projects, applications ----------------------------------
-    def create_client(self, name: str) -> Dict[str, Any]:
-        name = (name or "").strip()
-        if not name or len(name) > 120:
-            raise RegistryError("client name must be 1-120 characters")
-        return {"id": self._client_id(name, create=True), "name": name}
-
-    def create_project(self, client_id: Optional[int], name: str) -> Dict[str, Any]:
-        name = (name or "").strip()
-        if not name or len(name) > 120:
-            raise RegistryError("project name must be 1-120 characters")
-        if client_id is not None:
-            self._require("client", client_id)
-        found = self.conn.execute(
-            "SELECT id FROM project WHERE name = ? AND client_id IS ?",
-            (name, client_id),
-        ).fetchone()
-        if found:
-            return {"id": found[0], "client_id": client_id, "name": name}
-        with self.conn:
-            new_id = self.conn.execute(
-                "INSERT INTO project (client_id, name, created_at) VALUES (?, ?, ?)",
-                (client_id, name, now_iso()),
-            ).lastrowid
-        return {"id": new_id, "client_id": client_id, "name": name}
-
-    def create_application(self, project_id: int, name: str) -> Dict[str, Any]:
-        name = (name or "").strip()
-        if not name or len(name) > 120:
-            raise RegistryError("application name must be 1-120 characters")
-        project = self._require("project", project_id)
-        found = self.conn.execute(
-            "SELECT id FROM application WHERE name = ? AND project_id = ?",
-            (name, project_id),
-        ).fetchone()
-        if found:
-            return {"id": found[0], "project_id": project_id, "name": name}
-        with self.conn:
-            new_id = self.conn.execute(
-                "INSERT INTO application (client_id, project_id, name, created_at)"
-                " VALUES (?, ?, ?, ?)",
-                (project["client_id"], project_id, name, now_iso()),
-            ).lastrowid
-        return {"id": new_id, "project_id": project_id, "name": name}
 
     def _require(self, table: str, row_id: int) -> sqlite3.Row:
         if table not in ("client", "project", "application", "connection"):
@@ -368,40 +339,8 @@ class Registry:
             f"SELECT * FROM {table} WHERE id = ?", (row_id,)
         ).fetchone()
         if not row:
-            raise RegistryError(f"no {table} with id {row_id}")
+            raise NotFoundError(f"no {table} with id {row_id}")
         return row
-
-    def portfolio_tree(self) -> List[Dict[str, Any]]:
-        """Clients with their projects and applications (for pickers)."""
-        clients = [
-            dict(r)
-            for r in self.conn.execute("SELECT id, name FROM client ORDER BY name")
-        ]
-        for client in clients:
-            client["projects"] = self._projects_for(client["id"])
-        internal = self._projects_for(None)
-        if internal:
-            clients.insert(0, {"id": None, "name": "Internal", "projects": internal})
-        return clients
-
-    def _projects_for(self, client_id: Optional[int]) -> List[Dict[str, Any]]:
-        projects = [
-            dict(r)
-            for r in self.conn.execute(
-                "SELECT id, name FROM project WHERE client_id IS ? ORDER BY name",
-                (client_id,),
-            )
-        ]
-        for project in projects:
-            project["applications"] = [
-                dict(r)
-                for r in self.conn.execute(
-                    "SELECT id, name FROM application WHERE project_id = ?"
-                    " ORDER BY name",
-                    (project["id"],),
-                )
-            ]
-        return projects
 
     # -- source editing ---------------------------------------------------
     def update_source(
@@ -412,13 +351,14 @@ class Registry:
         connection_id: Optional[int] = None,
         clear_connection: bool = False,
     ) -> Dict[str, Any]:
-        self.get_source(source_id)
+        """``client=""`` clears the client; ``None`` leaves it unchanged."""
+        source = self.get_source(source_id)
         with self.conn:
             if client is not None:
                 self.conn.execute(
                     "UPDATE source SET client_id = ? WHERE id = ?",
                     (
-                        self._client_id(client, create=True) if client else None,
+                        self.client_id_for(client, current=source["client_id"]),
                         source_id,
                     ),
                 )

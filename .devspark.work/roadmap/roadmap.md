@@ -280,9 +280,9 @@ Known gaps and notes:
   also settles the spec's open check of Dependabot REST field shapes (tests use fixtures). This repository's
   own open Dependabot alerts (19 on 2026-11-21) are housekeeping, not part of ps-006.
 - ps-023: classifications reach `portfolio.json` but not the per-source `repositories.json` (the collector
-  writes it without reading the registry); ps-022 picks this up for per-source filtering. Not yet done on
-  the server: back up the registry, deploy (migration 4 runs on start), confirm existing clients and
-  assignments on the Lists tab, and merge suggested duplicates. The two Low review findings were fixed
+  writes it without reading the registry); ps-022 picks this up for per-source filtering. Deployed to the
+  server 2026-11-22 after a registry backup; migration 4 ran and the developer confirmed existing clients,
+  assignments, and the new tabs. The two Low review findings were fixed
   (d7eb401) and await an independent reviewer's confirmation.
 
 ## Where we are and what is next
@@ -310,8 +310,7 @@ classification domains. CI validation on `main` is green (lint, types, tests, de
    ps-015 (how a deployment is evidenced), ps-016 and ps-017 (provider access), ps-019 (AI provider and
    client-data policy).
 
-**Housekeeping that is not a roadmap item:** back up the registry, redeploy the stack, confirm a security
-refresh on real repositories and the ps-023 Lists tab (merge suggested duplicates); work down this repository's open Dependabot alerts; change the admin password and remove it
+**Housekeeping that is not a roadmap item:** confirm a security refresh on real repositories; work down this repository's open Dependabot alerts; change the admin password and remove it
 from the stack environment; rotate the Portainer and GitHub token files; set up an off-host backup copy;
 consider a per-source "collect now"; and have the collector count a lint or test script in `package.json`
 as tests so static sites are not flagged for missing tests.

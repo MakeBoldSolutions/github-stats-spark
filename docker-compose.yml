@@ -20,6 +20,9 @@ services:
       args:
         SPARK_REVISION: ${SPARK_REVISION:-unknown}
     image: github-stats-spark-web:${SPARK_IMAGE_TAG:-local}
+    # Built here and never published: always build, never pull from a registry
+    # (Portainer's "Re-pull image" would otherwise fail with "pull access denied").
+    pull_policy: build
     ports:
       # Defaults to this machine only. On the home server set BIND_ADDRESS=192.168.1.197.
       - "${BIND_ADDRESS:-127.0.0.1}:${WEB_PORT:-8086}:8080"
@@ -49,6 +52,7 @@ services:
       args:
         SPARK_REVISION: ${SPARK_REVISION:-unknown}
     image: github-stats-spark-worker:${SPARK_IMAGE_TAG:-local}
+    pull_policy: build
     # Long-running scheduler. Collects on start (SPARK_RUN_ON_START) and then
     # every SPARK_REFRESH_INTERVAL. To force a run now, restart this container.
     restart: unless-stopped
@@ -109,6 +113,7 @@ services:
       args:
         SPARK_REVISION: ${SPARK_REVISION:-unknown}
     image: github-stats-spark-worker:${SPARK_IMAGE_TAG:-local}
+    pull_policy: build
     restart: unless-stopped
     # Bounded so the stack coexists with other workloads on the home server.
     mem_limit: 256m

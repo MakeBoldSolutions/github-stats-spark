@@ -7,6 +7,10 @@ import {
 } from "@/services/dataService";
 import { deferExecution, getConnectionType } from "@/utils/performance";
 import { hashForSection, sectionFromHash } from "@/config/sections";
+import { fullNameOf } from "@/utils/scope";
+
+/** Repositories from several owners can share a name; compare full names. */
+export const sameRepo = (a, b) => fullNameOf(a) === fullNameOf(b);
 
 /**
  * Owns the dashboard-shell state that previously lived directly in App.jsx:
@@ -129,9 +133,7 @@ export function useDashboardShell({ data, refetch }) {
 
   const handleNextRepo = useCallback(() => {
     if (!selectedRepo || !activeResultList.length) return;
-    const index = activeResultList.findIndex(
-      (r) => r.name === selectedRepo.name,
-    );
+    const index = activeResultList.findIndex((r) => sameRepo(r, selectedRepo));
     if (index >= 0 && index < activeResultList.length - 1) {
       setSelectedRepo(activeResultList[index + 1]);
     }
@@ -139,9 +141,7 @@ export function useDashboardShell({ data, refetch }) {
 
   const handlePreviousRepo = useCallback(() => {
     if (!selectedRepo || !activeResultList.length) return;
-    const index = activeResultList.findIndex(
-      (r) => r.name === selectedRepo.name,
-    );
+    const index = activeResultList.findIndex((r) => sameRepo(r, selectedRepo));
     if (index > 0) {
       setSelectedRepo(activeResultList[index - 1]);
     }

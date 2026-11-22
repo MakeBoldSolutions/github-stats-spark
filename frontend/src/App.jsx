@@ -2,7 +2,7 @@ import React, { Suspense, lazy, useCallback, useMemo } from "react";
 import { ViewportProvider } from "@/contexts/ViewportContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import useRepositoryData from "@/hooks/useRepositoryData";
-import { useDashboardShell } from "@/hooks/useDashboardShell";
+import { sameRepo, useDashboardShell } from "@/hooks/useDashboardShell";
 import usePortfolio from "@/hooks/usePortfolio";
 import useScope from "@/hooks/useScope";
 import useAdminAvailable from "@/hooks/useAdminAvailable";
@@ -422,8 +422,8 @@ function App() {
                 onClose={closeDetail}
                 onNext={handleNextRepo}
                 onPrevious={handlePreviousRepo}
-                resultIndex={activeResultList.findIndex(
-                  (r) => r.name === selectedRepo.name,
+                resultIndex={activeResultList.findIndex((r) =>
+                  sameRepo(r, selectedRepo),
                 )}
                 resultTotal={activeResultList.length}
                 security={alertsForRepository(

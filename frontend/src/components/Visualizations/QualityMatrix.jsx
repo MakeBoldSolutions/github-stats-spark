@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { Card, Eyebrow } from "@/components/Brand";
 import styles from "./QualityMatrix.module.css";
+import { fullNameOf } from "@/utils/scope";
 
 const COLUMNS = [
   { key: "has_readme", label: "README" },
@@ -36,7 +37,7 @@ export default function QualityMatrix({ repositories, onRepoClick }) {
           <tbody>
             {repositories.map((repo) => (
               <tr
-                key={repo.name}
+                key={fullNameOf(repo)}
                 className={styles.row}
                 tabIndex={0}
                 role="button"

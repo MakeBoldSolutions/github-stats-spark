@@ -47,7 +47,13 @@ export default function useRepositoryData({
             .map((s) => s.slug);
           const slugs = sourcesForScope(portfolio, scope, ready);
           const dashboards = await Promise.all(
-            slugs.map((user) => fetchDashboardData({ ...fetchOptions, user })),
+            slugs.map((user) =>
+              fetchDashboardData({ ...fetchOptions, user }).catch((err) => {
+                throw new Error(
+                  `Could not load the data for source "${user}": ${err.message}`,
+                );
+              }),
+            ),
           );
           result = mergeDashboards(dashboards, portfolio, scope);
         }

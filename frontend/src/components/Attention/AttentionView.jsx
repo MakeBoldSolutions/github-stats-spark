@@ -5,6 +5,7 @@ import ExportButton from "@/components/Common/ExportButton";
 import CoverageState from "@/components/Common/CoverageState";
 import { getTierTone, getTierLabel } from "@/utils/repositoryPresentation";
 import styles from "./AttentionView.module.css";
+import { fullNameOf } from "@/utils/scope";
 
 const COMPONENT_ROWS = [
   { key: "pull_requests", label: "Pull requests" },
@@ -226,7 +227,7 @@ function AttentionView({ repositories, onRepoClick, onToast }) {
                   const score = repo.attention_score ?? 0;
                   const openPrs = getOpenPullRequests(repo);
                   return (
-                    <tr key={repo.name} className={styles.row}>
+                    <tr key={fullNameOf(repo)} className={styles.row}>
                       <td>{index + 1}</td>
                       <td>
                         <div className={styles.repoCell}>

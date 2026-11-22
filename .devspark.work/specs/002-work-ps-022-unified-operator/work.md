@@ -1,6 +1,6 @@
 # Work: ps-022 Unified operator experience
 
-**Status**: Complete (implemented and validated locally 2026-11-22, not yet committed)
+**Status**: Complete
 **Branch**: 002-work-ps-022-unified-operator (from main 54a09ef)
 **Source**: roadmap item ps-022 (`.devspark.work/roadmap/specs/ps-022-unified-operator-experience.md`)
 

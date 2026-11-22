@@ -2,8 +2,10 @@ import { useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { Card, Badge, Eyebrow } from "@/components/Brand";
 import ExportButton from "@/components/Common/ExportButton";
+import CoverageState from "@/components/Common/CoverageState";
 import { getTierTone, getTierLabel } from "@/utils/repositoryPresentation";
 import styles from "./AttentionView.module.css";
+import { fullNameOf } from "@/utils/scope";
 
 const COMPONENT_ROWS = [
   { key: "pull_requests", label: "Pull requests" },
@@ -22,6 +24,15 @@ function getComponentScore(repo, key) {
 
 function getSecurityAlerts(repo) {
   return getComponents(repo).security?.active_alert_counts?.total_open ?? 0;
+}
+
+/** Collected security availability; a missing reading is never zero. */
+function getSecurityAvailability(repo) {
+  return (
+    getComponents(repo).security?.availability ||
+    repo.security_summary?.availability ||
+    "available"
+  );
 }
 
 function getOpenPullRequests(repo) {
@@ -216,7 +227,7 @@ function AttentionView({ repositories, onRepoClick, onToast }) {
                   const score = repo.attention_score ?? 0;
                   const openPrs = getOpenPullRequests(repo);
                   return (
-                    <tr key={repo.name} className={styles.row}>
+                    <tr key={fullNameOf(repo)} className={styles.row}>
                       <td>{index + 1}</td>
                       <td>
                         <div className={styles.repoCell}>
@@ -245,7 +256,15 @@ function AttentionView({ repositories, onRepoClick, onToast }) {
                         </div>
                       </td>
                       <td>{openPrs ?? "n/a"}</td>
-                      <td>{getSecurityAlerts(repo)}</td>
+                      <td>
+                        {getSecurityAvailability(repo) === "available" ? (
+                          getSecurityAlerts(repo)
+                        ) : (
+                          <CoverageState
+                            status={getSecurityAvailability(repo)}
+                          />
+                        )}
+                      </td>
                       <td>{repo.days_since_last_push ?? "n/a"}</td>
                       <td
                         className={!repo.has_readme ? styles.readmeMissing : ""}

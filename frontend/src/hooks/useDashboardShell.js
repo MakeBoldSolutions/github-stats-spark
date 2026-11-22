@@ -6,36 +6,11 @@ import {
   clearCache,
 } from "@/services/dataService";
 import { deferExecution, getConnectionType } from "@/utils/performance";
+import { hashForSection, sectionFromHash } from "@/config/sections";
+import { fullNameOf } from "@/utils/scope";
 
-/**
- * Maps a URL hash fragment to the app's internal view identifier.
- * Preserves the original `table`/`visualizations`/`attention` hashes while
- * also accepting the newer `insights`/`health` aliases (FR-008).
- */
-function resolveViewFromHash(hash) {
-  const value = hash.slice(1);
-  if (value === "visualizations" || value === "insights") {
-    return "visualizations";
-  }
-  if (value === "attention" || value === "health") {
-    return "attention";
-  }
-  if (value === "sources") {
-    return "sources";
-  }
-  if (value === "security") {
-    return "security";
-  }
-  return "table";
-}
-
-const VIEW_HASH = {
-  table: "",
-  visualizations: "visualizations",
-  attention: "attention",
-  sources: "sources",
-  security: "security",
-};
+/** Repositories from several owners can share a name; compare full names. */
+export const sameRepo = (a, b) => fullNameOf(a) === fullNameOf(b);
 
 /**
  * Owns the dashboard-shell state that previously lived directly in App.jsx:
@@ -104,12 +79,12 @@ export function useDashboardShell({ data, refetch }) {
 
   // ---- View routing (hash-synced) ----
   const [currentView, setCurrentView] = useState(() =>
-    resolveViewFromHash(window.location.hash),
+    sectionFromHash(window.location.hash),
   );
 
   useEffect(() => {
     const handleHashChange = () => {
-      setCurrentView(resolveViewFromHash(window.location.hash));
+      setCurrentView(sectionFromHash(window.location.hash));
     };
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
@@ -117,7 +92,7 @@ export function useDashboardShell({ data, refetch }) {
 
   const handleViewChange = useCallback((view) => {
     setCurrentView(view);
-    window.location.hash = VIEW_HASH[view] ?? "";
+    window.location.hash = hashForSection(view);
   }, []);
 
   // ---- Catalog filter/sort (shared by Insights and Health until their own
@@ -158,9 +133,7 @@ export function useDashboardShell({ data, refetch }) {
 
   const handleNextRepo = useCallback(() => {
     if (!selectedRepo || !activeResultList.length) return;
-    const index = activeResultList.findIndex(
-      (r) => r.name === selectedRepo.name,
-    );
+    const index = activeResultList.findIndex((r) => sameRepo(r, selectedRepo));
     if (index >= 0 && index < activeResultList.length - 1) {
       setSelectedRepo(activeResultList[index + 1]);
     }
@@ -168,9 +141,7 @@ export function useDashboardShell({ data, refetch }) {
 
   const handlePreviousRepo = useCallback(() => {
     if (!selectedRepo || !activeResultList.length) return;
-    const index = activeResultList.findIndex(
-      (r) => r.name === selectedRepo.name,
-    );
+    const index = activeResultList.findIndex((r) => sameRepo(r, selectedRepo));
     if (index > 0) {
       setSelectedRepo(activeResultList[index - 1]);
     }
@@ -188,9 +159,9 @@ export function useDashboardShell({ data, refetch }) {
     try {
       await clearCache();
       await refetch({ forceRefresh: true, cacheBust: true });
-      addToast("Data refreshed and cache cleared", "success", 3000);
+      addToast("Data reloaded and cache cleared", "success", 3000);
     } catch {
-      addToast("Refresh failed. Check the console for details.", "error", 4000);
+      addToast("Reload failed. Check the console for details.", "error", 4000);
     }
   }, [refetch, addToast]);
 

@@ -17,6 +17,7 @@ import {
   getRelativePushLabel,
 } from "@/utils/repositoryPresentation";
 import styles from "./RepositoryGrid.module.css";
+import { fullNameOf } from "@/utils/scope";
 
 function QualityChip({ label, active }) {
   return (
@@ -338,7 +339,11 @@ export default function RepositoryGrid({ repositories, onRepoClick, onToast }) {
       ) : (
         <div className={styles.grid}>
           {filtered.map((repo) => (
-            <RepoCard key={repo.name} repo={repo} onClick={handleCardClick} />
+            <RepoCard
+              key={fullNameOf(repo)}
+              repo={repo}
+              onClick={handleCardClick}
+            />
           ))}
         </div>
       )}

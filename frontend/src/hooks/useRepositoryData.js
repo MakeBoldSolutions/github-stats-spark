@@ -1,76 +1,80 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchDashboardData } from "@/services/dataService";
+import { sourcesForScope } from "@/utils/scope";
+import { mergeDashboards } from "@/utils/scopedData";
 
 /**
- * Custom hook for fetching and managing repository dashboard data
+ * Loads the dashboard data for the current scope.
  *
- * This hook handles the data fetching lifecycle including loading states,
- * error handling, and automatic refetching on mount.
+ * - Without a portfolio (GitHub Pages, or a single-profile deployment) it
+ *   loads the one profile named by `?user=` or the default, exactly as
+ *   before.
+ * - With a self-hosted portfolio it loads the dashboard file of each
+ *   collected source the scope needs and merges them (see
+ *   mergeDashboards), reloading whenever the scope changes.
  *
- * @returns {Object} Hook state object containing:
- *   - data: Dashboard data object (null if not loaded)
- *   - loading: Boolean indicating if data is currently being fetched
- *   - error: Error object if fetch failed (null otherwise)
- *   - refetch: Function to manually trigger data refetch
+ * Waits while `portfolioLoading` is true so the mode is known first.
  *
- * @example
- * function MyComponent() {
- *   const { data, loading, error, refetch } = useRepositoryData()
- *
- *   if (loading) return <LoadingState />
- *   if (error) return <ErrorState error={error} />
- *
- *   return <RepositoryTable repositories={data.repositories} />
- * }
+ * @returns {{data: object|null, loading: boolean, error: Error|null, refetch: Function}}
  */
-export default function useRepositoryData() {
+export default function useRepositoryData({
+  portfolio = null,
+  portfolioLoading = false,
+  scope = null,
+} = {}) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const request = useRef(0);
 
-  /**
-   * Fetch dashboard data and update state
-   */
-  const fetchData = async (options = {}) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const dashboardData = await fetchDashboardData({
+  const fetchData = useCallback(
+    async (options = {}) => {
+      const id = ++request.current;
+      const fetchOptions = {
         useCache: options.useCache ?? false,
         forceRefresh: options.forceRefresh ?? true,
         cacheBust: options.cacheBust ?? true,
-      });
+      };
+      try {
+        setLoading(true);
+        setError(null);
+        let result;
+        if (!portfolio || !scope) {
+          result = await fetchDashboardData(fetchOptions);
+        } else {
+          const ready = portfolio.sources
+            .filter((s) => s.ready)
+            .map((s) => s.slug);
+          const slugs = sourcesForScope(portfolio, scope, ready);
+          const dashboards = await Promise.all(
+            slugs.map((user) =>
+              fetchDashboardData({ ...fetchOptions, user }).catch((err) => {
+                throw new Error(
+                  `Could not load the data for source "${user}": ${err.message}`,
+                );
+              }),
+            ),
+          );
+          result = mergeDashboards(dashboards, portfolio, scope);
+        }
+        if (id === request.current) setData(result);
+        return result;
+      } catch (err) {
+        console.error("Error in useRepositoryData:", err);
+        if (id === request.current) setError(err);
+        // Do not re-throw: callers read the error state.
+        return undefined;
+      } finally {
+        if (id === request.current) setLoading(false);
+      }
+    },
+    [portfolio, scope],
+  );
 
-      setData(dashboardData);
-      return dashboardData;
-    } catch (err) {
-      console.error("Error in useRepositoryData:", err);
-      setError(err);
-      // Do not re-throw: error state is set above; callers check the error return value
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /**
-   * Effect to fetch data on component mount
-   */
   useEffect(() => {
+    if (portfolioLoading) return;
     fetchData({ cacheBust: false });
-  }, []); // Empty dependency array = run once on mount
+  }, [portfolioLoading, fetchData]);
 
-  /**
-   * Manual refetch function
-   */
-  const refetch = (options = {}) => {
-    return fetchData(options);
-  };
-
-  return {
-    data,
-    loading,
-    error,
-    refetch,
-  };
+  return { data, loading, error, refetch: fetchData };
 }

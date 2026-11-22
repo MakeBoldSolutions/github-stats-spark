@@ -1,0 +1,26 @@
+.bar {
+  background: var(--surface-sunken);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.bar form {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.reset {
+  min-height: 40px;
+  padding: 6px 14px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--text-strong);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.reset:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

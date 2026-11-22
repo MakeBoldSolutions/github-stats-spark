@@ -29,6 +29,7 @@ import ActivityMetricsSection from "./RepositoryDetail/sections/ActivityMetricsS
 import RankingSection from "./RepositoryDetail/sections/RankingSection";
 import TechStackSection from "./RepositoryDetail/sections/TechStackSection";
 import FixScorePromptSection from "./RepositoryDetail/sections/FixScorePromptSection";
+import SecuritySection from "./RepositoryDetail/sections/SecuritySection";
 
 /**
  * RepositoryDetail Component
@@ -50,6 +51,8 @@ import FixScorePromptSection from "./RepositoryDetail/sections/FixScorePromptSec
  * @param {Function} props.onClose - Callback to close the modal
  * @param {Function} [props.onNext] - Callback to navigate to next repository
  * @param {Function} [props.onPrevious] - Callback to navigate to previous repository
+ * @param {Object} [props.security] - Stored alerts and coverage for this
+ *   repository (self-hosted only); adds the Security panel
  */
 const STAT_TILES = [
   { key: "stars", label: "Stars" },
@@ -99,6 +102,7 @@ function RepositoryDetail({
   onPrevious,
   resultIndex,
   resultTotal,
+  security = null,
 }) {
   const { expandedSections, toggleSection } = useSectionToggles();
   const bind = useRepositoryDetailInteractions({ onClose, onNext, onPrevious });
@@ -182,6 +186,12 @@ function RepositoryDetail({
 
             <AttentionBreakdown
               components={repository.attention_metrics?.components}
+            />
+
+            <SecuritySection
+              security={security}
+              expanded={expandedSections.security}
+              onToggle={toggleSection}
             />
 
             <FixScorePromptSection

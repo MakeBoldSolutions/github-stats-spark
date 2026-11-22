@@ -1,76 +1,54 @@
 import { useMemo, useState } from "react";
 import PropTypes from "prop-types";
-import { Card, Badge } from "@/components/Brand";
+import { Card } from "@/components/Brand";
+import CoverageState from "@/components/Common/CoverageState";
+import DataTable from "@/components/Common/DataTable";
+import ExportButton from "@/components/Common/ExportButton";
+import FilterBar from "@/components/Common/FilterBar";
 import {
-  COVERAGE_LABELS,
+  ALERT_EXPORT_COLUMNS,
   REASON_LABELS,
   SEVERITY_ORDER,
   STATE_FILTERS,
-  alertsToCsv,
   coverageGaps,
   filterAlerts,
 } from "@/utils/dependabot";
+import { alertColumns, alertKey } from "./alertColumns";
 import styles from "./SecurityView.module.css";
 
-const SEVERITY_TONE = {
-  critical: "critical",
-  high: "critical",
-  medium: "caution",
-  low: "neutral",
-  unknown: "neutral",
-};
-
-const formatDate = (value) => (value ? value.slice(0, 10) : "—");
-
-function downloadCsv(alerts) {
-  const blob = new Blob([alertsToCsv(alerts)], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "dependabot-alerts.csv";
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
-function Select({ id, label, value, onChange, children }) {
-  return (
-    <label className={styles.field} htmlFor={id}>
-      {label}
-      <select id={id} value={value} onChange={(e) => onChange(e.target.value)}>
-        {children}
-      </select>
-    </label>
-  );
-}
-
-Select.propTypes = {
-  id: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  children: PropTypes.node,
-};
-
 /**
- * Dependabot alerts across the portfolio: totals, a coverage panel that says
- * which repositories could not be read and why, and a filterable alert list.
+ * Dependabot alerts for the repositories in scope: totals, a coverage panel
+ * that says which repositories could not be read and why, and a filterable
+ * alert list. A repository name opens that repository's details.
  */
-function SecurityView({ file, onToast }) {
+function SecurityView({ file, onToast, onOpenRepository }) {
   const [filters, setFilters] = useState({
     state: "open",
     severity: "",
     repository: "",
-    client: "",
   });
   const set = (key) => (value) =>
     setFilters((previous) => ({ ...previous, [key]: value }));
 
-  const alerts = useMemo(() => filterAlerts(file, filters), [file, filters]);
-  const gaps = useMemo(() => coverageGaps(file), [file]);
-  const clients = useMemo(
-    () => [...new Set(file.repositories.map((r) => r.client).filter(Boolean))],
+  const repositoryNames = useMemo(
+    () => new Set(file.repositories.map((r) => r.full_name)),
     [file],
   );
+  // A repository filter left over from a wider scope no longer applies.
+  const repository = repositoryNames.has(filters.repository)
+    ? filters.repository
+    : "";
+  const effective = { ...filters, repository };
+  const alerts = useMemo(
+    () =>
+      filterAlerts(file, {
+        state: filters.state,
+        severity: filters.severity,
+        repository,
+      }),
+    [file, filters.state, filters.severity, repository],
+  );
+  const gaps = useMemo(() => coverageGaps(file), [file]);
 
   const totals = useMemo(() => {
     const open = { total: 0, critical: 0, high: 0, medium: 0, low: 0 };
@@ -83,15 +61,10 @@ function SecurityView({ file, onToast }) {
   }, [file]);
 
   const read = file.repositories.length - gaps.length;
-
-  function handleExport() {
-    try {
-      downloadCsv(alerts);
-      onToast?.(`Exported ${alerts.length} alerts`, "success");
-    } catch {
-      onToast?.("Export failed", "error");
-    }
-  }
+  const columns = useMemo(
+    () => alertColumns({ onOpenRepository }),
+    [onOpenRepository],
+  );
 
   return (
     <div className={styles.layout}>
@@ -118,7 +91,6 @@ function SecurityView({ file, onToast }) {
         A Dependabot alert is not proof that a vulnerability can be exploited in
         your code, and no alerts is not proof that a repository is secure.
         Counts cover only the repositories read.
-        {file.generated_at && ` Updated ${formatDate(file.generated_at)}.`}
       </p>
 
       {gaps.length > 0 && (
@@ -134,12 +106,10 @@ function SecurityView({ file, onToast }) {
               {gaps.map((repo) => (
                 <li key={repo.full_name}>
                   <strong>{repo.full_name}</strong>{" "}
-                  <Badge tone="caution">
-                    {COVERAGE_LABELS[repo.status] || repo.status}
-                  </Badge>{" "}
-                  <span className={styles.muted}>
-                    {REASON_LABELS[repo.reason] ?? repo.reason}
-                  </span>
+                  <CoverageState
+                    status={repo.status}
+                    reason={REASON_LABELS[repo.reason] ?? repo.reason}
+                  />
                 </li>
               ))}
             </ul>
@@ -151,147 +121,58 @@ function SecurityView({ file, onToast }) {
         <div className={styles.tableHeader}>
           <h3 id="alerts-heading">Alerts</h3>
         </div>
-        <form
-          className={styles.filters}
-          aria-label="Alert filters"
-          onSubmit={(e) => e.preventDefault()}
+        <FilterBar
+          label="Alert filters"
+          fields={[
+            {
+              id: "sec-state",
+              label: "State",
+              value: effective.state,
+              onChange: set("state"),
+              allLabel: null,
+              options: STATE_FILTERS,
+            },
+            {
+              id: "sec-severity",
+              label: "Severity",
+              value: effective.severity,
+              onChange: set("severity"),
+              allLabel: "All severities",
+              options: SEVERITY_ORDER.map((s) => ({ value: s, label: s })),
+            },
+            {
+              id: "sec-repository",
+              label: "Repository",
+              value: effective.repository,
+              onChange: set("repository"),
+              allLabel: "All repositories",
+              options: file.repositories.map((r) => ({
+                value: r.full_name,
+                label: r.full_name,
+              })),
+            },
+          ]}
         >
-          <Select
-            id="sec-state"
-            label="State"
-            value={filters.state}
-            onChange={set("state")}
-          >
-            {STATE_FILTERS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </Select>
-          <Select
-            id="sec-severity"
-            label="Severity"
-            value={filters.severity}
-            onChange={set("severity")}
-          >
-            <option value="">All severities</option>
-            {SEVERITY_ORDER.map((severity) => (
-              <option key={severity} value={severity}>
-                {severity}
-              </option>
-            ))}
-          </Select>
-          <Select
-            id="sec-repository"
-            label="Repository"
-            value={filters.repository}
-            onChange={set("repository")}
-          >
-            <option value="">All repositories</option>
-            {file.repositories.map((repo) => (
-              <option key={repo.full_name} value={repo.full_name}>
-                {repo.full_name}
-              </option>
-            ))}
-          </Select>
-          {clients.length > 0 && (
-            <Select
-              id="sec-client"
-              label="Client"
-              value={filters.client}
-              onChange={set("client")}
-            >
-              <option value="">All clients</option>
-              {clients.map((client) => (
-                <option key={client} value={client}>
-                  {client}
-                </option>
-              ))}
-            </Select>
-          )}
-          <button
-            type="button"
-            className={styles.exportButton}
-            onClick={handleExport}
+          <ExportButton
+            data={alerts}
+            columns={ALERT_EXPORT_COLUMNS}
+            filename="dependabot-alerts"
+            noun="alerts"
+            jsonDescription="Full alert records"
             disabled={alerts.length === 0}
-          >
-            Export CSV
-          </button>
-        </form>
+            onToast={onToast}
+          />
+        </FilterBar>
 
-        <div className={styles.tableWrapper}>
-          <table className={styles.table} aria-labelledby="alerts-heading">
-            <caption role="status" aria-live="polite">
-              Showing {alerts.length} alert{alerts.length === 1 ? "" : "s"}
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col">Severity</th>
-                <th scope="col">Repository</th>
-                <th scope="col">Package</th>
-                <th scope="col">Advisory</th>
-                <th scope="col">Vulnerable</th>
-                <th scope="col">Fixed in</th>
-                <th scope="col">State</th>
-                <th scope="col">Age</th>
-                <th scope="col">GitHub</th>
-              </tr>
-            </thead>
-            <tbody>
-              {alerts.length === 0 && (
-                <tr>
-                  <td colSpan={9} className={styles.muted}>
-                    No alerts match these filters.
-                  </td>
-                </tr>
-              )}
-              {alerts.map((alert) => (
-                <tr key={`${alert.repository}#${alert.number}`}>
-                  <td>
-                    <Badge tone={SEVERITY_TONE[alert.severity] || "neutral"}>
-                      {alert.severity}
-                    </Badge>
-                  </td>
-                  <td>{alert.repository}</td>
-                  <td>
-                    {alert.package || "—"}
-                    {alert.ecosystem && (
-                      <span className={styles.muted}> ({alert.ecosystem})</span>
-                    )}
-                  </td>
-                  <td title={alert.summary || undefined}>
-                    {alert.ghsa_id || alert.cve_id || "—"}
-                  </td>
-                  <td>{alert.vulnerable_range || "—"}</td>
-                  <td>{alert.fixed_version || "No fix yet"}</td>
-                  <td>
-                    {alert.state}
-                    {alert.state === "fixed" &&
-                      ` ${formatDate(alert.fixed_at)}`}
-                    {alert.state === "dismissed" &&
-                      ` ${formatDate(alert.dismissed_at)}`}
-                  </td>
-                  <td>{alert.age_days == null ? "—" : `${alert.age_days}d`}</td>
-                  <td>
-                    {alert.html_url ? (
-                      <a
-                        className={styles.link}
-                        href={alert.html_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`Alert ${alert.number} on ${alert.repository} (opens GitHub)`}
-                      >
-                        #{alert.number}
-                      </a>
-                    ) : (
-                      `#${alert.number}`
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          labelledBy="alerts-heading"
+          caption={`Showing ${alerts.length} alert${alerts.length === 1 ? "" : "s"}`}
+          columns={columns}
+          rows={alerts}
+          rowKey={alertKey}
+          emptyMessage="No alerts match these filters."
+          minWidth={760}
+        />
       </Card>
     </div>
   );
@@ -304,6 +185,7 @@ SecurityView.propTypes = {
     alerts: PropTypes.array.isRequired,
   }).isRequired,
   onToast: PropTypes.func,
+  onOpenRepository: PropTypes.func,
 };
 
 export default SecurityView;

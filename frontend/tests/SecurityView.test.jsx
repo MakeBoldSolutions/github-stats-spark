@@ -190,9 +190,41 @@ describe("SecurityView", () => {
     await user.selectOptions(screen.getByLabelText("Repository"), "o/api");
     expect(screen.getByRole("status")).toHaveTextContent("Showing 1 alert");
 
-    await user.selectOptions(screen.getByLabelText("Repository"), "");
-    await user.selectOptions(screen.getByLabelText("Client"), "Beta");
-    expect(screen.getByRole("status")).toHaveTextContent("Showing 1 alert");
+    // Client is part of the dashboard scope, not a Security filter.
+    expect(screen.queryByLabelText("Client")).not.toBeInTheDocument();
+  });
+
+  it("opens a repository's details from its alert row", async () => {
+    const user = userEvent.setup();
+    const onOpenRepository = vi.fn();
+    render(
+      <SecurityView file={makeFile()} onOpenRepository={onOpenRepository} />,
+    );
+    const [button] = screen.getAllByRole("button", {
+      name: "Open o/web details",
+    });
+    await user.click(button);
+    expect(onOpenRepository).toHaveBeenCalledWith("o/web");
+  });
+
+  it("drops a repository filter that is outside a narrower scope", async () => {
+    const user = userEvent.setup();
+    const file = makeFile();
+    const { rerender } = render(<SecurityView file={file} />);
+    await user.selectOptions(screen.getByLabelText("Repository"), "o/api");
+    rerender(
+      <SecurityView
+        file={{
+          ...file,
+          repositories: file.repositories.filter(
+            (r) => r.full_name === "o/web",
+          ),
+          alerts: file.alerts.filter((a) => a.repository === "o/web"),
+        }}
+      />,
+    );
+    expect(screen.getByLabelText("Repository")).toHaveValue("");
+    expect(screen.getByRole("status")).toHaveTextContent("Showing 2 alerts");
   });
 
   it("says so when nothing matches and disables export", async () => {
@@ -201,7 +233,7 @@ describe("SecurityView", () => {
     await user.selectOptions(screen.getByLabelText("State"), "fixed");
     await user.selectOptions(screen.getByLabelText("Severity"), "critical");
     expect(screen.getByText("No alerts match these filters.")).toBeVisible();
-    expect(screen.getByRole("button", { name: "Export CSV" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Export data" })).toBeDisabled();
   });
 
   it("exports the filtered rows and reports the outcome", async () => {
@@ -215,11 +247,13 @@ describe("SecurityView", () => {
       .mockImplementation(() => {});
 
     render(<SecurityView file={makeFile()} onToast={onToast} />);
-    await user.click(screen.getByRole("button", { name: "Export CSV" }));
+    await user.click(screen.getByRole("button", { name: "Export data" }));
+    expect(screen.getByText("3 alerts in current view")).toBeInTheDocument();
+    await user.click(screen.getByRole("menuitem", { name: /Export as CSV/ }));
 
     expect(create).toHaveBeenCalledTimes(1);
     expect(click).toHaveBeenCalled();
-    expect(onToast).toHaveBeenCalledWith("Exported 3 alerts", "success");
+    expect(onToast).toHaveBeenCalledWith("Exported 3 alerts as CSV", "success");
     click.mockRestore();
   });
 

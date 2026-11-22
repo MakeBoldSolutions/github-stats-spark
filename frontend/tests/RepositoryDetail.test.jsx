@@ -163,4 +163,79 @@ describe("<RepositoryDetail />", () => {
       screen.getByText("Arrow keys to navigate · Esc to close"),
     ).toBeInTheDocument();
   });
+  it("shows no Security panel without stored alerts", () => {
+    render(<RepositoryDetail repository={repository} onClose={vi.fn()} />);
+    expect(
+      screen.queryByRole("button", { name: /^Security/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("lists the repository's open stored alerts in a Security panel", () => {
+    const security = {
+      coverage: {
+        full_name: "example/repo-one",
+        status: "available",
+        reason: "none",
+        counts: { open: { total: 2 } },
+      },
+      alerts: [
+        {
+          repository: "example/repo-one",
+          number: 1,
+          state: "open",
+          severity: "high",
+          package: "a",
+        },
+        {
+          repository: "example/repo-one",
+          number: 2,
+          state: "open",
+          severity: "low",
+          package: "b",
+        },
+        {
+          repository: "example/repo-one",
+          number: 3,
+          state: "fixed",
+          severity: "low",
+          package: "c",
+        },
+      ],
+    };
+    render(
+      <RepositoryDetail
+        repository={repository}
+        onClose={vi.fn()}
+        security={security}
+      />,
+    );
+    expect(screen.getByText("2 open")).toBeInTheDocument();
+    expect(
+      screen.getByRole("table", { name: "2 open alerts" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("c")).not.toBeInTheDocument();
+  });
+
+  it("says why a repository's alerts could not be read", () => {
+    render(
+      <RepositoryDetail
+        repository={repository}
+        onClose={vi.fn()}
+        security={{
+          coverage: {
+            full_name: "example/repo-one",
+            status: "unauthorized",
+            reason: "permission_denied",
+            counts: { open: { total: 0 } },
+          },
+          alerts: [],
+        }}
+      />,
+    );
+    expect(screen.getByText("No access")).toBeInTheDocument();
+    expect(
+      screen.getByText(/lacks Dependabot alerts read permission/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("None open")).not.toBeInTheDocument();
+  });
 });

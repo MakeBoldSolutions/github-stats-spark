@@ -84,8 +84,8 @@ describe("<AttentionView />", () => {
     });
 
     expect(repositoryHeader).toHaveAttribute("aria-sort", "none");
-  repositorySortButton.focus();
-  await user.keyboard("{Enter}");
+    repositorySortButton.focus();
+    await user.keyboard("{Enter}");
     let names = screen
       .getAllByText(/critical-repo|healthy-repo/)
       .map((n) => n.textContent);
@@ -131,5 +131,23 @@ describe("<AttentionView />", () => {
   it("renders an export control for the ranked list", () => {
     render(<AttentionView repositories={repositories} onRepoClick={vi.fn()} />);
     expect(screen.getByRole("button", { name: /export/i })).toBeInTheDocument();
+  });
+  it("shows a missing security reading as unavailable, not zero", () => {
+    const unreadable = makeRepo({
+      name: "unreadable-repo",
+      attention_metrics: {
+        ...makeRepo().attention_metrics,
+        components: {
+          ...makeRepo().attention_metrics.components,
+          security: {
+            score: 0,
+            availability: "unauthorized",
+            active_alert_counts: { total_open: 0 },
+          },
+        },
+      },
+    });
+    render(<AttentionView repositories={[unreadable]} onRepoClick={vi.fn()} />);
+    expect(screen.getByText("No access")).toBeInTheDocument();
   });
 });

@@ -6,6 +6,7 @@ const INITIAL_SECTIONS = {
   info: true,
   signals: true,
   remediation: true,
+  security: true,
   commits: false,
   languages: false,
   tech: false,

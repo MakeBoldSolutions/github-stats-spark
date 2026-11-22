@@ -58,7 +58,7 @@ keeps private data out of this release). Prefer a secret file over `GITHUB_TOKEN
 2. Stack variables: `SPARK_USER`, `GITHUB_TOKEN` (or the secret-file approach), `BIND_ADDRESS=192.168.1.197`,
    `WEB_PORT=8086`.
 3. Deploy. Both containers become healthy; the worker collects on start and then every interval.
-4. Refresh now: restart the `worker` container in Portainer.
+4. To collect immediately, use **Collect now** in Admin, or restart the `worker` container in Portainer.
 5. Browse to `http://192.168.1.197:8086` from the LAN.
 
 The default bind is `127.0.0.1`; the app has no authentication yet, so keep it on the trusted LAN and do
@@ -134,7 +134,25 @@ dashboard shows a **Sources** page only when the API answers; on GitHub Pages it
   encrypted at rest. A token's expiry is tracked: the page warns when one is within 14 days, and a
   source whose token has expired reports `connection_unusable` instead of silently using another.
   Sources without a token use the stack's `GITHUB_TOKEN`.
-- **Refresh now:** asks the worker to collect; it starts within seconds.
+- **Collect now:** asks the worker to collect; it starts within seconds.
+
+**Scope and sections**
+- **Scope:** the bar under the header chooses what every section shows: the whole portfolio, a
+  client (repositories with no client are **Internal**), a source, or one repository, filtered by
+  any domain value. Each list offers only choices within the levels above it. The scope is part of
+  the URL (`?client=Acme&source=acme&repo=Acme/web&d.tier=core`), so a link or reload restores it;
+  older `?user=<source>` links still work. Overview, Insights, Health and Security all follow it.
+- **Sections:** Overview, Insights, Health, Security and Admin. Sites, Delivery and Presence appear
+  only once those capabilities collect data. Old `#sources` links open Admin. On a phone, sections
+  that do not fit in the bottom bar are under **More**.
+- **One number per fact:** wherever an open Dependabot alert count appears (Health, the repository
+  drawer, the fix-score prompt, exports), it comes from the stored alerts behind Security, not the
+  first-page summary taken during collection. The attention score itself is still computed at
+  collection time. A repository whose alerts could not be read shows why, never zero.
+- **Links:** a repository name in Security opens that repository's details; the details drawer has a
+  Security panel listing its open alerts.
+- **Reload data** (footer) re-reads the published files in the browser. **Collect now** (Admin) asks
+  the worker to collect from GitHub.
 
 **Security notes**
 - Passwords are stored as Argon2id hashes; session cookies are `HttpOnly`, `SameSite=Strict`, and only
@@ -163,7 +181,7 @@ After the first collection, and then every `SPARK_SECURITY_INTERVAL` (default `6
 `off` disables it), the worker reads every Dependabot alert (open, dismissed and fixed, all pages) for
 each **public** repository an enabled source reaches. Alerts are kept in the database, one observation
 of the counts is added per read, and `/data/security/dependabot.json` is rewritten for the **Security**
-view. "Refresh now" also triggers it. The result appears in `/data/status.json` under `security`.
+view. "Collect now" also triggers it. The result appears in `/data/status.json` under `security`.
 
 The token needs read access to Dependabot alerts: for a fine-grained token, the **Dependabot alerts**
 repository permission set to read. A repository that cannot be read is listed in the view's Coverage

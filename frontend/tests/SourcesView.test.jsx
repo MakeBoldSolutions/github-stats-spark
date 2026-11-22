@@ -179,10 +179,10 @@ describe("<SourcesView />", () => {
     const user = userEvent.setup();
     render(<SourcesView />);
     await user.click(
-      await screen.findByRole("button", { name: "Refresh now" }),
+      await screen.findByRole("button", { name: "Collect now" }),
     );
     expect(refresh).toHaveBeenCalled();
-    expect(await screen.findByText(/Refresh requested/)).toBeInTheDocument();
+    expect(await screen.findByText(/Collection requested/)).toBeInTheDocument();
   });
 
   it("never keeps the token after saving and warns when encryption is off", async () => {

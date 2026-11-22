@@ -3,12 +3,113 @@ import PropTypes from "prop-types";
 import { Download } from "lucide-react";
 import styles from "./ExportButton.module.css";
 
+const REPOSITORY_COLUMNS = [
+  { key: "name", label: "Repository Name" },
+  { key: "language", label: "Language" },
+  { key: "stars", label: "Stars" },
+  { key: "forks", label: "Forks" },
+  { key: "watchers", label: "Watchers" },
+  { key: "open_issues", label: "Open Issues" },
+  { key: "created_at", label: "Created At" },
+  { key: "updated_at", label: "Last Updated" },
+  { key: "commit_history.total_commits", label: "Total Commits" },
+  { key: "commit_history.recent_90d", label: "Commits (90d)" },
+  { key: "commit_history.recent_180d", label: "Commits (180d)" },
+  { key: "commit_history.recent_365d", label: "Commits (365d)" },
+  { key: "commit_history.first_commit_date", label: "First Commit" },
+  { key: "commit_history.last_commit_date", label: "Last Commit" },
+  { key: "commit_metrics.avg_size", label: "Avg Commit Size" },
+  { key: "commit_metrics.largest_commit.size", label: "Largest Commit" },
+  { key: "commit_metrics.smallest_commit.size", label: "Smallest Commit" },
+  { key: "commit_velocity", label: "Commit Velocity" },
+  { key: "age_days", label: "Age (days)" },
+  { key: "days_since_last_push", label: "Days Since Push" },
+  { key: "has_readme", label: "Has README" },
+  { key: "has_license", label: "Has License" },
+  { key: "has_ci_cd", label: "Has CI/CD" },
+  { key: "has_tests", label: "Has Tests" },
+  {
+    key: "pull_request_summary.availability",
+    label: "PR Data Availability",
+  },
+  { key: "pull_request_summary.total_open", label: "Open Pull Requests" },
+  { key: "pull_request_summary.draft_count", label: "Draft Pull Requests" },
+  {
+    key: "pull_request_summary.review_requested_count",
+    label: "PRs Awaiting Review",
+  },
+  {
+    key: "security_summary.availability",
+    label: "Security Data Availability",
+  },
+  {
+    key: "security_summary.overall_state",
+    label: "Security Overall State",
+  },
+  {
+    key: "security_summary.active_alert_counts.total_open",
+    label: "Open Security Alerts",
+  },
+  {
+    key: "security_summary.active_alert_counts.critical",
+    label: "Critical Alerts",
+  },
+  {
+    key: "security_summary.active_alert_counts.high",
+    label: "High Alerts",
+  },
+  {
+    key: "diagnostics_summary.availability",
+    label: "Diagnostics Availability",
+  },
+  {
+    key: "diagnostics_summary.issues.total_open",
+    label: "Open Issues (Diagnostics)",
+  },
+  {
+    key: "diagnostics_summary.security.dependabot.total_open",
+    label: "Dependabot Open Alerts",
+  },
+  {
+    key: "diagnostics_summary.actions.failure_count",
+    label: "Workflow Failures",
+  },
+  { key: "screenshot_audit.status", label: "Screenshot Audit Status" },
+  { key: "screenshot_audit.flags", label: "Screenshot Audit Flags" },
+];
+
+const getNestedValue = (obj, path) =>
+  path.split(".").reduce((acc, part) => acc?.[part], obj);
+
+const csvCell = (value) => {
+  if (value === null || value === undefined) return '""';
+  if (typeof value === "boolean") return value ? "Yes" : "No";
+  if (typeof value === "number") return value;
+  if (Array.isArray(value)) return csvCell(value.join("; "));
+  const text = String(value);
+  // Prefix formula starters so a spreadsheet never evaluates cell text.
+  const safe = /^[=+\-@\t\r]/.test(text) ? `'${text}` : text;
+  return `"${safe.replace(/"/g, '""')}"`;
+};
+
+/** CSV for `rows` with the given `{key, label}` columns (keys may be dotted). */
+export function toCsv(rows, columns) {
+  if (!Array.isArray(rows) || rows.length === 0) return "";
+  const header = columns.map((col) => `"${col.label}"`).join(",");
+  const body = rows.map((row) =>
+    columns.map((col) => csvCell(getNestedValue(row, col.key))).join(","),
+  );
+  return [header, ...body].join("\n");
+}
+
 /**
  * ExportButton Component
  *
- * Accessible, dismissible export menu for the current Overview filtered
- * list or Health ranked list. Exports CSV or JSON client-side and reports
- * outcomes through the supplied toast callback instead of alert().
+ * Accessible, dismissible export menu used by every data table: the
+ * Overview list, the Health ranking and the Security alerts. Exports CSV or
+ * JSON client-side and reports outcomes through the supplied toast
+ * callback instead of alert(). `columns` picks the CSV columns (repository
+ * columns by default); `noun` names the rows in messages.
  *
  * @component
  * @param {Object} props
@@ -17,6 +118,9 @@ import styles from "./ExportButton.module.css";
  * @param {string} [props.label='Export'] - Button label
  * @param {boolean} [props.disabled=false] - Whether button is disabled
  * @param {Function} [props.onToast] - (message, variant) => void, for export outcomes
+ * @param {Array} [props.columns] - CSV columns as {key, label}; dotted keys reach nested fields
+ * @param {string} [props.noun='repositories'] - What the rows are, for messages
+ * @param {string} [props.jsonDescription] - Menu description of the JSON export
  */
 function ExportButton({
   data,
@@ -24,6 +128,9 @@ function ExportButton({
   label = "Export",
   disabled = false,
   onToast,
+  columns = null,
+  noun = "repositories",
+  jsonDescription = "Full repository records",
 }) {
   const [showMenu, setShowMenu] = useState(false);
   const rootRef = useRef(null);
@@ -50,103 +157,7 @@ function ExportButton({
     if (onToast) onToast(message, variant);
   };
 
-  const convertToCSV = (repositories) => {
-    if (!Array.isArray(repositories) || repositories.length === 0) return "";
-
-    const columns = [
-      { key: "name", label: "Repository Name" },
-      { key: "language", label: "Language" },
-      { key: "stars", label: "Stars" },
-      { key: "forks", label: "Forks" },
-      { key: "watchers", label: "Watchers" },
-      { key: "open_issues", label: "Open Issues" },
-      { key: "created_at", label: "Created At" },
-      { key: "updated_at", label: "Last Updated" },
-      { key: "commit_history.total_commits", label: "Total Commits" },
-      { key: "commit_history.recent_90d", label: "Commits (90d)" },
-      { key: "commit_history.recent_180d", label: "Commits (180d)" },
-      { key: "commit_history.recent_365d", label: "Commits (365d)" },
-      { key: "commit_history.first_commit_date", label: "First Commit" },
-      { key: "commit_history.last_commit_date", label: "Last Commit" },
-      { key: "commit_metrics.avg_size", label: "Avg Commit Size" },
-      { key: "commit_metrics.largest_commit.size", label: "Largest Commit" },
-      { key: "commit_metrics.smallest_commit.size", label: "Smallest Commit" },
-      { key: "commit_velocity", label: "Commit Velocity" },
-      { key: "age_days", label: "Age (days)" },
-      { key: "days_since_last_push", label: "Days Since Push" },
-      { key: "has_readme", label: "Has README" },
-      { key: "has_license", label: "Has License" },
-      { key: "has_ci_cd", label: "Has CI/CD" },
-      { key: "has_tests", label: "Has Tests" },
-      {
-        key: "pull_request_summary.availability",
-        label: "PR Data Availability",
-      },
-      { key: "pull_request_summary.total_open", label: "Open Pull Requests" },
-      { key: "pull_request_summary.draft_count", label: "Draft Pull Requests" },
-      {
-        key: "pull_request_summary.review_requested_count",
-        label: "PRs Awaiting Review",
-      },
-      {
-        key: "security_summary.availability",
-        label: "Security Data Availability",
-      },
-      {
-        key: "security_summary.overall_state",
-        label: "Security Overall State",
-      },
-      {
-        key: "security_summary.active_alert_counts.total_open",
-        label: "Open Security Alerts",
-      },
-      {
-        key: "security_summary.active_alert_counts.critical",
-        label: "Critical Alerts",
-      },
-      {
-        key: "security_summary.active_alert_counts.high",
-        label: "High Alerts",
-      },
-      {
-        key: "diagnostics_summary.availability",
-        label: "Diagnostics Availability",
-      },
-      {
-        key: "diagnostics_summary.issues.total_open",
-        label: "Open Issues (Diagnostics)",
-      },
-      {
-        key: "diagnostics_summary.security.dependabot.open_alerts",
-        label: "Dependabot Open Alerts",
-      },
-      {
-        key: "diagnostics_summary.actions.failure_count",
-        label: "Workflow Failures",
-      },
-      { key: "screenshot_audit.status", label: "Screenshot Audit Status" },
-      { key: "screenshot_audit.flags", label: "Screenshot Audit Flags" },
-    ];
-
-    const getNestedValue = (obj, path) =>
-      path.split(".").reduce((acc, part) => acc?.[part], obj);
-
-    const header = columns.map((col) => `"${col.label}"`).join(",");
-
-    const rows = repositories.map((repo) =>
-      columns
-        .map((col) => {
-          const value = getNestedValue(repo, col.key);
-          if (value === null || value === undefined) return '""';
-          if (typeof value === "boolean") return value ? "Yes" : "No";
-          if (typeof value === "number") return value;
-          return `"${String(value).replace(/"/g, '""')}"`;
-        })
-        .join(","),
-    );
-
-    return [header, ...rows].join("\n");
-  };
+  const convertToCSV = (rows) => toCsv(rows, columns || REPOSITORY_COLUMNS);
 
   const downloadFile = (content, downloadFilename, mimeType) => {
     const blob = new Blob([content], { type: mimeType });
@@ -174,7 +185,7 @@ function ExportButton({
         `${filename}-${timestamp}.csv`,
         "text/csv;charset=utf-8;",
       );
-      notify(`Exported ${data.length} repositories as CSV`, "success");
+      notify(`Exported ${data.length} ${noun} as CSV`, "success");
     } catch (error) {
       console.error("CSV export failed:", error);
       notify("Export failed. Check the console for details.", "error");
@@ -195,7 +206,7 @@ function ExportButton({
         `${filename}-${timestamp}.json`,
         "application/json;charset=utf-8;",
       );
-      notify(`Exported ${data.length} repositories as JSON`, "success");
+      notify(`Exported ${data.length} ${noun} as JSON`, "success");
     } catch (error) {
       console.error("JSON export failed:", error);
       notify("Export failed. Check the console for details.", "error");
@@ -222,7 +233,7 @@ function ExportButton({
       {showMenu && (
         <div className={styles.menu} role="menu">
           <p className={styles.menuCount}>
-            {count} repositories in current view
+            {count} {noun} in current view
           </p>
           <button
             type="button"
@@ -242,7 +253,7 @@ function ExportButton({
             onClick={handleExportJSON}
           >
             <span className={styles.menuItemLabel}>Export as JSON</span>
-            <span className={styles.menuItemDesc}>Full repository records</span>
+            <span className={styles.menuItemDesc}>{jsonDescription}</span>
           </button>
         </div>
       )}
@@ -256,6 +267,11 @@ ExportButton.propTypes = {
   label: PropTypes.string,
   disabled: PropTypes.bool,
   onToast: PropTypes.func,
+  columns: PropTypes.arrayOf(
+    PropTypes.shape({ key: PropTypes.string, label: PropTypes.string }),
+  ),
+  noun: PropTypes.string,
+  jsonDescription: PropTypes.string,
 };
 
 export default ExportButton;

@@ -1,27 +1,43 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useCallback, useMemo } from "react";
 import { ViewportProvider } from "@/contexts/ViewportContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import useRepositoryData from "@/hooks/useRepositoryData";
 import { useDashboardShell } from "@/hooks/useDashboardShell";
-import LoadingState from "@/components/Common/LoadingState";
-import FilterControls from "@/components/Common/FilterControls";
-import ContributionHeatmap from "@/components/Visualizations/ContributionHeatmap";
-import ProfileHero from "@/components/ProfileHero/ProfileHero";
-import { Eyebrow, Card, Button } from "@/components/Brand";
-import { RefreshCw } from "lucide-react";
-import RepositoryGrid from "@/components/RepositoryGrid/RepositoryGrid";
-import TabBar from "@/components/Mobile/TabBar/TabBar";
-import { OfflineIndicator } from "@/components/Mobile/OfflineIndicator/OfflineIndicator";
-import CollectionStatus from "@/components/Common/CollectionStatus";
-import UserPicker from "@/components/Common/UserPicker";
-import useUserOptions from "@/hooks/useUserOptions";
+import usePortfolio from "@/hooks/usePortfolio";
+import useScope from "@/hooks/useScope";
 import useAdminAvailable from "@/hooks/useAdminAvailable";
 import useDependabot from "@/hooks/useDependabot";
+import LoadingState from "@/components/Common/LoadingState";
+import FilterControls from "@/components/Common/FilterControls";
+import PageHeader from "@/components/Common/PageHeader";
+import ContributionHeatmap from "@/components/Visualizations/ContributionHeatmap";
+import ProfileHero from "@/components/ProfileHero/ProfileHero";
+import { Card, Button } from "@/components/Brand";
+import RepositoryGrid from "@/components/RepositoryGrid/RepositoryGrid";
+import TabBar from "@/components/Mobile/TabBar/TabBar";
+import EmptyState from "@/components/Mobile/EmptyState/EmptyState";
+import AppHeader from "@/components/Shell/AppHeader";
+import AppFooter from "@/components/Shell/AppFooter";
 import { ToastContainer } from "@/components/Mobile/Toast/Toast";
+import { visibleSections } from "@/config/sections";
+import {
+  EMPTY_SCOPE,
+  fullNameOf,
+  isWholePortfolio,
+  repoKey,
+  scopeLabel,
+  scopedRepoKeys,
+} from "@/utils/scope";
+import {
+  alertsForRepository,
+  scopeAlertFile,
+  storedCoverage,
+  withStoredAlerts,
+} from "@/utils/storedAlerts";
 
-// SIZE JUSTIFICATION (Constitution I): App composes routing/layout for the
-// three primary views and delegates all cross-cutting state (toasts, view
-// routing, active result list, refresh) to useDashboardShell.
+// Composes the shell (header, sections, footer, drawer, toasts). Data
+// loading lives in the hooks and utils above; cross-cutting view state in
+// useDashboardShell, so this file stays compositional.
 
 const DashboardView = lazy(
   () => import("@/components/Visualizations/DashboardView"),
@@ -38,23 +54,53 @@ const RepositoryDetail = lazy(
 /**
  * GitHub Stats Spark Dashboard - Root App Component
  *
- * Composes the dashboard shell (header/nav, main content, footer, drawer,
- * toasts) around the three primary views. All cross-cutting state lives in
- * useDashboardShell so this component stays presentational.
+ * Public (GitHub Pages): one profile, Overview, Insights and Health.
+ * Self-hosted (a portfolio.json exists): a scope selector that every
+ * section follows, alert counts from the stored Dependabot alerts, and the
+ * Security and Admin sections when their data is available.
  *
  * @component
  */
 function App() {
+  const { loading: portfolioLoading, portfolio } = usePortfolio();
+  const [scope, setScope] = useScope();
+  const selfHosted = Boolean(portfolio);
   const {
-    data,
+    data: collected,
     loading: dataLoading,
     error: dataError,
     refetch,
-  } = useRepositoryData();
+  } = useRepositoryData({
+    portfolio,
+    portfolioLoading,
+    scope: selfHosted ? scope : null,
+  });
   const adminAvailable = useAdminAvailable();
-  const dependabot = useDependabot();
-  const userOptions = useUserOptions();
-  const showUserPicker = userOptions.length >= 2;
+  const alertFile = useDependabot();
+
+  // One source per number: stored alerts replace the collected summary.
+  const data = useMemo(() => {
+    if (!collected || !alertFile) return collected;
+    const coverage = storedCoverage(alertFile);
+    return {
+      ...collected,
+      repositories: collected.repositories.map((repo) =>
+        withStoredAlerts(repo, coverage),
+      ),
+    };
+  }, [collected, alertFile]);
+
+  const scopeKeys = useMemo(
+    () =>
+      selfHosted && !isWholePortfolio(scope)
+        ? scopedRepoKeys(portfolio, scope)
+        : null,
+    [selfHosted, portfolio, scope],
+  );
+  const scopedAlerts = useMemo(
+    () => scopeAlertFile(alertFile, scopeKeys),
+    [alertFile, scopeKeys],
+  );
 
   const {
     toasts,
@@ -77,119 +123,72 @@ function App() {
     handleForceRefresh,
   } = useDashboardShell({ data, refetch });
 
-  // Admin pages do not depend on dashboard data, so a data failure must not hide them.
-  const onAdminView = adminAvailable && currentView === "sources";
+  const sections = visibleSections({
+    security: Boolean(alertFile),
+    admin: adminAvailable,
+  });
+  const header = selfHosted
+    ? {
+        scope: scopeLabel(scope, portfolio),
+        freshness: [
+          { label: "Repository data", at: data?.metadata?.generated_at },
+          ...(alertFile
+            ? [{ label: "Security", at: alertFile.generated_at }]
+            : []),
+        ],
+      }
+    : {};
+
+  const openRepository = useCallback(
+    (fullName) => {
+      const key = repoKey(fullName);
+      const list = data?.repositories || [];
+      const found = list.find((repo) => repoKey(fullNameOf(repo)) === key);
+      if (found) {
+        handleRepoClick(found, list);
+        return;
+      }
+      const entry = alertFile?.repositories.find(
+        (repo) => repoKey(repo.full_name) === key,
+      );
+      handleRepoClick(
+        {
+          name: fullName.split("/").pop(),
+          full_name: fullName,
+          url: entry?.html_url,
+        },
+        [],
+      );
+    },
+    [data, alertFile, handleRepoClick],
+  );
+
+  // Admin and Security do not depend on dashboard data, so a data failure must not hide them.
+  const onAdminView = adminAvailable && currentView === "admin";
   const onSecurityView = currentView === "security";
   const standaloneView = onAdminView || onSecurityView;
-  const loading = dataLoading && !standaloneView;
+  const loading = (dataLoading || portfolioLoading) && !standaloneView;
   const error = standaloneView ? null : dataError;
+  const emptyScope =
+    selfHosted && data && (data.repositories || []).length === 0;
 
   return (
     <ThemeProvider>
       <ViewportProvider>
         <div className="app">
-          {/* Header */}
-          <header className="header" role="banner">
-            <div className="container">
-              <div
-                className="flex items-center justify-between"
-                style={{ height: "var(--header-height)" }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    minWidth: 0,
-                  }}
-                >
-                  <a
-                    href="/"
-                    className="header-brand"
-                    aria-label="GitHubSpark — home"
-                  >
-                    <div className="header-logo" aria-hidden="true">
-                      <img src="/logo-mark.svg" alt="" width="28" height="28" />
-                    </div>
-                    <div className="header-title-group">
-                      <span className="header-title-main">GitHubSpark</span>
-                      {!showUserPicker && (
-                        <span className="header-title-sub">
-                          {data?.profile?.username || "MakeBoldSolutions"}
-                        </span>
-                      )}
-                    </div>
-                  </a>
-                  {/* Outside the link: a control inside an anchor is invalid and would navigate home. */}
-                  <UserPicker users={userOptions} />
-                </div>
+          <AppHeader
+            sections={sections}
+            currentView={currentView}
+            onViewChange={handleViewChange}
+            subtitle={
+              selfHosted ? null : data?.profile?.username || "MakeBoldSolutions"
+            }
+            portfolio={portfolio}
+            scope={scope}
+            onScopeChange={setScope}
+            onRetry={() => refetch({ cacheBust: false })}
+          />
 
-                {/* Navigation Menu */}
-                <nav
-                  className="nav-menu"
-                  id="navigation"
-                  aria-label="Main navigation"
-                >
-                  <button
-                    className={`nav-menu-item ${currentView === "table" ? "nav-menu-item--active" : ""}`}
-                    onClick={() => handleViewChange("table")}
-                    aria-current={currentView === "table" ? "page" : undefined}
-                    aria-label="Switch to repository overview"
-                  >
-                    Overview
-                  </button>
-                  <button
-                    className={`nav-menu-item ${currentView === "visualizations" ? "nav-menu-item--active" : ""}`}
-                    onClick={() => handleViewChange("visualizations")}
-                    aria-current={
-                      currentView === "visualizations" ? "page" : undefined
-                    }
-                    aria-label="Insights — switch to visualizations view"
-                  >
-                    Insights
-                  </button>
-                  <button
-                    className={`nav-menu-item ${currentView === "attention" ? "nav-menu-item--active" : ""}`}
-                    onClick={() => handleViewChange("attention")}
-                    aria-current={
-                      currentView === "attention" ? "page" : undefined
-                    }
-                    aria-label="Health — repositories needing attention"
-                  >
-                    Health
-                  </button>
-                  {dependabot && (
-                    <button
-                      className={`nav-menu-item ${currentView === "security" ? "nav-menu-item--active" : ""}`}
-                      onClick={() => handleViewChange("security")}
-                      aria-current={
-                        currentView === "security" ? "page" : undefined
-                      }
-                      aria-label="Security — Dependabot alerts"
-                    >
-                      Security
-                    </button>
-                  )}
-                  {adminAvailable && (
-                    <button
-                      className={`nav-menu-item ${currentView === "sources" ? "nav-menu-item--active" : ""}`}
-                      onClick={() => handleViewChange("sources")}
-                      aria-current={
-                        currentView === "sources" ? "page" : undefined
-                      }
-                      aria-label="Sources — manage organizations and repositories"
-                    >
-                      Sources
-                    </button>
-                  )}
-                </nav>
-              </div>
-            </div>
-            <OfflineIndicator onRetry={() => refetch({ cacheBust: false })} />
-            <CollectionStatus />
-          </header>
-
-          {/* Main Content */}
           <main
             className="main"
             id="main-content"
@@ -208,17 +207,23 @@ function App() {
 
                 {onSecurityView && (
                   <section aria-labelledby="security-heading">
-                    <div className="mb-lg">
-                      <Eyebrow>Security</Eyebrow>
-                      <h2 id="security-heading">Dependabot alerts</h2>
-                    </div>
-                    {dependabot ? (
+                    <PageHeader
+                      eyebrow="Security"
+                      title="Dependabot alerts"
+                      titleId="security-heading"
+                      {...header}
+                    />
+                    {scopedAlerts ? (
                       <Suspense
                         fallback={
                           <LoadingState message="Loading security view..." />
                         }
                       >
-                        <SecurityView file={dependabot} onToast={addToast} />
+                        <SecurityView
+                          file={scopedAlerts}
+                          onToast={addToast}
+                          onOpenRepository={openRepository}
+                        />
                       </Suspense>
                     ) : (
                       <p className="text-muted" role="status">
@@ -228,15 +233,13 @@ function App() {
                   </section>
                 )}
 
-                {/* Loading State */}
-                {loading && (
+                {loading && !standaloneView && (
                   <LoadingState
                     message="Loading repository data..."
                     size="large"
                   />
                 )}
 
-                {/* Error State */}
                 {error && !loading && (
                   <Card accent padding="lg">
                     <h3>Error loading data</h3>
@@ -257,205 +260,161 @@ function App() {
                   </Card>
                 )}
 
-                {/* Data Loaded - Render Current View */}
-                {!loading && !error && data && (
-                  <>
-                    {currentView === "table" && (
-                      <section aria-labelledby="repository-overview-heading">
-                        {/* Profile Hero */}
-                        <ProfileHero
-                          profile={data?.profile}
-                          generatedAt={data?.metadata?.generated_at}
-                        />
+                {!loading &&
+                  !error &&
+                  data &&
+                  !standaloneView &&
+                  emptyScope && (
+                    <EmptyState
+                      title="No repositories in this scope"
+                      description="Nothing collected matches the client, source, repository and filters chosen above."
+                      actionLabel="Show the whole portfolio"
+                      onAction={() => setScope(EMPTY_SCOPE)}
+                    />
+                  )}
 
-                        {/* Contribution heatmap for trailing 365-day activity */}
-                        {data?.profile?.activity_calendar && (
-                          <div className="mb-lg">
-                            <ContributionHeatmap
-                              activityCalendar={data.profile.activity_calendar}
-                              generatedAt={data?.metadata?.generated_at}
+                {!loading &&
+                  !error &&
+                  data &&
+                  !standaloneView &&
+                  !emptyScope && (
+                    <>
+                      {currentView === "table" && (
+                        <section aria-labelledby="repository-overview-heading">
+                          {selfHosted && !data.profile && (
+                            <PageHeader
+                              eyebrow="Overview"
+                              title="Portfolio"
+                              titleId="repository-overview-heading"
+                              {...header}
                             />
-                          </div>
-                        )}
-
-                        {/* Repository Grid */}
-                        <RepositoryGrid
-                          repositories={data.repositories || []}
-                          onRepoClick={handleRepoClick}
-                          onToast={addToast}
-                        />
-                      </section>
-                    )}
-
-                    {currentView === "visualizations" && (
-                      <section
-                        className="view-transition"
-                        aria-labelledby="visualizations-heading"
-                      >
-                        <div className="mb-lg">
-                          <Eyebrow>Insights</Eyebrow>
-                          <h2 id="visualizations-heading">
-                            Repository insights
-                          </h2>
-                          <p
-                            className="text-muted"
-                            role="status"
-                            aria-live="polite"
-                          >
-                            Showing {processedRepositories.length} repositories
-                            {filterLanguage && ` filtered by ${filterLanguage}`}
-                          </p>
-                        </div>
-
-                        {availableLanguages.length > 0 && (
-                          <FilterControls
-                            languages={availableLanguages}
-                            selectedLanguage={filterLanguage}
-                            onFilterChange={handleFilterChange}
-                            onClearFilter={clearFilter}
-                          />
-                        )}
-
-                        <Suspense
-                          fallback={
-                            <LoadingState message="Loading visualizations..." />
-                          }
-                        >
-                          <DashboardView
-                            repositories={processedRepositories}
+                          )}
+                          <ProfileHero
                             profile={data?.profile}
-                            onRepoClick={(repo) =>
-                              handleRepoClick(repo, processedRepositories)
-                            }
+                            generatedAt={data?.metadata?.generated_at}
                           />
-                        </Suspense>
-                      </section>
-                    )}
 
-                    {currentView === "attention" && (
-                      <section
-                        className="view-transition"
-                        aria-labelledby="attention-heading"
-                      >
-                        <div className="mb-lg">
-                          <Eyebrow>Health</Eyebrow>
-                          <h2 id="attention-heading">
-                            Repositories needing attention
-                          </h2>
-                          <p
-                            className="text-muted"
-                            role="status"
-                            aria-live="polite"
-                          >
-                            Ranked by pull request pressure, security findings,
-                            staleness, and dependency health
-                          </p>
-                        </div>
+                          {data?.profile?.activity_calendar && (
+                            <div className="mb-lg">
+                              <ContributionHeatmap
+                                activityCalendar={
+                                  data.profile.activity_calendar
+                                }
+                                generatedAt={data?.metadata?.generated_at}
+                              />
+                            </div>
+                          )}
 
-                        {availableLanguages.length > 0 && (
-                          <FilterControls
-                            languages={availableLanguages}
-                            selectedLanguage={filterLanguage}
-                            onFilterChange={handleFilterChange}
-                            onClearFilter={clearFilter}
-                          />
-                        )}
-
-                        <Suspense
-                          fallback={
-                            <LoadingState message="Loading attention view..." />
-                          }
-                        >
-                          <AttentionView
-                            repositories={processedRepositories}
+                          <RepositoryGrid
+                            repositories={data.repositories || []}
                             onRepoClick={handleRepoClick}
                             onToast={addToast}
                           />
-                        </Suspense>
-                      </section>
-                    )}
-                  </>
-                )}
+                        </section>
+                      )}
+
+                      {currentView === "visualizations" && (
+                        <section
+                          className="view-transition"
+                          aria-labelledby="visualizations-heading"
+                        >
+                          <PageHeader
+                            eyebrow="Insights"
+                            title="Repository insights"
+                            titleId="visualizations-heading"
+                            description={
+                              <>
+                                Showing {processedRepositories.length}{" "}
+                                repositories
+                                {filterLanguage &&
+                                  ` filtered by ${filterLanguage}`}
+                              </>
+                            }
+                            {...header}
+                          />
+
+                          {availableLanguages.length > 0 && (
+                            <FilterControls
+                              languages={availableLanguages}
+                              selectedLanguage={filterLanguage}
+                              onFilterChange={handleFilterChange}
+                              onClearFilter={clearFilter}
+                            />
+                          )}
+
+                          <Suspense
+                            fallback={
+                              <LoadingState message="Loading visualizations..." />
+                            }
+                          >
+                            <DashboardView
+                              repositories={processedRepositories}
+                              profile={data?.profile}
+                              onRepoClick={(repo) =>
+                                handleRepoClick(repo, processedRepositories)
+                              }
+                            />
+                          </Suspense>
+                        </section>
+                      )}
+
+                      {currentView === "attention" && (
+                        <section
+                          className="view-transition"
+                          aria-labelledby="attention-heading"
+                        >
+                          <PageHeader
+                            eyebrow="Health"
+                            title="Repositories needing attention"
+                            titleId="attention-heading"
+                            description="Ranked by pull request pressure, security findings, staleness, and dependency health"
+                            {...header}
+                          />
+
+                          {availableLanguages.length > 0 && (
+                            <FilterControls
+                              languages={availableLanguages}
+                              selectedLanguage={filterLanguage}
+                              onFilterChange={handleFilterChange}
+                              onClearFilter={clearFilter}
+                            />
+                          )}
+
+                          <Suspense
+                            fallback={
+                              <LoadingState message="Loading attention view..." />
+                            }
+                          >
+                            <AttentionView
+                              repositories={processedRepositories}
+                              onRepoClick={handleRepoClick}
+                              onToast={addToast}
+                            />
+                          </Suspense>
+                        </section>
+                      )}
+                    </>
+                  )}
               </div>
             </div>
           </main>
 
-          {/* Mobile TabBar Navigation */}
           <TabBar
             activeTab={currentView}
             onTabChange={handleViewChange}
-            showAdmin={adminAvailable}
-            showSecurity={Boolean(dependabot)}
+            sections={sections}
           />
 
-          {/* Footer */}
-          <footer className="footer" role="contentinfo">
-            <div className="container">
-              <div className="footer-inner">
-                <div className="footer-left">
-                  <div className="footer-brand">
-                    <span className="footer-brand-name">GitHubSpark</span>
-                    <span className="footer-brand-sep">·</span>
-                    <a
-                      href="https://github-stats.makeboldspark.com"
-                      className="footer-brand-url"
-                    >
-                      github-stats.makeboldspark.com
-                    </a>
-                  </div>
-                  <p className="footer-copy">
-                    Built by{" "}
-                    <a
-                      href="https://markhazleton.com"
-                      rel="author"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Mark Hazleton
-                    </a>
-                    {" · "}
-                    <a
-                      href="https://makeboldsolutions.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Make Bold Solutions
-                    </a>
-                    {" · "}
-                    <a
-                      href="https://makeboldspark.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Make Bold Spark
-                    </a>
-                  </p>
-                </div>
-                <div className="footer-right">
-                  {data?.metadata && (
-                    <p className="footer-meta">
-                      Data: {formatGeneratedAt(data.metadata.generated_at)}
-                    </p>
-                  )}
-                  <button
-                    className="btn btn-secondary footer-refresh-btn"
-                    onClick={handleForceRefresh}
-                    disabled={loading}
-                    aria-label="Force refresh repositories data"
-                  >
-                    <RefreshCw
-                      size={14}
-                      aria-hidden="true"
-                      className={loading ? "spin" : undefined}
-                    />
-                    {loading ? "Refreshing…" : "Refresh"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </footer>
+          <AppFooter
+            generatedAt={
+              data?.metadata
+                ? formatGeneratedAt(data.metadata.generated_at)
+                : null
+            }
+            loading={loading}
+            onReload={handleForceRefresh}
+          />
 
-          {/* Detail Drawer (drill-down) */}
           {selectedRepo && (
             <Suspense fallback={<LoadingState message="Loading details..." />}>
               <RepositoryDetail
@@ -467,11 +426,14 @@ function App() {
                   (r) => r.name === selectedRepo.name,
                 )}
                 resultTotal={activeResultList.length}
+                security={alertsForRepository(
+                  alertFile,
+                  fullNameOf(selectedRepo),
+                )}
               />
             </Suspense>
           )}
 
-          {/* Toast Notifications */}
           <ToastContainer toasts={toasts} onRemove={removeToast} />
         </div>
       </ViewportProvider>

@@ -105,6 +105,12 @@ const csvCell = (value) => {
   return /[",\n]/.test(safe) ? `"${safe.replace(/"/g, '""')}"` : safe;
 };
 
+/** The alert CSV columns in the shape ExportButton takes. */
+export const ALERT_EXPORT_COLUMNS = CSV_COLUMNS.map(([key, label]) => ({
+  key,
+  label,
+}));
+
 export function alertsToCsv(alerts) {
   const header = CSV_COLUMNS.map(([, label]) => label).join(",");
   const rows = alerts.map((alert) =>

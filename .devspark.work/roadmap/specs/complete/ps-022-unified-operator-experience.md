@@ -1,11 +1,11 @@
 ---
 id: ps-022
 title: Unified operator experience
-status: proposed
+status: complete
 order: 58
 depends_on: [ps-006, ps-021, ps-023]
 blockers: []
-delivery: []
+delivery: ["branch 002-work-ps-022-unified-operator", "PR #8", "commit db8b87f", "review fixes 4108483", "merge 26fcc91"]
 ---
 
 # ps-022: Unified operator experience
